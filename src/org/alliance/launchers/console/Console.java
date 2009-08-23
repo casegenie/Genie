@@ -18,6 +18,8 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
+import org.alliance.core.node.InvitaitonManager;
+import org.alliance.core.node.Invitation;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -39,12 +41,19 @@ public class Console {
     public interface Printer {
 
         void println(String line);
+
+        void print(String line);
     }
     private final static Printer PLAIN_PRINTER = new Printer() {
 
         @Override
         public void println(String line) {
             System.out.println(line);
+        }
+
+        @Override
+        public void print(String line) {
+            System.out.print(line);
         }
     };
     private CoreSubsystem core;
@@ -192,11 +201,55 @@ public class Console {
             bye();
         } else if ("forcesslhandshake".equals(command)) {
             forcesslhandshake();
+        } else if ("invitations".equals(command)) {
+            invitations();
+        } else if ("scaninvi".equals(command)) {
+            invitationsScan();
+        } else if ("removeinvi".equals(command)) {
+            invitationsRemove();
         } else if ("error".equals(command)) {
             throw new Exception("test error");
         } else {
             printer.println("Unknown command " + command);
         }
+    }
+
+    private void invitations() {
+        int count = 0;
+        printer.println("Stored Invitation codes:");
+        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
+            count++;
+            printer.print(i.getCompleteInvitaitonString());
+            if (core.getInvitaitonManager().getInvitation(i.getInvitationPassKey()).isForwardedInvitation()) {
+                printer.println(" (Forwarded)  -  Valid next: " + Long.toString((InvitaitonManager.INVITATION_TIMEOUT_FORWARDED - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60)) + " minutes.");
+            } else {
+                printer.println(" (Manual)  -  Valid next: " + Long.toString((InvitaitonManager.INVITATION_TIMEOUT - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60 * 60)) + " hours.");
+            }
+        }
+        printer.println("Found " + count + " Invitations.");
+    }
+
+    private void invitationsScan() {
+        int count = 0;
+        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
+            if (!core.getInvitaitonManager().isValid(i.getInvitationPassKey())) {
+                core.getInvitaitonManager().consume(i.getInvitationPassKey());
+                count++;
+            }
+        }
+        printer.println("Removed " + count + " outdated Invitations.");
+    }
+
+    private void invitationsRemove() {
+        int count = 0;
+        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
+            core.getInvitaitonManager().consume(i.getInvitationPassKey());
+            count++;
+        }
+        printer.println("Removed " + count + " Invitations.");
     }
 
     private void showbuilds() {

@@ -99,7 +99,7 @@ public class MyNode extends Node {
 
     @Override
     public int getNumberOfFilesShared() {
-        return core.getFileManager().getFileDatabase().getNumberOfFiles();
+        return core.getFileManager().getFileDatabase().getNumberOfShares();
     }
 
     @Override

@@ -9,6 +9,7 @@
             <menuitem image="gfx/icons/down.png" text="Move Down" eventid="moveDown"/>
             <menuitem image="gfx/icons/top.png" text="Move To Top" eventid="moveTop"/>
             <menuitem image="gfx/icons/bottom.png" text="Move To Bottom" eventid="moveBottom"/>
+            <menuitem image="gfx/icons/loadingsharenode.png" text="Open file/folder" eventid="openfile"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <strut width="7"/>

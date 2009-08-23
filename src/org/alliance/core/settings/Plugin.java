@@ -1,5 +1,12 @@
 package org.alliance.core.settings;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.jar.JarFile;
+
 /**
  * Created by IntelliJ IDEA.
  * User: maciek
@@ -10,20 +17,46 @@ package org.alliance.core.settings;
 public class Plugin {
 
     private String jar, pluginclass;
+    private final String JARCLASSFILE = "Alliance.config";
 
     public String getJar() {
         return jar;
     }
 
-    public void setJar(String jar) {
-        this.jar = jar;
+    public void setJar(String jar) throws IOException {
+        File jarfile = new File(jar);
+        if (jarfile.exists()) {
+            init(jarfile);
+        } else {
+            this.jar = jar;
+            pluginclass = "";
+        }
     }
 
-    public String getPluginclass() {
+    //TODO: This is not a "get" to ensure that it is not in the settings.xml file
+    //If there is a better way please fix
+    public String retrievePluginClass() {
         return pluginclass;
     }
 
-    public void setPluginclass(String pluginclass) {
-        this.pluginclass = pluginclass;
+    @Override
+    public String toString() {
+        return this.jar;
+    }
+
+    /**
+     * Code below gets a file in the root of the jar with a name of JARCLASSFILE
+     * this class needs to contain the alliance class
+     */
+    public void init(File file) throws IOException {
+        JarFile jarfile = new JarFile(file);
+        InputStream is = jarfile.getInputStream(jarfile.getEntry(JARCLASSFILE));
+        BufferedReader dis = new BufferedReader(new InputStreamReader(is));
+        String mainclass = dis.readLine();
+        jarfile.close();
+        dis.close();
+        is.close();
+        this.jar = file.getCanonicalPath();
+        this.pluginclass = mainclass;
     }
 }

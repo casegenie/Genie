@@ -51,6 +51,7 @@ public class AddFriendWizard extends JWizard {
     public static final int STEP_PORT_NOT_OPEN = 11;
     public static final int STEP_INVITE_MSN = 12;
     public static final int STEP_INVITE_EMAIL = 13;
+    public static final int STEP_MANUAL_CONNECTION_OK = 14;
     private int radioButtonSelected;
     private UISubsystem ui;
     private XUIDialog outerDialog;
@@ -443,6 +444,9 @@ public class AddFriendWizard extends JWizard {
                     if (T.t) {
                         T.info("Looks like we connected succesfully.");
                     }
+                    setStep(STEP_MANUAL_CONNECTION_OK);
+                    next.setEnabled(false);
+                    prev.setEnabled(false);
                 }
             }
         });
@@ -537,6 +541,14 @@ public class AddFriendWizard extends JWizard {
 
     public void EVENT_selectall(ActionEvent e) {
         forwardInvitationNodesList.selectAll();
+    }
+
+    public void EVENT_selecttrusted(ActionEvent e) {
+        forwardInvitationNodesList.selectTrusted();
+    }
+
+    public void EVENT_selectnone(ActionEvent e) {
+        forwardInvitationNodesList.selectNone();
     }
 
     public XUIDialog getOuterDialog() {

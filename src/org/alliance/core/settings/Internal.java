@@ -4,6 +4,8 @@ import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.launchers.OSInfo;
 
 import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileSystemView;
 
 /**
  * Created by IntelliJ IDEA.
@@ -23,6 +25,15 @@ public class Internal extends SettingClass {
         if (OSInfo.isLinux()) {
             USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
             CURRENT_DIRECTORY = USER_DIRECTORY;
+        } else if (OSInfo.isWindows()) {
+            if (new File("standaloneVersion").exists()) {
+                USER_DIRECTORY = "";
+            } else {
+                USER_DIRECTORY = System.getenv("APPDATA") + "/Alliance/";
+            }
+            JFileChooser fr = new JFileChooser();
+            FileSystemView fw = fr.getFileSystemView();
+            CURRENT_DIRECTORY = fw.getDefaultDirectory() + "/Alliance/";
         } else {
             String s = new File(".").getAbsoluteFile().toString();
             if (s.endsWith(".")) {
@@ -37,8 +48,12 @@ public class Internal extends SettingClass {
     private String filedatabaseindexfile = USER_DIRECTORY + "data/share.idx";
     private String downloadquefile = USER_DIRECTORY + "data/downloads.dat";
     private String corestatefile = USER_DIRECTORY + "data/core.dat";
+    private String windowstatefile = USER_DIRECTORY + "data/mainwindow.state";
+    private String pmsound = "sounds/chatpm.wav";
+    private String publicsound = "sounds/chatpublic.wav";
+    private String downloadsound = "sounds/download.wav";
     private String downloadfolder = CURRENT_DIRECTORY + "downloads";
-    private String cachefolder = CURRENT_DIRECTORY + "cache";
+    private String cachefolder = USER_DIRECTORY + "cache";
     private String keystorefilename = CURRENT_DIRECTORY + "me.ks";
     private Integer reconnectinterval = 60 * 10;
     private Integer connectFriendInterval = 1;
@@ -56,13 +71,17 @@ public class Internal extends SettingClass {
     private Integer hasneverdownloadedafile = 1;
     private Integer enablesupportfornonenglishcharacters = 0;
     private Integer alwaysautomaticallyconnecttoallfriendsoffriend = 0;
+    private Integer alwaysdenyuntrustedinvitations = 1;
+    private Integer alwaysallowfriendsoftrustedfriendstoconnecttome = 1;
+    private Integer disablenewuserpopup = 0;
+    private Integer rdnsname = 0;
     private Integer invitationmayonlybeusedonce = 1;
     private Integer secondstoaway = 60 * 5;
     private String chipersuite = ""; //user defined chipher suite, none by default
     private Integer encryption = 0; // 0: TranslationCryptoLayer 1: SSLCryptoLayer
-    private Integer daysnotconnectedwhenold = 7 * 2; //after three weeks of disconnection from a friend hes concidered old
+    private Integer daysnotconnectedwhenold = 7 * 2; //after two weeks of disconnection from a friend hes concidered old
     private Integer alwaysallowfriendstoconnect = 1;
-    private Integer alwaysallowfriendsoffriendstoconnecttome = 1;
+    private Integer alwaysallowfriendsoffriendstoconnecttome = 0;
     private Integer automaticallydenyallinvitations = 0;
     private Integer showpublicchatmessagesintray = 1;
     private Integer showprivatechatmessagesintray = 1;
@@ -72,7 +91,7 @@ public class Internal extends SettingClass {
     /** Be polite when running on XP sp2 wich only allows 10 pending tcp/ip connections
      * before stopping the network stack. Set to 8 to be on the safe side. */
     private Integer maxpendingconnections = 8;
-    private Integer hashspeedinmbpersecond = 3; //when in background mode
+    private Integer hashspeedinmbpersecond = 20; //when in background mode //Bastvera DeathfireD request
     private Integer sosendbuf = -1, soreceivebuf = -1;
     private Integer discwritebuffer = 256 * KB, //one instance of this one per download
             socketsendbuffer = 256 * KB; //one instance per download
@@ -281,6 +300,38 @@ public class Internal extends SettingClass {
         this.corestatefile = corestatefile;
     }
 
+    public String getWindowstatefile() {
+        return windowstatefile;
+    }
+
+    public void setWindowstatefile(String windowstatefile) {
+        this.windowstatefile = windowstatefile;
+    }
+
+    public String getPmsound() {
+        return pmsound;
+    }
+
+    public void setPmsound(String pmsound) {
+        this.pmsound = pmsound;
+    }
+
+    public String getDownloadsound() {
+        return downloadsound;
+    }
+
+    public void setDownloadsound(String downloadsound) {
+        this.downloadsound = downloadsound;
+    }
+
+    public String getPublicsound() {
+        return publicsound;
+    }
+
+    public void setPublicsound(String publicsound) {
+        this.publicsound = publicsound;
+    }
+
     public Integer getMaxpendingconnections() {
         return maxpendingconnections;
     }
@@ -359,6 +410,38 @@ public class Internal extends SettingClass {
 
     public void setAlwaysallowfriendsoffriendstoconnecttome(Integer alwaysallowfriendsoffriendstoconnecttome) {
         this.alwaysallowfriendsoffriendstoconnecttome = alwaysallowfriendsoffriendstoconnecttome;
+    }
+
+    public Integer getDisablenewuserpopup() {
+        return disablenewuserpopup;
+    }
+
+    public void setDisablenewuserpopup(Integer disablenewuserpopup) {
+        this.disablenewuserpopup = disablenewuserpopup;
+    }
+
+    public Integer getAlwaysallowfriendsoftrustedfriendstoconnecttome() {
+        return alwaysallowfriendsoftrustedfriendstoconnecttome;
+    }
+
+    public void setAlwaysallowfriendsoftrustedfriendstoconnecttome(Integer alwaysallowfriendsoftrustedfriendstoconnecttome) {
+        this.alwaysallowfriendsoftrustedfriendstoconnecttome = alwaysallowfriendsoftrustedfriendstoconnecttome;
+    }
+
+    public Integer getAlwaysdenyuntrustedinvitations() {
+        return alwaysdenyuntrustedinvitations;
+    }
+
+    public void setAlwaysdenyuntrustedinvitations(Integer alwaysdenyuntrustedinvitations) {
+        this.alwaysdenyuntrustedinvitations = alwaysdenyuntrustedinvitations;
+    }
+
+    public Integer getRdnsname() {
+        return rdnsname;
+    }
+
+    public void setRdnsname(Integer rdnsname) {
+        this.rdnsname = rdnsname;
     }
 
     public String getServerlistenip() {

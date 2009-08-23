@@ -25,7 +25,7 @@ public class IPBlacklist extends ArrayList<Routerule> {
     public boolean checkConnection(int ipaddr) {
         for (Routerule rule : this) {
             if (isValid(ipaddr, rule.getAddress(), rule.getMask())) {
-                if (rule.getRuleType() == Routerule.ALLOW) {
+                if (rule.getRuleType().equals(Routerule.ALLOW)) {
                     return true;
                 } else {
                     return false;
@@ -37,10 +37,9 @@ public class IPBlacklist extends ArrayList<Routerule> {
 
     private int makeArrayInt(byte[] addr) {
         int value = 0;
-        int shiftval = 0;
-        for (int i = addr.length - 1; i >= 0; i--) {
-            value = value + (addr[i] << shiftval);
-            shiftval += 8;
+        for (int i = 0; i < 4; i++) {
+            int shift = (4 - 1 - i) * 8;
+            value += (addr[i] & 0x000000FF) << shift;
         }
         return value;
     }

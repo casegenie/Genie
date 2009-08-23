@@ -8,17 +8,25 @@
             <menuitem image="gfx/icons/reconnect.png" text="Reconnect" eventid="reconnect"/>
             <menuitem image="gfx/icons/connections.png" text="Edit hostname" eventid="edithostname"/>
             <menuitem image="gfx/icons/removeconnection.png" text="Remove" eventid="removefriend"/>
+            <menuitem image="gfx/icons/editgroup.png" text="Edit group name" eventid="editgroupname"/>
+            <menuitem image="gfx/icons/edittrusted.png" text="Edit trusted friend" eventid="edittrusted"/>
+            <menuitem image="gfx/icons/forwardinvite.png" text="View found via..." eventid="viewvia"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <strut width="7"/>
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
         </panel>
 
-
         <scrollpanel expand="both" scrollbars="optional" id="scrollpanel" bordertype="lowered">
         </scrollpanel>
 
         <panel axis="y" border="5"  expand="horiz">
+            <panel axis="x" expand="horiz">
+                <textfield id="searchfield"/>
+                <strut width="5"/>
+                <button eventid="searchfriend" text="Search friend"/>
+                <filler/>
+            </panel>
             <panel axis="x" expand="horiz">
                 <panel axis="y" expand="vert" border="0">
                     <panel axis="x" border="5">

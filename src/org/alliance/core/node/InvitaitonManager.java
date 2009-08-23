@@ -7,15 +7,15 @@ import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.InvitationConnection;
 import org.alliance.core.settings.Settings;
 
+import java.net.InetAddress;
+import java.util.HashMap;
+import java.util.Collection;
+import java.util.Iterator;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.util.HashMap;
-import java.util.Collection;
-import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,7 +26,8 @@ import java.util.Iterator;
 public class InvitaitonManager {
 
     public static final long INVITATION_TIMEOUT_IN_MINUTES = 60 * 24 * 31;
-    public static final long INVITATION_TIMEOUT = 1000 * 60 * 60 * INVITATION_TIMEOUT_IN_MINUTES;
+    public static final long INVITATION_TIMEOUT = 1000 * 60 * INVITATION_TIMEOUT_IN_MINUTES;
+    public static final long INVITATION_TIMEOUT_FORWARDED = 1000 * 60 * 15;
     private CoreSubsystem core;
     private HashMap<Integer, Invitation> invitations = new HashMap<Integer, Invitation>();
 
@@ -49,7 +50,11 @@ public class InvitaitonManager {
     }
 
     public boolean isValid(int key) {
-        return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT;
+        if (invitations.get(key).isForwardedInvitation()) {
+            return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT_FORWARDED;
+        } else {
+            return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT;
+        }
     }
 
     public void attemptToBecomeFriendWith(String invitation, Friend middleman) throws IOException {

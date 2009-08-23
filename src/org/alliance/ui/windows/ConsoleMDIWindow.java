@@ -89,4 +89,15 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
     public Console getConsole() {
         return console;
     }
+
+    @Override
+    public void print(final String line) {
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                textarea.append(line);
+            }
+        });
+    }
 }

@@ -3,8 +3,6 @@ package org.alliance.ui;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.PacedRunner;
 import org.alliance.core.node.Friend;
-import org.alliance.core.node.Node;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -22,11 +20,13 @@ import javax.swing.SwingUtilities;
 public class FriendListModel extends DefaultListModel {
 
     private CoreSubsystem core;
+    private UISubsystem ui;
     private boolean ignoreFires;
     private PacedRunner pacedRunner;
 
-    public FriendListModel(CoreSubsystem core) {
+    public FriendListModel(CoreSubsystem core, final UISubsystem ui) {
         this.core = core;
+        this.ui = ui;
 
         pacedRunner = new PacedRunner(new Runnable() {
 
@@ -37,23 +37,23 @@ public class FriendListModel extends DefaultListModel {
                     @Override
                     public void run() {
                         updateFriendList();
+                        ui.getMainWindow().getFriendListMDIWindow().update();
                     }
                 });
             }
         }, 1000);
-
         updateFriendList();
     }
 
-    private void updateFriendList() {
+    public void updateFriendList() {
         clear();
         ignoreFires = true;
         Collection<Friend> c = new ArrayList<Friend>(core.getFriendManager().friends());
 
-        TreeSet<Node> ts = new TreeSet<Node>(new Comparator<Node>() {
+        TreeSet<Friend> ts = new TreeSet<Friend>(new Comparator<Friend>() {
 
             @Override
-            public int compare(Node o1, Node o2) {
+            public int compare(Friend o1, Friend o2) {
                 if (o1 == null || o2 == null) {
                     return 0;
                 }
@@ -65,43 +65,75 @@ public class FriendListModel extends DefaultListModel {
                 return o1.nickname().compareToIgnoreCase(o2.nickname());
             }
         });
+
+        TreeSet<String> groups = new TreeSet<String>(new Comparator<String>() {
+
+            @Override
+            public int compare(String o1, String o2) {
+                if (o1.length() == 0 || o1.length() == 0) {
+                    return 0;
+                }
+                if (o1.equalsIgnoreCase(o2)) {
+                    return 0;
+                }
+                return o1.compareToIgnoreCase(o2);
+            }
+        });
+
         for (Friend f : c) {
             ts.add(f);
+            groups.add(f.getUGroupName());
         }
-        ts.add(core.getFriendManager().getMe());
-        int max = core.getFriendManager().getNumberOfInvitesNeededToBeKing();
-        for (Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() >= max) {
-                addElement(f);
+
+        addElement(core.getFriendManager().getMe());
+        for (String group : groups) {
+            if (group.equalsIgnoreCase("")) {
+                continue;
             }
+            addElement(group);
+            drawList(ts, group);
         }
-        for (Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() >= 3 && f.getNumberOfInvitedFriends() < max) {
-                addElement(f);
-            }
+        if (groups.size() > 0) {
+            addElement("Not in a Group");
+            drawList(ts, "");
         }
-        for (Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() > 0 && f.getNumberOfInvitedFriends() < 3) {
-                addElement(f);
-            }
-        }
-        for (Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() <= 0) {
-                addElement(f);
-            }
-        }
-        for (Node f : ts) {
-            if (!f.isConnected() && !f.hasNotBeenOnlineForLongTime()) {
-                addElement(f);
-            }
-        }
-        for (Node f : ts) {
-            if (!f.isConnected() && f.hasNotBeenOnlineForLongTime()) {
-                addElement(f);
-            }
-        }
+
         ignoreFires = false;
         fireIntervalAdded(this, 0, size() - 1);
+    }
+
+    private void drawList(TreeSet<Friend> ts, String group) {
+        int max = core.getFriendManager().getNumberOfInvitesNeededToBeKing();
+        for (Friend f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() >= max && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
+        for (Friend f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() >= 3 && f.getNumberOfInvitedFriends() < max && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
+        for (Friend f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() > 0 && f.getNumberOfInvitedFriends() < 3 && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
+        for (Friend f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() <= 0 && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
+        for (Friend f : ts) {
+            if (!f.isConnected() && !f.hasNotBeenOnlineForLongTime() && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
+        for (Friend f : ts) {
+            if (!f.isConnected() && f.hasNotBeenOnlineForLongTime() && f.getUGroupName().equalsIgnoreCase(group)) {
+                addElement(f);
+            }
+        }
     }
 
     public void signalFriendChanged(Friend node) {

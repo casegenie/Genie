@@ -13,6 +13,7 @@ public class Server extends SettingClass {
     private Integer port;
     private String hostname;
     private Integer lansupport = 0;
+    private String dnsname = "";
 
     public Server() {
     }
@@ -55,6 +56,14 @@ public class Server extends SettingClass {
 
     public void setHostname(String hostname) {
         this.hostname = hostname;
+    }
+
+    public String getDnsname() {
+        return dnsname;
+    }
+
+    public void setDnsname(String dnsname) {
+        this.dnsname = dnsname;
     }
     private static final int[] reservedPorts = {
         1,

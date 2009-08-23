@@ -318,6 +318,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                         Thread.sleep(5000);
                     }
                 } catch (InterruptedException e) {
+                } catch (NullPointerException e) {
                 }
             }
         });

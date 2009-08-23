@@ -45,15 +45,14 @@ public class ShareManager {
         shareBases.clear();
         shareBaseOrder.clear();
         for (Share s : settings.getSharelist()) {
-            add(new ShareBase(s.getPath()));
+            add(new ShareBase(s.getPath(), s.getSgroupname())); //Bastvera (Save group name for shared folder)
         }
         if (!isShared(settings.getInternal().getCachefolder())) {
-            add(new ShareBase(settings.getInternal().getCachefolder()));
+            add(new ShareBase(settings.getInternal().getCachefolder(), "public")); //Bastvera (Cache default net name "public")
         }
         if (!isShared(settings.getInternal().getDownloadfolder())) {
-            add(new ShareBase(settings.getInternal().getDownloadfolder()));
+            add(new ShareBase(settings.getInternal().getDownloadfolder(), "public")); //Bastvera (Download default net name "public")
         }
-
         if (fileSystemMonitor != null) {
             fileSystemMonitor.launch();
         }

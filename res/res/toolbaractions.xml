@@ -78,6 +78,33 @@
                 addInMenu="file"
                 accelerator="Delete"
                 mnemonic="d"/>
+        <action
+                id="editgroupname"
+                name="Edit group name"
+                description="Change the group name of selected friend"
+                menuimage="gfx/icons/editgroup.png"
+                toolbarimage="gfx/icons/editgroup.png"
+                addInMenu="file"
+                accelerator="ctrl-n"
+                mnemonic="n"/>
+        <action
+                id="edittrusted"
+                name="Edit trusted friend"
+                description="Change trusted status of friend"
+                menuimage="gfx/icons/edittrusted.png"
+                toolbarimage="gfx/icons/edittrusted.png"
+                addInMenu="file"
+                accelerator="ctrl-T"
+                mnemonic="t"/>
+        <action
+                id="viewvia"
+                name="View found via..."
+                description="View by who you have discovered this user"
+                menuimage="gfx/icons/forwardinvite.png"
+                toolbarimage="gfx/icons/forwardinvite.png"
+                addInMenu="file"
+                accelerator="ctrl-V"
+                mnemonic="v"/>
         <action filler="true"/>
     </group>
 
@@ -130,6 +157,25 @@
     </group>
 
     <group id="publicchat">
+        <action
+                id="cleanscreen"
+                name="Clean chat"
+                description="Clear chat screen"
+                menuimage="gfx/icons/cleanup.png"
+                toolbarimage="gfx/icons/cleanup.png"
+                addInMenu="window"
+                accelerator="ctrl-c"
+                mnemonic="c"/>
+        <action
+                id="cleanup"
+                name="Clean all"
+                description="Clear chat screen and chat log file"
+                menuimage="gfx/icons/cleanall.png"
+                toolbarimage="gfx/icons/cleanall.png"
+                addInMenu="window"
+                accelerator="ctrl-a"
+                mnemonic="a"/>
+        <action filler="true"/>
     </group>
 
     <group id="viewshare">
@@ -142,6 +188,7 @@
                 addInMenu="file"
                 accelerator="F5"
                 mnemonic="r"/>
+        <action separator="yes"/>
         <action separator="yes"/>
         <action
                 id="download"
@@ -184,12 +231,31 @@
                 accelerator="F5"
                 mnemonic="r"/>
         <action separator="yes"/>
+        <action separator="yes"/>
         <action
                 id="sendtochat"
                 name="Create link in chat"
                 description="Create link in chat to selected files"
                 menuimage="gfx/icons/sendtochat.png"
                 toolbarimage="gfx/icons/sendtochat.png"
+                addInMenu="window"
+                mnemonic="c"/>
+        <action
+                id="linktohdd"
+                name="Create link on hdd"
+                description="Create link on hdd to selected files"
+                menuimage="gfx/icons/download.png"
+                toolbarimage="gfx/icons/download.png"
+                addInMenu="window"
+                mnemonic="c"/>
+        <action separator="yes"/>
+        <action separator="yes"/>
+        <action
+                id="openfile"
+                name="Open file/folder"
+                description="Open file or folder"
+                menuimage="gfx/icons/execute.png"
+                toolbarimage="gfx/icons/execute.png"
                 addInMenu="window"
                 mnemonic="c"/>
         <action filler="true"/>
@@ -242,6 +308,8 @@
                 addInMenu="file"
                 accelerator="ctrl-end"
                 mnemonic="u"/>
+        <action separator="yes"/>
+        <action separator="yes"/>
         <action
                 id="cleanup"
                 name="Clean up"
@@ -260,6 +328,32 @@
                 addInMenu="window"
                 accelerator="del"
                 mnemonic="r"/>
+        <action separator="yes"/>
+        <action separator="yes"/>
+        <action
+                id="openfile"
+                name="Open file/folder"
+                description="Open file or folder"
+                menuimage="gfx/icons/execute.png"
+                toolbarimage="gfx/icons/execute.png"
+                addInMenu="window"
+                mnemonic="c"/>
+        <action
+                id="opendownloaddir"
+                name="View download folder"
+                description="It opens your download folder"
+                menuimage="gfx/icons/folder_view.png"
+                toolbarimage="gfx/icons/folder_view.png"
+                addInMenu="window"
+                mnemonic="c"/>
+        <action
+                id="openhddlink"
+                name="Open link from hdd"
+                description="It opens link from hdd and add files to download"
+                menuimage="gfx/icons/uploads.png"
+                toolbarimage="gfx/icons/uploads.png"
+                addInMenu="window"
+                mnemonic="c"/>
         <action filler="true"/>
     </group>
 

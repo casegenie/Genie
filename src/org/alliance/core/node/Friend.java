@@ -9,6 +9,8 @@ import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.settings.Settings;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 /**
@@ -33,15 +35,19 @@ public class Friend extends Node {
     private int numberOfFilesShared, numberOfInvitedFriends;
     private boolean isAway;
     private String nicknameToShowInUI;
+    private String ugroupname;  //Network name for Friend
+    private int trusted;
 
     public Friend(FriendManager manager, org.alliance.core.settings.Friend f) {
+        this.manager = manager;
         nickname = f.getNickname();
         guid = f.getGuid();
         lastKnownHost = f.getHost();
         lastKnownPort = f.getPort();
-        this.manager = manager;
         lastSeenOnlineAt = f.getLastseenonlineat() == null ? 0 : f.getLastseenonlineat();
         middlemanGuid = f.getMiddlemanguid() == null ? 0 : f.getMiddlemanguid();
+        ugroupname = f.getUgroupname(); //Bastvera (Load net name for Friend from settings.xml)
+        trusted = f.getTrusted();
     }
 
     public Friend(FriendManager manager, String nickname, int guid) {
@@ -78,7 +84,7 @@ public class Friend extends Node {
                 T.info("Updating host info for " + this + ": " + host + ":" + port);
             }
             boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
-            lastKnownHost = host;
+            lastKnownHost = rDNSConvert(host, s.getFriend(guid));
             lastKnownPort = port;
             s.getFriend(guid).setHost(lastKnownHost);
             s.getFriend(guid).setPort(lastKnownPort);
@@ -88,14 +94,64 @@ public class Friend extends Node {
         }
     }
 
+    public String rDNSConvert(String host, org.alliance.core.settings.Friend f) {
+        if (manager.getSettings().getInternal().getRdnsname() > 0) {
+            if (isValidIP(host)) {
+                //Convert IP to DNS
+                try {
+                    InetAddress addr = InetAddress.getByAddress(getByteArray(host));
+                    host = addr.getHostName();
+                    f.setHost(host);
+                    return host;
+                } catch (UnknownHostException e) {
+                    return host;
+                }
+            } else {
+                return host;
+            }
+        } else {
+            if (!isValidIP(host)) {
+                //Convert DNS to IP
+                try {
+                    InetAddress addr = InetAddress.getByName(host);
+                    host = addr.getHostAddress();
+                    f.setHost(host);
+                    return host;
+
+                } catch (UnknownHostException e) {
+                    return host;
+                }
+            } else {
+                return host;
+            }
+        }
+    }
+
     /**
      * Updates host settings of the friend
      * @param host New hostname or IP-Address
      */
     public void setLastKnownHost(String host) {
-        Settings s = manager.getSettings();
         lastKnownHost = host;
-        s.getFriend(guid).setHost(lastKnownHost);
+        manager.getSettings().getFriend(guid).setHost(lastKnownHost);
+    }
+
+    public void setUGroupName(String ugroupname) { //Bastvera (Network name setting for friend
+        this.ugroupname = ugroupname;
+        manager.getSettings().getFriend(guid).setUgroupname(ugroupname);
+    }
+
+    public String getUGroupName() { //Bastvera (Used by AuthenticatedConnection.java)
+        return ugroupname;
+    }
+
+    public void setTrusted(int trusted) {
+        this.trusted = trusted;
+        manager.getSettings().getFriend(guid).setTrusted(trusted);
+    }
+
+    public int getTrusted() {
+        return trusted;
     }
 
     @Override
@@ -308,5 +364,51 @@ public class Friend extends Node {
 
     public void setAway(boolean away) {
         isAway = away;
+    }
+
+    //Kratos
+    private boolean isValidIP(String host) {
+        Integer temp;
+        if (host.length() > 15) {
+            return false;
+        }
+        String tempString = host;
+        for (int i = 0; i < 3; i++) {
+            int divider = tempString.indexOf('.');
+            if (divider == -1) {
+                return false;
+            }
+            try {
+                temp = new Integer(tempString.substring(0, divider));
+            } catch (NumberFormatException e) {
+                return false;
+            }
+            if (temp > 255 || temp < 0) {
+                return false;
+            }
+            tempString = tempString.substring(divider + 1);
+        }
+        return true;
+    }
+
+    //Will convert IP into byte array, note there is no checking, and it is expected
+    //you've checked it already
+    private byte[] getByteArray(String lasthost) {
+        byte[] array = new byte[4];
+        Integer temp;
+        String tempString = lasthost;
+        for (int i = 0; i < 3; i++) {
+            int divider = tempString.indexOf('.');
+            try {
+                temp = new Integer(tempString.substring(0, divider));
+            } catch (NumberFormatException e) {
+                //This means we have a dns address, you didn't check did you?
+                return null;
+            }
+            array[i] = temp.byteValue();
+            tempString = tempString.substring(divider + 1);
+        }
+        array[3] = new Integer(tempString).byteValue();
+        return array;
     }
 }

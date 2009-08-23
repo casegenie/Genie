@@ -8,6 +8,7 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.launchers.OSInfo;
 
+import java.io.File;
 import java.util.List;
 import javax.swing.SwingUtilities;
 
@@ -103,16 +104,21 @@ public class UIBridge implements UICallback {
 
     @Override
     public void firstDownloadEverFinished() {
-        if (OSInfo.isWindows()) {
-            SwingUtilities.invokeLater(new Runnable() {
+        if (ui.getCore().getSettings().getInternal().getHasneverdownloadedafile() != null && ui.getCore().getSettings().getInternal().getHasneverdownloadedafile() == 1) {
+            ui.getCore().getSettings().getInternal().setHasneverdownloadedafile(0);
+            if (OSInfo.isWindows()) {
+                SwingUtilities.invokeLater(new Runnable() {
 
-                @Override
-                public void run() {
-                    OptionDialog.showInformationDialog(ui.getMainWindow(),
-                            "Congratulations! You have downloaded your first file using Alliance.[p]To find your Alliance downloads use the shortcut on the Desktop called 'My Alliance Downloads'.");
-                }
-            });
+                    @Override
+                    public void run() {
+                        OptionDialog.showInformationDialog(ui.getMainWindow(),
+                                "Congratulations! You have downloaded your first file using Alliance.[p]To find your Alliance downloads use the shortcut on the Desktop called 'My Alliance Downloads'.");
+                    }
+                });
+            }
         }
+        UISound Sound = new UISound(new File(ui.getCore().getSettings().getInternal().getDownloadsound()));
+        Sound.start();
     }
 
     @Override

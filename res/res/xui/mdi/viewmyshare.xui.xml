@@ -2,11 +2,10 @@
 <xui>
     <title value=""/>
     <body>
-        <popupmenu id="popup" detached="yes">
-            <menuitem image="gfx/icons/download.png" text="Download" eventid="download"/>
-        </popupmenu>
         <popupmenu id="popupme" detached="yes">
             <menuitem image="gfx/icons/sendtochat.png" text="Send as link to chat" eventid="sendtochat"/>
+            <menuitem image="gfx/icons/download.png" text="Create link on hdd" eventid="linktohdd"/>
+            <menuitem image="gfx/icons/loadingsharenode.png" text="Open file/folder" eventid="openfile"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <strut width="7"/>

@@ -86,10 +86,8 @@ public class NetworkManager extends Manager {
         cryptoLayer = core.getCryptoManager().getCryptoLayer();
         downloadManager = new DownloadManager(friendManager.getCore());
         router = new Router(friendManager);
-        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(),
-                ((long) settings.getInternal().getTotalmegabytesdownloaded() * MB));
-        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(),
-                ((long) settings.getInternal().getTotalmegabytesuploaded() * MB));
+        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(), ((long) settings.getInternal().getTotalmegabytesdownloaded() * MB));
+        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(), ((long) settings.getInternal().getTotalmegabytesuploaded() * MB));
         bandwidthInHighRefresh = new BandwidthAnalyzer(1500);
         bandwidthOutHighRefresh = new BandwidthAnalyzer(1500);
 
@@ -114,8 +112,7 @@ public class NetworkManager extends Manager {
                                         FriendConnection fc = (FriendConnection) c;
                                         if (fc.getNetworkLatency() > 15 * 1000) {
                                             if (T.t) {
-                                                T.error(fc.getRemoteFriend().getNickname() +
-                                                        " has a very high network latency - this is probably a bug. Reconnecting to friend.");
+                                                T.error(fc.getRemoteFriend().getNickname() + " has a very high network latency - this is probably a bug. Reconnecting to friend.");
                                             }
                                             fc.getRemoteFriend().reconnect();
                                         } else {
@@ -170,7 +167,7 @@ public class NetworkManager extends Manager {
     }
 
     public void reportError(String source, Object key, Exception e) {
-        if (!(e instanceof ConnectException)) {
+        if (!(e instanceof ConnectException) && !(e instanceof NullPointerException)) {
             core.reportError(e, source + ": " + connections.get(key));
         }
         if (connections.containsKey(key)) {
@@ -189,8 +186,10 @@ public class NetworkManager extends Manager {
                 if (T.t) {
                     T.warn("Error for " + source + ": " + e, e);
                 }
-                System.err.println("Error for " + friendManager.getMe() + ": ");
-                e.printStackTrace();
+                if (!(e instanceof NullPointerException)) {
+                    System.err.println("Error for " + friendManager.getMe() + ": ");
+                    e.printStackTrace();
+                }
             }
         }
     }
@@ -238,7 +237,7 @@ public class NetworkManager extends Manager {
     public void virtualConnect(int dstGuid, AuthenticatedConnection connection) throws IOException {
         Friend f = router.findClosestFriend(dstGuid);
 
-        if (f.getFriendConnection() != null && f.getFriendConnection().getDirection() == Connection.Direction.IN) {
+        if (f.getFriendConnection() != null && f.getFriendConnection().getDirection() == Connection.Direction.IN && core.getSettings().getInternal().getEncryption() == 0) {
 //        if (f.getFriendConnection() != null && true) {
             if (T.t) {
                 T.info("Attemting reverse connect to circument firewall");

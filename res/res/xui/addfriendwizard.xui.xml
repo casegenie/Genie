@@ -123,7 +123,11 @@
                 </scrollpanel>
                 <panel border="5,5,0,0" axis="x">
                     <filler expand="horiz"/>
+                    <button text="Select trusted" eventid="selecttrusted"/>
+                    <strut width="5"/>
                     <button text="Select all" eventid="selectall"/>
+                    <strut width="5"/>
+                    <button text="Select none" eventid="selectnone"/>
                 </panel>
                 <mlabel html="yes">
                     [p]
@@ -231,6 +235,10 @@
                 <mlabel id="text" html="yes">
                     Press next to automatically invite the friends above into your Alliance network.
                 </mlabel>
+            </step>
+
+            <step text="Manual connection ok">
+                <mlabel html="yes">[b]Connection OK.[/b]</mlabel>
             </step>
             
         </wizard>

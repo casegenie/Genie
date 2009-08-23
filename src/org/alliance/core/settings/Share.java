@@ -10,12 +10,14 @@ package org.alliance.core.settings;
 public class Share {
 
     private String path;
+    private String sgroupname; //Bastvera (folder group name in settings.xml)
 
     public Share() {
     }
 
-    public Share(String path) {
+    public Share(String path, String sgroupname) {
         this.path = path;
+        this.sgroupname = sgroupname; //Bastvera (saving folder group name)
     }
 
     public String getPath() {
@@ -33,5 +35,16 @@ public class Share {
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setSgroupname(String sgroupname) { //Bastvera
+        this.sgroupname = sgroupname;
+    }
+
+    public String getSgroupname() { //Bastvera
+        if (sgroupname == null) {
+            sgroupname = "Public";
+        }
+        return sgroupname;
     }
 }

@@ -213,7 +213,7 @@ public class GenerateTestSuite {
 
     private Share getRandomShare() {
         File files[] = new File(shareDirectory).listFiles();
-        return new Share(files[((int) (Math.random() * files.length))].getPath());
+        return new Share(files[((int) (Math.random() * files.length))].getPath(), "public");
     }
 
     public static void main(String[] args) throws Exception {

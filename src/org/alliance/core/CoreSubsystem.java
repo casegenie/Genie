@@ -48,6 +48,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JFrame;
@@ -223,9 +224,10 @@ public class CoreSubsystem implements Subsystem {
 
     private void setupLog() throws Exception {
         try {
-            new File("logs").mkdirs();
-            errorLog = new Log("logs/error.log");
-            traceLog = new Log("logs/trace.log");
+            String logpath = Main.localizeHomeDir();
+            new File(logpath + "logs").mkdirs();
+            errorLog = new Log(logpath + "logs/error.log");
+            traceLog = new Log(logpath + "logs/trace.log");
         } catch (FileNotFoundException e) {
             if (OSInfo.isMac()) {
                 OptionDialog.showErrorDialog(new JFrame(), "It seems that you are trying to run Alliance from a mounted image on Mac.[p]You need to drag'n'drop the Alliance icon you clicked on to your Applications folder and then start Alliance from there.[p]Alliance will now shut down.");
@@ -309,7 +311,7 @@ public class CoreSubsystem implements Subsystem {
         }
     }
 
-    public void saveState() throws IOException {
+    public synchronized void saveState() throws IOException {
         if (T.t) {
             T.info("Saving core state");
         }
@@ -366,7 +368,7 @@ public class CoreSubsystem implements Subsystem {
         }
     }
 
-    public void saveSettings() throws Exception {
+    public synchronized void saveSettings() throws Exception {
         if (T.t) {
             T.info("Saving settings");
         }
@@ -605,14 +607,31 @@ public class CoreSubsystem implements Subsystem {
             } catch (IOException e) {
                 reportError(e, ui);
             }
-        } else if (ui instanceof ForwardedInvitationInteraction &&
-                getSettings().getInternal().getAlwaysallowfriendsoffriendstoconnecttome() > 0) {
-            try {
-                ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) ui;
-                getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
-                return;
-            } catch (Exception e) {
-                reportError(e, ui);
+        } else if (ui instanceof ForwardedInvitationInteraction) {
+            if (getSettings().getInternal().getAlwaysallowfriendsoffriendstoconnecttome() > 0) {
+                try {
+                    ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) ui;
+                    getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
+                    return;
+                } catch (Exception e) {
+                    reportError(e, ui);
+                }
+            } else if (getSettings().getInternal().getAlwaysallowfriendsoftrustedfriendstoconnecttome() > 0) {
+                try {
+                    ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) ui;
+                    Collection<Friend> friends = friendManager.friends();
+                    for (Friend f : friends.toArray(new Friend[friends.size()])) {
+                        if (f.getFriendsFriend(fii.getFromGuid()) != null && f.getTrusted() == 1) {
+                            getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
+                            return;
+                        }
+                    }
+                    if (getSettings().getInternal().getAlwaysdenyuntrustedinvitations() > 0) {
+                        return;
+                    }
+                } catch (Exception e) {
+                    reportError(e, ui);
+                }
             }
         }
         userInternactionQue.add(ui);
@@ -681,8 +700,7 @@ public class CoreSubsystem implements Subsystem {
             }
             if (GULCounter > 300) {
                 try {
-                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter +
-                            "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
+                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
                 } catch (XUIException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
@@ -745,5 +763,9 @@ public class CoreSubsystem implements Subsystem {
 
     public AwayManager getAwayManager() {
         return awayManager;
+    }
+
+    public PluginManager getPluginManager() {
+        return pluginManager;
     }
 }

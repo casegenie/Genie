@@ -1,6 +1,8 @@
 package org.alliance.core.settings;
 
-public class Routerule {
+import java.io.Serializable;
+
+public class Routerule implements Serializable {
 
     public final static Integer ALLOW = 1;
     public final static Integer DENY = 0;

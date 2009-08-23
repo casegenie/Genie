@@ -91,9 +91,14 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
             if (T.t) {
                 debug("Creating a ConnectionData for new connection " + c);
             }
-            d = new ConnectionData(c instanceof TransferConnection || c instanceof ReverseConnection ? //@todo: this is such bullshit. Encryption buffers should be dynamic then this parameter would not be needed at all
-                    core.getSettings().getInternal().getSocketsendbuffer() : core.getSettings().getInternal().getMaximumAlliancePacketSize());
-            connectionData.put(c.getKey(), d);
+            if (core.getSettings().getInternal().getEncryption() == 1) {
+                d = new ConnectionData(core.getSettings().getInternal().getSocketsendbuffer());
+                connectionData.put(c.getKey(), d);
+            } else {
+                d = new ConnectionData(c instanceof TransferConnection || c instanceof ReverseConnection ? //@todo: this is such bullshit. Encryption buffers should be dynamic then this parameter would not be needed at all
+                        core.getSettings().getInternal().getSocketsendbuffer() : core.getSettings().getInternal().getMaximumAlliancePacketSize());
+                connectionData.put(c.getKey(), d);
+            }
         }
         return d;
     }

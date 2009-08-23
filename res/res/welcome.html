@@ -1,16 +1,53 @@
 <b>Changelog</b>
 <br><br>
-
 <p>
-    <b>next</b> - next
+    <b>1.0.8 Beta</b> - 2009-08-23
 <dl>
+    <dd>+ Added: External hash links. (thanks Bastvera)
+</dl>
+<p>
+    <b>1.0.7 Beta</b> - 2009-06-17
+<dl>
+    <dd>+ Added: Search friend. (thanks Bastvera)
+    <dd>+ Fixed bug: DNS names sometimes resets to IP. (thanks Bastvera)
+    <dd>+ Windows Vista Solution. (thanks Bastvera)
+    <dd>+ Added: Sound options tab. (thanks Bastvera)
+    <dd>+ Groups view on friend list changes. (thanks Bastvera)
+    <dd>+ Added: rDNS support. (thanks Kratos)
+    <dd>+ Added: Found via window. (thanks Bastvera)
+    <dd>+ Fixed bug: SSL should work again on most PCs. (thanks Bastvera)
+    <dd>+ Fixed bug: Update of own shared size on Friend List. (thanks Bastvera)
+    <dd>+ Fixed bug: Some ConcurrentModificationExceptions. (thanks Bastvera)
+    <dd>+ Added: <b>Friends of Trusted Friend</b> system. (thanks Bastvera)
+    <dd>+ Friend of Friends changes (removing of unwanted people should be much easier). (thanks Bastvera)
+    <dd>+ Opening of downloaded files and download folder on download tab. (thanks Bastvera)
+    <dd>+ Opening of own folders and files on My Share view. (thanks Bastvera)
+    <dd>+ Sound notification on private message. (thanks Bastvera)
+    <dd>+ New user message notification disable option. (thanks Bastvera)
+    <dd>+ DNS Support. (thanks Bastvera)
+    <dd>+ Fixed bug: send file to chat sometimes had wrong html format. (thanks Bastvera)
+    <dd>+ Selected friends don't lose focus when friends come online/offline. (thanks Bastvera)
+    <dd>+ Fixed bug: where people could download from you even though you didn't give them permission to. (thanks Bastvera)
+    <dd>+ Changed chat behavior ("HTML no longer allowed in chat" still was possible and could bring crashes). (thanks Bastvera)
+    <dd>+ Fixed bug: Edit -> Cancel crash when editing a firewall rule. (thanks Kratos)
+    <dd>+ RouteRule is serializable. (thanks Kratos)
+    <dd>+ Fixed bug: where Firewall traffic was denied when allow rule was present. (thanks Kratos)
+    <dd>+ Lots of changes to how plugins are loaded, including GUI support. (thanks Kratos)
+    <dd>+ Added Https:// and Ftp:// links support in chat. (thanks Bastvera)
+    <dd>+ Added 2 icons (with /clearlog and /clear functionality) to chat window. (thanks Bastvera)
+    <dd>+ Added /clearlog command. Clears the chat log file. (thanks Bastvera)
+    <dd>+ Added <b>groups (Networks)</b> feature. (thanks Bastvera)
+    <dd>+ Fixed bug: double folder adding. People can't add the same folder twice in Alliance's share list anymore. (thanks Bastvera)
+    <dd>+ Fixed bug: problem with autohash after adding new folders. (thanks Bastvera)
+    <dd>+ Fixed bug: counter of shared files. Alliance should show the correct number of files your sharing at the bottom right now. (thanks Bastvera)
+    <dd>+ Minor bug fixes and improvements. (thanks Bastvera)
     <dd>+ Improved scalability of Alliance: uses even less memory when connected to many users
     <dd>+ Move to top/bottom in download que (thanks bucketsort)
     <dd>+ Better handling of Alliance settings folder in Linux - ends up in user home (thanks bucketsort)
     <dd>+ Chat log history is more often saved  (thanks bucketsort)
     <dd>+ Older chat messages are shown with time AND date (thanks bucketsort)
 </dl>
-
+<br>
 <p>
     <b>1.0.6</b> - 2008-12-06
 <dl>
@@ -20,16 +57,16 @@
     <dd>+ Improved speed of connecting to new friends
     <dd>+ Change time from 100 days to 200 days for automatic offline friend removal
     <dd>+ Direction of connection now shown in TCP/IP Connections debug window
-    <dd>+ fixed bug: problem in packet routing algorithm 
-    <dd>+ fixed bug: files that are an exact multiple of one megabyte (1 048 576 bytes) now download correctly
-    <dd>+ fixed bug: when settings-file is corrupt the backup settingsfile is now correctly used
-    <dd>+ fixed bug: OutOfMemoryError: can not create native thread
-    <dd>+ fixed bug: OutOfMemoryError: out of direct memory buffer space
-    <dd>+ fixed bug: several ConcurrentModificationExceptions fixed
-    <dd>+ fixed bug: a bug introduced in version 1.0.5 where when joining a large network problems occured if you are firewalled
-    <dd>+ fixed bug: automatic hashing of files that are added/moved/deleted in shares now works again (thanks deathfired)
+    <dd>+ Fixed bug: problem in packet routing algorithm
+    <dd>+ Fixed bug: files that are an exact multiple of one megabyte (1 048 576 bytes) now download correctly
+    <dd>+ Fixed bug: when settings-file is corrupt the backup settingsfile is now correctly used
+    <dd>+ Fixed bug: OutOfMemoryError: can not create native thread
+    <dd>+ Fixed bug: OutOfMemoryError: out of direct memory buffer space
+    <dd>+ Fixed bug: several ConcurrentModificationExceptions fixed
+    <dd>+ Fixed bug: a bug introduced in version 1.0.5 where when joining a large network problems occured if you are firewalled
+    <dd>+ Fixed bug: automatic hashing of files that are added/moved/deleted in shares now works again (thanks deathfired)
 </dl>
-
+<br>
 <p>
     <b>1.0.5</b> - 2008-09-20
 <dl>
@@ -40,10 +77,10 @@
     <dd>+ Alliance firewall: IP Rules (Access Control Lists) You are now able to setup ip address ranges to specifically allow or deny alliance to connect to, or accept connections from (thanks Kratos)
     <dd>+ Added support for Plugins - will be useful for people that want to create bots for an Alliance network
     <dd>+ Friends that have not been online for 100 days are automatically removed from friend list
-    <dd>+ fixed wordarounds for top three most reported bugs (using the "send error" function)
-    <dd>+ fixed bug: when writing to a file into a alliance shared directory alliance continually tries to hash the file (thanks Kratos)
+    <dd>+ Fixed wordarounds for top three most reported bugs (using the "send error" function)
+    <dd>+ Fixed bug: when writing to a file into a alliance shared directory alliance continually tries to hash the file (thanks Kratos)
 </dl>
-
+<br>
 <p>
     <b>1.0.4</b> - 2008-06-05
 <dl>
@@ -51,38 +88,37 @@
     <dd>+ If the settings file is corrupt the backup version of the settings are automatically loaded
     <dd>+ A user friendly message is shown when a user tries to run Alliance on Mac from a mounted image
     <dd>+ Added a command in chat windows: "/clear". Clears the entire chat
-    <dd>+ fixed bug: chat text field no longer looses focus when sending a message
-    <dd>+ fixed bug: Automatic upgrade dialog is shown maaaany times
+    <dd>+ Fixed bug: chat text field no longer looses focus when sending a message
+    <dd>+ Fixed bug: Automatic upgrade dialog is shown maaaany times
     <dd>+ Fixed several crashes
 </dl>
-
+<br>
 <p>
     <b>1.0.3</b> - 2008-05-14
 <dl>
-
-    <dd>+ fixed bug: chat messages appear in incorrect order
+    <dd>+ Fixed bug: chat messages appear in incorrect order
 </dl>
-
+<br>
 <p>
     <b>1.0.2</b> - 2008-05-13
 <dl>
     <dd>+ When a new private chat message arrives the Alliance window is brought to front (if it is open) and the chat message tab is shown
-    <dd>+ fixed bug: Alliance locks up and uses 100% CPU in networks with many friends
+    <dd>+ Fixed bug: Alliance locks up and uses 100% CPU in networks with many friends
 </dl>
-
+<br>
 <p>
     <b>1.0.1</b> - 2008-05-11
 <dl>
     <dd>+ Possibility to autmatically hide the "You have successfully connected to ..." popups
     <dd>+ Better support for OS X including real icon on dock, nicer UI and real installation package
     <dd>+ Possibility to change the dns name for a friend. Right-click on the friend and select "Edit hostname" (thanks jpluebbert)
-    <dd>+ fixed bug: chat messages should now be displayed in correct order
-    <dd>+ fixed bug: nickname may no longer contain html
-    <dd>+ fixed bug: Alliance does not crash when an inaccessable folder is shared
-    <dd>+ fixed bug: several concurrent modification errors
-    <dd>+ maybe fixed bug: Alliance locks up and uses 100% CPU
+    <dd>+ Fixed bug: chat messages should now be displayed in correct order
+    <dd>+ Fixed bug: nickname may no longer contain html
+    <dd>+ Fixed bug: Alliance does not crash when an inaccessable folder is shared
+    <dd>+ Fixed bug: several concurrent modification errors
+    <dd>+ Maybe fixed bug: Alliance locks up and uses 100% CPU
 </dl>
-
+<br>
 <p>
     <b>1.0.0</b> - 2008-04-18
 <dl>
@@ -117,11 +153,10 @@
     <dd>+ Fixed bug: When a share is removed from the list of shared folders the files in that share are no longer shared
     <dd>+ Fixed bug: Alliance window no longer maximaizes over start menu
 </dl>
-
+<br>
 <p>
     <b>0.9.8</b> - 2007-03-02
 <dl>
-    <dd>+
     <dd>+ Added ETA on every search result - approximates the time it would take you to download the file - if you choose to do so
     <dd>+ Added popup menus in friend tab and download tab
     <dd>+ Alliance now works on Java 6.0
@@ -133,8 +168,9 @@
     <dd>+ Fixed bug: When number of sources no longer shown as "1.0" when there's actually 10 sources
     <dd>+ Fixed bug: Two similar folder names can now be shared
 </dl>
-
-<b>0.9.7</b> - 2007-02-18
+<br>
+<p>
+    <b>0.9.7</b> - 2007-02-18
 <dl>
     <dd>+ Added a small clock on friend icon when friend is away from the computer
     <dd>+ Search hits are now compressed - this should make search result come back faster
@@ -156,7 +192,7 @@
     <dd>+ Improved startup speed of splash window
     <dd>+ Maybe fixed bug: all files turn up as duplicates
 </dl>
-
+<br>
 <p>
     <b>0.9.6.2</b> - 2007-01-29
 <dl>
@@ -173,8 +209,9 @@
     <dd>+ Fixed bug: "ConcurrentModificationError" when deleting downloads for que
     <dd>+ Fixed sveral other minor bugs
 </dl>
-
-<b>0.9.6</b> - 2007-01-14
+<br>
+<p>
+    <b>0.9.6</b> - 2007-01-14
 <dl>
     <dd>+ Added public chat room
     <dd>+ Added "reverse connects" when downloading - it is possible to download from firewalled users now
@@ -187,8 +224,9 @@
     <dd>+ Fixed bug: "offline for X" was inaccurate sometimes
     <dd>+ Fixed bug: packet que overflow
 </dl>
-
-<b>0.9.5</b> - 2007-01-09
+<br>
+<p>
+    <b>0.9.5</b> - 2007-01-09
 <dl>
     <dd>+ Added support for two encryption types: "SSL", "Basic". Basic is a really weak encryption algorithm but it works well. SSL is uses very strong encryption but is experimental and buggy. Basic is the default encryption.
     <dd>+ Changed network expansion default to facilitate faster network growth. Network security is slightly lower than the previous defaults.
@@ -201,13 +239,13 @@
     <dd>+ Blocks that are downloaded and detected as corrupt are correctly downloaded again
     <dd>+ Reduced memory usage when UI is not visible
     <dd>+ Reduced core memory usage slightly
-    <dd>+ fixed bug: SSL re-handshaking now works correctly
-    <dd>+ fixed bug: NPE in download window
-    <dd>+ fixed bug: Alliance sometimes crashed when moving files, on disk, out of share
-    <dd>+ fixed packet overflow when there are lots of files in download que
-    <dd>+ fixed various small bugs
+    <dd>+ Fixed bug: SSL re-handshaking now works correctly
+    <dd>+ Fixed bug: NPE in download window
+    <dd>+ Fixed bug: Alliance sometimes crashed when moving files, on disk, out of share
+    <dd>+ Fixed packet overflow when there are lots of files in download que
+    <dd>+ Fixed various small bugs
 </dl>
-
+<br>
 <p>
     <b>0.9.0</b> - 2006-08-29
 <dl>
@@ -218,7 +256,7 @@
     <dd>+ Fixed bug: Same folder can not be shared twice
     <dd>+ Share is not rescanned when choosing OK/Apply in Options window without having altered the share folders.
 </dl>
-
+<br>
 <p>
     <b>0.8.30</b> - 2006-08-14
 <dl>
@@ -229,7 +267,7 @@
     <dd>+ Automatically unfold folders in search result that only have one item in them
     <dd>+ Fixed bug: Alliance window overlapping start menu when maximized
 </dl>
-
+<br>
 <p>
     <b>0.8.26</b> - 2006-07-13
 <dl>
@@ -248,14 +286,12 @@
     <dd>+ Fixed bug: file extension was not shown on unknown file types
 </dl>
 <br>
-
 <p>
     <b>0.8.25.1</b> - 2006-04-28
 <dl>
     <dd>+ Trying to fix a pesky bug where searches are not always returned correctly
 </dl>
 <br>
-
 <p>
     <b>0.8.25</b> - 2006-04-26
 <dl>
@@ -267,7 +303,6 @@
     <dd>+ "Last modified" file dates are correctly preserved when files are downloaded
 </dl>
 <br>
-
 <p>
     <b>0.8.21</b> - 2006-04-20
 <dl>
@@ -275,7 +310,6 @@
     <dd>+ Sorting by file size in search tab now works again
 </dl>
 <br>
-
 <p>
     <b>0.8.20</b> - 2006-04-19
 <dl>
@@ -285,8 +319,6 @@
     <dd>+ Logic to prevent flooding of invitation forwards
 </dl>
 <br>
-
-
 <p>
     <b>0.8.19</b> - 2006-04-19
 <dl>
@@ -303,7 +335,6 @@
     <dd>+ Does not show files in search result that you already have
 </dl>
 <br>
-
 <p>
     <b>0.8.10</b> - 2006-03-26
 <dl>
@@ -318,7 +349,6 @@
     <dd>+ A bunch of minor fixes
 </dl>
 <br>
-
 <p>
     <b>0.8.8</b> - 2006-03-21
 <dl>
@@ -333,8 +363,8 @@
     <dd>+ Messages are now rememered when ui is not running and displayed when you oppen the ui.
 </dl>
 <br>
-
-<b>0.8.5</b> -  2006-03-14
+<p>
+    <b>0.8.5</b> -  2006-03-14
 <dl>
     <dd>+ Upload throttling! Set the throttle value under Tools->Options. It is <b>higly recommended</b> for ADSL users with 1mbit upstream to set their upload throttle to 70 (kb/s).
     <dd>+ "Look for new files" function - the links above. Try it!
@@ -344,14 +374,12 @@
     <dd>+ File types. It's now possible to search per file type
 </dl>
 <br>
-
 <p>
     <b>0.8.1</b> - 2006-02-22
 <dl>
     <dd>+ Minor bugfixes
 </dl>
 <br>
-
 <p>
     <b>0.8.0</b> - 2006-02-18
 <dl>
@@ -361,7 +389,6 @@
     <dd>+ Even more polite hashing. Really don't want this to be a problem. Hashes 50Gb and waits 30 minutes (and repeats).
 </dl>
 <br>
-
 <p>
     <b>0.7.7</b> - 2006-02-14
 <dl>
@@ -371,8 +398,8 @@
     <dd>+ File downloads of files larger than 2Gb now work.
 </dl>
 <br>
-
-<b>0.7.5</b> - 2006-02-13
+<p>
+    <b>0.7.5</b> - 2006-02-13
 <dl>
     <dd>+ Upload tab
     <dd>+ Fixed bug (maybe): BufferUnderflowException when connecting to friend.
@@ -380,8 +407,8 @@
     <dd>+ Polite hashing. After each 200Gb of hashed data the system waits for two hours (configurable). Disks where getting overheated..
 </dl>
 <br>
-
-<b>0.7.0</b> - 2006-02-12
+<p>
+    <b>0.7.0</b> - 2006-02-12
 <dl>
     <dd>+ Improved download reliability significantly
     <dd>+ Download queue is remembered between restarts.
@@ -396,8 +423,8 @@
     <dd>+ Added user names in search hits
 </dl>
 <br>
-
-<b>0.6.0</b> - 2006-02-10
+<p>
+    <b>0.6.0</b> - 2006-02-10
 <dl>
     <dd>+ Improved friend tree ui
     <dd>+ Limit on number of hits is no longer fixed but is based on maximum packet size - right now 15kb.
@@ -409,8 +436,8 @@
     <dd>+ Error messages are now shown as balloons when UI has not been initiated. Error dialogs do not block COMM thread.
 </dl>
 <br>
-
-<b>0.5.5</b> - 2006-02-09
+<p>
+    <b>0.5.5</b> - 2006-02-09
 <dl>
     <dd>+ Fixed serious problem where a download would not finish if we're uploading the same file at the same time.
     <dd>+ Incomplete files in downloads are no longer fragmented - thay are saved sequentially to disk. This saves a lot of time when the download is comlete and is moved out from the blockstorage. Files in cache are still fragmented. This saves disk space when having partial files in cache.
@@ -419,8 +446,8 @@
     <dd>+ This window
 </dl>
 <br>
-
-<b>0.5.0</b> - 2006-02-07
+<p>
+    <b>0.5.0</b> - 2006-02-07
 <dl>
     <dd>+ First release ever!
 </dl>

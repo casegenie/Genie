@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.TreeSet;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
 import javax.swing.JEditorPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -99,8 +99,8 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
                         String link = e.getDescription();
-                        if (link.startsWith("http://")) {
-                            String allowedChars = "abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-.;/?:@&=+$_.!~*'()#";
+                        if (link.startsWith("https://") || link.startsWith("http://") || link.startsWith("ftp://")) {
+                            String allowedChars = "abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-%.;/?:@&=+$_.!~*'()#";
                             for (int i = 0; i < link.length(); i++) {
                                 if (allowedChars.indexOf(link.toLowerCase().charAt(i)) == -1) {
                                     OptionDialog.showInformationDialog(ui.getMainWindow(), "Character " + link.charAt(i) + " is not allowed in link.");
@@ -108,11 +108,15 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                 }
                             }
                             ui.openURL(link);
-                        } else {
+                        } else if (link.contains("|")) {
                             String[] hashes = link.split("\\|");
                             for (String s : hashes) {
                                 if (T.t) {
                                     T.trace("Part: " + s);
+                                }
+                                if (s.length() < 2) {
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                                    return;
                                 }
                             }
                             int guid = Integer.parseInt(hashes[0]);
@@ -124,9 +128,15 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                 }
                                 ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                             }
+                        } else {
+                            OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                            return;
                         }
                     } catch (IOException e1) {
                         ui.getCore().reportError(e1, this);
+                    } catch (NumberFormatException e1) {
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                        return;
                     }
                 }
             }
@@ -142,29 +152,36 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         chatMessage();
     }
 
+    private void chatClear() {
+        chatLines.clear();
+        regenerateHtml();
+        needToUpdateHtml = true;
+        chat.setText("");
+    }
+
     private void chatMessage() throws Exception {
-        if (chat.getText().trim().length() == 0) {
+        if (chat.getText().trim().equals("")) {//Empty
+            return;
+        } else if (chat.getText().contains(" ")) {//(Alt+255)
+            return;
+        } else if (chat.getText().trim().equals("/clear")) {
+            chatClear();
+            return;
+        } else if (chat.getText().trim().equals("/clearlog")) { //Bastvera /clearlog functionality
+            chatClear();
+            ui.getCore().getPublicChatHistory().clearHistory();
             return;
         }
-        if (chat.getText().trim().equals("/clear")) {
-            chatLines.clear();
-            regenerateHtml();
-            needToUpdateHtml = true;
-            chat.setText("");
-            return;
-        }
-        send(escapeHTML(chat.getText()));
+        send(chat.getText().replace("<", "&lt;")); //unHTML
     }
 
     public void EVENT_chat2(ActionEvent e) throws Exception {
         chatMessage();
     }
 
-    private String escapeHTML(String text) {
-        text = text.replace("<", "&lt;");
-        String pattern = "http://";
+    private String checkLinks(String text, String pString) {
         int i = 0;
-        while ((i = text.indexOf(pattern, i)) != -1) {
+        while ((i = text.indexOf(pString, i)) != -1) {
             int end = text.indexOf(' ', i);
             if (end == -1) {
                 end = text.length();
@@ -177,6 +194,28 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
             }
             text = s;
         }
+        return text;
+    }
+
+    private String escapeHTML(String text) { //Bastvera Https/ftp support;
+        text = text.replace("<", "&lt;"); //unHTML
+        text = text.replace(">", "&gt;");
+        text = text.replace("&lt;a href=\"", "");
+
+        if (text.endsWith(" files)") && text.contains("|") && text.contains(" in ")) {
+            text = text.replace("\"&gt;", " ");
+            text = text.replace("&lt;/a&gt;", "");
+            String link = text.substring(0, text.indexOf(" "));
+            String link2 = text.substring(text.indexOf(" ") + 1, text.lastIndexOf(" ("));
+            text = text.replace(link, "<a href=\"" + link + "\">");
+            text = text.replace(" " + link2, link2 + "</a>");
+        } else {
+            text = text.replaceAll("\"&gt;\\S*&lt;/a&gt;", "");
+            text = checkLinks(text, "https://");
+            text = checkLinks(text, "http://");
+            text = checkLinks(text, "ftp://");
+        }
+        text = text.trim();
         return text;
     }
 
@@ -288,7 +327,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
 
         public ChatLine(String from, String message, long tick, Color color) {
             this.from = from;
-            this.message = message;
+            this.message = escapeHTML(message);
             this.tick = tick;
             this.color = color;
         }
@@ -315,5 +354,14 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
+    }
+
+    public void EVENT_cleanup(ActionEvent a) throws Exception {
+        chatClear();
+        ui.getCore().getPublicChatHistory().clearHistory();
+    }
+
+    public void EVENT_cleanscreen(ActionEvent a) throws Exception {
+        chatClear();
     }
 }

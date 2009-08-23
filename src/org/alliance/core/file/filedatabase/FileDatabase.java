@@ -351,6 +351,10 @@ public class FileDatabase {
         return totalSize;
     }
 
+    public int getNumberOfShares() {
+        return baseHashTable.size();
+    }
+
     public synchronized Set<Hash> getAllHashes() {
         return baseHashTable.keySet();
     }

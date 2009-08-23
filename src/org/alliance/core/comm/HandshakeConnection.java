@@ -68,13 +68,14 @@ public class HandshakeConnection extends PacketConnection {
                     netMan.replaceConnection(key, c);
                     c.init();
 
-                    if (core.getSettings().getInternal().getInvitationmayonlybeusedonce() != 0) {
+                    if (core.getSettings().getInternal().getInvitationmayonlybeusedonce() != 0 || core.getInvitaitonManager().getInvitation(guid).isForwardedInvitation()) {
                         core.getInvitaitonManager().consume(guid);
                     }
 
                     return;
                 } else {
-                    core.getUICallback().statusMessage("Invitation code used second time! Connection ignored.");
+                    core.getUICallback().statusMessage("Invitation code time expired! Connection ignored.");
+                    core.getInvitaitonManager().consume(guid);
                 }
             } else {
                 if (T.t) {

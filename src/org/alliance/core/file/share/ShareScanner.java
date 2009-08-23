@@ -137,6 +137,7 @@ public class ShareScanner extends Thread {
             if (!alive) {
                 break;
             }
+            core.getFriendManager().getMe().setShareSize(core.getShareManager().getFileDatabase().getTotalSize());
             waitForNextScan();
         }
     }

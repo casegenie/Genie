@@ -15,8 +15,9 @@ import java.io.IOException;
 public class ShareBase {
 
     private String path;
+    private String groupname; //Bastvera (Each folder has own groupname name)
 
-    public ShareBase(String path) {
+    public ShareBase(String path, String groupname) {
         try {
             path = new File(path).getCanonicalFile().getPath();
         } catch (IOException e) {
@@ -25,10 +26,21 @@ public class ShareBase {
             }
         }
         this.path = TextUtils.makeSurePathIsMultiplatform(path);
+        this.groupname = groupname;
     }
 
     public String getPath() {
         return path;
+    }
+
+    //Bastvera (Group name get)
+    public String getSBGroupName() {
+        return groupname;
+    }
+
+    //Bastvera (Group name set)
+    public void setSBGroupName(String groupname) {
+        this.groupname = groupname;
     }
 
     @Override
@@ -37,7 +49,7 @@ public class ShareBase {
     }
 
     /**
-     * @return A friendly, short version of this share. Sent over the network to other users. Don't want to send full
+     * @return A friendly, short version of this share. Sent over the groupname to other users. Don't want to send full
      * pathname because is discloses security information that remote peers don't need to know. Currently this is the
      * name of the last directory in the sharebase's path.
      */

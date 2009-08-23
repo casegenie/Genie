@@ -37,9 +37,43 @@ public class ShareBaseList extends RPC {
     @Override
     public Packet serializeTo(Packet p) {
         Collection<ShareBase> c = manager.getCore().getShareManager().shareBases();
+
+        //Bastvera
+        //(Group names for specific user)
+        String usergroupname = con.getRemoteGroupName();
+
+        //Split Multi group names to single cell in array
+        String[] dividedu = usergroupname.split(",");
+
         p.writeInt(c.size());
         for (ShareBase sb : c) {
-            p.writeUTF(sb.getName());
+            String sbgroupname = sb.getSBGroupName(); //Group names for specific folder
+            boolean positive = false;
+            if (sbgroupname.equalsIgnoreCase("public")) {
+                positive = true;
+            } else {
+                //Split Multi sbgroupname names to single cell in array
+                String[] dividedsb = sbgroupname.split(",");
+                //Compare every usergroupname with every sbgroupname break if positive match
+
+                for (String testsb : dividedsb) {
+                    for (String testu : dividedu) {
+                        if (testsb.equalsIgnoreCase(testu)) {
+                            positive = true;
+                            break;
+                        }
+                    }
+                    if (positive == true) {
+                        break;
+                    }
+                }
+            }
+            //Send matched sharebase listing and always send public folders
+            if (positive == true) {
+                p.writeUTF(sb.getName());
+            } else {
+                p.writeUTF("You are using old version of Alliance"); //unique name for hidden folders
+            }
         }
         return p;
     }

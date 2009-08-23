@@ -13,6 +13,8 @@ public class Friend {
     private Long lastseenonlineat;
     private Integer middlemanguid; //0 if a first degree friend, guid of middleman if introduced by someone to me
     private String renamednickname; //used to display a different nickname then the "anonymous" one in ones UI
+    private String ugroupname; //Bastvera (settings.xml variable)
+    private Integer trusted;
 
     public Friend() {
     }
@@ -22,6 +24,8 @@ public class Friend {
         this.host = lasthost;
         this.guid = guid;
         this.port = lastport;
+        this.ugroupname = ""; //Bastvera (Default group name for New Friend)
+        this.trusted = 0;
     }
 
     public Friend(String nickname, String lasthost, Integer guid, Integer lastport, Integer introducedBy) {
@@ -88,5 +92,27 @@ public class Friend {
 
     public void setRenamednickname(String renamednickname) {
         this.renamednickname = renamednickname;
+    }
+
+    public void setUgroupname(String ugroupname) { //Bastvera (Renaming group name)
+        this.ugroupname = ugroupname;
+    }
+
+    public String getUgroupname() {  //Bastvera (Loading group name from settings.xml)
+        if (ugroupname == null) {
+            ugroupname = "";
+        }
+        return ugroupname;
+    }
+
+    public void setTrusted(Integer trusted) {
+        this.trusted = trusted;
+    }
+
+    public Integer getTrusted() {
+        if (trusted == null) {
+            trusted = 0;
+        }
+        return trusted;
     }
 }

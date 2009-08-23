@@ -59,13 +59,47 @@ public class DirectoryListing extends CompressedRPC {
         if (T.t) {
             T.info("compressing directory listing and sending..");
         }
+        boolean positive = false;
+        //Bastvera
+        //(Group names for specific user)
+        String usergroupname = con.getRemoteGroupName();
 
-        out.writeInt(shareBaseIndex);
-        out.writeUTF(path);
+        //Bastvera (Group names for specific shared folder)
+        String sbgroupname = manager.getCore().getShareManager().getBaseByIndex(shareBaseIndex).getSBGroupName();
+        if (sbgroupname.equalsIgnoreCase("public")) {
+            positive = true;
+        } else {
 
-        out.writeInt(files.length);
-        for (String s : files) {
-            out.writeUTF(s);
+            //Split Multi sbgroupname names to single cell in array
+            String[] dividedu = usergroupname.split(",");
+            String[] dividedsb = sbgroupname.split(",");
+
+            //Compare every usergroupname with every sbgroupname break if positive match
+
+            for (String testsb : dividedsb) {
+                for (String testu : dividedu) {
+                    if (testsb.equalsIgnoreCase(testu)) {
+                        positive = true;
+                        break;
+                    }
+                }
+                if (positive == true) {
+                    break;
+                }
+            }
+        }
+        //Send matched directory listing and always send public folders
+        if (positive == true) {
+            out.writeInt(shareBaseIndex);
+            out.writeUTF(path);
+            out.writeInt(files.length);
+            for (String s : files) {
+                out.writeUTF(s);
+            }
+        } else {
+            out.writeInt(shareBaseIndex);
+            out.writeUTF(path);
+            out.writeInt(0); //Do not list hidden folders
         }
     }
 }

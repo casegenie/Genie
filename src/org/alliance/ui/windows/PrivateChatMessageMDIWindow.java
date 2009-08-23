@@ -2,7 +2,9 @@ package org.alliance.ui.windows;
 
 import org.alliance.core.comm.rpc.ChatMessageV3;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.UISound;
 
+import java.io.File;
 import java.io.IOException;
 import javax.swing.SwingUtilities;
 
@@ -29,7 +31,6 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
             @Override
             public void run() {
                 chat.setText("Type here and then press 'send' to start chatting.");
-                chat.requestFocus();
                 chat.selectAll();
             }
         });
@@ -38,15 +39,10 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
     @Override
     public void addMessage(String from, String message, long tick, boolean messageHasBeenQueuedAwayForAWhile) {
         super.addMessage(from, message, tick, messageHasBeenQueuedAwayForAWhile);
-        manager.selectWindow(this);
-        ui.getMainWindow().toFront();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                chat.requestFocus();
-            }
-        });
+        if (!ui.getCore().getSettings().getMy().getNickname().equals(from)) {
+            UISound Sound = new UISound(new File(ui.getCore().getSettings().getInternal().getPmsound()));
+            Sound.start();
+        }
     }
 
     @Override

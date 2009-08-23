@@ -11,6 +11,7 @@ import org.alliance.ui.UISubsystem;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.TreeSet;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -26,8 +28,7 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.JTextField;
 
 /**
  * Created by IntelliJ IDEA.
@@ -45,6 +46,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     private String[] LEVEL_ICONS = {"friend_lame", "friend", "friend_cool", "friend_king"};
     private ImageIcon[] friendIcons;
     private ImageIcon[] friendIconsAway;
+    private ImageIcon groupIcon;
+    private Object[] selectedObjects;
     private JPopupMenu popup;
 
     public FriendListMDIWindow() {
@@ -54,6 +57,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         super(manager, "friendlist", ui);
         this.ui = ui;
 
+        groupIcon = new ImageIcon(ui.getRl().getResource("gfx/icons/editgroup.png"));
         friendIcons = new ImageIcon[LEVEL_ICONS.length];
         friendIconsAway = new ImageIcon[LEVEL_ICONS.length];
         for (int i = 0; i < LEVEL_ICONS.length; i++) {
@@ -74,6 +78,25 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
     public void update() {
         statusright.setText("Online: " + ui.getCore().getFriendManager().getNFriendsConnected() + "/" + ui.getCore().getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared()) + ")");
+        if (selectedObjects != null) {
+            int[] selectedIndexes = new int[list.getModel().getSize()];
+            for (int i = 0; i < list.getModel().getSize(); i++) {
+
+                for (Object selection : selectedObjects) {
+                    if (list.getModel().getElementAt(i).equals(selection)) {
+                        selectedIndexes[i] = i;
+                        break;
+                    } else {
+                        selectedIndexes[i] = -1;
+                    }
+                }
+            }
+            list.setSelectedIndices(selectedIndexes);
+        }
+        try {
+            updateMyLevelInformation();
+        } catch (IOException ex) {
+        }
     }
 
     static {
@@ -91,24 +114,10 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         list.setCellRenderer(new FriendListRenderer());
         ((JScrollPane) xui.getComponent("scrollpanel")).setViewportView(list);
 
-        list.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            private int selectedIndex = -1;
-
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                try {
-                    if (!e.getValueIsAdjusting() && selectedIndex != list.getSelectedIndex()) {
-                        selectedIndex = list.getSelectedIndex();
-                        EVENT_viewshare(null);
-                    }
-                } catch (Exception e1) {
-                    ui.handleErrorInEventLoop(e1);
-                }
-            }
-        });
-
         popup = (JPopupMenu) xui.getComponent("popup");
+        updateMyLevelInformation();
+        statusright.setText("Online: " + ui.getCore().getFriendManager().getNFriendsConnected() + "/" + ui.getCore().getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared()) + ")");
+
         list.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -117,8 +126,13 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             }
 
             @Override
-            public void mousePressed(MouseEvent e) {
-                maybeShowPopup(e);
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    EVENT_viewshare(null);
+                } catch (Exception ex) {
+                    ui.handleErrorInEventLoop(ex);
+                }
+                selectedObjects = list.getSelectedValues();
             }
 
             private void maybeShowPopup(MouseEvent e) {
@@ -138,11 +152,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 }
             }
         });
-
-
-
-        updateMyLevelInformation();
-
         postInit();
     }
 
@@ -203,22 +212,21 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     }
 
     private int getLevel(int numberOfInvites) {
-        if (numberOfInvites == 0) {
-            return 0;
+        switch (numberOfInvites) {
+            case 0:
+                return 0;
+            case 1:
+                return 1;
+            case 2:
+                return 1;
+            case 3:
+                return 2;
+            default:
+                if (numberOfInvites >= ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing()) {
+                    return 3;
+                }
+                return 2;
         }
-        if (numberOfInvites == 1) {
-            return 1;
-        }
-        if (numberOfInvites == 2) {
-            return 1;
-        }
-        if (numberOfInvites == 3) {
-            return 2;
-        }
-        if (numberOfInvites >= ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing()) {
-            return 3;
-        }
-        return 2;
     }
 
     private int getMyNumberOfInvites() {
@@ -265,13 +273,34 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            /*            cnt++;
-            if (cnt%1000==0) {
-            System.out.println("count: "+cnt);
-            new Exception().printStackTrace();
-            }*/
+            //Groups painting
+            if (value instanceof String) {
+                setIcon(groupIcon);
+                setFont(new Font("Tahoma", Font.BOLD, 12));
+                setText(value.toString());
+                setBackground(new Color(230, 230, 233));
+                return this;
+            }
 
             Node n = (Node) value;
+
+            //Bastvera for displaying group names/trusted status in friend list + popup
+            String groupname = "";
+            String trusted = "";
+            String sharesize = TextUtils.formatByteSize(n.getShareSize());
+            if (n instanceof Friend) {
+                Friend f = (Friend) n;
+                groupname = f.getUGroupName();
+                if (groupname.length() == 0) {
+                    groupname = "Not in a Group";
+                }
+                if (f.getTrusted() == 1) {
+                    trusted = "(T) ";
+                }
+            } else {
+                groupname = "Not Allowed";
+            }
+
             if (n.isConnected()) {
 
                 if (!n.isAway()) {
@@ -285,27 +314,29 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     setForeground(Color.black);
                 }
 //                setText(f.getNickname()+" ("+ TextUtils.formatByteSize(f.getShareSize())+")");
-                String s = nickname(n.getGuid());
+                String s = "";
                 if (n instanceof Friend) {
+                    s = trusted + nickname(n.getGuid());
                     //s += FriendListMDIWindow.this.ui.getCore().getFriendManager().contactPath(n.getGuid());
                 } else {
-                    s += " (myself)";
+                    s = "[Myself] - ";
+                    s += n.getNickname();
                 }
-                s += " (" + TextUtils.formatByteSize(n.getShareSize()) + ")";
+                s += " (" + sharesize + ")";
                 setText(s);
             } else if (n.hasNotBeenOnlineForLongTime()) {
                 setIcon(iconFriendOld);
                 setForeground(Color.lightGray);
                 if (n.getLastSeenOnlineAt() != 0) {
-                    setText(nickname(n.getGuid()) + " (offline for " +
+                    setText(trusted + nickname(n.getGuid()) + " (offline for " +
                             ((System.currentTimeMillis() - n.getLastSeenOnlineAt()) / 1000 / 60 / 60 / 24) + " days)");
                 } else {
-                    setText(nickname(n.getGuid()));
+                    setText(trusted + nickname(n.getGuid()));
                 }
             } else {
                 setIcon(iconFriendDimmed);
                 setForeground(Color.lightGray);
-                setText(FriendListMDIWindow.this.ui.getCore().getFriendManager().nicknameWithContactPath(n.getGuid()));
+                setText(trusted + nickname(n.getGuid()));
             }
 
             String cp = FriendListMDIWindow.this.ui.getCore().getFriendManager().contactPath(n.getGuid());
@@ -313,14 +344,14 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 cp = "Found " + cp + "<br>";
             }
             setToolTipText("<html>" + cp +
-                    "Share: " + TextUtils.formatByteSize(n.getShareSize()) + " in " + n.getNumberOfFilesShared() + " files<br>" +
+                    "Share: " + sharesize + " in " + n.getNumberOfFilesShared() + " files<br>" +
                     "Invited friends: " + n.getNumberOfInvitedFriends() + "<br>" +
                     "Upload speed record: " + TextUtils.formatByteSize((long) n.getHighestOutgoingCPS()) + "/s<br>" +
                     "Download speed record: " + TextUtils.formatByteSize((long) n.getHighestIncomingCPS()) + "/s<br>" +
                     "Bytes uploaded: " + TextUtils.formatByteSize(n.getTotalBytesSent()) + "<br>" +
                     "Bytes downloaded: " + TextUtils.formatByteSize(n.getTotalBytesReceived()) + "<br>" +
-                    "Ratio (ul:dl): " + n.calculateRatio() + "</html>");
-
+                    "Ratio (ul:dl): " + n.calculateRatio() + "<br>" +
+                    "Group name: " + groupname + "</html>");
             return this;
         }
     }
@@ -330,12 +361,9 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     }
 
     public void EVENT_editname(ActionEvent e) {
-        if (list.getSelectedValue() == null) {
-            return;
-        }
         if (list.getSelectedValue() instanceof MyNode) {
             OptionDialog.showInformationDialog(ui.getMainWindow(), "If you want to change your nickname you need to open the Options (View->Options)");
-        } else {
+        } else if (list.getSelectedValue() instanceof Friend) {
             Friend f = (Friend) list.getSelectedValue();
             if (f != null) {
                 String pi = JOptionPane.showInputDialog("Enter nickname for friend: " + nickname(f.getGuid()), nickname(f.getGuid()));
@@ -344,43 +372,37 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 }
                 ui.getFriendListModel().signalFriendChanged(f);
             }
+        } else {
+            return;
         }
-
     }
 
     public void EVENT_chat(ActionEvent e) throws Exception {
-        if (list.getSelectedValue() == null) {
+        if (list.getSelectedValue() instanceof Friend) {
+            Friend f = (Friend) list.getSelectedValue();
+            if (f != null) {
+                ui.getMainWindow().chatMessage(f.getGuid(), null, 0, false);
+            }
+        } else {
             return;
-        }
-        if (list.getSelectedValue() instanceof MyNode) {
-            return;
-        }
-        Friend f = (Friend) list.getSelectedValue();
-        if (f != null) {
-            ui.getMainWindow().chatMessage(f.getGuid(), null, 0, false);
         }
     }
 
     public void EVENT_reconnect(ActionEvent e) throws Exception {
-        if (list.getSelectedValue() == null) {
+        if (list.getSelectedValue() instanceof Friend) {
+            final Friend f = (Friend) list.getSelectedValue();
+            if (f.isConnected()) {
+                f.reconnect();
+            }
+        } else {
             return;
-        }
-        if (list.getSelectedValue() instanceof MyNode) {
-            return;
-        }
-        final Friend f = (Friend) list.getSelectedValue();
-        if (f.isConnected()) {
-            f.reconnect();
         }
     }
 
     public void EVENT_viewshare(ActionEvent e) throws Exception {
-        if (list.getSelectedValue() == null) {
-            return;
-        }
         if (list.getSelectedValue() instanceof MyNode) {
             ui.getMainWindow().EVENT_myshare(null);
-        } else {
+        } else if (list.getSelectedValue() instanceof Friend) {
             Friend f = (Friend) list.getSelectedValue();
             if (f != null) {
                 if (!f.isConnected()) {
@@ -390,6 +412,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     ui.getMainWindow().viewShare(f);
                 }
             }
+        } else {
+            return;
         }
     }
 
@@ -398,23 +422,24 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     }
 
     public void EVENT_removefriend(ActionEvent e) throws Exception {
-        if (list.getSelectedValue() == null) {
-            return;
-        }
-        Object[] friends = list.getSelectedValues();
-        if (friends != null && friends.length > 0) {
-            Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to permanently delete these (" + friends.length + ") connections?");
-            if (delete == null) {
-                return;
-            }
-            if (delete) {
-                for (Object friend : friends) {
-                    Node f = (Node) friend;
-                    if (f != null && f instanceof Friend) {
-                        ui.getCore().getFriendManager().permanentlyRemove((Friend) f);
-                    }
+        if (list.getSelectedValue() instanceof Friend) {
+            Object[] friends = list.getSelectedValues();
+            if (friends != null && friends.length > 0) {
+                Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to permanently delete these (" + friends.length + ") connections?");
+                if (delete == null) {
+                    return;
                 }
-                revert();
+                if (delete) {
+                    for (Object friend : friends) {
+                        Node f = (Node) friend;
+                        if (f != null && f instanceof Friend) {
+                            ui.getCore().getFriendManager().permanentlyRemove((Friend) f);
+                        }
+                    }
+                    revert();
+                }
+            } else {
+                return;
             }
         }
     }
@@ -422,41 +447,140 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     /**
      * Changes the hostname of a friend you have in your friendlist via the GUI. Can
      * be used to configure a hostname instead of the IP that's set via an invitation.
+     * @param e
      * @author jpluebbert
      */
     public void EVENT_edithostname(ActionEvent e) {
-        if (list.getSelectedValue() == null) {
-            return;
-        }
-        if (!(list.getSelectedValue() instanceof Friend)) {
-            return;
-        }
+        if (list.getSelectedValue() instanceof Friend) {
+            Friend friend = (Friend) list.getSelectedValue();
+            if (friend != null) {
+                String hostname = friend.getLastKnownHost();
 
-        Friend friend = (Friend) list.getSelectedValue();
-        if (friend != null) {
-            String hostname = friend.getLastKnownHost();
+                if (hostname == null) {
+                    hostname = "";
+                }
 
-            if (hostname == null) {
-                hostname = "";
-            }
-
-            String input = JOptionPane.showInputDialog("Enter hostname for friend: " + nickname(friend.getGuid()), hostname);
-            if (input != null && !hostname.equalsIgnoreCase(input)) {
-                if (input.length() == 0) {
-                    OptionDialog.showErrorDialog(ui.getMainWindow(), "Hostname can not be empty. Changes ignored.");
-                } else {
-                    friend.setLastKnownHost(input);
-                    try {
-                        if (friend.isConnected()) {
-                            friend.reconnect();
-                        } else {
-                            friend.connect();
+                String input = JOptionPane.showInputDialog("Enter hostname for friend: " + nickname(friend.getGuid()), hostname);
+                if (input != null && !hostname.equalsIgnoreCase(input)) {
+                    if (input.length() == 0) {
+                        OptionDialog.showErrorDialog(ui.getMainWindow(), "Hostname can not be empty. Changes ignored.");
+                    } else {
+                        friend.setLastKnownHost(input);
+                        try {
+                            if (friend.isConnected()) {
+                                friend.reconnect();
+                            } else {
+                                friend.connect();
+                            }
+                        } catch (IOException e1) {
                         }
-                    } catch (IOException e1) {
+                    }
+                }
+            } else {
+                return;
+            }
+        }
+    }
+
+    public void EVENT_edittrusted(ActionEvent e) {
+        if (list.getSelectedValue() instanceof Friend) {
+            Object[] friends = list.getSelectedValues();
+            if (friends != null && friends.length > 0) {
+                for (Object friend : friends) {
+                    if (friend instanceof Friend) {
+                        Friend f = (Friend) friend;
+                        if (f != null) {
+                            if (f.getTrusted() == 0) {
+                                f.setTrusted(1);
+                            } else {
+                                f.setTrusted(0);
+                            }
+                        }
+                    }
+                }
+                try {
+                    ui.getCore().saveSettings();
+                } catch (Exception ex) {
+                }
+            }
+        } else {
+            return;
+        }
+    }
+
+    public void EVENT_editgroupname(ActionEvent e) { //Editing friends group names
+        if (list.getSelectedValue() instanceof Friend) {
+            Object[] friends = list.getSelectedValues();
+            if (friends != null && friends.length > 0) {
+                String groupname = JOptionPane.showInputDialog("Edit group name for (" + friends.length + ") friend.\nDivide multiple group names with commas.\nExample 1: music,games\nExample 2: music,games,private", ((Friend) friends[0]).getUGroupName());
+                if (groupname == null) {
+                    return;
+                }
+                if (groupname.trim().length() == 0) {
+                    groupname = "";
+                } else {
+                    TreeSet<String> groupSort = new TreeSet<String>();
+                    String[] dividegroup = groupname.split(",");
+                    for (String group : dividegroup) {
+                        if (group.trim().length() > 0) {
+                            groupSort.add(group.trim().toUpperCase().substring(0, 1) + group.trim().toLowerCase().substring(1));//Uppercase 1st letter rest Lowercase
+                        } else if (group.trim().length() == 1) {
+                            groupSort.add(group.trim().toUpperCase());
+                        }
+                    }
+                    groupname = "";
+                    for (String group : groupSort) {
+                        groupname += group.trim() + ",";
+                    }
+                    if (groupname.lastIndexOf(",") == groupname.length() - 1 && groupname.length() > 0) {
+                        groupname = groupname.substring(0, groupname.length() - 1);
+                    }
+                }
+                for (Object friend : friends) {
+                    if (friend instanceof Friend) {
+                        Friend f = (Friend) friend;
+                        if (f != null) {
+                            f.setUGroupName(groupname);
+                        }
+                    }
+                }
+                try {
+                    ui.getCore().saveSettings();
+                    revert();
+                } catch (Exception ex) {
+                }
+            }
+        } else {
+            return;
+        }
+    }
+
+    public void EVENT_viewvia(ActionEvent e) {
+        if (list.getSelectedValue() instanceof Friend) {
+            Friend friend = (Friend) list.getSelectedValue();
+            try {
+                new ViewFoundVia(ui, friend);
+            } catch (Exception ex) {
+            }
+        } else {
+            return;
+        }
+    }
+
+    public void EVENT_searchfriend(ActionEvent e) {
+        String text = ((JTextField) xui.getComponent("searchfield")).getText();
+        int nhit = 0;
+        for (int i = 0; i < list.getModel().getSize(); i++) {
+            Object friend = list.getModel().getElementAt(i);
+            if (friend instanceof Friend) {
+                for (int x = 1; x <= text.length(); x++) {
+                    if (((Friend) friend).getNickname().toLowerCase().startsWith(text.substring(0, x).toLowerCase()) && x > nhit) {
+                        list.setSelectedValue(friend, true);
+                        selectedObjects = list.getSelectedValues();
+                        nhit++;
                     }
                 }
             }
         }
-
     }
 }

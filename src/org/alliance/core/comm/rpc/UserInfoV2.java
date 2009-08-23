@@ -101,7 +101,7 @@ public class UserInfoV2 extends RPC {
         p.writeLong(core.getNetworkManager().getBandwidthOut().getTotalBytes());
         p.writeInt((int) Math.round(core.getNetworkManager().getBandwidthIn().getHighestCPS()));
         p.writeInt((int) Math.round(core.getNetworkManager().getBandwidthOut().getHighestCPS()));
-        p.writeInt(core.getFileManager().getFileDatabase().getNumberOfFiles());
+        p.writeInt(core.getFileManager().getFileDatabase().getNumberOfShares());
         p.writeInt(core.getSettings().getMy().getInvitations());
 
         return p;

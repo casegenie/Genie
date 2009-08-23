@@ -14,15 +14,6 @@ import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.windows.AllianceMDIWindow;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -33,6 +24,20 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import javax.swing.JFileChooser;
 
 /**
  * Created by IntelliJ IDEA.
@@ -110,7 +115,9 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         popup = (JPopupMenu) xui.getComponent(remote instanceof MyNode ? "popupme" : "popup");
 
-        if (xui.getComponent("chatmessage") != null) {
+        //Bastvera For preventing XUI warning
+        // if (xui.getComponent("chatmessage") != null) {
+        if (!(remote instanceof MyNode)) {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
             l.addHyperlinkListener(new HyperlinkListener() {
 
@@ -128,7 +135,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         }
 
         JLabel status = (JLabel) xui.getComponent("status");
-        status.setText(TextUtils.formatByteSize(remote.getShareSize()) + " in " + remote.getNumberOfFilesShared() + " files");
+        status.setText(TextUtils.formatByteSize(remote.getShareSize()) + " in " + remote.getNumberOfFilesShared() + " files"); //Bastvera (Share files counter)
         status = (JLabel) xui.getComponent("status2");
         status.setText("Uploaded: " + TextUtils.formatByteSize(remote.getTotalBytesSent()) + " (" + TextUtils.formatByteSize((long) remote.getHighestOutgoingCPS()) + "/s)");
         status = (JLabel) xui.getComponent("status3");
@@ -157,6 +164,28 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             if (T.t) {
                 T.error("Could not find share with sharebase " + shareBaseIndex);
             }
+        }
+    }
+
+    public void EVENT_openfile(ActionEvent e) {
+        if (!(remote instanceof MyNode)) {
+            return;
+        }
+        if (tree == null || tree.getSelectionPaths() == null) {
+            return;
+        }
+        if (tree.getSelectionPaths().length > 1) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only open one folder or file");
+            return;
+        }
+        ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
+        String path = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath() + "/" + node.getFileItemPath();
+        try {
+            Desktop.getDesktop().open(new File(path));
+        } catch (IOException ex) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
+        } catch (IllegalArgumentException ex) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
         }
     }
 
@@ -207,6 +236,57 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         ui.getMainWindow().getPublicChat().send(link);
         ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getPublicChat());
+    }
+
+    public void EVENT_linktohdd(ActionEvent e) throws IOException {
+        if (!(remote instanceof MyNode)) {
+            return;
+        }
+        if (tree == null || tree.getSelectionPaths() == null) {
+            return;
+        }
+        if (tree.getSelectionPaths().length > 1) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only save link to one folder or file.");
+            return;
+        }
+
+        ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
+        if (!(node instanceof ViewShareFileNode)) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can not save link for entire root folders.");
+            return;
+        }
+
+        String path = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath() + "/" + node.getFileItemPath();
+        String name = node.getName();
+        Collection<FileDescriptor> files = ui.getCore().getFileManager().getFileDatabase().getFDsByPath(path);
+
+        String link = ui.getCore().getFriendManager().getMyGUID() + "|";
+
+        for (FileDescriptor f : files) {
+            link += f.getRootHash().getRepresentation() + "|";
+        }
+        link = link.substring(0, link.length() - 1);
+        if (name.endsWith("/")) {
+            name = name.substring(0, name.length() - 1);
+        }
+
+        char[] charArray = link.toCharArray();
+        for (int i = 0; i < link.length(); i++) {
+            charArray[i] += 33;
+        }
+
+        String wd = System.getProperty("user.dir");
+        JFileChooser fc = new JFileChooser(wd);
+        fc.setSelectedFile(new File(name + ".alliance"));
+        int rc = fc.showOpenDialog(null);
+        if (rc == JFileChooser.APPROVE_OPTION) {
+            File outFile = fc.getSelectedFile();
+            OutputStream out = new FileOutputStream(outFile);
+            for (char c : charArray) {
+                out.write(c);
+            }
+            out.close();
+        }
     }
 
     public void EVENT_chat(ActionEvent e) throws Exception {

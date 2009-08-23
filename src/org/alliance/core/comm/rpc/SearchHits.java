@@ -67,10 +67,10 @@ public class SearchHits extends RPC {
                 }
                 break;
             }
-            p.writeLong(sh.getSize());
-            p.writeArray(sh.getRoot().array());
-            p.writeUTF(sh.getPath());
-            p.writeByte((byte) sh.getHashedDaysAgo());
+            //  p.writeLong(sh.getSize());
+            //  p.writeArray(sh.getRoot().array());
+            //  p.writeUTF(sh.getPath());
+            //  p.writeByte((byte)sh.getHashedDaysAgo());
             i++;
             if (i > n) {
                 break;

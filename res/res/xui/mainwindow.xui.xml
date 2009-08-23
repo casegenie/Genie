@@ -20,12 +20,13 @@
             </menu>
             <menuitem eventid="changelog" mnemonic="l" text="Change Log"/>
             <menu text="Debug">
-                <menuitem eventid="trace" mnemonic="t" accelerator="ctrl-t" text="Trace"/>
+            <!--<menuitem eventid="trace" mnemonic="t" accelerator="ctrl-t" text="Trace"/>-->
                 <menuitem eventid="console" mnemonic="d" accelerator="ctrl-y" text="Debug Console"/>
                 <menuitem eventid="connections" mnemonic="c" accelerator="ctrl-p" text="TCP/IP Connections"/>
-                <menuitem eventid="friendtree" mnemonic="c" accelerator="ctrl-n"  text="Network Topology"/>
+            <!--<menuitem eventid="friendtree" mnemonic="c" accelerator="ctrl-n"  text="Network Topology"/>-->
             </menu>
             <separator/>
+            <menuitem eventid="plugins" text="Plugins"/>
             <menuitem eventid="options" accelerator="ctrl-o" mnemonic="o" text="Options"/>
         </menu>
     </menubar>

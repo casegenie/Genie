@@ -30,7 +30,7 @@ import javax.swing.UIManager;
  */
 public class UISubsystem implements UINexus, Subsystem {
 
-    public static final boolean NODE_TREE_MODEL_DISABLED = !T.t; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
+    public static final boolean NODE_TREE_MODEL_DISABLED = false; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
     private MainWindow mainWindow;
     private ResourceLoader rl;
     private CoreSubsystem core;
@@ -212,7 +212,7 @@ public class UISubsystem implements UINexus, Subsystem {
 
     public FriendListModel getFriendListModel() {
         if (friendListModel == null) {
-            friendListModel = new FriendListModel(core);
+            friendListModel = new FriendListModel(core, this);
         }
         return friendListModel;
     }

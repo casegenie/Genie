@@ -89,6 +89,12 @@ public class InvitationConnection extends AuthenticatedConnection {
 
         if (server.getHostname() != null) {
             p.writeUTF(server.getHostname());
+        } else if (server.getDnsname() != null) {
+            if (server.getDnsname().trim().length() > 0) {
+                p.writeUTF(server.getDnsname());
+            } else {
+                p.writeUTF(me.getExternalIp(core));
+            }
         } else {
             p.writeUTF(me.getExternalIp(core));
         }

@@ -4,11 +4,13 @@ import org.alliance.core.comm.SearchHit;
 import org.alliance.core.comm.T;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
+import org.alliance.core.file.share.ShareBase;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -40,11 +42,54 @@ public class SearchHitsV2 extends CompressedRPC {
             n = MAX_SEARCH_HITS;
         }
         int i = 0;
+
+        //Get user group names and folders sbgroupname names
+        Collection<ShareBase> c = manager.getCore().getShareManager().shareBases();
+        String usergroupname = con.getRemoteGroupName();
+
+        //Split Multi group names to single cell in array
+        String[] dividedu = usergroupname.split(",");
+
+        //For each search hit we check if it belongs to any of shared folders
+        //and for each shared folders we check if user got permission to it
         for (SearchHit sh : hits) {
-            out.writeLong(sh.getSize());
-            out.write(sh.getRoot().array());
-            out.writeUTF(sh.getPath());
-            out.writeByte((byte) sh.getHashedDaysAgo());
+            String basepath = sh.getBasePath(); //Get base path for 1 search hit
+
+            for (ShareBase sb : c) {
+
+                //lets se if search hit is part of this folder (sb)
+                if (sb.getPath().equalsIgnoreCase(basepath)) {
+                    String sbgroupname = sb.getSBGroupName(); //Group name for specific folder
+                    boolean positive = false;
+                    if (sbgroupname.equalsIgnoreCase("public")) {
+                        positive = true;
+                    } else {
+                        //Split Multi sbgroupname names to single cell in array
+                        String[] dividedsb = sbgroupname.split(",");
+                        //Compare every usergroupname with every sbgroupname break if positive match
+
+                        for (String testsb : dividedsb) {
+                            for (String testu : dividedu) {
+                                if (testsb.equalsIgnoreCase(testu)) {
+                                    positive = true;
+                                    break;
+                                }
+                            }
+                            if (positive == true) {
+                                break;
+                            }
+                        }
+                    }
+                    //If friend (usergroupname) has permission to folder (sbgroupname) or folder is public
+                    if (positive == true) {
+                        out.writeLong(sh.getSize());
+                        out.write(sh.getRoot().array());
+                        out.writeUTF(sh.getPath());
+                        out.writeByte((byte) sh.getHashedDaysAgo());
+                        break;
+                    }
+                }
+            }
             i++;
             if (i > n) {
                 break;

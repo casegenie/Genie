@@ -17,6 +17,7 @@ public class SearchHit {
     private String path;
     private long size;
     private int hashedDaysAgo;
+    private String basepath;
 
     public SearchHit() {
     }
@@ -32,6 +33,7 @@ public class SearchHit {
         root = fd.getRootHash();
         path = fd.getSubpath();
         size = fd.getSize();
+        basepath = fd.getBasePath(); //Get base path
         hashedDaysAgo = (int) ((System.currentTimeMillis() - fd.getModifiedAt()) / 1000 / 60 / 60 / 24);
         if (hashedDaysAgo > 255) {
             hashedDaysAgo = 255;
@@ -48,6 +50,10 @@ public class SearchHit {
 
     public String getPath() {
         return path;
+    }
+
+    public String getBasePath() {
+        return basepath;
     }
 
     public void setPath(String path) {

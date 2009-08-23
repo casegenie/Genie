@@ -25,7 +25,7 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     void fill(String[] shareBaseNames) {
         shareBases.clear();
         for (int i = 0; i < shareBaseNames.length; i++) {
-            if (!shareBaseNames[i].equals("cache")) {
+            if (!shareBaseNames[i].equals("cache") && !shareBaseNames[i].equals("You are using old version of Alliance")) { //For hiding unique empty folders
                 shareBases.add(new ViewShareShareBaseNode(shareBaseNames[i], this, i));
             }
         }

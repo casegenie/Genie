@@ -24,8 +24,8 @@ public class ConnectedToNewFriendDialog extends XUIDialog {
         display();
         JCheckBox cb = (JCheckBox) xui.getComponent("dontshow");
         if (cb.isSelected()) {
-            if (OptionDialog.showQuestionDialog(this, "Next time a new friends connects to you no message will be shown. You will also automatically connect to all friends of the new friend. Is this what you want?")) {
-                ui.getCore().getSettings().getInternal().setAlwaysautomaticallyconnecttoallfriendsoffriend(1);
+            if (OptionDialog.showQuestionDialog(this, "Next time a new friend connects to you no message will be shown. Is this what you want?")) {
+                ui.getCore().getSettings().getInternal().setDisablenewuserpopup(1);
             }
         }
         ui.getMainWindow().setConnectedToNewFriendDialogShowing(false);

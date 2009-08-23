@@ -4,6 +4,9 @@ import org.alliance.core.BroadcastManager;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.Manager;
 import org.alliance.core.T;
+import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
+import org.alliance.core.settings.My;
+import org.alliance.core.settings.Settings;
 import org.alliance.core.comm.AuthenticatedConnection;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.FriendConnection;
@@ -17,9 +20,6 @@ import org.alliance.core.comm.rpc.PleaseForwardInvitation;
 import org.alliance.core.comm.rpc.UserInfo;
 import org.alliance.core.comm.rpc.UserInfoV2;
 import org.alliance.core.comm.rpc.UserList;
-import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
-import org.alliance.core.settings.My;
-import org.alliance.core.settings.Settings;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -272,10 +272,26 @@ public class FriendManager extends Manager {
 
     public String contactPath(int guid) {
         String s = "";
+        int count = 0;
 
-        Friend f = getFriend(guid);
-        if (f != null && f.getMiddlemanGuid() != 0) {
-            s += "via " + nickname(f.getMiddlemanGuid());
+        Friend fr = getFriend(guid);
+        if (fr != null && fr.getMiddlemanGuid() != 0) {
+            s = "via ";
+            Collection<Friend> allfriends = friends();
+            for (Friend f : allfriends.toArray(new Friend[friends().size()])) {
+                if (f.getFriendsFriend(guid) != null) {
+                    if (count < 3) {
+                        if (s.length() > 4) {
+                            s += ", ";
+                        }
+                        s += f.getNickname();
+                    }
+                    count++;
+                }
+            }
+            if (count > 3) {
+                s += " and " + (count - 3) + " more friends";
+            }
         }
         return s;
     }

@@ -2,8 +2,17 @@ package org.alliance.launchers;
 
 import org.alliance.Version;
 import org.alliance.core.ResourceSingelton;
-
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Window;
 
 /**
  * User: maciek
@@ -49,7 +58,7 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
         g.setColor(Color.white);
         int texty = image.getHeight(null) - 10;
         g.drawString(statusMessage, 10, texty);
-        String s = "Version " + Version.VERSION + " " + Version.BUILD_NUMBER;
+        String s = "Version " + Version.VERSION + " build (" + Version.BUILD_NUMBER + ")";
         g.drawString(s, image.getWidth(null) - 10 - g.getFontMetrics().stringWidth(s), texty);
 
         if (progressPercent >= 0) {

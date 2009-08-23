@@ -8,15 +8,15 @@ import org.alliance.core.T;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 
+import java.lang.reflect.Method;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,17 +28,22 @@ import java.net.Socket;
 public class Main {
 
     private static final int STARTED_SIGNAL_PORT = 56345;
+    private static String link = "";
 
     public static void main(String[] args) {
         try {
             System.out.println("Launching Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
             System.setProperty("alliance.build", "" + Version.BUILD_NUMBER);
 
+            passArgumentLink(args);
+
             boolean allowMultipleInstances = argsContain(args, "/allowMultipleInstances") || new File("allowMultipleInstances").exists();
             boolean runMinimized = argsContain(args, "/min");
 
             if (!allowMultipleInstances) {
                 checkIfAlreadyRunning(!runMinimized);
+                listenExternalLinks();
+                passArgumentLink(args);
             }
 
             Runnable r = null;
@@ -48,7 +53,7 @@ public class Main {
 
             String s = getSettingsFile();
             for (int i = 0; i < args.length; i++) {
-                if (!args[i].startsWith("/")) {
+                if (!args[i].startsWith("/") && !args[i].endsWith(".alliance")) {
                     s = args[i];
                 }
             }
@@ -83,7 +88,7 @@ public class Main {
             }
         } catch (Throwable e) {
             try {
-                new File("logs").mkdirs();
+                new File(localizeHomeDir() + "logs").mkdirs();
                 PrintWriter writer = new PrintWriter("logs/crash.log");
                 e.printStackTrace(writer);
                 writer.close();
@@ -93,18 +98,24 @@ public class Main {
         }
     }
 
-    private static String getSettingsFile() {
-        String s = "data/settings.xml";
-
-        String home = System.getProperty("user.home");
-        String system = System.getProperty("os.name");
+    public static String localizeHomeDir() {
+        String dir;
         if (OSInfo.isLinux()) {
-            home = home + "/.alliance/";
+            dir = System.getProperty("user.home") + "/.alliance/";
+        } else if (OSInfo.isWindows()) {
+            if (new File("standaloneVersion").exists()) {
+                dir = "";
+            } else {
+                dir = System.getenv("APPDATA") + "/Alliance/";
+            }
         } else {
-            home = "";
+            dir = "";
         }
+        return dir;
+    }
 
-        return home + s;
+    private static String getSettingsFile() {
+        return localizeHomeDir() + "data/settings.xml";
     }
 
     private static boolean argsContain(String[] args, String pattern) {
@@ -247,5 +258,72 @@ public class Main {
         } catch (Exception t) {
             reportError(t);
         }
+    }
+    private static Thread listenThread;
+    private static ServerSocket listenServerSocket;
+
+    private static void listenExternalLinks() {
+        listenThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    listenServerSocket = new ServerSocket(56346, 0, InetAddress.getByName("127.0.0.1"));
+                    while (true) {
+                        try {
+                            Socket s = listenServerSocket.accept(); //connection is made on this port if user wants to open the ui
+                            if (listenThread == null) {
+                                return;
+                            }
+                            link = "";
+                            int i;
+                            while ((i = s.getInputStream().read()) != -1) {
+                                link += ((char) i);
+                            }
+                            s.close();
+                        } catch (IOException e) {
+                            if (listenThread == null) {
+                                return;
+                            }
+                            try {
+                                Thread.sleep(10000);
+                            } catch (InterruptedException e1) {
+                            }
+                        }
+                    }
+                } catch (IOException e) {
+                }
+            }
+        });
+        listenThread.setDaemon(true);
+        listenThread.start();
+    }
+
+    private static void passArgumentLink(String[] args) {
+        try {
+            if (args != null) {
+                for (String string : args) {
+                    if (string.contains(".alliance")) {
+                        Socket s = new Socket("127.0.0.1", 56346);
+                        OutputStream o = s.getOutputStream();
+                        o.write(string.getBytes());
+                        o.flush();
+                        o.close();
+                        System.out.println("Argument passed.");
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("No available listener.");
+        }
+    }
+
+    public static String getLink() {
+        return link;
+    }
+
+    public static void clearLink() {
+        link = "";
     }
 }

@@ -7,20 +7,13 @@ import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.filetransfers.Download;
 import org.alliance.core.comm.filetransfers.DownloadConnection;
 import org.alliance.core.comm.filetransfers.UploadConnection;
+import org.alliance.core.file.hash.Hash;
+import org.alliance.launchers.ui.Main;
 import org.alliance.ui.JDownloadGrid;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.jdesktop.swingx.JXTable;
 
-import java.awt.Component;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
@@ -33,6 +26,21 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.filechooser.FileFilter;
+import java.awt.Component;
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import javax.swing.JFileChooser;
 
 /**
  * Created by IntelliJ IDEA.
@@ -131,6 +139,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         update();
 
         setTitle("Downloads");
+        listenExternalLinks();
         postInit();
     }
 
@@ -562,6 +571,108 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         rows.add(dw);
     }
 
+    public void EVENT_openfile(ActionEvent e) {
+        int selection[] = table.getSelectedRows();
+
+        if (selection == null || selection.length == 0) {
+            return;
+        }
+        if (selection.length > 1) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only open one folder or file");
+            return;
+        }
+
+        Download d = rows.get(selection[0]).download;
+        if (d.isComplete() == true) {
+            String path = ui.getCore().getSettings().getInternal().getDownloadfolder() + "\\" + d.getAuxInfoFilename();
+            try {
+                Desktop.getDesktop().open(new File(path));
+            } catch (IOException ex) {
+                OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
+            } catch (IllegalArgumentException ex) {
+                OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
+            }
+        } else {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "File hasn't been downloaded yet");
+        }
+    }
+
+    public void EVENT_opendownloaddir(ActionEvent e) {
+        try {
+            Desktop.getDesktop().open(new File(ui.getCore().getSettings().getInternal().getDownloadfolder()));
+        } catch (IOException ex) {
+        } catch (IllegalArgumentException ex) {
+        }
+    }
+
+    public void d() {
+        System.out.println("OMFG");
+
+    }
+
+    public void EVENT_openhddlink(ActionEvent e) {
+        JFileChooser fc = new JFileChooser("");
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+        fc.addChoosableFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                if (pathname.toString().endsWith("alliance") || pathname.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public String getDescription() {
+                return ("Alliance files");
+            }
+        });
+        int returnVal = fc.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getPath();
+            downloadHddLink(path);
+        }
+    }
+
+    private void downloadHddLink(String path) {
+        try {
+            File file = new File(path);
+            InputStream reader = new FileInputStream(file);
+            StringBuffer contents = new StringBuffer();
+            byte[] charArray = new byte[(int) file.length()];
+
+            reader.read(charArray);
+
+            for (int i = 0; i < (int) file.length(); i++) {
+                contents.append((char) ((charArray[i] & 0xFF) - 33));
+            }
+
+            String link = new String(contents);
+            if (link.contains("|")) {
+                String[] hashes = link.split("\\|");
+                for (String s : hashes) {
+                    if (s.length() < 2) {
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                        return;
+                    }
+                }
+                int guid = Integer.parseInt(hashes[0]);
+                if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Add " + (hashes.length - 1) + " files to downloads?")) {
+                    ArrayList<Integer> al = new ArrayList<Integer>();
+                    al.add(guid);
+                    for (int i = 1; i < hashes.length; i++) {
+                        ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);
+                    }
+                    ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
+                }
+            }
+        } catch (IOException ex) {
+        }
+    }
+
     public void EVENT_remove(ActionEvent e) {
         int selection[] = table.getSelectedRows();
 
@@ -655,5 +766,27 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
+    }
+    private Thread listenThread;
+
+    private void listenExternalLinks() {
+        listenThread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        Thread.sleep(2500);
+                        if (!Main.getLink().isEmpty()) {
+                            downloadHddLink(Main.getLink());
+                            Main.clearLink();
+                        }
+                    } catch (InterruptedException ex) {
+                    }
+                }
+            }
+        });
+        listenThread.setDaemon(true);
+        listenThread.start();
     }
 }

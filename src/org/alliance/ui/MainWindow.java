@@ -19,6 +19,8 @@ import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.PublicChatHistory;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.comm.BandwidthAnalyzer;
+import org.alliance.core.node.Friend;
+import org.alliance.core.node.Node;
 import org.alliance.core.interactions.ForwardedInvitationInteraction;
 import org.alliance.core.interactions.FriendAlreadyInListUserInteraction;
 import org.alliance.core.interactions.NeedsToRestartBecauseOfUpgradeInteraction;
@@ -26,12 +28,11 @@ import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
-import org.alliance.core.node.Friend;
-import org.alliance.core.node.Node;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
 import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
+import org.alliance.ui.windows.AddPluginWindow;
 import org.alliance.ui.windows.ConnectedToNewFriendDialog;
 import org.alliance.ui.windows.ConnectionsMDIWindow;
 import org.alliance.ui.windows.ConsoleMDIWindow;
@@ -56,6 +57,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -175,6 +177,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         String id = "" + Math.random();
         monitor.addCollector(id, 3000, 1000, new Collector() {
 
+            @Override
             public double getValue() {
                 return ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getCPS();
             }
@@ -387,7 +390,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             if (T.t) {
                 T.info("Serializing window state");
             }
-            FileOutputStream out = new FileOutputStream(System.getProperty("user.home") + "/mainwindow.state" + System.getProperty("tracewindow.id"));
+            FileOutputStream out = new FileOutputStream(ui.getCore().getSettings().getInternal().getWindowstatefile() + System.getProperty("tracewindow.id"));
             ObjectOutputStream obj = new ObjectOutputStream(out);
 
             obj.writeObject(getLocation());
@@ -410,7 +413,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         try {
             // TODO tracewindow.id is read, but never set? => everytime null?
             // TODO user.home isn't the right place to put this file into, should be appdata/alliance or something similar
-            FileInputStream in = new FileInputStream(System.getProperty("user.home") + "/mainwindow.state" + System.getProperty("tracewindow.id"));
+            FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile() + System.getProperty("tracewindow.id"));
             ObjectInputStream obj = new ObjectInputStream(in);
 
             setLocation((Point) obj.readObject());
@@ -462,6 +465,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (message != null) {
             if (T.t) {
                 T.info("Received public chat message: " + message);
+            }
+            if (ui.getCore().getSettings().getMy().getGuid() != guid) {
+                UISound Sound = new UISound(new File(ui.getCore().getSettings().getInternal().getPublicsound()));
+                Sound.start();
             }
             publicChat.addMessage(ui.getCore().getFriendManager().nickname(guid), message, tick, messageHasBeenQueuedAwayForAWhile);
             ui.getCore().getPublicChatHistory().addMessage(tick, guid, message);
@@ -551,11 +558,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         if (mdiManager != null && getUploadsWindow() != null) {
                             getUploadsWindow().update();
                         }
-                        if (mdiManager != null && getFriendListMDIWindow() != null) {
-                            getFriendListMDIWindow().update();
-                        }
+                        // if (mdiManager != null && getFriendListMDIWindow() != null) getFriendListMDIWindow().update(); //updated by paced runner in friendlistmodel
 
-                        shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getTotalSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfFiles() + " files");
+                        shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getTotalSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfShares() + " files");
 //                        uploadMessage.setText("Up: "+TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes()));
 //                        downloadMessage.setText("Down: "+TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes()));
 
@@ -784,7 +789,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     } else {
                         showSuccessfullyConnectedToNewFriendDialog(name);
                         try {
-                            openWizardAt(AddFriendWizard.STEP_FORWARD_INVITATIONS);
+                            if (ui.getCore().getSettings().getInternal().getDisablenewuserpopup() == 0) {
+                                openWizardAt(AddFriendWizard.STEP_FORWARD_INVITATIONS);
+                            }
                         } catch (Exception e) {
                             ui.handleErrorInEventLoop(e);
                         }
@@ -837,8 +844,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     private void showSuccessfullyConnectedToNewFriendDialog(String name) {
         try {
-            if (ui.getCore().getSettings().getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 0) {
-                new ConnectedToNewFriendDialog(ui, this, name);
+            if (ui.getCore().getSettings().getInternal().getDisablenewuserpopup() == 0) {
+                if (ui.getCore().getSettings().getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 0) {
+                    new ConnectedToNewFriendDialog(ui, this, name);
+                }
             }
         } catch (Exception e) {
             ui.handleErrorInEventLoop(e);
@@ -880,12 +889,16 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         new OptionsWindow(ui, true);
     }
 
+    public void EVENT_plugins(ActionEvent e) throws Exception {
+        new AddPluginWindow(ui);
+    }
+
     public void EVENT_trace(ActionEvent e) throws Exception {
-        if (!org.alliance.T.t) {
-            OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
-        } else {
+         if (!org.alliance.T.t) {
+              OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
+          } else {
             createTraceWindow();
-        }
+          }
     }
 
     /*    public void EVENT_shutdown6(ActionEvent e) throws Exception{

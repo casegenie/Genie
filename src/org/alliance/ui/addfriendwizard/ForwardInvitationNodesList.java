@@ -62,7 +62,26 @@ public class ForwardInvitationNodesList extends JList {
             ((ListRow) getModel().getElementAt(i)).selected = true;
             addFriendWizard.enableNext();
         }
+        repaint();
+    }
 
+    public void selectNone() {
+        for (int i = 0; i < getModel().getSize(); i++) {
+            ((ListRow) getModel().getElementAt(i)).selected = false;
+            addFriendWizard.enableNext();
+        }
+        repaint();
+    }
+
+    public void selectTrusted() {
+        for (int i = 0; i < getModel().getSize(); i++) {
+            if (((ListRow) getModel().getElementAt(i)).trusted == 1) {
+                ((ListRow) getModel().getElementAt(i)).selected = true;
+            } else {
+                ((ListRow) getModel().getElementAt(i)).selected = false;
+            }
+            addFriendWizard.enableNext();
+        }
         repaint();
     }
 
@@ -90,11 +109,13 @@ public class ForwardInvitationNodesList extends JList {
         public int guid;
         public String toString;
         public boolean selected;
+        public int trusted;
 
-        public ListRow(String nickname, String connectedThrough, int guid) {
+        public ListRow(String nickname, String connectedThrough, int guid, int trusted) {
             this.nickname = nickname;
             this.connectedThrough = connectedThrough;
             this.guid = guid;
+            this.trusted = trusted;
 
             toString = "<html>" + nickname + " <font color=gray>(connected to " + connectedThrough + ")</font></html>";
         }
@@ -138,7 +159,15 @@ public class ForwardInvitationNodesList extends JList {
                 }
             }
 
-            for (Invitation i : ui.getCore().getInvitaitonManager().allInvitations()) {
+            removeDoubledInvitation(secondaryNodeGuids);
+            for (int guid : secondaryNodeGuids) {
+                addElement(new ListRow(ui.getCore().getFriendManager().nickname(guid), createConnectedThroughList(guid, friends), guid, checkTrusted(guid, friends)));
+            }
+        }
+
+        private void removeDoubledInvitation(TreeSet<Integer> secondaryNodeGuids) {
+            Collection<Invitation> invitations = ui.getCore().getInvitaitonManager().allInvitations();
+            for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
                 if (i.getDestinationGuid() == null) {
                     continue;
                 }
@@ -146,15 +175,11 @@ public class ForwardInvitationNodesList extends JList {
                     secondaryNodeGuids.remove(i.getDestinationGuid()); //often the guid won't exist in the list - that's fine.
                 }
             }
-
-            for (int guid : secondaryNodeGuids) {
-                addElement(new ListRow(ui.getCore().getFriendManager().nickname(guid), createConnectedThroughList(guid), guid));
-            }
         }
 
-        private String createConnectedThroughList(int guid) {
+        private String createConnectedThroughList(int guid, Collection<Friend> friends) {
             String s = "";
-            for (Friend f : ui.getCore().getFriendManager().friends()) {
+            for (Friend f : friends.toArray(new Friend[friends.size()])) {
                 if (f.getFriendsFriend(guid) != null) {
                     if (s.length() > 0) {
                         s += ", ";
@@ -163,6 +188,15 @@ public class ForwardInvitationNodesList extends JList {
                 }
             }
             return s;
+        }
+
+        private int checkTrusted(int guid, Collection<Friend> friends) {
+            for (Friend f : friends.toArray(new Friend[friends.size()])) {
+                if (f.getFriendsFriend(guid) != null && f.getTrusted() == 1) {
+                    return f.getTrusted();
+                }
+            }
+            return 0;
         }
     }
 
