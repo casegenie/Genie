@@ -27,6 +27,7 @@ public class UserInfo extends RPC {
     public UserInfo() {
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         Friend f = con.getRemoteFriend();
         if (f == null) {
@@ -86,6 +87,7 @@ public class UserInfo extends RPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(manager.getMyGUID());
         p.writeInt(core.getSettings().getServer().getPort());

@@ -11,6 +11,7 @@ public enum FileType {
 
     EVERYTHING("All Files", 0, new FileTypeIdentifier() {
 
+        @Override
 public boolean matches(String s) {
     return true;
 }
@@ -18,6 +19,7 @@ public boolean matches(String s) {
     AUDIO("Audio", 1, new ExtensionFileType(new String[]{"mp3", "mp4", "wav", "acc", "ogg", "asf", "wma", "aiff"})),
     ARCHIVE("Archives", 4, new ExtensionFileType(new String[]{"rar", "zip", "tar", "gz"}) {
 
+        @Override
 public boolean matches(String s) {
     if (!super.matches(s)) {
         if (s.length() > 3 && s.charAt(s.length() - 3) == 'r' && Character.isDigit(s.charAt(s.length() - 2)) && Character.isDigit(s.charAt(s.length() - 1))) {
@@ -73,6 +75,7 @@ public boolean matches(String s) {
         return null;
     }
 
+    @Override
     public String toString() {
         return "FileType " + description + " (" + id + ")";
     }

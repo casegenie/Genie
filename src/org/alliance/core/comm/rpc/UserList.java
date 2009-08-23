@@ -27,6 +27,7 @@ public class UserList extends RPC {
         routable = true;
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         int remoteGUID = in.readInt();
         Node n = manager.getNode(remoteGUID);
@@ -60,6 +61,7 @@ public class UserList extends RPC {
         manager.getCore().getUICallback().nodeOrSubnodesUpdated(n);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(manager.getMyGUID());
 

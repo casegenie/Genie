@@ -31,14 +31,17 @@ public class ViewShareRootNode extends ViewShareTreeNode {
         }
     }
 
+    @Override
     public ViewShareShareBaseNode getChildAt(int childIndex) {
         return shareBases.get(childIndex);
     }
 
+    @Override
     protected int getShareBaseIndex() {
         throw new RuntimeException("This may not be called!");
     }
 
+    @Override
     protected String getFileItemPath() {
         if (T.t) {
             T.warn("This should not be called");
@@ -46,14 +49,17 @@ public class ViewShareRootNode extends ViewShareTreeNode {
         return null;
     }
 
+    @Override
     public int getChildCount() {
         return shareBases.size();
     }
 
+    @Override
     public ViewShareTreeNode getParent() {
         return null;
     }
 
+    @Override
     public int getIndex(TreeNode node) {
         if (!(node instanceof ViewShareShareBaseNode)) {
             return -1;
@@ -61,14 +67,17 @@ public class ViewShareRootNode extends ViewShareTreeNode {
         return shareBases.indexOf((ViewShareShareBaseNode) node);
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return true;
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }
 
+    @Override
     public Enumeration children() {
         return EnumerationIteratorConverter.enumeration(shareBases.iterator());
     }

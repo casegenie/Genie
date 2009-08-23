@@ -27,6 +27,7 @@ public class PluginManager extends Manager {
         this.core = core;
     }
 
+    @Override
     public void init() throws Exception {
         if (core.getSettings().getPluginlist().size() > 0) {
             setupClassLoader();

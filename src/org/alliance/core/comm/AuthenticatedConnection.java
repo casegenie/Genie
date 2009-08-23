@@ -38,6 +38,7 @@ public abstract class AuthenticatedConnection extends PacketConnection {
         this.remoteUserGUID = userGUID;
     }
 
+    @Override
     public void init() throws IOException {
         super.init();
         netMan.getFriendManager().connectionEstablished(this);
@@ -75,6 +76,7 @@ public abstract class AuthenticatedConnection extends PacketConnection {
         }
     }
 
+    @Override
     public String toString() {
         return netMan.getFriendManager().getFriend(remoteUserGUID) + " (" + TextUtils.simplifyClassName(this) + ")";
     }

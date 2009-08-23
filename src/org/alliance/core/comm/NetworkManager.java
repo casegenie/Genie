@@ -26,7 +26,11 @@ import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,7 +40,9 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class NetworkManager extends Manager {
-//    public static final boolean DIRECTLY_CALL_READYTOSEND = false;  //setting false here produces weird results - not sure anymore now that encryption is implemented - anyway. It seems to be working well with this flag on.
+    //public static final boolean DIRECTLY_CALL_READYTOSEND = false;
+    //Setting false here produces weird results - not sure anymore now that encryption is implemented - anyway.
+    //It seems to be working well with this flag on.
 
     public static final boolean DIRECTLY_CALL_READYTOSEND = true;
     private int serverPort;
@@ -80,14 +86,17 @@ public class NetworkManager extends Manager {
         cryptoLayer = core.getCryptoManager().getCryptoLayer();
         downloadManager = new DownloadManager(friendManager.getCore());
         router = new Router(friendManager);
-        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(), ((long) settings.getInternal().getTotalmegabytesdownloaded() * MB));
-        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(), ((long) settings.getInternal().getTotalmegabytesuploaded() * MB));
+        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(),
+                ((long) settings.getInternal().getTotalmegabytesdownloaded() * MB));
+        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(),
+                ((long) settings.getInternal().getTotalmegabytesuploaded() * MB));
         bandwidthInHighRefresh = new BandwidthAnalyzer(1500);
         bandwidthOutHighRefresh = new BandwidthAnalyzer(1500);
 
         // keep-alive thread
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 while (alive) {
                     final int ms = NetworkManager.this.core.getSettings().getInternal().getConnectionkeepaliveinterval() * 1000;
@@ -97,6 +106,7 @@ public class NetworkManager extends Manager {
                     }
                     invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             try {
                                 for (Connection c : connections.values()) {
@@ -104,7 +114,8 @@ public class NetworkManager extends Manager {
                                         FriendConnection fc = (FriendConnection) c;
                                         if (fc.getNetworkLatency() > 15 * 1000) {
                                             if (T.t) {
-                                                T.error(fc.getRemoteFriend().getNickname() + " has a very high network latency - this is probably a bug. Reconnecting to friend.");
+                                                T.error(fc.getRemoteFriend().getNickname() +
+                                                        " has a very high network latency - this is probably a bug. Reconnecting to friend.");
                                             }
                                             fc.getRemoteFriend().reconnect();
                                         } else {
@@ -128,6 +139,7 @@ public class NetworkManager extends Manager {
         t.start();
     }
 
+    @Override
     public void init() throws IOException {
         downloadManager.init();
         networkLayer.start();

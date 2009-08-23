@@ -61,6 +61,7 @@ public class Friend {
         this.nickname = nickname;
     }
 
+    @Override
     public String toString() {
         return "Friend [" + nickname + "]";
     }

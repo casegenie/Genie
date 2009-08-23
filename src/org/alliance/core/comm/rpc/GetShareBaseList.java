@@ -17,10 +17,12 @@ public class GetShareBaseList extends RPC {
     public GetShareBaseList() {
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         send(new ShareBaseList());
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         return p;
     }

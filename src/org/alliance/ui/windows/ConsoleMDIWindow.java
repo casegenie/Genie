@@ -4,11 +4,13 @@ import com.stendahls.nif.ui.mdi.MDIWindow;
 import org.alliance.launchers.console.Console;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,6 +38,7 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
         postInit();
     }
 
+    @Override
     public void windowSelected() {
         super.windowSelected();
         chat.requestFocus();
@@ -50,26 +53,33 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
         console.handleLine(text);
     }
 
+    @Override
     public String getIdentifier() {
         return "console";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
 
+    @Override
     public void println(final String line) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 textarea.append(line + "\n");
             }

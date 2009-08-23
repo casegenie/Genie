@@ -1,6 +1,10 @@
 package org.alliance.core.comm.upnp;
 
-import org.alliance.core.comm.*;
+import org.alliance.core.comm.AuthenticatedConnection;
+import org.alliance.core.comm.Connection.Direction;
+import org.alliance.core.comm.HandshakeConnection;
+import org.alliance.core.comm.NetworkManager;
+import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.filetransfers.T;
 
 import java.io.IOException;
@@ -38,6 +42,7 @@ public class ReverseConnection extends AuthenticatedConnection {
         this.reverseConnectionId = reverseConnectionId;
     }
 
+    @Override
     public void init() throws IOException {
         super.init();
         if (direction == Direction.OUT) {
@@ -53,6 +58,7 @@ public class ReverseConnection extends AuthenticatedConnection {
         }
     }
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         if (direction == Direction.IN) {
             reverseConnectionId = p.readInt();
@@ -77,6 +83,7 @@ public class ReverseConnection extends AuthenticatedConnection {
         }
     }
 
+    @Override
     protected int getConnectionId() {
         return CONNECTION_ID;
     }

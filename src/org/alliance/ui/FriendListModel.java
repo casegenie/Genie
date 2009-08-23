@@ -5,11 +5,12 @@ import org.alliance.core.PacedRunner;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
+import javax.swing.DefaultListModel;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,9 +30,11 @@ public class FriendListModel extends DefaultListModel {
 
         pacedRunner = new PacedRunner(new Runnable() {
 
+            @Override
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         updateFriendList();
                     }
@@ -49,6 +52,7 @@ public class FriendListModel extends DefaultListModel {
 
         TreeSet<Node> ts = new TreeSet<Node>(new Comparator<Node>() {
 
+            @Override
             public int compare(Node o1, Node o2) {
                 if (o1 == null || o2 == null) {
                     return 0;
@@ -108,6 +112,7 @@ public class FriendListModel extends DefaultListModel {
         pacedRunner.invoke();
     }
 
+    @Override
     protected void fireContentsChanged(Object source, int index0, int index1) {
         if (ignoreFires) {
             return;
@@ -115,6 +120,7 @@ public class FriendListModel extends DefaultListModel {
         super.fireContentsChanged(source, index0, index1);
     }
 
+    @Override
     protected void fireIntervalAdded(Object source, int index0, int index1) {
         if (ignoreFires) {
             return;
@@ -122,6 +128,7 @@ public class FriendListModel extends DefaultListModel {
         super.fireIntervalAdded(source, index0, index1);
     }
 
+    @Override
     protected void fireIntervalRemoved(Object source, int index0, int index1) {
         if (ignoreFires) {
             return;

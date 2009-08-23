@@ -15,6 +15,7 @@ import java.io.IOException;
  */
 public class Ping extends RPC {
 
+    @Override
     public void execute(Packet data) throws IOException {
         if (T.t) {
             T.debug("received Ping!");
@@ -22,6 +23,7 @@ public class Ping extends RPC {
         send(new Pong());
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         con.pingSent();
         return p;

@@ -1,6 +1,11 @@
 package org.alliance.core.comm;
 
-import org.alliance.core.comm.rpc.*;
+import org.alliance.core.comm.rpc.Broadcast;
+import org.alliance.core.comm.rpc.GetMyExternalIp;
+import org.alliance.core.comm.rpc.GetUserInfo;
+import org.alliance.core.comm.rpc.GetUserInfoV2;
+import org.alliance.core.comm.rpc.GetUserList;
+import org.alliance.core.comm.rpc.Route;
 import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
 import org.alliance.core.node.Friend;
 
@@ -28,6 +33,7 @@ public class FriendConnection extends AuthenticatedConnection {
         super(netMan, key, direction, guid);
     }
 
+    @Override
     public void init() throws IOException {
         super.init();
         send(new GetUserList());
@@ -40,6 +46,7 @@ public class FriendConnection extends AuthenticatedConnection {
         }
     }
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         received(getRemoteUserGUID(), 0, p);
     }
@@ -93,6 +100,7 @@ public class FriendConnection extends AuthenticatedConnection {
         }
     }
 
+    @Override
     protected int getConnectionId() {
         return CONNECTION_ID;
     }
@@ -158,6 +166,7 @@ public class FriendConnection extends AuthenticatedConnection {
         return p;
     }
 
+    @Override
     public String toString() {
         if (getRemoteFriend() == null) {
             return super.toString();

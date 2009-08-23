@@ -27,6 +27,7 @@ public class ChatMessage extends PersistantRPC {
         this.messageToAll = messageToAll;
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         message = in.readUTF();
         messageToAll = in.readBoolean();
@@ -37,6 +38,7 @@ public class ChatMessage extends PersistantRPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeUTF(message);
         p.writeBoolean(messageToAll);

@@ -1,11 +1,25 @@
 package org.alliance.core.comm.networklayers.tcpnio;
 
-import org.alliance.core.comm.*;
+import org.alliance.core.comm.T;
+import org.alliance.core.comm.Connection;
+import org.alliance.core.comm.AuthenticatedConnection;
+import org.alliance.core.comm.HandshakeConnection;
+import org.alliance.core.comm.NetworkManager;
+import org.alliance.core.comm.Packet;
+import org.alliance.core.comm.PacketConnection;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.ConnectException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.*;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
+import java.nio.channels.UnresolvedAddressException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -58,7 +72,8 @@ public class TCPNIONetworkLayer implements Runnable {
     public void connect(final String host, final int port, final AuthenticatedConnection connection) throws IOException {
         try {
             if (T.t) {
-                T.info("Attempting to connect to " + host + ":" + port + "... (outstanding connections: " + pendingConnectionAttempts.size() + ")");
+                T.info("Attempting to connect to " + host + ":" + port + "... (outstanding connections: " +
+                        pendingConnectionAttempts.size() + ")");
             }
             if (netMan.getCore().getSettings().getInternal().getEnableiprules() == 1) {
                 if (netMan.getCore().getSettings().getRulelist().checkConnection(host)) {
@@ -87,6 +102,7 @@ public class TCPNIONetworkLayer implements Runnable {
 
             invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         sc.register(selector, SelectionKey.OP_CONNECT, connection);
@@ -187,6 +203,7 @@ public class TCPNIONetworkLayer implements Runnable {
         return new NIOPacket(netMan.getCore().allocateBuffer(size), false);
     }
 
+    @Override
     public void run() {
 
         while (netMan.isAlive()) {
@@ -197,7 +214,8 @@ public class TCPNIONetworkLayer implements Runnable {
                     SelectionKey key = (SelectionKey) it.next();
                     it.remove();
 
-                    Thread.currentThread().setName("NetworkLayer " + key + " -- " + netMan.getFriendManager().getCore().getSettings().getMy().getNickname());
+                    Thread.currentThread().setName("NetworkLayer " + key + " -- " +
+                            netMan.getFriendManager().getCore().getSettings().getMy().getNickname());
 
                     try {
                         if (key.isAcceptable()) {
@@ -250,7 +268,8 @@ public class TCPNIONetworkLayer implements Runnable {
             serverSocket.setReuseAddress(true);
             InetSocketAddress address;
             if (netMan.getCore().getSettings().getInternal().getServerlistenip().trim().length() > 0) {
-                address = new InetSocketAddress(netMan.getCore().getSettings().getInternal().getServerlistenip(), netMan.getServerPort());
+                address = new InetSocketAddress(netMan.getCore().getSettings().getInternal().getServerlistenip(),
+                        netMan.getServerPort());
             } else {
                 address = new InetSocketAddress(netMan.getServerPort());
             }
@@ -260,6 +279,7 @@ public class TCPNIONetworkLayer implements Runnable {
             //maybe a fix for a problem when the binding lingers.
             Runtime.getRuntime().addShutdownHook(new Thread() {
 
+                @Override
                 public void run() {
                     if (serverSocket.isBound()) {
                         try {

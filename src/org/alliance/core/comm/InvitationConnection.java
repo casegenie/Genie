@@ -47,6 +47,7 @@ public class InvitationConnection extends AuthenticatedConnection {
         sendMyInfoWrapped();
     }
 
+    @Override
     public void sendConnectionIdentifier() throws IOException {
         if (T.t) {
             T.trace("InvitationConnection succeded - remove connection error event");
@@ -100,6 +101,7 @@ public class InvitationConnection extends AuthenticatedConnection {
     }
     private boolean friendInfoReceived = false;
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         if (friendInfoReceived) {
             if (T.t) {
@@ -146,10 +148,12 @@ public class InvitationConnection extends AuthenticatedConnection {
         }
     }
 
+    @Override
     protected int getConnectionId() {
         return CONNECTION_ID;
     }
 
+    @Override
     public void signalConnectionAttemtError() {
         super.signalConnectionAttemtError();
         if (connectionFailedEvent != null) {

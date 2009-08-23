@@ -1,11 +1,13 @@
 package org.alliance.ui;
 
-import static org.alliance.core.CoreSubsystem.*;
+import static org.alliance.core.CoreSubsystem.BLOCK_SIZE;
 import org.alliance.core.file.blockstorage.BlockFile;
 import org.alliance.core.comm.filetransfers.Download;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import javax.swing.JComponent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,10 +28,12 @@ public class JDownloadGrid extends JComponent {
         repaint();
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(400, 40);
     }
 
+    @Override
     public synchronized void paint(Graphics g) {
         g.setColor(getBackground());
         g.fillRect(0, 0, getWidth(), getHeight());

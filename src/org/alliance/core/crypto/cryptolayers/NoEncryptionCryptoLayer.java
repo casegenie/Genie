@@ -22,15 +22,18 @@ public class NoEncryptionCryptoLayer extends BufferedCryptoLayer {
         super(core);
     }
 
+    @Override
     public void closed(Connection c) {
     }
 
+    @Override
     public int encrypt(Connection c, ByteBuffer src, ByteBuffer dst) throws IOException {
         int r = src.remaining();
         dst.put(src);
         return r;
     }
 
+    @Override
     public void decrypt(Connection c, ByteBuffer src, ByteBuffer dst) throws IOException {
         dst.put(src);
     }

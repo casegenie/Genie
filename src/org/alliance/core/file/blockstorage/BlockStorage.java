@@ -72,6 +72,7 @@ public abstract class BlockStorage extends Thread {
 
     public abstract int getStorageTypeId();
 
+    @Override
     public void run() {
         while (alive) {
             try {
@@ -85,6 +86,7 @@ public abstract class BlockStorage extends Thread {
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             try {
                                 if (T.t) {
@@ -116,6 +118,7 @@ public abstract class BlockStorage extends Thread {
     private void loadHashes() {
         File hashes[] = storagePath.listFiles(new FilenameFilter() {
 
+            @Override
             public boolean accept(File dir, String name) {
                 return name != null && name.endsWith(".dir");
             }

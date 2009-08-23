@@ -28,6 +28,7 @@ public class ForwardedInvitation extends PersistantRPC {
         this.fromNickname = from.getNickname();
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         fromGuid = data.readInt();
         invitationCode = data.readUTF();
@@ -35,6 +36,7 @@ public class ForwardedInvitation extends PersistantRPC {
         core.queNeedsUserInteraction(new ForwardedInvitationInteraction(con.getRemoteFriend(), fromNickname, fromGuid, invitationCode));
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(fromGuid);
         p.writeUTF(invitationCode);

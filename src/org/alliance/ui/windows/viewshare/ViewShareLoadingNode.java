@@ -12,14 +12,17 @@ public class ViewShareLoadingNode extends ViewShareFileNode {
         super("Loading...", root, parent);
     }
 
+    @Override
     protected int getShareBaseIndex() {
         return getParent().getShareBaseIndex();
     }
 
+    @Override
     protected String getFileItemPath() {
         return getParent().getFileItemPath() + getName();
     }
 
+    @Override
     public boolean isLeaf() {
         return true;
     }

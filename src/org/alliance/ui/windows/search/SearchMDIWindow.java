@@ -11,13 +11,10 @@ import org.alliance.ui.util.CutCopyPastePopup;
 import org.alliance.ui.windows.AllianceMDIWindow;
 import org.jdesktop.swingx.JXTreeTable;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.table.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -26,6 +23,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,6 +80,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         JHtmlLabel label = (JHtmlLabel) xui.getComponent("label");
         label.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 String s = e.getURL().toString();
                 s = s.substring(s.length() - 1);
@@ -88,6 +104,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
         table.getTableHeader().addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 JTableHeader h = (JTableHeader) e.getSource();
                 TableColumnModel columnModel = h.getColumnModel();
@@ -117,9 +134,11 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         });
         table.addMouseMotionListener(new MouseMotionListener() {
 
+            @Override
             public void mouseDragged(MouseEvent e) {
             }
 
+            @Override
             public void mouseMoved(MouseEvent e) {
                 if (table.getPathForLocation(e.getX(), e.getY()) != null) {
                     SearchTreeNode n = (SearchTreeNode) table.getPathForLocation(e.getX(), e.getY()).getLastPathComponent();
@@ -151,14 +170,17 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
         table.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() >= 2) {
                     EVENT_download(null);
@@ -252,6 +274,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                     } else {
                         ui.getCore().invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 try {
                                     String name = n.getOriginalFilename();
@@ -309,6 +332,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         }
     }
 
+    @Override
     public void windowSelected() {
         super.windowSelected();
     }
@@ -343,6 +367,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         table.setTreeTableModel(model = new SearchTreeTableModel(ui.getCore(), pacedRunner));
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     ui.getCore().getFriendManager().getNetMan().sendSearch(t, ft);
@@ -353,19 +378,24 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         });
     }
 
+    @Override
     public String getIdentifier() {
         return "Search";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
@@ -380,6 +410,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
     public class NameCellRenderer extends DefaultTreeCellRenderer {
 
+        @Override
         public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded, boolean leaf, int row, boolean hasFocus) {
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
             if (value instanceof FileNode) {
@@ -404,6 +435,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
     public class BytesizeCellRenderer extends DefaultTableCellRenderer {
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
@@ -412,21 +444,26 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             return this;
         }
 
+        @Override
         public void validate() {
         }
 
+        @Override
         public void revalidate() {
         }
 
+        @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         }
 
+        @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
     }
 
     public class DaysOldCellRenderer extends DefaultTableCellRenderer {
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
@@ -439,21 +476,26 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             return this;
         }
 
+        @Override
         public void validate() {
         }
 
+        @Override
         public void revalidate() {
         }
 
+        @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         }
 
+        @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
     }
 
     public class SourcesCellRenderer extends DefaultTableCellRenderer {
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
@@ -475,15 +517,19 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             return this;
         }
 
+        @Override
         public void validate() {
         }
 
+        @Override
         public void revalidate() {
         }
 
+        @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         }
 
+        @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
     }
@@ -496,6 +542,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             setOpaque(true);
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             if (value != null && value instanceof Double) {
@@ -508,18 +555,23 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             return this;
         }
 
+        @Override
         public void validate() {
         }
 
+        @Override
         public void revalidate() {
         }
 
+        @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         }
 
+        @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
 
+        @Override
         public void paint(Graphics g) {
             super.paint(g);
             Graphics2D g2 = (Graphics2D) g;

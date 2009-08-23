@@ -27,6 +27,7 @@ public class NewFriendConnectedUserInteraction implements NeedsUserInteraction {
         this.guid = guid;
     }
 
+    @Override
     public boolean canRunInParallelWithOtherInteractions() {
         return true;
     }

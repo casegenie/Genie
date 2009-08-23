@@ -1,7 +1,6 @@
 package org.alliance.ui.windows.viewshare;
 
 import com.stendahls.nif.ui.OptionDialog;
-import com.stendahls.nif.ui.framework.TreeState;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
@@ -15,12 +14,7 @@ import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.windows.AllianceMDIWindow;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -29,6 +23,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.TreePath;
 
 /**
  * Created by IntelliJ IDEA.
@@ -69,10 +73,12 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         tree.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -108,6 +114,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
             l.addHyperlinkListener(new HyperlinkListener() {
 
+                @Override
                 public void hyperlinkUpdate(HyperlinkEvent e) {
                     if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                         try {
@@ -232,6 +239,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 for (ViewShareFileNode p : paths) {
                     if (remote.isConnected()) {
@@ -251,27 +259,33 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
     }
 
+    @Override
     public String getIdentifier() {
         return "viewshare" + remote.getGuid();
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
         ViewShareMDIWindow viewShareMDIWindow = new ViewShareMDIWindow(ui, remote);
         manager.recreateWindow(this, viewShareMDIWindow);
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
 
     private class ViewShareTreeRenderer extends DefaultTreeCellRenderer {
 
+        @Override
         public Component getTreeCellRendererComponent(
                 JTree tree,
                 Object value,

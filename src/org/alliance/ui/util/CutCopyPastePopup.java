@@ -1,8 +1,13 @@
 package org.alliance.ui.util;
 
-import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.text.JTextComponent;
-import java.awt.event.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,10 +47,12 @@ public class CutCopyPastePopup extends JPopupMenu implements ActionListener {
 
         target.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -58,6 +65,7 @@ public class CutCopyPastePopup extends JPopupMenu implements ActionListener {
         });
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         if ("cut".equals(e.getActionCommand())) {
             target.cut();

@@ -43,11 +43,13 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         super(core);
     }
 
+    @Override
     public void closed(Connection c) {
         super.closed(c);
         contexts.remove(c.getKey());
     }
 
+    @Override
     public void init() throws Exception {
         if (T.t) {
             T.info("SSLCryptoLayer initializing!");
@@ -83,6 +85,7 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         allowedChipherSuites.toArray(ALLOWED_CHIPHER_SUITES);
     }
 
+    @Override
     public int encrypt(Connection c, ByteBuffer src, ByteBuffer dst) throws IOException {
         if (T.t) {
             T.debug("Encrypt");
@@ -98,7 +101,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
             r = e.wrap(src, dst);
             read += r.bytesConsumed();
             if (T.t) {
-                T.trace("SSLResult: " + r.getStatus() + " " + r.getHandshakeStatus() + " produced: " + r.bytesProduced() + " consumed: " + r.bytesConsumed());
+                T.trace("SSLResult: " + r.getStatus() + " " + r.getHandshakeStatus() + " produced: " +
+                        r.bytesProduced() + " consumed: " + r.bytesConsumed());
             }
             if (r.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_TASK) {
                 Runnable task;
@@ -137,6 +141,7 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         return read;
     }
 
+    @Override
     public void decrypt(Connection c, ByteBuffer src, ByteBuffer dst) throws IOException {
         if (T.t) {
             T.debug("Decrypt");
@@ -161,7 +166,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
             r = e.unwrap(src, dst);
             forceAnotherUnwrap = false;
             if (T.t) {
-                T.trace("SSLResult: " + r.getStatus() + " " + r.getHandshakeStatus() + " produced: " + r.bytesProduced() + " consumed: " + r.bytesConsumed());
+                T.trace("SSLResult: " + r.getStatus() + " " + r.getHandshakeStatus() +
+                        " produced: " + r.bytesProduced() + " consumed: " + r.bytesConsumed());
             }
             if (T.t) {
                 T.trace("Left in src buffer: " + src.remaining());
@@ -172,7 +178,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
                     if (T.t) {
                         T.warn("Creating new incoming data buffer");
                     }
-                    cx.incomingEncryptedData = ByteBuffer.allocate(src.remaining() > START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER ? src.remaining() : START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER);
+                    cx.incomingEncryptedData = ByteBuffer.allocate(src.remaining() >
+                            START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER ? src.remaining() : START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER);
                 }
                 if (cx.incomingEncryptedData != src) {
                     if (cx.incomingEncryptedData.remaining() >= src.remaining()) {
@@ -230,7 +237,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
 
     private ByteBuffer expandBufferAndAppend(ByteBuffer bufferToExpand, ByteBuffer bufferToAppend) {
         if (T.t) {
-            T.warn("Need to expand buffer. Capacity before: " + bufferToExpand.capacity() + " remaining: " + bufferToExpand.remaining() + ", need to add: " + bufferToAppend.remaining());
+            T.warn("Need to expand buffer. Capacity before: " + bufferToExpand.capacity() +
+                    " remaining: " + bufferToExpand.remaining() + ", need to add: " + bufferToAppend.remaining());
         }
         ByteBuffer old = bufferToExpand;
         old.flip();

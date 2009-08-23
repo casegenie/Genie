@@ -29,6 +29,7 @@ public class GracefulClose extends RPC {
         this.reason = reason;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         reason = data.readByte();
         if (T.t) {
@@ -41,7 +42,8 @@ public class GracefulClose extends RPC {
             /*            if (con.getRemoteFriend().hasMultipleFriendConnections()) {
             if(T.t)T.info("Ha! We have detected a double connection to one friend. Closing one down.");
             } else {
-            if(T.t)T.info(con.getRemoteFriend()+" is closing us down even though we only have one connection to him! This is a little bit scketchy but probably ok. We just don't know that we'll get a new connection to him in an instant.");
+            if(T.t)T.info(con.getRemoteFriend()+
+             " is closing us down even though we only have one connection to him! This is a little bit scketchy but probably ok. We just don't know that we'll get a new connection to him in an instant.");
             }*/
         } else if (reason == SHUTDOWN) {
             if (T.t) {
@@ -75,6 +77,7 @@ public class GracefulClose extends RPC {
         //at the same time. This is why it works this way
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
@@ -82,6 +85,7 @@ public class GracefulClose extends RPC {
                 }
                 core.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             con.close();
@@ -97,6 +101,7 @@ public class GracefulClose extends RPC {
         t.start();
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeByte(reason);
         return p;

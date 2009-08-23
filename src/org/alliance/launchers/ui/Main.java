@@ -8,7 +8,11 @@ import org.alliance.core.T;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -133,6 +137,7 @@ public class Main {
     private static void startStartSignalThread(final Subsystem tray) {
         signalThread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     signalServerSocket = new ServerSocket(STARTED_SIGNAL_PORT, 0, InetAddress.getByName("127.0.0.1"));

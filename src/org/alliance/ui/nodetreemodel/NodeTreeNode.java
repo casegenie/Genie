@@ -9,11 +9,11 @@ import org.alliance.core.node.Node;
 import org.alliance.core.node.UntrustedNode;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.swing.tree.TreeNode;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -60,12 +60,14 @@ public class NodeTreeNode extends GenericNode {
                     children.add(new NodeTreeNode("Loading ..."));
                     manager.getCore().invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             try {
                                 manager.loadSubnodesFor(node);
                             } catch (final IOException e) {
                                 SwingUtilities.invokeLater(new Runnable() {
 
+                                    @Override
                                     public void run() {
                                         reportError(e.toString());
                                     }
@@ -89,32 +91,39 @@ public class NodeTreeNode extends GenericNode {
         }
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         assureChildrenAreLoaded();
         return children.get(childIndex);
     }
 
+    @Override
     public int getChildCount() {
         assureChildrenAreLoaded();
         return children.size();
     }
 
+    @Override
     public TreeNode getParent() {
         return parent;
     }
 
+    @Override
     public int getIndex(TreeNode node) {
         return children.indexOf((NodeTreeNode) node);
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return true;
     }
 
+    @Override
     public boolean isLeaf() {
         return dummyString != null;
     }
 
+    @Override
     public Enumeration children() {
         assureChildrenAreLoaded();
         return EnumerationIteratorConverter.enumeration(children.iterator());
@@ -124,6 +133,7 @@ public class NodeTreeNode extends GenericNode {
         return node;
     }
 
+    @Override
     public String toString() {
         if (dummyString != null) {
             return dummyString;
@@ -136,6 +146,7 @@ public class NodeTreeNode extends GenericNode {
         assureChildrenAreLoaded();
     }
 
+    @Override
     public Object getIdentifier() {
         if (node == null) {
             return null;

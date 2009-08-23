@@ -89,6 +89,7 @@ public abstract class Connection {
         return key;
     }
 
+    @Override
     public String toString() {
         return TextUtils.simplifyClassName(getClass()) + " [" + key + "]";
     }

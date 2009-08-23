@@ -1,7 +1,5 @@
 package org.alliance.core.comm;
 
-import org.alliance.core.comm.networklayers.tcpnio.TCPNIONetworkLayer;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -28,6 +26,7 @@ public abstract class PacketConnection extends Connection {
         super(netMan, direction, key);
     }
 
+    @Override
     public void init() throws IOException {
         super.init();
         receivePacket = netMan.createPacketForReceive(netMan.getCore().getSettings().getInternal().getMaximumAlliancePacketSize() * 11 / 10);
@@ -56,11 +55,13 @@ public abstract class PacketConnection extends Connection {
         lastPacketSentAt = System.currentTimeMillis();
     }
 
+    @Override
     public void readyToSend() throws IOException {
 //          looks like alliance can hang in an infitite loop here sometimes
 //        if(T.t)T.traceNoDup("OS send buffer space is available - try to send sometihing");
         if (T.netTrace) {
-            T.trace("OS send buffer space is available - try to send sometihing. Packets in que: " + packetsToSend.size() + "packetCurrentlySending: " + packetCurrentlyInSending);
+            T.trace("OS send buffer space is available - try to send sometihing. Packets in que: " +
+                    packetsToSend.size() + "packetCurrentlySending: " + packetCurrentlyInSending);
         }
 
         while (true) {
@@ -98,6 +99,7 @@ public abstract class PacketConnection extends Connection {
         }
     }
 
+    @Override
     public void received(ByteBuffer buf) throws IOException {
         if (T.netTrace) {
             T.trace("Received " + buf.remaining() + " bytes - " + receivePacket.getAvailable() + " bytes available in buffer.");
@@ -113,7 +115,8 @@ public abstract class PacketConnection extends Connection {
                 T.trace("Packet length " + len + " received. In packet buffer: " + receivePacket.getPos());
             }
             if (len > core.getSettings().getInternal().getMaximumAlliancePacketSize()) {
-                throw new IOException("Received too large Alliance packet! Max: " + core.getSettings().getInternal().getMaximumAlliancePacketSize() + ", received: " + len);
+                throw new IOException("Received too large Alliance packet! Max: " +
+                        core.getSettings().getInternal().getMaximumAlliancePacketSize() + ", received: " + len);
             }
             if (receivePacket.getPos() >= len + 2) {
                 if (T.netTrace) {

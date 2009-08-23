@@ -4,10 +4,13 @@ import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.ui.OptionDialog;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
 
 public class AddRuleWindow extends XUIDialog {
 
@@ -91,7 +94,7 @@ public class AddRuleWindow extends XUIDialog {
         Integer temp;
         for (int i = 0; i < OPTIONS.length - 1; i++) {
             //If it's left blank, assume a 0
-            if (FIELDS.get(i).getText() == "") {
+            if (FIELDS.get(i).getText().isEmpty()) {
                 FIELDS.get(i).setText("0");
             }
             try {

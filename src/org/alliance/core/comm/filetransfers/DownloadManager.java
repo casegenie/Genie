@@ -9,8 +9,19 @@ import org.alliance.core.file.blockstorage.BlockStorage;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.node.Friend;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -37,6 +48,7 @@ public class DownloadManager extends Manager implements Runnable {
         this.core = core;
     }
 
+    @Override
     public void init() throws IOException {
         netMan = core.getNetworkManager();
         load();
@@ -47,6 +59,7 @@ public class DownloadManager extends Manager implements Runnable {
         thread.start();
     }
 
+    @Override
     public void run() {
         while (alive) {
             for (int i = 0; i < 4; i++) {
@@ -56,6 +69,7 @@ public class DownloadManager extends Manager implements Runnable {
                 }
                 core.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             flushBlockMaskRequestQue();
@@ -68,6 +82,7 @@ public class DownloadManager extends Manager implements Runnable {
 
             core.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         checkForDownloadsToStart();
@@ -80,6 +95,7 @@ public class DownloadManager extends Manager implements Runnable {
             if (System.currentTimeMillis() - lastSaveTick > 1000 * 60 * 10) {
                 core.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             save();

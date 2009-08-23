@@ -37,6 +37,7 @@ public class FriendConnector extends Thread {
         setPriority(MIN_PRIORITY);
     }
 
+    @Override
     public void run() {
         if (CoreSubsystem.isRunningAsTestSuite()) {
             //all hell breaks loose if all clients attempt to connect to each other at the same time
@@ -50,6 +51,7 @@ public class FriendConnector extends Thread {
             ArrayList<Friend> al = new ArrayList<Friend>(manager.friends());
             Collections.sort(al, new Comparator<Friend>() {
 
+                @Override
                 public int compare(Friend o1, Friend o2) {
                     long diff = o2.getLastSeenOnlineAt() - o1.getLastSeenOnlineAt();
                     if (diff > 0xffffff) {

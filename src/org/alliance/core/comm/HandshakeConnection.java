@@ -22,6 +22,7 @@ public class HandshakeConnection extends PacketConnection {
         super(netMan, Direction.IN, key);
     }
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         if (T.t) {
             T.trace("packetReceived in HandhshakeConnection - " + p);
@@ -112,6 +113,7 @@ public class HandshakeConnection extends PacketConnection {
         }
     }
 
+    @Override
     protected int getConnectionId() {
         return 0;
     }

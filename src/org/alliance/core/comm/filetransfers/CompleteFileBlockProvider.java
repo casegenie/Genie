@@ -42,6 +42,7 @@ public class CompleteFileBlockProvider extends BlockProvider {
         }
     }
 
+    @Override
     public int fill(ByteBuffer buf) throws IOException {
         if (!fileChannel.isOpen()) {
             return -1;

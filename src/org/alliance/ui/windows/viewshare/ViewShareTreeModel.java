@@ -38,6 +38,7 @@ public class ViewShareTreeModel extends DefaultTreeModel {
             //send get share base list to remote - answer will come asynchronously
             core.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     if (node.isConnected()) {
                         try {
@@ -70,6 +71,7 @@ public class ViewShareTreeModel extends DefaultTreeModel {
         nodeStructureChanged(getRoot());
     }
 
+    @Override
     public ViewShareRootNode getRoot() {
         return (ViewShareRootNode) super.getRoot();
     }

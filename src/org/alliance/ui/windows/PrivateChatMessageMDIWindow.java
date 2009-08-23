@@ -3,8 +3,8 @@ package org.alliance.ui.windows;
 import org.alliance.core.comm.rpc.ChatMessageV3;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.io.IOException;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -26,6 +26,7 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         postInit();
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 chat.setText("Type here and then press 'send' to start chatting.");
                 chat.requestFocus();
@@ -34,24 +35,28 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         });
     }
 
+    @Override
     public void addMessage(String from, String message, long tick, boolean messageHasBeenQueuedAwayForAWhile) {
         super.addMessage(from, message, tick, messageHasBeenQueuedAwayForAWhile);
         manager.selectWindow(this);
         ui.getMainWindow().toFront();
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 chat.requestFocus();
             }
         });
     }
 
+    @Override
     protected void send(final String text) throws IOException {
         if (text == null || text.trim().length() == 0) {
             return;
         }
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     ui.getCore().getFriendManager().getNetMan().sendPersistantly(new ChatMessageV3(text, false), ui.getCore().getFriendManager().getFriend(guid));
@@ -64,6 +69,7 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         addMessage(ui.getCore().getFriendManager().getMe().getNickname(), text, System.currentTimeMillis(), false);
     }
 
+    @Override
     public String getIdentifier() {
         return "msg" + guid;
     }

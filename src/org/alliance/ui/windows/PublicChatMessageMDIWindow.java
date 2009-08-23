@@ -23,12 +23,14 @@ public class PublicChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         postInit();
     }
 
+    @Override
     public void send(final String text) throws Exception {
         if (text == null || text.trim().length() == 0) {
             return;
         }
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     for (Friend f : ui.getCore().getFriendManager().friends()) {
@@ -43,6 +45,7 @@ public class PublicChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         ui.getMainWindow().publicChatMessage(ui.getCore().getFriendManager().getMe().getGuid(), text, System.currentTimeMillis(), false);
     }
 
+    @Override
     public String getIdentifier() {
         return "publicchat";
     }

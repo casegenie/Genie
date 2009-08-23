@@ -23,6 +23,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
         getRoot().setModel(this, pacedRunner);
     }
 
+    @Override
     public RootNode getRoot() {
         return (RootNode) super.getRoot();
     }
@@ -31,10 +32,12 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
         getRoot().addSearchHits(sourceGuid, hops, hits);
     }
 
+    @Override
     public int getColumnCount() {
         return 6;
     }
 
+    @Override
     public Class<?> getColumnClass(int columnIndex) {
         if (columnIndex == 1) {
             return Long.class;
@@ -54,6 +57,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
         return super.getColumnClass(columnIndex);
     }
 
+    @Override
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0:
@@ -73,6 +77,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
         }
     }
 
+    @Override
     public Object getValueAt(Object o, int i) {
         SearchTreeNode n = (SearchTreeNode) o;
         return n.getValueAt(i);
@@ -81,6 +86,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     Comparator<SearchTreeNode> createNameComparator() {
         return new Comparator<SearchTreeNode>() {
 
+            @Override
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
@@ -90,6 +96,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     Comparator<SearchTreeNode> createSourcesComparator() {
         return new Comparator<SearchTreeNode>() {
 
+            @Override
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return (int) Math.round((o2.getSources() - o1.getSources()) * 1000);
             }
@@ -99,6 +106,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     Comparator<SearchTreeNode> createDaysAgoComparator() {
         return new Comparator<SearchTreeNode>() {
 
+            @Override
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return (int) Math.round((o1.getDaysAgo() - o2.getDaysAgo()) * 1000);
             }
@@ -108,6 +116,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     Comparator<SearchTreeNode> createSizeComparator() {
         return new Comparator<SearchTreeNode>() {
 
+            @Override
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return (int) (o2.getSize() - o1.getSize());
             }
@@ -117,6 +126,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     Comparator<SearchTreeNode> createSpeedComparator() {
         return new Comparator<SearchTreeNode>() {
 
+            @Override
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return (int) Math.round((o2.getSpeed() - o1.getSpeed()) * 1000);
             }

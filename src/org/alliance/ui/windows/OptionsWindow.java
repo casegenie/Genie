@@ -6,19 +6,31 @@ import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
 import static org.alliance.core.CoreSubsystem.KB;
-import org.alliance.core.settings.*;
+import org.alliance.core.settings.My;
+import org.alliance.core.settings.Routerule;
+import org.alliance.core.settings.SettingClass;
+import org.alliance.core.settings.Settings;
+import org.alliance.core.settings.Share;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JList;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 /**
  * Created by IntelliJ IDEA. User: maciek Date: 2006-mar-20 Time: 22:33:46 To

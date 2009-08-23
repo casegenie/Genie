@@ -2,13 +2,17 @@ package org.alliance.ui.windows.search;
 
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.util.TextUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeNode;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.PacedRunner;
-
-import javax.swing.tree.TreeNode;
-import javax.swing.*;
-import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,9 +36,11 @@ public class RootNode extends SearchTreeNode {
         this.pacedRunner = pacedRunner;
         pacedRunner.setRunner(new Runnable() {
 
+            @Override
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         resortTable();
                     }
@@ -134,50 +140,62 @@ public class RootNode extends SearchTreeNode {
         model.nodeStructureChanged(this);
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         return children.get(childIndex);
     }
 
+    @Override
     public int getChildCount() {
         return children.size();
     }
 
+    @Override
     public TreeNode getParent() {
         return null;
     }
 
+    @Override
     public int getIndex(TreeNode node) {
         return children.indexOf(node);
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return true;
     }
 
+    @Override
     public boolean isLeaf() {
         return false;
     }
 
+    @Override
     public Enumeration children() {
         return EnumerationIteratorConverter.enumeration(children.iterator());
     }
 
+    @Override
     public String getName() {
         return "root";
     }
 
+    @Override
     public double getSources() {
         return 0;
     }
 
+    @Override
     public double getSpeed() {
         return 0;
     }
 
+    @Override
     public long getSize() {
         return 0;
     }
 
+    @Override
     public int getDaysAgo() {
         return 0;
     }

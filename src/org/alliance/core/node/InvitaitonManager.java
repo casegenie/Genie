@@ -7,7 +7,11 @@ import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.InvitationConnection;
 import org.alliance.core.settings.Settings;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.util.HashMap;
 import java.util.Collection;
@@ -72,6 +76,7 @@ public class InvitaitonManager {
         InvitationConnection ic = new InvitationConnection(core.getNetworkManager(), Connection.Direction.OUT, passkey, middleman);
         ic.setConnectionFailedEvent(new Runnable() {
 
+            @Override
             public void run() {
                 if (T.t) {
                     T.info("Attemted to connect using invitation but failed. From guid: " + fromGuid);

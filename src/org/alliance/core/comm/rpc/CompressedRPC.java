@@ -4,7 +4,11 @@ import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
 import org.alliance.core.comm.T;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -22,6 +26,7 @@ public abstract class CompressedRPC extends RPC {
 
     public abstract void serializeCompressed(DataOutputStream out) throws IOException;
 
+    @Override
     public void execute(Packet data) throws IOException {
         int len = data.readInt();
         byte arr[] = new byte[len];
@@ -33,6 +38,7 @@ public abstract class CompressedRPC extends RPC {
         in.close();
     }
 
+    @Override
     public Packet serializeTo(Packet p) throws IOException {
         ByteArrayOutputStream buf = new ByteArrayOutputStream(1024); //in general compressed RPC are fairly big packets - that's why we crank up the starting byte array size
         DataOutputStream out = new DataOutputStream(new DeflaterOutputStream(buf, new Deflater(9)));

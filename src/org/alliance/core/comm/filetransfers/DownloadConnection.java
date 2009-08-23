@@ -27,10 +27,12 @@ public class DownloadConnection extends TransferConnection {
         this.download = download;
     }
 
+    @Override
     public Hash getRoot() {
         return download.getRoot();
     }
 
+    @Override
     public void init() throws IOException {
         super.init();
         download.connectionEstablished(this);
@@ -47,6 +49,7 @@ public class DownloadConnection extends TransferConnection {
         }
     }
 
+    @Override
     public void bytesReceived(int n) {
         super.bytesReceived(n);
         download.getBandwidth().update(n);
@@ -66,11 +69,13 @@ public class DownloadConnection extends TransferConnection {
         close();
     }
 
+    @Override
     public void close() throws IOException {
         super.close();
         download.removeConnection(this);
     }
 
+    @Override
     public void received(ByteBuffer buf) throws IOException {
         if (mode == Mode.PACKET) {
             super.received(buf);
@@ -84,6 +89,7 @@ public class DownloadConnection extends TransferConnection {
         }
     }
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         if (T.t) {
             T.ass(false, "eh. We're not receiving any packets here");
@@ -133,10 +139,12 @@ public class DownloadConnection extends TransferConnection {
         switchMode(Mode.RAW);
     }
 
+    @Override
     protected int getConnectionId() {
         return CONNECTION_ID;
     }
 
+    @Override
     public int getConnectionIdForRemote() {
         return UploadConnection.CONNECTION_ID;
     }
@@ -199,6 +207,7 @@ public class DownloadConnection extends TransferConnection {
         }
     }
 
+    @Override
     public String toString() {
         if (getRemoteFriend() == null) {
             return "Establishing connection (download)";

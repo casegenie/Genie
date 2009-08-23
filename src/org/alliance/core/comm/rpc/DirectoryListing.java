@@ -28,6 +28,7 @@ public class DirectoryListing extends CompressedRPC {
         this.path = path;
     }
 
+    @Override
     public void executeCompressed(DataInputStream in) throws IOException {
         shareBaseIndex = in.readInt();
         path = in.readUTF();
@@ -53,6 +54,7 @@ public class DirectoryListing extends CompressedRPC {
         core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, files);
     }
 
+    @Override
     public void serializeCompressed(DataOutputStream out) throws IOException {
         if (T.t) {
             T.info("compressing directory listing and sending..");

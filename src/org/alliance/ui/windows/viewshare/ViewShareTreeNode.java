@@ -9,10 +9,10 @@ import org.alliance.core.node.Node;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.ui.T;
 
-import javax.swing.*;
-import javax.swing.tree.TreeNode;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import javax.swing.SwingUtilities;
+import javax.swing.tree.TreeNode;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,6 +43,7 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
             final Node node = root.getModel().getNode();
             root.getModel().getCore().invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         if (node instanceof Friend) {
@@ -70,6 +71,7 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
                             }
                             SwingUtilities.invokeLater(new Runnable() {
 
+                                @Override
                                 public void run() {
                                     root.getModel().getWin().directoryListingReceived(getShareBaseIndex(), getFileItemPath(), files);
                                 }
@@ -83,6 +85,7 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
             hasSentQueryForChildren = true;
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     if (children.size() == 0) {
                         children.add(new ViewShareLoadingNode(root, ViewShareTreeNode.this));
@@ -93,28 +96,34 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
         }
     }
 
+    @Override
     public int getChildCount() {
         assureChildrenAreLoaded();
         return children.size();
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         return children.get(childIndex);
     }
 
+    @Override
     public ViewShareTreeNode getParent() {
         return parent;
     }
 
+    @Override
     public int getIndex(TreeNode node) {
         assureChildrenAreLoaded();
         return children.indexOf(node);
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return true;
     }
 
+    @Override
     public boolean isLeaf() {
         if (name == null) {
             return false;
@@ -122,11 +131,13 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
         return !name.endsWith("/");
     }
 
+    @Override
     public Enumeration children() {
         assureChildrenAreLoaded();
         return EnumerationIteratorConverter.enumeration(children.iterator());
     }
 
+    @Override
     public String toString() {
         if (name != null && name.endsWith("/")) {
             return name.substring(0, name.length() - 1);
@@ -197,6 +208,7 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
         return name;
     }
 
+    @Override
     public Object getIdentifier() {
         return name + getFileItemPath();
     }

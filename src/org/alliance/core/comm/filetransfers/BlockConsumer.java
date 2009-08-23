@@ -38,6 +38,7 @@ public class BlockConsumer implements DataConsumer {
     }
     private boolean firstConsume = true;
 
+    @Override
     public void consume(ByteBuffer buf) throws IOException {
         int saveBufferPos = saveBuffer == null ? 0 : saveBuffer.position();
         if (sliceOffset + buf.remaining() + saveBufferPos > BlockFile.getBlockSize(blockNumber, fd.getSize())) {

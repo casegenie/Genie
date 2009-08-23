@@ -8,10 +8,7 @@ import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
 
-import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import java.awt.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -22,6 +19,12 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.TreeSet;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.JEditorPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,6 +60,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         super(manager, mdiWindowIdentifier, ui);
         chatLines = new TreeSet<ChatLine>(new Comparator<ChatLine>() {
 
+            @Override
             public int compare(ChatLine o1, ChatLine o2) {
                 long diff = o1.tick - o2.tick;
                 if (diff <= Integer.MIN_VALUE) {
@@ -72,8 +76,10 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
 
     protected abstract void send(final String text) throws IOException, Exception;
 
+    @Override
     public abstract String getIdentifier();
 
+    @Override
     protected void postInit() {
         textarea = new JEditorPane("text/html", "");
         new CutCopyPastePopup(textarea);
@@ -88,6 +94,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         textarea.setBackground(Color.white);
         textarea.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
@@ -233,12 +240,14 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         }
     }
 
+    @Override
     public void run() {
         while (alive) {
             if (needToUpdateHtml) {
                 needToUpdateHtml = false;
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         textarea.setText(html);
                     }
@@ -285,20 +294,25 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         }
     }
 
+    @Override
     public void windowClosed() {
         super.windowClosed();
         alive = false;
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }

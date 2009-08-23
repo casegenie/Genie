@@ -20,12 +20,14 @@ public class DownloadStorage extends BlockStorage {
         isSequential = true;
     }
 
+    @Override
     protected void signalFileComplete(BlockFile bf) {
         if (T.t) {
             T.info("File downloaded successfully: " + bf.getFd());
         }
     }
 
+    @Override
     public int getStorageTypeId() {
         return TYPE_ID;
     }

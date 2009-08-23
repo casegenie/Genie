@@ -39,6 +39,7 @@ public class BlockMaskResult extends RPC {
         hasAllBits = false;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         hasAllBits = data.readBoolean();
         hash = new Hash();
@@ -52,6 +53,7 @@ public class BlockMaskResult extends RPC {
         manager.getNetMan().getDownloadManager().blockMaskReceived(fromGuid, hops, hash, blockMask);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeBoolean(hasAllBits);
         p.writeArray(hash.array());

@@ -25,11 +25,13 @@ public class PlugInCommunication extends PersistantRPC {
         this.data = data;
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         data = in.readUTF();
         manager.getCore().getUICallback().pluginCommunicationReceived(con.getRemoteFriend(), data);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeUTF(data);
         return p;

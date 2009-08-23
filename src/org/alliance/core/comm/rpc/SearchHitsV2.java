@@ -33,6 +33,7 @@ public class SearchHitsV2 extends CompressedRPC {
         hits.add(new SearchHit(fd));
     }
 
+    @Override
     public void serializeCompressed(DataOutputStream out) throws IOException {
         int n = hits.size();
         if (n > MAX_SEARCH_HITS) {
@@ -52,6 +53,7 @@ public class SearchHitsV2 extends CompressedRPC {
         out.writeLong(-1);
     }
 
+    @Override
     public void executeCompressed(DataInputStream in) throws IOException {
         for (;;) {
             long size = in.readLong();

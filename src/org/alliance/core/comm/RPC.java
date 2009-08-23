@@ -71,6 +71,7 @@ public abstract class RPC {
         return initialized;
     }
 
+    @Override
     public String toString() {
         return TextUtils.simplifyClassName(getClass()) + "(RPC)";
     }

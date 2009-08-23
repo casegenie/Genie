@@ -8,14 +8,18 @@ import org.alliance.core.node.MyNode;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.nodetreemodel.NodeTreeNode;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Set;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTree;
+import javax.swing.tree.DefaultTreeCellRenderer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,13 +61,16 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow {
         postInit();
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public String getIdentifier() {
         return "friends";
     }
 
+    @Override
     public void revert() throws Exception {
         Set<Object> set = JTreeFoldStateManager.saveState(tree);
         ui.purgeNodeTreeModel();
@@ -71,9 +78,11 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow {
         JTreeFoldStateManager.restoreState(tree, set);
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
@@ -92,6 +101,7 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow {
 
     private class FriendCellRenderer extends DefaultTreeCellRenderer {
 
+        @Override
         public Component getTreeCellRendererComponent(
                 JTree tree,
                 Object value,

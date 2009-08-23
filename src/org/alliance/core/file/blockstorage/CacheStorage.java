@@ -20,6 +20,7 @@ public class CacheStorage extends BlockStorage {
         isSequential = false;
     }
 
+    @Override
     protected void signalFileComplete(BlockFile bf) {
         String path = bf.getFd().getFullPath();
         if (T.t) {
@@ -35,6 +36,7 @@ public class CacheStorage extends BlockStorage {
         }
     }
 
+    @Override
     public int getStorageTypeId() {
         return TYPE_ID;
     }

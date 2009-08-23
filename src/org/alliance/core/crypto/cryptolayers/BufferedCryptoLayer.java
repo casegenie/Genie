@@ -48,6 +48,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
 
     public abstract void decrypt(Connection c, ByteBuffer src, ByteBuffer dst) throws IOException;
 
+    @Override
     public int send(Connection c, ByteBuffer buf) throws IOException {
         int bytesToSend = buf.remaining();
         if (T.t) {
@@ -58,7 +59,8 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
 
         if (bytesToSend > d.encryptionBuffer.remaining()) {
             if (T.t) {
-                trace("Encryption buffer overflow: wants to send " + bytesToSend + " remaining in buffer: " + d.encryptionBuffer.remaining() + " - pos: " + d.encryptionBuffer.position() + " - wait for it to clear");
+                trace("Encryption buffer overflow: wants to send " + bytesToSend + " remaining in buffer: " +
+                        d.encryptionBuffer.remaining() + " - pos: " + d.encryptionBuffer.position() + " - wait for it to clear");
             }
             if (bytesToSend > d.encryptionBuffer.capacity()) {
                 if (T.t) {
@@ -131,6 +133,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
         }
     }
 
+    @Override
     public void received(Connection connection, ByteBuffer buf) throws IOException {
         if (T.t) {
             trace("Received " + buf.remaining() + " bytes of data. Decrypting and sending to connection.");
@@ -150,6 +153,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
         }
     }
 
+    @Override
     public void readyToSend(Connection connection) throws IOException {
         if (T.t) {
             trace("Connection is ready to send");
@@ -174,6 +178,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
         } else {
             networkLayer.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     c.setHasWriteInterest(true);
                     networkLayer.addInterestForWrite(c.getKey());
@@ -190,6 +195,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
         } else {
             networkLayer.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     c.setHasWriteInterest(false);
                     networkLayer.removeInterestForWrite(c.getKey());
@@ -202,6 +208,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
      * Called from connection classes
      * @param c
      */
+    @Override
     public void signalInterestToSend(final Connection c) {
         if (T.t) {
             trace("Connection interested in sending");
@@ -215,6 +222,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
      * Called from connection classes
      * @param c
      */
+    @Override
     public void noInterestToSend(final Connection c) {
         if (T.t) {
             trace("Connection NOT interested in sending");
@@ -226,6 +234,7 @@ public abstract class BufferedCryptoLayer extends CryptoLayer {
         }
     }
 
+    @Override
     public void closed(Connection c) {
         removeDataConnectionFor(c);
     }

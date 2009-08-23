@@ -26,6 +26,7 @@ public class TestBlockStorage extends TestCase {
 
     private CoreSubsystem core;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 //        new TraceWindow();

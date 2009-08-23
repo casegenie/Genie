@@ -4,14 +4,29 @@ import org.alliance.core.BroadcastManager;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.Manager;
 import org.alliance.core.T;
-import org.alliance.core.comm.*;
-import org.alliance.core.comm.rpc.*;
+import org.alliance.core.comm.AuthenticatedConnection;
+import org.alliance.core.comm.Connection;
+import org.alliance.core.comm.FriendConnection;
+import org.alliance.core.comm.InvitationConnection;
+import org.alliance.core.comm.NetworkManager;
+import org.alliance.core.comm.rpc.ForwardedInvitation;
+import org.alliance.core.comm.rpc.GetUserList;
+import org.alliance.core.comm.rpc.GracefulClose;
+import org.alliance.core.comm.rpc.Ping;
+import org.alliance.core.comm.rpc.PleaseForwardInvitation;
+import org.alliance.core.comm.rpc.UserInfo;
+import org.alliance.core.comm.rpc.UserInfoV2;
+import org.alliance.core.comm.rpc.UserList;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.settings.My;
 import org.alliance.core.settings.Settings;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Random;
 
 /**
  * The FriendManager keeps track of all nodes. Contains a list of friends and a list of all nodes
@@ -42,6 +57,7 @@ public class FriendManager extends Manager {
         this.core = core;
     }
 
+    @Override
     public void init() throws Exception {
         netMan = core.getNetworkManager();
         setupGUID();

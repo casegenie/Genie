@@ -32,6 +32,7 @@ public class HashHit implements Comparable {
         this.core = core;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -42,10 +43,12 @@ public class HashHit implements Comparable {
         return hash.equals(((HashHit) obj).hash);
     }
 
+    @Override
     public int hashCode() {
         return hash.hashCode();
     }
 
+    @Override
     public int compareTo(Object o) {
         if (T.t) {
             T.ass(o instanceof HashHit, "");

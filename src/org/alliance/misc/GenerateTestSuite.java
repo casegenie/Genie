@@ -2,12 +2,22 @@ package org.alliance.misc;
 
 import com.stendahls.nif.util.SXML;
 import com.stendahls.nif.util.xmlserializer.XMLSerializer;
-import org.alliance.core.settings.*;
+import org.alliance.core.settings.Friend;
+import org.alliance.core.settings.Internal;
+import org.alliance.core.settings.My;
+import org.alliance.core.settings.Server;
+import org.alliance.core.settings.Settings;
+import org.alliance.core.settings.Share;
 import org.w3c.dom.Document;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Created by IntelliJ IDEA.

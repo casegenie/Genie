@@ -5,13 +5,19 @@ import org.alliance.core.node.UntrustedNode;
 import org.alliance.core.node.Invitation;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Comparator;
 import java.util.TreeSet;
 import java.util.Collection;
+import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
+import javax.swing.JList;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListSelectionModel;
+import javax.swing.UIManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,6 +38,7 @@ public class ForwardInvitationNodesList extends JList {
 
         addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 int index = locationToIndex(e.getPoint());
                 if (index == -1) {
@@ -66,6 +73,7 @@ public class ForwardInvitationNodesList extends JList {
             setForeground(UIManager.getColor("List.textForeground"));
         }
 
+        @Override
         public Component getListCellRendererComponent(JList list, Object value,
                 int index, boolean isSelected, boolean hasFocus) {
             setEnabled(list.isEnabled());
@@ -91,6 +99,7 @@ public class ForwardInvitationNodesList extends JList {
             toString = "<html>" + nickname + " <font color=gray>(connected to " + connectedThrough + ")</font></html>";
         }
 
+        @Override
         public String toString() {
             return toString;
         }
@@ -105,6 +114,7 @@ public class ForwardInvitationNodesList extends JList {
 
             TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
 
+                @Override
                 public int compare(Integer o1, Integer o2) {
                     String n1 = ui.getCore().getFriendManager().nickname(o1);
                     String n2 = ui.getCore().getFriendManager().nickname(o2);
@@ -162,6 +172,7 @@ public class ForwardInvitationNodesList extends JList {
             if (r.selected) {
                 ui.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             ui.getCore().getFriendManager().forwardInvitationTo(r.guid);

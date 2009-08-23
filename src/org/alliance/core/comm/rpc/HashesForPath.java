@@ -39,6 +39,7 @@ public class HashesForPath extends CompressedRPC {
         }
     }
 
+    @Override
     public void serializeCompressed(DataOutputStream out) throws IOException {
         out.writeUTF(path);
         out.writeInt(hashes.length);
@@ -48,6 +49,7 @@ public class HashesForPath extends CompressedRPC {
         }
     }
 
+    @Override
     public void executeCompressed(DataInputStream in) throws IOException {
         String path = in.readUTF();
         int len = in.readInt();

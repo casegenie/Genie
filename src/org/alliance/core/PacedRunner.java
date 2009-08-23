@@ -28,6 +28,7 @@ public class PacedRunner extends Thread {
         this.runner = runner;
     }
 
+    @Override
     public void run() {
         while (alive) {
             int sleep = paceInMs;

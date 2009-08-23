@@ -3,10 +3,10 @@ package org.alliance.ui.windows;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.ui.JHtmlLabel;
-
-import javax.swing.*;
-
 import org.alliance.ui.UISubsystem;
+
+import javax.swing.JCheckBox;
+import javax.swing.JFrame;
 
 /**
  * Created by IntelliJ IDEA.

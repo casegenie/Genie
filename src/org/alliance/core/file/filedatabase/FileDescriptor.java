@@ -10,7 +10,13 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.hash.Tiger;
 import org.alliance.core.file.share.T;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -270,6 +276,7 @@ public class FileDescriptor {
         return f.exists() && f.length() == getSize() && f.lastModified() == getModifiedAt();
     }
 
+    @Override
     public String toString() {
         return "FileDescriptor [" + basePath + ", " + subpath + ", " + size + ", " + rootHash + "]";
     }

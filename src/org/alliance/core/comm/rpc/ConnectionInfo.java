@@ -30,6 +30,7 @@ public class ConnectionInfo extends RPC {
         friend = f;
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         int guid = in.readInt();
         if (guid == manager.getMyGUID()) {
@@ -63,6 +64,7 @@ public class ConnectionInfo extends RPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(friend.getGuid());
         p.writeUTF(friend.getLastKnownHost());

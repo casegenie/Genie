@@ -25,80 +25,96 @@ public class DoubleUICallback implements UICallback {
         this.second = second;
     }
 
+    @Override
     public void nodeOrSubnodesUpdated(Node node) {
         first.nodeOrSubnodesUpdated(node);
         second.nodeOrSubnodesUpdated(node);
     }
 
+    @Override
     public void noRouteToHost(Node node) {
         first.noRouteToHost(node);
         second.noRouteToHost(node);
     }
 
+    @Override
     public void pluginCommunicationReceived(Friend source, String data) {
         first.pluginCommunicationReceived(source, data);
         second.pluginCommunicationReceived(source, data);
     }
 
+    @Override
     public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {
         first.searchHits(srcGuid, hops, hits);
         second.searchHits(srcGuid, hops, hits);
     }
 
+    @Override
     public void trace(int level, String message, Exception stackTrace) {
         first.trace(level, message, stackTrace);
         second.trace(level, message, stackTrace);
     }
 
+    @Override
     public void handleError(Throwable e, Object Source) {
         first.handleError(e, Source);
         second.handleError(e, Source);
     }
 
+    @Override
     public void statusMessage(String s) {
         first.statusMessage(s);
         second.statusMessage(s);
     }
 
+    @Override
     public void toFront() {
         first.toFront();
         second.toFront();
     }
 
+    @Override
     public void signalFriendAdded(Friend friend) {
         first.signalFriendAdded(friend);
         second.signalFriendAdded(friend);
     }
 
+    @Override
     public boolean isUIVisible() {
         return first.isUIVisible() || second.isUIVisible();
     }
 
+    @Override
     public void logNetworkEvent(String event) {
         first.logNetworkEvent(event);
         second.logNetworkEvent(event);
     }
 
+    @Override
     public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
         first.receivedShareBaseList(friend, shareBaseNames);
         second.receivedShareBaseList(friend, shareBaseNames);
     }
 
+    @Override
     public void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, String[] files) {
         first.receivedDirectoryListing(friend, shareBaseIndex, path, files);
         second.receivedDirectoryListing(friend, shareBaseIndex, path, files);
     }
 
+    @Override
     public void newUserInteractionQueued(NeedsUserInteraction ui) {
         first.newUserInteractionQueued(ui);
         second.newUserInteractionQueued(ui);
     }
 
+    @Override
     public void firstDownloadEverFinished() {
         first.firstDownloadEverFinished();
         second.firstDownloadEverFinished();
     }
 
+    @Override
     public void callbackRemoved() {
         first.callbackRemoved();
         second.callbackRemoved();

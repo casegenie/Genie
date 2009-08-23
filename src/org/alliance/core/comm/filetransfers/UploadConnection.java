@@ -28,10 +28,12 @@ public class UploadConnection extends TransferConnection {
         setStatusString("Waiting for request...");
     }
 
+    @Override
     public Hash getRoot() {
         return root;
     }
 
+    @Override
     public void packetReceived(Packet p) throws IOException {
         int cmd = p.readByte();
         if (cmd == Command.GET_FD.value()) {
@@ -105,6 +107,7 @@ public class UploadConnection extends TransferConnection {
         }
     }
 
+    @Override
     public void readyToSend() throws IOException {
         if (mode == Mode.PACKET) {
             super.readyToSend();
@@ -158,14 +161,17 @@ public class UploadConnection extends TransferConnection {
         }
     }
 
+    @Override
     protected int getConnectionId() {
         return CONNECTION_ID;
     }
 
+    @Override
     public int getConnectionIdForRemote() {
         return DownloadConnection.CONNECTION_ID;
     }
 
+    @Override
     protected void switchMode(Mode m) {
         super.switchMode(m);
         if (m == Mode.RAW) {
@@ -177,6 +183,7 @@ public class UploadConnection extends TransferConnection {
         }
     }
 
+    @Override
     public String toString() {
         return (getRemoteFriend() == null ? "unknown" : getRemoteFriend().getNickname()) + " (upload)";
     }

@@ -37,6 +37,7 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
     }
     private int progressBarLength = 100, progressBarHeight = 8;
 
+    @Override
     public void paint(Graphics frontG) {
         Graphics2D g = (Graphics2D) frontG;
 
@@ -68,6 +69,7 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
@@ -83,11 +85,13 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
         progressPercent = i;
     }
 
+    @Override
     public void run() {
         setVisible(false);
         dispose();
     }
 
+    @Override
     public void updateProgress(String message) {
         setStatusMessage(message + "...");
     }

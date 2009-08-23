@@ -9,10 +9,8 @@ import org.alliance.core.node.MyNode;
 import org.alliance.core.node.Node;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.SystemFlavorMap;
 import java.awt.event.ActionEvent;
@@ -21,6 +19,15 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -88,6 +95,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
             private int selectedIndex = -1;
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 try {
                     if (!e.getValueIsAdjusting() && selectedIndex != list.getSelectedIndex()) {
@@ -103,10 +111,12 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         popup = (JPopupMenu) xui.getComponent("popup");
         list.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -215,16 +225,20 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         return ui.getCore().getSettings().getMy().getInvitations();
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public String getIdentifier() {
         return "friendlist";
     }
 
+    @Override
     public void revert() throws Exception {
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     ui.getCore().refreshFriendInfo();
@@ -235,9 +249,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         });
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
@@ -245,6 +261,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 //    private static int cnt = 0;
     private class FriendListRenderer extends DefaultListCellRenderer {
 
+        @Override
         public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 

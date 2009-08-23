@@ -24,6 +24,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         }
     }
 
+    @Override
     public int encrypt(Connection c, ByteBuffer src, ByteBuffer dst) {
         int start = dst.position();
         dst.put(src);
@@ -39,6 +40,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
 
     }
 
+    @Override
     public void decrypt(Connection c, ByteBuffer src, ByteBuffer dst) {
         int start = dst.position();
         dst.put(src);

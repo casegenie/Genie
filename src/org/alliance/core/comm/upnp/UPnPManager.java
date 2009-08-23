@@ -1,12 +1,22 @@
 package org.alliance.core.comm.upnp;
 
 import org.alliance.core.CoreSubsystem;
-import org.cybergarage.upnp.*;
+import org.cybergarage.upnp.Action;
+import org.cybergarage.upnp.Argument;
+import org.cybergarage.upnp.ControlPoint;
+import org.cybergarage.upnp.Device;
+import org.cybergarage.upnp.DeviceList;
+import org.cybergarage.upnp.Service;
+import org.cybergarage.upnp.UPnP;
 import org.cybergarage.upnp.device.DeviceChangeListener;
 import org.cybergarage.xml.parser.JaxpParser;
 
 import java.io.IOException;
-import java.net.*;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -103,6 +113,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
         addDeviceChangeListener(this);
     }
 
+    @Override
     public boolean start() {
         if (T.t) {
             T.info("Starting UPnP Manager.");
@@ -194,6 +205,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
     /**
      * this method will be called when we discover a UPnP device.
      */
+    @Override
     public void deviceAdded(Device dev) {
         synchronized (DEVICE_LOCK) {
             if (T.t) {
@@ -433,6 +445,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
 
             Thread cleaner = new Thread("UPnP Cleaner") {
 
+                @Override
                 public void run() {
                     if (T.t) {
                         T.debug("start cleaning");
@@ -460,6 +473,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
         }
     }
 
+    @Override
     public void finalize() {
         stop();
     }
@@ -476,6 +490,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
     /**
      * stub
      */
+    @Override
     public void deviceRemoved(Device dev) {
     }
 
@@ -568,6 +583,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
             _description = description;
         }
 
+        @Override
         public String toString() {
             return _externalAddress + ":" + _externalPort + "->" + _internalAddress + ":" + _internalPort +
                     "@" + _protocol + " desc: " + _description;
@@ -593,6 +609,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
             return s;
         }
 
+        @Override
         public void run() {
 
             if (T.t) {

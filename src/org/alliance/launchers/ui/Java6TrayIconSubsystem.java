@@ -5,14 +5,24 @@ import com.stendahls.resourceloader.ResourceLoader;
 import com.stendahls.util.TextUtils;
 import org.alliance.Subsystem;
 import org.alliance.Version;
-import org.alliance.core.*;
+import org.alliance.core.CoreSubsystem;
+import org.alliance.core.NeedsUserInteraction;
+import org.alliance.core.ResourceSingelton;
+import org.alliance.core.T;
+import org.alliance.core.UICallback;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Menu;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.SystemTray;
+import java.awt.Toolkit;
+import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -31,15 +41,18 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
     private TrayIcon ti;
     private Runnable balloonClickHandler;
 
+    @Override
     public void init(ResourceLoader rl, Object... params) throws Exception {
         this.rl = rl;
         core = (CoreSubsystem) params[0];
         initTray();
         core.setUICallback(new UICallback() {
 
+            @Override
             public void firstDownloadEverFinished() {
             }
 
+            @Override
             public void callbackRemoved() {
             }
 
@@ -49,43 +62,56 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             public void signalFileDatabaseFlushComplete() {
             }
 
+            @Override
             public void nodeOrSubnodesUpdated(Node node) {
             }
 
+            @Override
             public void noRouteToHost(Node node) {
             }
 
+            @Override
             public void pluginCommunicationReceived(Friend source, String data) {
             }
 
+            @Override
             public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {
             }
 
+            @Override
             public void trace(int level, String message, Exception stackTrace) {
             }
 
+            @Override
             public void statusMessage(String s) {
             }
 
+            @Override
             public void toFront() {
             }
 
+            @Override
             public void signalFriendAdded(Friend friend) {
             }
 
+            @Override
             public boolean isUIVisible() {
                 return false;
             }
 
+            @Override
             public void logNetworkEvent(String event) {
             }
 
+            @Override
             public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
             }
 
+            @Override
             public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
             }
 
+            @Override
             public void newUserInteractionQueued(NeedsUserInteraction ui) {
                 if (ui instanceof PostMessageInteraction) {
                     PostMessageInteraction pmi = (PostMessageInteraction) ui;
@@ -106,17 +132,20 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                 }
                 balloonClickHandler = new Runnable() {
 
+                    @Override
                     public void run() {
                         openUI();
                     }
                 };
             }
 
+            @Override
             public void handleError(final Throwable e, final Object source) {
                 ti.displayMessage(e.getClass().getName(), e + "\n" + source, TrayIcon.MessageType.ERROR);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             e.printStackTrace();
@@ -145,6 +174,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 openUI();
             }
@@ -176,6 +206,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 shutdown();
             }
@@ -187,6 +218,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60 * 6);
             }
@@ -197,6 +229,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60 * 3);
             }
@@ -207,6 +240,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60);
             }
@@ -217,6 +251,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(30);
             }
@@ -232,6 +267,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
         ti.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 openUI();
             }
@@ -250,6 +286,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
             private long lastClickAt;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (System.currentTimeMillis() - lastClickAt < 1000) {
                     openUI();
@@ -273,6 +310,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         // Update tooltip periodically with current transfer rates
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     while (true) {
@@ -299,6 +337,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         }
     }
 
+    @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
             ti.displayMessage("", "Shutting down...", TrayIcon.MessageType.NONE);
@@ -344,6 +383,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         }
     }
 
+    @Override
     public void run() {
         openUI();
     }

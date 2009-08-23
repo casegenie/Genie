@@ -29,18 +29,22 @@ public class MyNode extends Node {
         this.core = core;
     }
 
+    @Override
     public boolean isConnected() {
         return true;
     }
 
+    @Override
     public int getNumberOfInvitedFriends() {
         return core.getSettings().getMy().getInvitations();
     }
 
+    @Override
     public boolean hasNotBeenOnlineForLongTime() {
         return false;
     }
 
+    @Override
     public long getLastSeenOnlineAt() {
         return System.currentTimeMillis();
     }
@@ -88,26 +92,32 @@ public class MyNode extends Node {
         }
     }
 
+    @Override
     public int getAllianceBuildNumber() {
         return Version.BUILD_NUMBER;
     }
 
+    @Override
     public int getNumberOfFilesShared() {
         return core.getFileManager().getFileDatabase().getNumberOfFiles();
     }
 
+    @Override
     public double getHighestOutgoingCPS() {
         return core.getSettings().getInternal().getRecordoutspeed();
     }
 
+    @Override
     public double getHighestIncomingCPS() {
         return core.getSettings().getInternal().getRecordinspeed();
     }
 
+    @Override
     public long getTotalBytesSent() {
         return core.getNetworkManager().getBandwidthOut().getTotalBytes();
     }
 
+    @Override
     public long getTotalBytesReceived() {
         return core.getNetworkManager().getBandwidthIn().getTotalBytes();
     }

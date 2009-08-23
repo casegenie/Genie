@@ -17,10 +17,12 @@ public class GetUserInfo extends RPC {
     public GetUserInfo() {
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         send(new UserInfo());
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         return p;
     }

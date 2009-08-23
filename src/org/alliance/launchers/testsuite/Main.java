@@ -8,12 +8,20 @@ import org.alliance.core.CoreSubsystem;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.HashMap;
+import javax.swing.DefaultListModel;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -54,6 +62,7 @@ public class Main {
 
                 private HashMap<String, BufferedWriter> logs = new HashMap<String, BufferedWriter>();
 
+                @Override
                 public void print(int level, Object o, Exception error) {
                     try {
                         String message = String.valueOf(o);
@@ -106,10 +115,12 @@ public class Main {
         frame.display();
         list.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseClicked(MouseEvent e) {
                 if (list.getSelectedValue() != null && e.getClickCount() > 1) {
                     Thread t = new Thread(new Runnable() {
 
+                        @Override
                         public void run() {
                             try {
                                 Main m = (Main) list.getSelectedValue();
@@ -131,6 +142,7 @@ public class Main {
                 users.put(f.toString().substring(f.toString().lastIndexOf(System.getProperty("file.separator")) + 1, f.toString().lastIndexOf('.')).toLowerCase(), m);
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         ((DefaultListModel) list.getModel()).addElement(m);
                     }
@@ -167,6 +179,7 @@ public class Main {
         core = null;
     }
 
+    @Override
     public String toString() {
         return settings;
     }

@@ -9,12 +9,22 @@ import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
 
-import javax.swing.*;
+import javax.swing.JLabel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.net.URL;
 import java.net.URLConnection;
@@ -57,6 +67,7 @@ public class AddFriendWizard extends JWizard {
         setSuperTitle("Add connection wizard");
     }
 
+    @Override
     public void EVENT_cancel(ActionEvent e) throws Exception {
         Component c = getParent();
         while (!(c instanceof Window)) {
@@ -87,6 +98,7 @@ public class AddFriendWizard extends JWizard {
         l.replaceString("$PORT$", "" + ui.getCore().getSettings().getServer().getPort());
         l.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     ui.openURL(e.getDescription());
@@ -104,6 +116,7 @@ public class AddFriendWizard extends JWizard {
         final JHtmlLabel l2 = (JHtmlLabel) innerXUI.getComponent("text");
         l2.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     goToManualInvite();
@@ -114,6 +127,7 @@ public class AddFriendWizard extends JWizard {
         final JHtmlLabel l3 = (JHtmlLabel) innerXUI.getComponent("newcode");
         l3.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     EVENT_createnew(null);
@@ -157,6 +171,7 @@ public class AddFriendWizard extends JWizard {
 
             Thread t = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         Thread.sleep(1000 * 10);
@@ -164,6 +179,7 @@ public class AddFriendWizard extends JWizard {
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             label.setText("");
                         }
@@ -219,6 +235,7 @@ public class AddFriendWizard extends JWizard {
 
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     String result = getResponseFromURL(PORT_OPEN_TEST_URL + ui.getCore().getSettings().getServer().getPort());
@@ -228,6 +245,7 @@ public class AddFriendWizard extends JWizard {
                     if ("OPEN".equals(result)) {
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 goToCreateInvitation();
                             }
@@ -235,6 +253,7 @@ public class AddFriendWizard extends JWizard {
                     } else if ("CLOSED".equals(result)) {
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 prev.setEnabled(true);
                                 next.setEnabled(false);
@@ -249,6 +268,7 @@ public class AddFriendWizard extends JWizard {
                         }
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 goToCreateInvitation();
                             }
@@ -304,6 +324,7 @@ public class AddFriendWizard extends JWizard {
         }
     }
 
+    @Override
     public void setStep(int i) {
         super.setStep(i);
         resetAllRadioButtons();
@@ -317,6 +338,7 @@ public class AddFriendWizard extends JWizard {
         }
     }
 
+    @Override
     public void nextStep() {
         if (getStep() == STEP_INTRO) {
             if (radioButtonSelected == 0) {
@@ -406,11 +428,13 @@ public class AddFriendWizard extends JWizard {
     public void goToAttemptConnect() {
         connectionThread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     Thread.sleep(1000 * 20);
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             goToConnectionFailed();
                         }
@@ -428,6 +452,7 @@ public class AddFriendWizard extends JWizard {
         prev.setEnabled(false);
     }
 
+    @Override
     public void prevStep() {
         if (getStep() == STEP_FORWARD_INVITATIONS) {
             setStep(STEP_INTRO);
@@ -478,11 +503,13 @@ public class AddFriendWizard extends JWizard {
         invitationCode.revalidate();
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     final Invitation i = ui.getCore().getInvitaitonManager().createInvitation();
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             invitationCode.setText("");
                             invitationCode.append("You have been invited to a private Alliance network!\n\n");
@@ -493,6 +520,7 @@ public class AddFriendWizard extends JWizard {
                             invitationCode.requestFocus();
                             SwingUtilities.invokeLater(new Runnable() {
 
+                                @Override
                                 public void run() {
                                     invitationCode.selectAll();
                                 }

@@ -213,6 +213,7 @@ public abstract class Packet {
         return new String(chararr, 0, chararr_count);
     }
 
+    @Override
     public String toString() {
         return "Packet [size: " + getSize() + "]";
     }

@@ -42,6 +42,7 @@ public class ShareScanner extends Thread {
         setPriority(MIN_PRIORITY);
     }
 
+    @Override
     public void run() {
         try {
             Thread.sleep(60 * 1000);
@@ -49,6 +50,7 @@ public class ShareScanner extends Thread {
         } //wait a while before starting first scan
         core.getAwayManager().addListener(new AwayManager.AwayStatusListener() {
 
+            @Override
             public void awayStatusChanged(boolean away) throws IOException {
                 if (away && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20 && !scanInProgress) {
                     if (T.t) {
@@ -120,7 +122,8 @@ public class ShareScanner extends Thread {
 
             try {
                 //flush fairly often when user is away - the UI locks when you flush so we want to avoid doing that while the user is by the computer
-                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20) || System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
+                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20) ||
+                        System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
                     manager.getFileDatabase().flush();
                     core.saveState();
                     lastFlushCompletedAt = System.currentTimeMillis();
@@ -283,7 +286,8 @@ public class ShareScanner extends Thread {
             queFileForHashing(file.toString(), true);
             return;
         }
-        manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime() + " (" + TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.))) + "/s)");
+        manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime() +
+                " (" + TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.))) + "/s)");
         manager.getFileDatabase().add(fd);
 
         bytesScanned += fd.getSize();
@@ -291,7 +295,8 @@ public class ShareScanner extends Thread {
             bytesScanned = 0;
             try {
                 if (T.t) {
-                    T.info("Polite scanning in progress. Sleeping for " + manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() + " minutes for harddrive to cool down.");
+                    T.info("Polite scanning in progress. Sleeping for " + manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() +
+                            " minutes for harddrive to cool down.");
                 }
                 Thread.sleep(manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() * 60 * 1000);
             } catch (InterruptedException e) {
@@ -351,6 +356,7 @@ public class ShareScanner extends Thread {
         }
         core.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     manager.getFileDatabase().getFDsByPath(oldFile);
@@ -368,6 +374,7 @@ public class ShareScanner extends Thread {
         }
         core.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     manager.getFileDatabase().removeFromDuplicates(file); //in case the file exists in duplicates it will be removed

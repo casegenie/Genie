@@ -15,6 +15,7 @@ public class ExtensionFileType extends FileTypeIdentifier {
         this.extensions = extensions;
     }
 
+    @Override
     public boolean matches(String s) {
         for (String e : extensions) {
             if (s.toLowerCase().endsWith(e)) {

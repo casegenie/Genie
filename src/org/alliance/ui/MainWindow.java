@@ -19,25 +19,58 @@ import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.PublicChatHistory;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.comm.BandwidthAnalyzer;
-import org.alliance.core.interactions.*;
+import org.alliance.core.interactions.ForwardedInvitationInteraction;
+import org.alliance.core.interactions.FriendAlreadyInListUserInteraction;
+import org.alliance.core.interactions.NeedsToRestartBecauseOfUpgradeInteraction;
+import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
+import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
+import org.alliance.core.interactions.PostMessageInteraction;
+import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
 import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
-import org.alliance.ui.windows.*;
+import org.alliance.ui.windows.ConnectedToNewFriendDialog;
+import org.alliance.ui.windows.ConnectionsMDIWindow;
+import org.alliance.ui.windows.ConsoleMDIWindow;
+import org.alliance.ui.windows.DownloadsMDIWindow;
+import org.alliance.ui.windows.DuplicatesMDIWindow;
+import org.alliance.ui.windows.ForwardInvitationDialog;
+import org.alliance.ui.windows.FriendListMDIWindow;
+import org.alliance.ui.windows.FriendsTreeMDIWindow;
+import org.alliance.ui.windows.OptionsWindow;
+import org.alliance.ui.windows.PrivateChatMessageMDIWindow;
+import org.alliance.ui.windows.PublicChatMessageMDIWindow;
+import org.alliance.ui.windows.TraceMDIWindow;
+import org.alliance.ui.windows.UploadsMDIWindow;
+import org.alliance.ui.windows.WelcomeMDIWindow;
 import org.alliance.ui.windows.search.SearchMDIWindow;
 import org.alliance.ui.windows.viewshare.ViewShareMDIWindow;
 
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalButtonUI;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.*;
+import java.io.EOFException;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.plaf.metal.MetalButtonUI;
 
 /**
  * Created by IntelliJ IDEA.
@@ -120,6 +153,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (ui.getCore().getSettings().getMy().hasUndefinedNickname()) {
             SwingUtilities.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     OptionDialog.showInformationDialog(MainWindow.this, "Welcome to Alliance![p]Before starting you need to enter your nickname.[p]The options window will now open.[p]");
                     try {
@@ -145,6 +179,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 return ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getCPS();
             }
 
+            @Override
             public double getMaxValue() {
                 //double d = Math.max(ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS(), ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS());
                 double d = ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS();
@@ -156,10 +191,12 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         id = "" + Math.random();
         monitor.addCollector(id, 3000, 1000, new Collector() {
 
+            @Override
             public double getValue() {
                 return ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getCPS();
             }
 
+            @Override
             public double getMaxValue() {
                 //return Math.max(ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS(), ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS());
                 return ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS();
@@ -195,6 +232,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 if (s == null || s.length() == 0) {
                     statusMessage.setText(" ");
@@ -209,6 +247,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
         messageFadeThread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 Thread myThread = messageFadeThread;
                 try {
@@ -234,6 +273,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             statusMessage.setText(" ");
                         }
@@ -253,6 +293,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     private synchronized void changeStatusMessageColor(final int color) {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 statusMessage.setForeground(new Color(color));
                 statusMessage.repaint();
@@ -271,6 +312,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     private void setupWindowEvents() {
         addWindowListener(new WindowAdapter() {
 
+            @Override
             public void windowClosing(WindowEvent e) {
                 if (OSInfo.isMac()) {
                     if (T.t) {
@@ -289,6 +331,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         }
                         Thread t = new Thread(new Runnable() {
 
+                            @Override
                             public void run() {
                                 try {
                                     Thread.sleep(100);
@@ -320,6 +363,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         shutdown();
     }
 
+    @Override
     public void showMenuItemDescription(String description) {
         setStatusMessage(description);
     }
@@ -387,9 +431,11 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         toFront();
     }
 
+    @Override
     public void titleChanged(MDIWindow source, String newTitle) {
     }
 
+    @Override
     public void windowSelected(MDIWindow source) {
     }
 
@@ -488,11 +534,13 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         return (ConsoleMDIWindow) mdiManager.getWindow("console");
     }
 
+    @Override
     public void run() {
         while (!shuttingDown) {
             if (isVisible()) {
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         if (mdiManager != null && getConnectionsWindow() != null) {
                             getConnectionsWindow().updateConnectionData();
@@ -596,6 +644,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     final NeedsUserInteraction nui1 = nui;
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             handleNeedsUserInteraction(nui1);
                         }
@@ -716,6 +765,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     if (ui.getCore().getSettings().getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
                         ui.getCore().invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 try {
                                     final ArrayList<ForwardInvitationNodesList.ListRow> al = new ArrayList<ForwardInvitationNodesList.ListRow>();
@@ -798,12 +848,14 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     public void forwardInvitation(final PleaseForwardInvitationInteraction pmi) {
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     ui.getCore().getFriendManager().forwardInvitation(pmi);
                 } catch (final IOException e) {
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             ui.handleErrorInEventLoop(e);
                         }

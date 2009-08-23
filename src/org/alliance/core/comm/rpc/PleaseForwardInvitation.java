@@ -27,6 +27,7 @@ public class PleaseForwardInvitation extends PersistantRPC {
         toGuid = toNode.getGuid();
     }
 
+    @Override
     public RPC init(FriendConnection rpcc) {
         super.init(rpcc);
         try {
@@ -42,12 +43,14 @@ public class PleaseForwardInvitation extends PersistantRPC {
         this.toGuid = toGuid;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         toGuid = data.readInt();
         invitationCode = data.readUTF();
         core.queNeedsUserInteraction(new PleaseForwardInvitationInteraction(con.getRemoteUserGUID(), toGuid, invitationCode));
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(toGuid);
         p.writeUTF(invitationCode);

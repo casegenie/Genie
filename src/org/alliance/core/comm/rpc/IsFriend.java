@@ -33,6 +33,7 @@ public class IsFriend extends RPC {
         this.guid = guid;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         int guid = data.readInt();
         boolean res = data.readBoolean();
@@ -67,6 +68,7 @@ public class IsFriend extends RPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(guid);
         p.writeBoolean(reply);

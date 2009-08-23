@@ -98,6 +98,7 @@ public class Friend extends Node {
         s.getFriend(guid).setHost(lastKnownHost);
     }
 
+    @Override
     public boolean isConnected() {
         return friendConnection != null;
     }
@@ -162,10 +163,12 @@ public class Friend extends Node {
         }
     }
 
+    @Override
     public long getLastSeenOnlineAt() {
         return lastSeenOnlineAt;
     }
 
+    @Override
     public boolean hasNotBeenOnlineForLongTime() {
         return System.currentTimeMillis() - lastSeenOnlineAt >
                 manager.getCore().getSettings().getInternal().getDaysnotconnectedwhenold() * 24 * 60 * 60 * 1000;
@@ -175,6 +178,7 @@ public class Friend extends Node {
         return middlemanGuid;
     }
 
+    @Override
     public int getAllianceBuildNumber() {
         return allianceBuildNumber;
     }
@@ -187,6 +191,7 @@ public class Friend extends Node {
         disconnect(GracefulClose.RECONNECT);
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     Thread.sleep(3000);
@@ -194,6 +199,7 @@ public class Friend extends Node {
                 }
                 manager.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         if (isConnected()) {
                             try {
@@ -220,6 +226,7 @@ public class Friend extends Node {
         manager.getCore().getFriendManager().getFriendConnector().queHighPriorityConnectTo(this, 500);
     }
 
+    @Override
     public String nickname() {
         if (nicknameToShowInUI == null) {
             org.alliance.core.settings.Friend f = manager.getCore().getSettings().getFriend(guid);
@@ -240,22 +247,27 @@ public class Friend extends Node {
         }
     }
 
+    @Override
     public int getNumberOfFilesShared() {
         return numberOfFilesShared;
     }
 
+    @Override
     public double getHighestOutgoingCPS() {
         return highestOutgoingCPS;
     }
 
+    @Override
     public double getHighestIncomingCPS() {
         return highestIncomingCPS;
     }
 
+    @Override
     public long getTotalBytesReceived() {
         return totalBytesReceived;
     }
 
+    @Override
     public long getTotalBytesSent() {
         return totalBytesSent;
     }
@@ -280,6 +292,7 @@ public class Friend extends Node {
         this.numberOfFilesShared = numberOfFilesShared;
     }
 
+    @Override
     public int getNumberOfInvitedFriends() {
         return numberOfInvitedFriends;
     }
@@ -288,6 +301,7 @@ public class Friend extends Node {
         this.numberOfInvitedFriends = numberOfInvitedFriends;
     }
 
+    @Override
     public boolean isAway() {
         return isAway;
     }

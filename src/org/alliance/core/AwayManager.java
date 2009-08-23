@@ -27,6 +27,7 @@ public class AwayManager extends Manager implements Runnable {
         this.core = core;
     }
 
+    @Override
     public void init() throws IOException, Exception {
         if (T.t) {
             T.info("AwayManger - <init>");
@@ -40,6 +41,7 @@ public class AwayManager extends Manager implements Runnable {
         listeners.add(l);
     }
 
+    @Override
     public void run() {
         try {
             if (T.t) {
@@ -77,6 +79,7 @@ public class AwayManager extends Manager implements Runnable {
             away = b;
             core.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         if (T.t) {

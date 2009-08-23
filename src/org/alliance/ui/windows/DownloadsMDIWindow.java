@@ -12,13 +12,7 @@ import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.jdesktop.swingx.JXTable;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import java.awt.*;
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,6 +21,18 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.JLabel;
+import javax.swing.JPopupMenu;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 /**
  * Created by IntelliJ IDEA.
@@ -69,6 +75,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         downloadGrid = (JDownloadGrid) xui.getComponent("downloadgrid");
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getFirstIndex() < 0 || e.getFirstIndex() >= rows.size()) {
                     downloadGrid.setDownload(null);
@@ -82,14 +89,17 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
         table.addMouseListener(new MouseAdapter() {
 
+            @Override
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
+            @Override
             public void mouseClicked(MouseEvent e) {
             }
 
@@ -267,19 +277,24 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         return null;
     }
 
+    @Override
     public String getIdentifier() {
         return "downloads";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
@@ -342,14 +357,17 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
     private class DownloadsTableModel extends AbstractTableModel {
 
+        @Override
         public int getRowCount() {
             return rows.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 6;
         }
 
+        @Override
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -369,6 +387,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             }
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -392,10 +411,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     public void EVENT_cleanup(ActionEvent e) {
         ui.getCore().invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ui.getCore().getNetworkManager().getDownloadManager().removeCompleteDownloads();
                 SwingUtilities.invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         update();
                     }
@@ -412,6 +433,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveDown(d);
                     }
@@ -435,6 +457,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveUp(d);
                     }
@@ -460,6 +483,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveTop(d);
                     }
@@ -483,6 +507,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
 
+                    @Override
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveBottom(d);
                     }
@@ -560,6 +585,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             }
             ui.getCore().invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     for (Download d : dls) {
                         if (d.isComplete()) {
@@ -574,6 +600,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     }
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             update();
                         }
@@ -590,6 +617,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             setOpaque(true);
         }
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value,
                 boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             if (value != null && value instanceof Integer) {
@@ -612,15 +640,19 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             return this;
         }
 
+        @Override
         public void validate() {
         }
 
+        @Override
         public void revalidate() {
         }
 
+        @Override
         protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
         }
 
+        @Override
         public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
         }
     }

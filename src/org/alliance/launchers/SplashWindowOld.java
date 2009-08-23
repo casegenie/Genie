@@ -3,7 +3,17 @@ package org.alliance.launchers;
 import org.alliance.Version;
 import org.alliance.core.ResourceSingelton;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.MediaTracker;
+import java.awt.RenderingHints;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.image.BufferedImage;
 
 /**
@@ -44,6 +54,7 @@ public class SplashWindowOld extends Window implements Runnable {
     }
     private int progressBarLength = 100, progressBarHeight = 8;
 
+    @Override
     public void paint(Graphics frontG) {
         init();
         Graphics2D g = backBufferGraphics;
@@ -87,6 +98,7 @@ public class SplashWindowOld extends Window implements Runnable {
         }
     }
 
+    @Override
     public void update(Graphics g) {
         paint(g);
     }
@@ -100,6 +112,7 @@ public class SplashWindowOld extends Window implements Runnable {
         progressPercent = i;
     }
 
+    @Override
     public void run() {
         setVisible(false);
         dispose();

@@ -17,11 +17,13 @@ public class GetUserInfoV2 extends RPC {
     public GetUserInfoV2() {
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         send(new UserInfoV2());
         send(new AwayStatus(core.getAwayManager().isAway()));
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         return p;
     }

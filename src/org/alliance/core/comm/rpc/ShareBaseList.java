@@ -20,6 +20,7 @@ public class ShareBaseList extends RPC {
     public ShareBaseList() {
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         int n = data.readInt();
         String shareBaseName[] = new String[n];
@@ -33,6 +34,7 @@ public class ShareBaseList extends RPC {
         core.getUICallback().receivedShareBaseList(con.getRemoteFriend(), shareBaseName);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         Collection<ShareBase> c = manager.getCore().getShareManager().shareBases();
         p.writeInt(c.size());

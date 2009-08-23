@@ -6,8 +6,8 @@ import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.node.FriendManager;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
+import javax.swing.JCheckBox;
 
 /**
  * Created by IntelliJ IDEA.

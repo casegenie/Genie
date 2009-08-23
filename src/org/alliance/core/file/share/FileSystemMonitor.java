@@ -72,6 +72,7 @@ public class FileSystemMonitor {
                 try {
                     int watchID = JNotify.addWatch(sb.getPath(), mask, true, new JNotifyListener() {
 
+                        @Override
                         public void fileRenamed(int wd, String rootPath, String oldName, String newName) {
                             if (!watchers.contains(wd)) {
                                 return;
@@ -88,6 +89,7 @@ public class FileSystemMonitor {
                             manager.getShareScanner().signalFileRenamed(rootPath + oldName, rootPath + newName);
                         }
 
+                        @Override
                         public void fileModified(int wd, String rootPath, String name) {
                             if (!watchers.contains(wd)) {
                                 return;
@@ -97,6 +99,7 @@ public class FileSystemMonitor {
                             }
                         }
 
+                        @Override
                         public void fileDeleted(int wd, String rootPath, String name) {
                             if (!watchers.contains(wd)) {
                                 return;
@@ -112,6 +115,7 @@ public class FileSystemMonitor {
                             manager.getShareScanner().signalFileDeleted(rootPath + name);
                         }
 
+                        @Override
                         public void fileCreated(int wd, String rootPath, String name) {
                             if (!watchers.contains(wd)) {
                                 return;

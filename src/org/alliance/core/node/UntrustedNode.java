@@ -32,18 +32,22 @@ public class UntrustedNode extends Node {
     /**
      * @return If this node has a connection to its parent
      */
+    @Override
     public boolean isConnected() {
         return connected;
     }
 
+    @Override
     public int getNumberOfInvitedFriends() {
         return 0;
     }
 
+    @Override
     public boolean hasNotBeenOnlineForLongTime() {
         return false;
     }
 
+    @Override
     public long getLastSeenOnlineAt() {
         return -1; //unknown
     }

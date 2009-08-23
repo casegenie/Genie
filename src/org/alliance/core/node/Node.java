@@ -54,6 +54,7 @@ public abstract class Node {
         this.guid = guid;
     }
 
+    @Override
     public String toString() {
         return getNickname() + "[" + guid + ", " + TextUtils.simplifyClassName(getClass()) + "]";
     }

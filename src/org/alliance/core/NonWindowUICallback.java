@@ -15,61 +15,78 @@ import java.util.List;
  */
 public class NonWindowUICallback implements UICallback {
 
+    @Override
     public void nodeOrSubnodesUpdated(Node node) {
     }
 
+    @Override
     public void noRouteToHost(Node node) {
     }
 
+    @Override
     public void pluginCommunicationReceived(Friend source, String data) {
     }
 
     public void messageRecieved(int srcGuid, String message) {
-        // @todo: handle this in some good way. balloon should be shown. should add it to ui - and balloon click should open ui with chat window
+    /*@todo: handle this in some good way. balloon should be shown. should add it to ui
+    and balloon click should open ui with chat window*/
     }
 
+    @Override
     public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {
     }
 
+    @Override
     public void trace(int level, String message, Exception stackTrace) {
     }
 
+    @Override
     public void handleError(Throwable e, Object source) {
         System.err.println("Error for : " + source + ": ");
         e.printStackTrace();
     }
 
+    @Override
     public void statusMessage(String s) {
         if (!CoreSubsystem.isRunningAsTestSuite()) {
             System.out.println(s);
         }
     }
 
+    @Override
     public void toFront() {
     }
 
+    @Override
     public void signalFriendAdded(Friend friend) {
     }
 
+    @Override
     public boolean isUIVisible() {
         return false;
     }
 
+    @Override
     public void logNetworkEvent(String event) {
     }
 
+    @Override
     public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
     }
 
+    @Override
     public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
     }
 
+    @Override
     public void newUserInteractionQueued(NeedsUserInteraction ui) {
     }
 
+    @Override
     public void firstDownloadEverFinished() {
     }
 
+    @Override
     public void callbackRemoved() {
     }
 

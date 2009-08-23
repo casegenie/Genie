@@ -3,7 +3,7 @@ package org.alliance.ui.macos;
 import org.alliance.launchers.OSInfo;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
+import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +33,7 @@ public class OSXAdaptation {
     public void preferences() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     ui.getMainWindow().EVENT_options(null);
@@ -46,6 +47,7 @@ public class OSXAdaptation {
     public void show() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ui.getMainWindow().setVisible(true);
             }
@@ -55,6 +57,7 @@ public class OSXAdaptation {
     public void quit() {
         SwingUtilities.invokeLater(new Runnable() {
 
+            @Override
             public void run() {
                 ui.getCore().shutdown();
             }

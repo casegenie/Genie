@@ -28,6 +28,7 @@ public class GetBlockMask extends RPC {
         this.root = root;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         root = new Hash();
         data.readArray(root.array());
@@ -57,6 +58,7 @@ public class GetBlockMask extends RPC {
         core.getNetworkManager().getDownloadManager().interestedInHash(con.getRemoteFriend(), root);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeArray(root.array());
         return p;

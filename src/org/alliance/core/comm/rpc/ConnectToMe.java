@@ -26,6 +26,7 @@ public class ConnectToMe extends RPC {
         this.connectionId = connectionId;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         connectionId = data.readInt();
         if (T.t) {
@@ -36,6 +37,7 @@ public class ConnectToMe extends RPC {
         manager.getNetMan().connect(con.getRemoteUserGUID(), c);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(connectionId);
         return p;

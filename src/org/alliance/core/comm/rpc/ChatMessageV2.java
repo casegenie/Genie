@@ -31,6 +31,7 @@ public class ChatMessageV2 extends PersistantRPC {
         sentAtTick = System.currentTimeMillis();
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         message = in.readUTF();
         messageToAll = in.readBoolean();
@@ -42,6 +43,7 @@ public class ChatMessageV2 extends PersistantRPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeUTF(message);
         p.writeBoolean(messageToAll);

@@ -4,10 +4,10 @@ import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.trace.TraceWindow;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import javax.swing.JPanel;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,19 +36,24 @@ public class TraceMDIWindow extends AllianceMDIWindow {
         tw.print(level, text, stackTrace);
     }
 
+    @Override
     public String getIdentifier() {
         return "trace";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }

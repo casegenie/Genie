@@ -17,10 +17,12 @@ public class GetMyExternalIp extends RPC {
     public GetMyExternalIp() {
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         send(new ConnectionInfo(con.getRemoteFriend()));
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         return p;
     }

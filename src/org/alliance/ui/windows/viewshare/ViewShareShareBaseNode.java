@@ -15,15 +15,18 @@ public class ViewShareShareBaseNode extends ViewShareTreeNode {
         this.shareBaseIndex = shareBaseIndex;
     }
 
+    @Override
     protected int getShareBaseIndex() {
         return shareBaseIndex;
 //        return root.getIndex(this);
     }
 
+    @Override
     protected String getFileItemPath() {
         return "";
     }
 
+    @Override
     public boolean isLeaf() {
         assureChildrenAreLoaded();
         return children.size() == 0;

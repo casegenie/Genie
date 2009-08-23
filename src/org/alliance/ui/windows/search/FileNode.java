@@ -75,30 +75,37 @@ public class FileNode extends SearchTreeNode implements Comparable {
         return originalFilename;
     }
 
+    @Override
     public TreeNode getChildAt(int childIndex) {
         return null;
     }
 
+    @Override
     public int getChildCount() {
         return 0;
     }
 
+    @Override
     public TreeNode getParent() {
         return parent;
     }
 
+    @Override
     public int getIndex(TreeNode node) {
         return -1;
     }
 
+    @Override
     public boolean getAllowsChildren() {
         return false;
     }
 
+    @Override
     public boolean isLeaf() {
         return true;
     }
 
+    @Override
     public Enumeration children() {
         return null;
     }
@@ -109,31 +116,38 @@ public class FileNode extends SearchTreeNode implements Comparable {
         updateSpeed();
     }
 
+    @Override
     public String toString() {
         return filename;
     }
 
+    @Override
     public String getName() {
         return filename;
     }
 
+    @Override
     public long getSize() {
         return size;
     }
 
+    @Override
     public int getDaysAgo() {
         return daysAgo;
     }
 
+    @Override
     public int compareTo(Object o) {
         FileNode n = (FileNode) o;
         return getName().compareToIgnoreCase(n.getName());
     }
 
+    @Override
     public double getSources() {
         return sources;
     }
 
+    @Override
     public double getSpeed() {
         return speed;
     }
@@ -174,6 +188,7 @@ public class FileNode extends SearchTreeNode implements Comparable {
         return userGuids;
     }
 
+    @Override
     public String getExtension() {
         return extension;
     }

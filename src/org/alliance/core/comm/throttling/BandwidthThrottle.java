@@ -106,9 +106,11 @@ public class BandwidthThrottle {
 
     private class Task extends TimerTask {
 
+        @Override
         public void run() {
             core.invokeLater(new Runnable() {
 
+                @Override
                 public void run() {
                     ArrayList<Connection> al = new ArrayList<Connection>(connectionsToWakeUp);
                     if (T.t) {

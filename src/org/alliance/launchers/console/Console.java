@@ -42,6 +42,7 @@ public class Console {
     }
     private final static Printer PLAIN_PRINTER = new Printer() {
 
+        @Override
         public void println(String line) {
             System.out.println(line);
         }
@@ -78,6 +79,7 @@ public class Console {
         } else if ("test".equals(command)) {
             Thread t = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         Thread.sleep(1000);
@@ -113,10 +115,11 @@ public class Console {
         } else if ("showbuilds".equals(command)) {
             showbuilds();
         } else if ("pingbomb".equals(command)) {
-            if (core.isRunningAsTestSuite()) {
+            if (CoreSubsystem.isRunningAsTestSuite()) {
                 printer.println("Sending a bunch of pings at random intervals");
                 Thread t = new Thread(new Runnable() {
 
+                    @Override
                     public void run() {
                         for (int i = 0; i < 10000; i++) {
                             Collection<Friend> c = core.getFriendManager().friends();
@@ -126,6 +129,7 @@ public class Console {
                             final Friend f = fa[n];
                             core.invokeLater(new Runnable() {
 
+                                @Override
                                 public void run() {
                                     try {
                                         f.getFriendConnection().send(new Ping());

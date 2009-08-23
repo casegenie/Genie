@@ -3,22 +3,23 @@ package org.alliance.ui.windows;
 import org.alliance.ui.UISubsystem;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
+import com.stendahls.nif.ui.mdi.MDIWindow;
+import com.stendahls.nif.ui.OptionDialog;
+import com.stendahls.util.TextUtils;
 
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.Component;
+import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.File;
-import java.awt.event.ActionEvent;
-import java.awt.*;
-
-import com.stendahls.nif.ui.mdi.MDIWindow;
-import com.stendahls.nif.ui.OptionDialog;
-import com.stendahls.util.TextUtils;
+import javax.swing.JLabel;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 
 /**
  * Created by IntelliJ IDEA.
@@ -107,34 +108,42 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         }
     }
 
+    @Override
     public String getIdentifier() {
         return "duplicates";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
         manager.recreateWindow(this, new DuplicatesMDIWindow(ui));
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
 
     private class TableModel extends AbstractTableModel {
 
+        @Override
         public int getRowCount() {
             return dups.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 2;
         }
 
+        @Override
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -146,6 +155,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
             }
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -169,6 +179,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
     private class MyCellRenderer extends DefaultTableCellRenderer {
 
+        @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String s = String.valueOf(value);

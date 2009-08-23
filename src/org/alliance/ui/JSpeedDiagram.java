@@ -2,8 +2,10 @@ package org.alliance.ui;
 
 import org.alliance.core.CoreSubsystem;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import javax.swing.JComponent;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,10 +23,12 @@ public class JSpeedDiagram extends JComponent {
         setOpaque(false);
     }
 
+    @Override
     public Dimension getPreferredSize() {
         return new Dimension(400, 30);
     }
 
+    @Override
     public synchronized void paint(Graphics g) {
         int xlen = getSize().width;
         int ylen = getSize().height;

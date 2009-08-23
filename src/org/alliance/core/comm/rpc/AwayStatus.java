@@ -24,6 +24,7 @@ public class AwayStatus extends RPC {
         this.away = away;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         away = data.readBoolean();
         if (T.t) {
@@ -33,6 +34,7 @@ public class AwayStatus extends RPC {
         core.getUICallback().nodeOrSubnodesUpdated(con.getRemoteFriend());
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeBoolean(away);
         return p;

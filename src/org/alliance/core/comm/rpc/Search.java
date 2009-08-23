@@ -29,6 +29,7 @@ public class Search extends RPC {
         this.fileTypeId = fileTypeId;
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         query = in.readUTF();
 
@@ -57,6 +58,7 @@ public class Search extends RPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeUTF(query);
         p.writeByte(fileTypeId);

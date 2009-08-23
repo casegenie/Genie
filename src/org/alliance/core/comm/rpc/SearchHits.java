@@ -33,6 +33,7 @@ public class SearchHits extends RPC {
         hits.add(new SearchHit(fd));
     }
 
+    @Override
     public void execute(Packet in) throws IOException {
         for (;;) {
             long size = in.readLong();
@@ -51,6 +52,7 @@ public class SearchHits extends RPC {
         manager.getCore().getUICallback().searchHits(fromGuid, hops, hits);
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         int n = hits.size();
         if (n > MAX_SEARCH_HITS) {

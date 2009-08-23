@@ -12,10 +12,12 @@ public class ViewShareFileNode extends ViewShareTreeNode {
         super(name, root, parent);
     }
 
+    @Override
     protected int getShareBaseIndex() {
         return getParent().getShareBaseIndex();
     }
 
+    @Override
     protected String getFileItemPath() {
         return getParent().getFileItemPath() + getName();
     }

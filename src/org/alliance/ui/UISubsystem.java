@@ -17,9 +17,10 @@ import org.alliance.ui.macos.OSXAdaptation;
 import org.alliance.ui.nodetreemodel.NodeTreeModel;
 import org.alliance.ui.nodetreemodel.NodeTreeNode;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Window;
 import java.lang.reflect.Method;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -43,12 +44,14 @@ public class UISubsystem implements UINexus, Subsystem {
     /**
      * @param params - takes one parameter - a boolean indicating if Alliance should shutdown when window closes
      */
+    @Override
     public void init(ResourceLoader rl, final Object... params) throws Exception {
         this.rl = rl;
         core = (CoreSubsystem) params[0];
 
         progress = new StartupProgressListener() {
 
+            @Override
             public void updateProgress(String message) {
             }
         };
@@ -62,6 +65,7 @@ public class UISubsystem implements UINexus, Subsystem {
         } else {
             SwingUtilities.invokeAndWait(new Runnable() {
 
+                @Override
                 public void run() {
                     realInit(params);
                 }
@@ -73,6 +77,7 @@ public class UISubsystem implements UINexus, Subsystem {
         ErrorDialog.setErrorReportUrl(ERROR_URL);
         ErrorDialog.setExceptionTranslator(new ErrorDialog.ExceptionTranslator() {
 
+            @Override
             public String translate(Throwable t) {
                 Throwable innerError = t;
 
@@ -121,14 +126,17 @@ public class UISubsystem implements UINexus, Subsystem {
         core.setUICallback(new UIBridge(this, core.getUICallback()));
     }
 
+    @Override
     public void handleErrorInEventLoop(Throwable t) {
         handleErrorInEventLoop(null, t, false);
     }
 
+    @Override
     public void handleErrorInEventLoop(Throwable t, boolean fatal) {
         handleErrorInEventLoop(null, t, fatal);
     }
 
+    @Override
     public void handleErrorInEventLoop(Window parent, Throwable t, boolean fatal) {
         core.reportError(t, null);
 //        try {
@@ -146,18 +154,22 @@ public class UISubsystem implements UINexus, Subsystem {
 //        }
     }
 
+    @Override
     public MainWindow getMainWindow() {
         return mainWindow;
     }
 
+    @Override
     public ResourceLoader getRl() {
         return rl;
     }
 
+    @Override
     public ToolbarActionManager getToolbarActionManager() {
         return mainWindow.getToolbarActionManager();
     }
 
+    @Override
     public void shutdown() {
         mainWindow.shutdown();
         core.setUICallback(null);

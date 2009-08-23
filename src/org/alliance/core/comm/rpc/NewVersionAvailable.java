@@ -26,6 +26,7 @@ public class NewVersionAvailable extends RPC {
     public NewVersionAvailable() {
     }
 
+    @Override
     public void execute(Packet p) throws IOException {
         hash = new Hash();
         p.readArray(hash.array());
@@ -49,6 +50,7 @@ public class NewVersionAvailable extends RPC {
         }
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeArray(hash.array());
         return p;

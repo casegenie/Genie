@@ -13,6 +13,7 @@ import org.alliance.core.comm.T;
  */
 public class Pong extends RPC {
 
+    @Override
     public void execute(Packet p) {
         String s = "Received Pong from " + con.getRemoteFriend().getNickname() + ". RTT: " + (System.currentTimeMillis() - con.getLastPacketSentAt()) + "ms";
         if (T.t) {
@@ -22,6 +23,7 @@ public class Pong extends RPC {
         core.updateLastSeenOnlineFor(con.getRemoteFriend());
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         return p;
     }

@@ -45,6 +45,7 @@ public class Hash implements Serializable {
         this.hash = hash;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -64,6 +65,7 @@ public class Hash implements Serializable {
         return true;
     }
 
+    @Override
     public int hashCode() {
         int h = hash[0];
         for (int i = 1; i < hash.length; i++) {
@@ -72,6 +74,7 @@ public class Hash implements Serializable {
         return h;
     }
 
+    @Override
     public String toString() {
         return getRepresentation();
     }

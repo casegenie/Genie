@@ -35,15 +35,22 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.InputSource;
 
-import javax.swing.*;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import javax.swing.JFrame;
 
 /**
  * This is the core of the entire Alliance system. There is not too much code here, it's more of a hub for the entire
@@ -89,9 +96,11 @@ public class CoreSubsystem implements Subsystem {
     public CoreSubsystem() {
     }
 
+    @Override
     public void init(ResourceLoader rl, Object... params) throws Exception {
         StartupProgressListener progress = new StartupProgressListener() {
 
+            @Override
             public void updateProgress(String message) {
             }
         };
@@ -105,6 +114,7 @@ public class CoreSubsystem implements Subsystem {
             final TraceHandler old = Trace.handler;
             Trace.handler = new TraceHandler() {
 
+                @Override
                 public void print(int level, Object message, Exception error) {
                     logTrace(level, message);
                     if (old != null) {
@@ -151,6 +161,7 @@ public class CoreSubsystem implements Subsystem {
         if (!isRunningAsTestSuite()) {
             Thread t = new Thread(new Runnable() {
 
+                @Override
                 public void run() {
                     try {
                         upnpManager.init();
@@ -164,6 +175,7 @@ public class CoreSubsystem implements Subsystem {
             if (OSInfo.isWindows() && settings.getInternal().getRestartEveryXHours() != 0) {
                 t = new Thread(new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             //on windows, where Alliance can be restarted, it will restart every X hours by default
@@ -171,6 +183,7 @@ public class CoreSubsystem implements Subsystem {
                             if (!getUICallback().isUIVisible()) {
                                 invokeLater(new Runnable() {
 
+                                    @Override
                                     public void run() {
                                         try {
                                             restartProgram(false);
@@ -192,6 +205,7 @@ public class CoreSubsystem implements Subsystem {
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
+            @Override
             public void run() {
                 shutdown();
             }
@@ -378,6 +392,7 @@ public class CoreSubsystem implements Subsystem {
     }
     private boolean shutdownInProgress;
 
+    @Override
     public synchronized void shutdown() {
         if (shutdownInProgress) {
             return;
@@ -666,7 +681,8 @@ public class CoreSubsystem implements Subsystem {
             }
             if (GULCounter > 300) {
                 try {
-                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
+                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter +
+                            "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
                 } catch (XUIException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }

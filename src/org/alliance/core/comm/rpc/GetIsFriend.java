@@ -24,11 +24,13 @@ public class GetIsFriend extends RPC {
         query = f;
     }
 
+    @Override
     public void execute(Packet data) throws IOException {
         int guid = data.readInt();
         send(new IsFriend(manager.getFriend(guid) != null, guid));
     }
 
+    @Override
     public Packet serializeTo(Packet p) {
         p.writeInt(query.getGuid());
         return p;

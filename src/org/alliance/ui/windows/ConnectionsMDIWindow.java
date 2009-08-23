@@ -5,13 +5,13 @@ import com.stendahls.util.TextUtils;
 import org.alliance.core.comm.Connection;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import javax.swing.JTable;
 
 /**
  * Created by IntelliJ IDEA.
@@ -76,19 +76,24 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         return null;
     }
 
+    @Override
     public String getIdentifier() {
         return "connections";
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;
     }
@@ -113,14 +118,17 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
 
     private class ConnectionsTableModel extends AbstractTableModel {
 
+        @Override
         public int getRowCount() {
             return rows.size();
         }
 
+        @Override
         public int getColumnCount() {
             return 5;
         }
 
+        @Override
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
@@ -138,6 +146,7 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
             }
         }
 
+        @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             switch (columnIndex) {
                 case 0:

@@ -5,7 +5,11 @@ import com.stendahls.resourceloader.ResourceLoader;
 import com.stendahls.util.TextUtils;
 import org.alliance.Subsystem;
 import org.alliance.Version;
-import org.alliance.core.*;
+import org.alliance.core.CoreSubsystem;
+import org.alliance.core.NeedsUserInteraction;
+import org.alliance.core.ResourceSingelton;
+import org.alliance.core.T;
+import org.alliance.core.UICallback;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.interactions.PostMessageInteraction;
@@ -15,8 +19,7 @@ import org.alliance.core.node.Node;
 import org.jdesktop.jdic.tray.SystemTray;
 import org.jdesktop.jdic.tray.TrayIcon;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -25,6 +28,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * Created by IntelliJ IDEA.
@@ -41,6 +50,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
     private TrayIcon ti;
     private Runnable balloonClickHandler;
 
+    @Override
     public void init(ResourceLoader rl, Object... params) throws Exception {
         this.rl = rl;
         core = (CoreSubsystem) params[0];
@@ -48,9 +58,11 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         initTray();
         core.setUICallback(new UICallback() {
 
+            @Override
             public void firstDownloadEverFinished() {
             }
 
+            @Override
             public void callbackRemoved() {
             }
 
@@ -60,43 +72,56 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
             public void signalFileDatabaseFlushComplete() {
             }
 
+            @Override
             public void nodeOrSubnodesUpdated(Node node) {
             }
 
+            @Override
             public void noRouteToHost(Node node) {
             }
 
+            @Override
             public void pluginCommunicationReceived(Friend source, String data) {
             }
 
+            @Override
             public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {
             }
 
+            @Override
             public void trace(int level, String message, Exception stackTrace) {
             }
 
+            @Override
             public void statusMessage(String s) {
             }
 
+            @Override
             public void toFront() {
             }
 
+            @Override
             public void signalFriendAdded(Friend friend) {
             }
 
+            @Override
             public boolean isUIVisible() {
                 return false;
             }
 
+            @Override
             public void logNetworkEvent(String event) {
             }
 
+            @Override
             public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
             }
 
+            @Override
             public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
             }
 
+            @Override
             public void newUserInteractionQueued(NeedsUserInteraction ui) {
                 if (ui instanceof PostMessageInteraction) {
                     PostMessageInteraction pmi = (PostMessageInteraction) ui;
@@ -117,17 +142,20 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                 }
                 balloonClickHandler = new Runnable() {
 
+                    @Override
                     public void run() {
                         openUI();
                     }
                 };
             }
 
+            @Override
             public void handleError(final Throwable e, final Object source) {
                 ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\nClick here to view detailed error (and send error report)", TrayIcon.ERROR_MESSAGE_TYPE);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
 
+                    @Override
                     public void run() {
                         try {
                             e.printStackTrace();
@@ -183,6 +211,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 openUI();
             }
@@ -214,6 +243,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 shutdown();
             }
@@ -225,6 +255,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60 * 6);
             }
@@ -235,6 +266,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60 * 3);
             }
@@ -245,6 +277,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(60);
             }
@@ -255,6 +288,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 restart(30);
             }
@@ -269,6 +303,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         ti.setIconAutoSize(false);
         ti.addBalloonActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (balloonClickHandler != null) {
                     balloonClickHandler.run();
@@ -282,6 +317,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
             private long lastClickAt;
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (System.currentTimeMillis() - lastClickAt < 1000) {
                     openUI();
@@ -292,10 +328,12 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
+            @Override
             public void run() {
                 if (tray != null) {
                     SwingUtilities.invokeLater(new Runnable() {
 
+                        @Override
                         public void run() {
                             tray.removeTrayIcon(ti);
                         }
@@ -308,11 +346,13 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         // Update tooltip periodically with current transfer rates
         Thread t = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     while (true) {
                         SwingUtilities.invokeLater(new Runnable() {
 
+                            @Override
                             public void run() {
                                 ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
                             }
@@ -340,6 +380,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         }
     }
 
+    @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
             ti.displayMessage("", "Shutting down...", TrayIcon.NONE_MESSAGE_TYPE);
@@ -383,6 +424,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         }
     }
 
+    @Override
     public void run() {
         openUI();
     }
