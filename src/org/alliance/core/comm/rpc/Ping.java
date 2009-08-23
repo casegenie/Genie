@@ -14,8 +14,11 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class Ping extends RPC {
+
     public void execute(Packet data) throws IOException {
-        if(T.t) T.debug("received Ping!");
+        if (T.t) {
+            T.debug("received Ping!");
+        }
         send(new Pong());
     }
 

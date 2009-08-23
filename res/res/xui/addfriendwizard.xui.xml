@@ -53,18 +53,22 @@
                 <mlabel html="yes">Enter the connection code you got from your friend: </mlabel>
                 <strut height="15"/>
                 <panel axis="x" border="0" expand="horiz">
-                    <label text="Connection code: "/> <textfield text="" id="codeinput" defaultfocus="true"/> <strut width="5"/>
+                    <label text="Connection code: "/>
+                    <textfield text="" id="codeinput" defaultfocus="true"/>
+                    <strut width="5"/>
                 </panel>
                 <strut height="15"/>
                 <mlabel html="yes">You can right click on the white area above and select paste to paste a code for the clipboard.
                     [p]
-                    When you press next Alliance will attempt to connect using the code.</mlabel>
+                    When you press next Alliance will attempt to connect using the code.
+                </mlabel>
             </step>
 
             <step text="Incorrect connection code">
                 <mlabel html="yes">The connection code seems to be corrupt.
                     [p]
-                    Please press back and try entering the code again.</mlabel>
+                    Please press back and try entering the code again.
+                </mlabel>
             </step>
 
             <step text="Attempting to connect">

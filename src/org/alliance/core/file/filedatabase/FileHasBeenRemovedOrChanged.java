@@ -8,7 +8,8 @@ package org.alliance.core.file.filedatabase;
  * To change this template use File | Settings | File Templates.
  */
 public class FileHasBeenRemovedOrChanged extends Exception {
-	private FileDescriptor fd;
+
+    private FileDescriptor fd;
 
     public FileHasBeenRemovedOrChanged(FileDescriptor fd) {
         this.fd = fd;

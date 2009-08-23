@@ -23,6 +23,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class UserInfo extends RPC {
+
     public UserInfo() {
     }
 
@@ -36,7 +37,9 @@ public class UserInfo extends RPC {
         boolean guidMismatch = false;
         int remoteGUID = in.readInt();
         if (remoteGUID != f.getGuid()) {
-            if(T.t)T.warn("GUID mismatch!!! Closing connection.");
+            if (T.t) {
+                T.warn("GUID mismatch!!! Closing connection.");
+            }
 //            f.setGuid(remoteGUID);
             guidMismatch = true;
         }
@@ -51,17 +54,23 @@ public class UserInfo extends RPC {
             if (buildNumber < Version.BUILD_NUMBER) {
                 //remote has old version
                 Hash h = core.getFileManager().getAutomaticUpgrade().getMyJarHash();
-                if (h != null) send(new NewVersionAvailable(h));
+                if (h != null) {
+                    send(new NewVersionAvailable(h));
+                }
             }
         }
 
         //now that we have a good connection to friend: verify that we only have ONE connection
         if (con.getRemoteFriend().hasMultipleFriendConnections()) {
-            if(T.t)T.trace("Has multple connections to a friend. Figuring out wich one of us should close the connection");
+            if (T.t) {
+                T.trace("Has multple connections to a friend. Figuring out wich one of us should close the connection");
+            }
             if ((con.getDirection() == Connection.Direction.IN && con.getRemoteUserGUID() > manager.getMyGUID()) ||
                     (con.getDirection() == Connection.Direction.OUT && manager.getMyGUID() > con.getRemoteUserGUID())) {
                 //serveral connections. Its up to us to close one
-                if(T.t)T.info("Already connected to "+con.getRemoteFriend()+". Closing connection");
+                if (T.t) {
+                    T.info("Already connected to " + con.getRemoteFriend() + ". Closing connection");
+                }
                 send(new GracefulClose(GracefulClose.DUPLICATE_CONNECTION));
                 //con.close();
                 //close connection when we in turn receive a graceful close

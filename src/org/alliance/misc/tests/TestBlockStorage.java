@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public class TestBlockStorage extends TestCase {
+
     private CoreSubsystem core;
 
     protected void setUp() throws Exception {
@@ -39,7 +40,7 @@ public class TestBlockStorage extends TestCase {
 
         System.out.println(" ****** Moving 5 files through block storage ...");
 
-        for(int f=0;f<5 & f<fda.length;f++) {
+        for (int f = 0; f < 5 & f < fda.length; f++) {
             FileDescriptor fd = fda[f];
             fake(bs, fd, false);
         }
@@ -56,28 +57,36 @@ public class TestBlockStorage extends TestCase {
     }
 
     private void fake(BlockStorage bs, FileDescriptor fd, boolean breakInMiddle) throws IOException {
-        System.out.println("Faking a download of "+fd+"...");
+        System.out.println("Faking a download of " + fd + "...");
 
         FileInputStream in = new FileInputStream(fd.getFullPath());
-        System.out.println("size: "+fd.getSize());
+        System.out.println("size: " + fd.getSize());
 
-        int nBlocks = (int)(fd.getSize()/BLOCK_SIZE);
-        if (fd.getSize() % BLOCK_SIZE != 0) nBlocks++;
+        int nBlocks = (int) (fd.getSize() / BLOCK_SIZE);
+        if (fd.getSize() % BLOCK_SIZE != 0) {
+            nBlocks++;
+        }
 
-        for(int i=0;i<nBlocks;i++) {
+        for (int i = 0; i < nBlocks; i++) {
             byte buf[] = new byte[323333];
             int off = 0;
-            System.out.println("block: "+i);
-            for(;;) {
-                int read = BLOCK_SIZE-off;
-                if (read <= 0) break;
-                if (read > buf.length) read = buf.length;
+            System.out.println("block: " + i);
+            for (;;) {
+                int read = BLOCK_SIZE - off;
+                if (read <= 0) {
+                    break;
+                }
+                if (read > buf.length) {
+                    read = buf.length;
+                }
                 read = in.read(buf, 0, read);
                 if (read == -1) {
                     System.out.println("Got -1 in read. Should be done now.");
                     break;
                 }
-                if (read == 0) continue;
+                if (read == 0) {
+                    continue;
+                }
 
                 //convert array to bytebyffer - this is temporary - nio will be used all over later
                 ByteBuffer bbuf = ByteBuffer.allocate(read);
@@ -86,16 +95,22 @@ public class TestBlockStorage extends TestCase {
 
                 if (!bs.containsBlock(fd.getRootHash(), i)) {
                     int r = bs.saveSlice(fd.getRootHash(), i, off, bbuf, fd);
-                    if(T.t)T.ass(r == read, "Mismatch");
-                    if (off+r >= BlockFile.getBlockSize(i, fd.getSize())) {
-                        if(T.t)T.ass(off+r <= BlockFile.getBlockSize(i, fd.getSize()), "Wrote outside!");
+                    if (T.t) {
+                        T.ass(r == read, "Mismatch");
+                    }
+                    if (off + r >= BlockFile.getBlockSize(i, fd.getSize())) {
+                        if (T.t) {
+                            T.ass(off + r <= BlockFile.getBlockSize(i, fd.getSize()), "Wrote outside!");
+                        }
                         break;
                     }
                 } else {
                     System.out.println("Skipping because block already exists.");
                 }
                 off += read;
-                if (breakInMiddle && (i>nBlocks/2 || i>2)) return;
+                if (breakInMiddle && (i > nBlocks / 2 || i > 2)) {
+                    return;
+                }
             }
         }
         System.out.println("all blocks should be done");

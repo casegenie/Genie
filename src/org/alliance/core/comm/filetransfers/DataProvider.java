@@ -11,5 +11,6 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public interface DataProvider {
+
     int fill(ByteBuffer buf) throws IOException;
 }

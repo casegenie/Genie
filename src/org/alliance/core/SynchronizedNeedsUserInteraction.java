@@ -8,7 +8,7 @@ package org.alliance.core;
  */
 public abstract class SynchronizedNeedsUserInteraction implements NeedsUserInteraction {
 
-	public boolean canRunInParallelWithOtherInteractions() {
+    public boolean canRunInParallelWithOtherInteractions() {
         return false;
     }
 }

@@ -23,10 +23,10 @@ import java.util.Set;
  * Date: 2005-dec-30
  * Time: 16:22:07
  */
-public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
-	private UISubsystem ui;
-    private JTree tree;
+public class FriendsTreeMDIWindow extends AllianceMDIWindow {
 
+    private UISubsystem ui;
+    private JTree tree;
     private ImageIcon iconMe, iconFriend, iconNode, iconFriendDimmed, iconNodeDimmed, iconRecursion;
 
     public FriendsTreeMDIWindow() {
@@ -48,11 +48,11 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
     }
 
     private void createUI() throws Exception {
-        ((JLabel)xui.getComponent("status")).setText(" ");
+        ((JLabel) xui.getComponent("status")).setText(" ");
 
         tree = new JTree(ui.getNodeTreeModel(true));
         tree.setCellRenderer(new FriendCellRenderer());
-        ((JScrollPane)xui.getComponent("treepanel")).setViewportView(tree);
+        ((JScrollPane) xui.getComponent("treepanel")).setViewportView(tree);
 
         postInit();
     }
@@ -60,7 +60,7 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
     public void save() throws Exception {
     }
 
-    public String  getIdentifier() {
+    public String getIdentifier() {
         return "friends";
     }
 
@@ -79,16 +79,20 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
     }
 
     public void EVENT_chat(ActionEvent e) throws Exception {
-        if (tree.getSelectionPath() == null) return;
-        NodeTreeNode n = (NodeTreeNode)tree.getSelectionPath().getLastPathComponent();
+        if (tree.getSelectionPath() == null) {
+            return;
+        }
+        NodeTreeNode n = (NodeTreeNode) tree.getSelectionPath().getLastPathComponent();
         if (n != null) {
-            if (n.getNode() != null) ui.getMainWindow().chatMessage(n.getNode().getGuid(), null, 0, false);
+            if (n.getNode() != null) {
+                ui.getMainWindow().chatMessage(n.getNode().getGuid(), null, 0, false);
+            }
         }
     }
 
     private class FriendCellRenderer extends DefaultTreeCellRenderer {
 
-		public Component getTreeCellRendererComponent(
+        public Component getTreeCellRendererComponent(
                 JTree tree,
                 Object value,
                 boolean sel,
@@ -102,7 +106,7 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
                     expanded, leaf, row,
                     hasFocus);
 
-            NodeTreeNode n = (NodeTreeNode)value;
+            NodeTreeNode n = (NodeTreeNode) value;
 
 
             if (n.getNode() != null && n.getNode().isConnected()) {
@@ -123,9 +127,13 @@ public class FriendsTreeMDIWindow extends AllianceMDIWindow  {
                 }
             }
 
-            if (n.getNode() instanceof MyNode) setIcon(iconMe);
+            if (n.getNode() instanceof MyNode) {
+                setIcon(iconMe);
+            }
 
-            if (sel) setForeground(Color.white);
+            if (sel) {
+                setForeground(Color.white);
+            }
 
             return this;
         }

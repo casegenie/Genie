@@ -18,6 +18,7 @@ import java.util.ArrayList;
  * Time: 14:30:21
  */
 public class Friend extends Node {
+
     private ArrayList<Connection> connections = new ArrayList<Connection>();
     private String lastKnownHost;
     private int lastKnownPort;
@@ -27,11 +28,9 @@ public class Friend extends Node {
     private long lastSeenOnlineAt;
     private int middlemanGuid;
     private int allianceBuildNumber;
-
     private long totalBytesSent, totalBytesReceived;
     private double highestIncomingCPS, highestOutgoingCPS;
     private int numberOfFilesShared, numberOfInvitedFriends;
-
     private boolean isAway;
     private String nicknameToShowInUI;
 
@@ -58,7 +57,7 @@ public class Friend extends Node {
     public void addConnection(AuthenticatedConnection c) throws IOException {
         connections.add(c);
         if (c instanceof FriendConnection) {
-            friendConnection = (FriendConnection)c;
+            friendConnection = (FriendConnection) c;
             manager.getCore().getNetworkManager().getDownloadManager().signalFriendWentOnline(this);
         }
     }
@@ -74,8 +73,10 @@ public class Friend extends Node {
         Settings s = manager.getSettings();
 
         // Don't overwrite hostnames set by the user manually
-        if ( TextUtils.isIpNumber(s.getFriend(guid).getHost()) ) {
-            if(T.t)T.info("Updating host info for "+this+": "+host+":"+port);
+        if (TextUtils.isIpNumber(s.getFriend(guid).getHost())) {
+            if (T.t) {
+                T.info("Updating host info for " + this + ": " + host + ":" + port);
+            }
             boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
             lastKnownHost = host;
             lastKnownPort = port;
@@ -105,15 +106,23 @@ public class Friend extends Node {
         connections.remove(ac);
         if (ac == friendConnection) {
             friendConnection = null;
-            for(Connection c : connections) if (c instanceof FriendConnection) friendConnection = (FriendConnection)c;
+            for (Connection c : connections) {
+                if (c instanceof FriendConnection) {
+                    friendConnection = (FriendConnection) c;
+                }
+            }
             if (friendConnection == null) {
-                if(T.t)T.info("Lost connection to "+this+". Closing all other connections too. Have to do this in order to be able to start a new donwload connnection to this friend (if he reconnects)");
+                if (T.t) {
+                    T.info("Lost connection to " + this + ". Closing all other connections too. Have to do this in order to be able to start a new donwload connnection to this friend (if he reconnects)");
+                }
                 ArrayList<Connection> al = new ArrayList<Connection>(connections);
-                for(Connection c: al) {
+                for (Connection c : al) {
                     try {
-                        if(T.t)T.info("Closing: "+c);
+                        if (T.t) {
+                            T.info("Closing: " + c);
+                        }
                         c.close();
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         manager.getCore().reportError(e, this);
                     }
                 }
@@ -131,7 +140,11 @@ public class Friend extends Node {
 
     public boolean hasMultipleFriendConnections() {
         int n = 0;
-        for(Connection c : connections) if (c instanceof FriendConnection) n++;
+        for (Connection c : connections) {
+            if (c instanceof FriendConnection) {
+                n++;
+            }
+        }
         return n > 1;
     }
 
@@ -144,7 +157,9 @@ public class Friend extends Node {
     }
 
     public void disconnect(byte reason) throws IOException {
-        if (friendConnection != null) friendConnection.send(new GracefulClose(reason));
+        if (friendConnection != null) {
+            friendConnection.send(new GracefulClose(reason));
+        }
     }
 
     public long getLastSeenOnlineAt() {
@@ -153,7 +168,7 @@ public class Friend extends Node {
 
     public boolean hasNotBeenOnlineForLongTime() {
         return System.currentTimeMillis() - lastSeenOnlineAt >
-                manager.getCore().getSettings().getInternal().getDaysnotconnectedwhenold()*24*60*60*1000;
+                manager.getCore().getSettings().getInternal().getDaysnotconnectedwhenold() * 24 * 60 * 60 * 1000;
     }
 
     public int getMiddlemanGuid() {
@@ -171,16 +186,28 @@ public class Friend extends Node {
     public void reconnect() throws IOException {
         disconnect(GracefulClose.RECONNECT);
         Thread t = new Thread(new Runnable() {
+
             public void run() {
-                try {Thread.sleep(3000);} catch (InterruptedException e1) {}
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException e1) {
+                }
                 manager.getCore().invokeLater(new Runnable() {
+
                     public void run() {
-                        if (isConnected()) try {
-                            getFriendConnection().close();
-                        } catch (IOException e1) {
-                            if(org.alliance.ui.T.t) org.alliance.ui.T.warn("Error when closing connection: "+e1);
+                        if (isConnected()) {
+                            try {
+                                getFriendConnection().close();
+                            } catch (IOException e1) {
+                                if (org.alliance.ui.T.t) {
+                                    org.alliance.ui.T.warn("Error when closing connection: " + e1);
+                                }
+                            }
                         }
-                        try {Thread.sleep(500);} catch (InterruptedException e1) {}
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e1) {
+                        }
                         manager.getCore().getFriendManager().getFriendConnector().queHighPriorityConnectTo(Friend.this);
                     }
                 });
@@ -196,10 +223,11 @@ public class Friend extends Node {
     public String nickname() {
         if (nicknameToShowInUI == null) {
             org.alliance.core.settings.Friend f = manager.getCore().getSettings().getFriend(guid);
-            if (f != null && f.getRenamednickname() != null && f.getRenamednickname().trim().length() > 0)
+            if (f != null && f.getRenamednickname() != null && f.getRenamednickname().trim().length() > 0) {
                 nicknameToShowInUI = f.getRenamednickname();
-            else
+            } else {
                 nicknameToShowInUI = nickname;
+            }
         }
         return nicknameToShowInUI;
     }

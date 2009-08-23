@@ -1,3 +1,4 @@
+
 <xui xmlns="http://rs.stendahls.net/XUI">
     <title value="Alliancet" image="gfx/icons/alliance.png"/>
     <menubar>
@@ -135,6 +136,6 @@
                     </panel>
                 </panel>
             </panel>
-            </panel>
+        </panel>
     </body>
 </xui>

@@ -9,8 +9,8 @@ import java.util.Random;
  * Time: 15:02:20
  */
 public class My extends SettingClass {
-    public static final String UNDEFINED_NICKNAME = "undefined";
 
+    public static final String UNDEFINED_NICKNAME = "undefined";
     private Integer guid = new Random().nextInt();
     private String nickname = UNDEFINED_NICKNAME;
     private Integer cguid = 0; //this is a checksum of the invitations property, disguised so that script kiddies won't find it
@@ -64,7 +64,7 @@ public class My extends SettingClass {
 
     public Integer getInvitations() {
         if (cguid != null && cguid != 0) {
-            if ((invitations ^ 234427)*13 != cguid) {
+            if ((invitations ^ 234427) * 13 != cguid) {
                 invitations = 0;
             }
         } else {
@@ -79,6 +79,6 @@ public class My extends SettingClass {
 
     public void createChecksumAndSetInvitations(Integer invitations) {
         this.invitations = invitations;
-        cguid = (invitations ^ 234427)*13;
+        cguid = (invitations ^ 234427) * 13;
     }
 }

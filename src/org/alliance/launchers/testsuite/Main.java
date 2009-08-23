@@ -23,21 +23,19 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class Main {
+
     public static final boolean LOG_TO_FILES = false;
-
     private static HashMap<String, Main> users = new HashMap<String, Main>();
-
     private CoreSubsystem core;
     private UISubsystem ui;
     private String settings;
-
     private static JList list;
 
     public Main() {
     }
 
     public Main(String settings) throws Exception {
-        System.out.println("  "+settings);
+        System.out.println("  " + settings);
         this.settings = settings;
         launchCore();
     }
@@ -47,10 +45,13 @@ public class Main {
 
         System.setProperty("testsuite", "true");
 
-        for(File f : new File("testsuite/logs").listFiles()) f.delete();
+        for (File f : new File("testsuite/logs").listFiles()) {
+            f.delete();
+        }
 
         if (T.t) {
             Trace.handler = new TraceHandler() {
+
                 private HashMap<String, BufferedWriter> logs = new HashMap<String, BufferedWriter>();
 
                 public void print(int level, Object o, Exception error) {
@@ -59,33 +60,37 @@ public class Main {
                         String name = Thread.currentThread().getName();
                         // String module = message.substring(0, message.indexOf(' '));
 
-                        if (level >= Trace.LEVEL_WARN) System.out.println(message+" ("+name+")");
+                        if (level >= Trace.LEVEL_WARN) {
+                            System.out.println(message + " (" + name + ")");
+                        }
 
                         if (LOG_TO_FILES) {
                             BufferedWriter out;
                             if (logs.containsKey(name)) {
                                 out = logs.get(name);
                             } else {
-                                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("testsuite/logs/"+name+".log")));
+                                out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("testsuite/logs/" + name + ".log")));
                                 logs.put(name, out);
                             }
-                            out.write(message+"\r\n");
+                            out.write(message + "\r\n");
                             out.flush();
                         }
 
                         int i = name.indexOf("--");
                         if (i != -1) {
-                            name = name.substring(i+3);
+                            name = name.substring(i + 3);
                             Main m = users.get(name.toLowerCase());
 //                            System.out.println(name+" "+message);
                             if (m != null) {
-                                if (error == null) error = new Exception();
+                                if (error == null) {
+                                    error = new Exception();
+                                }
                                 m.core.propagateTraceMessage(level, String.valueOf(message), error);
                             }
                         } else {
                         }
 
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
@@ -96,16 +101,18 @@ public class Main {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getXUI().setEventHandler(new Main());
         list = new JList(new DefaultListModel());
-        JScrollPane p = (JScrollPane)frame.getXUI().getComponent("sp");
+        JScrollPane p = (JScrollPane) frame.getXUI().getComponent("sp");
         p.setViewportView(list);
         frame.display();
         list.addMouseListener(new MouseAdapter() {
+
             public void mouseClicked(MouseEvent e) {
                 if (list.getSelectedValue() != null && e.getClickCount() > 1) {
                     Thread t = new Thread(new Runnable() {
+
                         public void run() {
                             try {
-                                Main m = (Main)list.getSelectedValue();
+                                Main m = (Main) list.getSelectedValue();
                                 m.launchUI();
                             } catch (Exception e1) {
                                 e1.printStackTrace();
@@ -118,35 +125,44 @@ public class Main {
         });
 
         File settings[] = new File("testsuite/settings").listFiles();
-        for(File f : settings) {
+        for (File f : settings) {
             if (f.toString().endsWith("xml")) {
                 final Main m = new Main(f.toString());
-                users.put(f.toString().substring(f.toString().lastIndexOf(System.getProperty("file.separator"))+1, f.toString().lastIndexOf('.')).toLowerCase(), m);
+                users.put(f.toString().substring(f.toString().lastIndexOf(System.getProperty("file.separator")) + 1, f.toString().lastIndexOf('.')).toLowerCase(), m);
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
-                        ((DefaultListModel)list.getModel()).addElement(m);
+                        ((DefaultListModel) list.getModel()).addElement(m);
                     }
                 });
             }
-            Thread.sleep((long)(1000));
+            Thread.sleep((long) (1000));
         }
     }
 
     private void launchUI() throws Exception {
-        if (core == null) launchCore();
+        if (core == null) {
+            launchCore();
+        }
         ui = new UISubsystem();
         ui.init(ResourceSingelton.getRl(), core);
     }
 
     private void launchCore() throws Exception {
-        if (core != null) shutdown();
+        if (core != null) {
+            shutdown();
+        }
         core = new CoreSubsystem();
         core.init(ResourceSingelton.getRl(), settings);
     }
 
     private void shutdown() {
-        if (ui != null) ui.shutdown();
-        if (core != null) core.shutdown();
+        if (ui != null) {
+            ui.shutdown();
+        }
+        if (core != null) {
+            core.shutdown();
+        }
         ui = null;
         core = null;
     }
@@ -156,17 +172,23 @@ public class Main {
     }
 
     public void EVENT_openui(ActionEvent e) throws Exception {
-        Main m = (Main)list.getSelectedValue();
-        if (m != null) m.launchUI();
+        Main m = (Main) list.getSelectedValue();
+        if (m != null) {
+            m.launchUI();
+        }
     }
 
     public void EVENT_start(ActionEvent e) throws Exception {
-        Main m = (Main)list.getSelectedValue();
-        if (m != null) m.launchCore();
+        Main m = (Main) list.getSelectedValue();
+        if (m != null) {
+            m.launchCore();
+        }
     }
 
     public void EVENT_stop(ActionEvent e) throws Exception {
-        Main m = (Main)list.getSelectedValue();
-        if (m != null) m.shutdown();
+        Main m = (Main) list.getSelectedValue();
+        if (m != null) {
+            m.shutdown();
+        }
     }
 }

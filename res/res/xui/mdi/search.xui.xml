@@ -36,7 +36,10 @@ Q:\rs.stendahls.net\XUI\xui.xsd">
             </panel>
         </panel>
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">
-            <label id="left" text=" "/><filler expand="horiz"/><label id="right" text=" "/><strut width="5"/>
+            <label id="left" text=" "/>
+            <filler expand="horiz"/>
+            <label id="right" text=" "/>
+            <strut width="5"/>
         </panel>
     </body>
 </xui>

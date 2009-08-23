@@ -14,12 +14,15 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public class FileDescriptorProvider implements DataProvider {
+
     private byte[] fd;
     private int index = 0;
     private boolean firstFill = true;
 
     public FileDescriptorProvider(FileDescriptor fd) throws IOException {
-        if(T.t)T.debug("Getting ready to send a FD: "+fd);
+        if (T.t) {
+            T.debug("Getting ready to send a FD: " + fd);
+        }
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         fd.serializeTo(out, true);
         out.flush();
@@ -31,16 +34,24 @@ public class FileDescriptorProvider implements DataProvider {
             buf.putInt(fd.length);
             firstFill = false;
         }
-        int len = fd.length-index;
-        if(T.t)T.trace("len: "+len);
+        int len = fd.length - index;
+        if (T.t) {
+            T.trace("len: " + len);
+        }
         if (len <= 0) {
-            if(T.t)T.trace("Done providing file descriptor");
+            if (T.t) {
+                T.trace("Done providing file descriptor");
+            }
             return -1;
         }
-        if (buf.remaining() < len) len = buf.remaining();
+        if (buf.remaining() < len) {
+            len = buf.remaining();
+        }
         buf.put(fd, index, len);
         index += len;
-        if(T.t)T.trace("Provided with "+len+" bytes of FD");
+        if (T.t) {
+            T.trace("Provided with " + len + " bytes of FD");
+        }
         return len;
     }
 }

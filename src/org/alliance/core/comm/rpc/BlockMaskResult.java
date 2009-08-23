@@ -15,6 +15,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class BlockMaskResult extends RPC {
+
     private BlockMask blockMask;
     private boolean hasAllBits;
     private Hash hash;

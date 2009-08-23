@@ -8,6 +8,7 @@ package org.alliance.core.file.filedatabase;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class FileTypeIdentifier {
+
     public boolean matches(FileDescriptor fd) {
         return matches(fd.getSubpath());
     }

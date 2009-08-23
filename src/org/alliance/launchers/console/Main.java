@@ -15,8 +15,9 @@ import java.io.InputStreamReader;
  * To change this template use File | Settings | File Templates.
  */
 public class Main {
+
     public Main(String args[]) throws Exception {
-        System.out.println("Console starting with settings "+args[0]+"...");
+        System.out.println("Console starting with settings " + args[0] + "...");
 
         trace();
 
@@ -27,11 +28,11 @@ public class Main {
 
         FriendManager manager = core.getFriendManager();
 
-        System.out.println("Welcome to alliance "+manager.getSettings().getMy().getNickname()+"!\n");
+        System.out.println("Welcome to alliance " + manager.getSettings().getMy().getNickname() + "!\n");
 
         Console c = new Console(core);
 
-        while(true) {
+        while (true) {
             System.out.print("> ");
             String line;
             line = new BufferedReader(new InputStreamReader(System.in)).readLine();

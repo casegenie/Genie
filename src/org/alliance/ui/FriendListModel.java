@@ -19,7 +19,8 @@ import java.util.TreeSet;
  * To change this template use File | Settings | File Templates.
  */
 public class FriendListModel extends DefaultListModel {
-	private CoreSubsystem core;
+
+    private CoreSubsystem core;
     private boolean ignoreFires;
     private PacedRunner pacedRunner;
 
@@ -27,15 +28,17 @@ public class FriendListModel extends DefaultListModel {
         this.core = core;
 
         pacedRunner = new PacedRunner(new Runnable() {
+
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         updateFriendList();
                     }
                 });
             }
         }, 1000);
-        
+
         updateFriendList();
     }
 
@@ -45,35 +48,56 @@ public class FriendListModel extends DefaultListModel {
         Collection<Friend> c = new ArrayList<Friend>(core.getFriendManager().friends());
 
         TreeSet<Node> ts = new TreeSet<Node>(new Comparator<Node>() {
+
             public int compare(Node o1, Node o2) {
-                if (o1 == null || o2 == null) return 0;
+                if (o1 == null || o2 == null) {
+                    return 0;
+                }
                 String s1 = o1.nickname();
                 String s2 = o2.nickname();
-                if (s1.equalsIgnoreCase(s2)) return o1.getGuid()-o2.getGuid();
+                if (s1.equalsIgnoreCase(s2)) {
+                    return o1.getGuid() - o2.getGuid();
+                }
                 return o1.nickname().compareToIgnoreCase(o2.nickname());
             }
         });
-        for(Friend f : c) {
+        for (Friend f : c) {
             ts.add(f);
         }
         ts.add(core.getFriendManager().getMe());
         int max = core.getFriendManager().getNumberOfInvitesNeededToBeKing();
-        for(Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() >= max) addElement(f);
+        for (Node f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() >= max) {
+                addElement(f);
+            }
         }
-        for(Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() >= 3 && f.getNumberOfInvitedFriends() < max) addElement(f);
+        for (Node f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() >= 3 && f.getNumberOfInvitedFriends() < max) {
+                addElement(f);
+            }
         }
-        for(Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() > 0 && f.getNumberOfInvitedFriends() < 3) addElement(f);
+        for (Node f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() > 0 && f.getNumberOfInvitedFriends() < 3) {
+                addElement(f);
+            }
         }
-        for(Node f : ts) {
-            if (f.isConnected() && f.getNumberOfInvitedFriends() <= 0) addElement(f);
+        for (Node f : ts) {
+            if (f.isConnected() && f.getNumberOfInvitedFriends() <= 0) {
+                addElement(f);
+            }
         }
-        for(Node f : ts) if (!f.isConnected() && !f.hasNotBeenOnlineForLongTime()) addElement(f);
-        for(Node f : ts) if (!f.isConnected() && f.hasNotBeenOnlineForLongTime()) addElement(f);
+        for (Node f : ts) {
+            if (!f.isConnected() && !f.hasNotBeenOnlineForLongTime()) {
+                addElement(f);
+            }
+        }
+        for (Node f : ts) {
+            if (!f.isConnected() && f.hasNotBeenOnlineForLongTime()) {
+                addElement(f);
+            }
+        }
         ignoreFires = false;
-        fireIntervalAdded(this, 0, size()-1);
+        fireIntervalAdded(this, 0, size() - 1);
     }
 
     public void signalFriendChanged(Friend node) {
@@ -85,17 +109,23 @@ public class FriendListModel extends DefaultListModel {
     }
 
     protected void fireContentsChanged(Object source, int index0, int index1) {
-        if (ignoreFires) return;
+        if (ignoreFires) {
+            return;
+        }
         super.fireContentsChanged(source, index0, index1);
     }
 
     protected void fireIntervalAdded(Object source, int index0, int index1) {
-        if (ignoreFires) return;
+        if (ignoreFires) {
+            return;
+        }
         super.fireIntervalAdded(source, index0, index1);
     }
 
     protected void fireIntervalRemoved(Object source, int index0, int index1) {
-        if (ignoreFires) return;
+        if (ignoreFires) {
+            return;
+        }
         super.fireIntervalRemoved(source, index0, index1);
     }
 }

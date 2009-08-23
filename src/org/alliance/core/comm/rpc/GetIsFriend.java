@@ -14,6 +14,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class GetIsFriend extends RPC {
+
     private Node query;
 
     public GetIsFriend() {

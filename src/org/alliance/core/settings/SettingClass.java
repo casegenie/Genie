@@ -11,9 +11,10 @@ import java.lang.reflect.Method;
  * Time: 09:51:47
  */
 public class SettingClass {
+
     public Object getValue(String k) throws Exception {
         Class c = getClass();
-        Method m = c.getMethod("get"+ TextUtils.upperCaseFirstLetter(k));
+        Method m = c.getMethod("get" + TextUtils.upperCaseFirstLetter(k));
         return m.invoke(this);
     }
 
@@ -21,10 +22,10 @@ public class SettingClass {
         Class c = getClass();
         Method m;
         try {
-            m = c.getMethod("set"+ TextUtils.upperCaseFirstLetter(name), val.getClass());
-        } catch(NoSuchMethodException e) {
+            m = c.getMethod("set" + TextUtils.upperCaseFirstLetter(name), val.getClass());
+        } catch (NoSuchMethodException e) {
             val = Integer.parseInt(val.toString());
-            m = c.getMethod("set"+ TextUtils.upperCaseFirstLetter(name), val.getClass());
+            m = c.getMethod("set" + TextUtils.upperCaseFirstLetter(name), val.getClass());
         }
         m.invoke(this, val);
     }

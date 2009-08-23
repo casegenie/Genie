@@ -1,3 +1,4 @@
+
 <xui>
     <title value=""/>
     <body>
@@ -37,13 +38,20 @@
             </panel>
             <panel axis="y" border="0">
                 <filler/>
-                <panel border="0" axis="x" expand="horiz"><strut width="5"/>
-                    <label text="Invite 2 friends to become " id="nextLevelText"/><image border="0" src="gfx/icons/friend.png" id="nextLevelIcon"/><label text=")" id="levelEnding"/><filler/></panel>
+                <panel border="0" axis="x" expand="horiz">
+                    <strut width="5"/>
+                    <label text="Invite 2 friends to become " id="nextLevelText"/>
+                    <image border="0" src="gfx/icons/friend.png" id="nextLevelIcon"/>
+                    <label text=")" id="levelEnding"/>
+                    <filler/>
+                </panel>
             </panel>
         </panel>
 
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">
-            <label id="statusleft" text=" "/><filler expand="horiz"/><label id="statusright" text=" "/>
+            <label id="statusleft" text=" "/>
+            <filler expand="horiz"/>
+            <label id="statusright" text=" "/>
         </panel>
     </body>
 </xui>

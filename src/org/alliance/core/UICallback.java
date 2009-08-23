@@ -15,6 +15,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public interface UICallback {
+
     /**
      * Called when a new friend has been added.
      * @param friend The new friend that was just added

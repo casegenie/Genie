@@ -21,8 +21,8 @@ import org.alliance.core.T;
  * Date: 2006-jul-12
  * Time: 14:04:19
  */
-
 public class CompressedPathCollection implements Serializable {
+
     private static final long serialVersionUID = 7234254693355857212L;   //@todo: MAKE SURE THIS IS BACKWARDS COMPATIBLE
     private HashSet<String> paths = new HashSet<String>();
 
@@ -53,7 +53,9 @@ public class CompressedPathCollection implements Serializable {
     // add or remove path causing a ConcurrentModificationError
     public synchronized String[] getDirectoryListing(String path) {
         path = TextUtils.makeSurePathIsMultiplatform(path);
-        if (!path.endsWith("/")) path = path+'/';
+        if (!path.endsWith("/")) {
+            path = path + '/';
+        }
 
         HashSet<String> hs = new HashSet<String>();
         for (java.util.Iterator it = paths.iterator(); it.hasNext();) {
@@ -65,8 +67,10 @@ public class CompressedPathCollection implements Serializable {
                     //show only files and folders that are in this directory, not in subdirectories
                     s = s.substring(0, s.indexOf('/') + 1);
                 }
-                if (!new File(path+s).exists()) {
-                    if(T.t)T.info("Ehm. Found file in path collection that does not exist. Recovering by ignoring it and removing it from path collection.");
+                if (!new File(path + s).exists()) {
+                    if (T.t) {
+                        T.info("Ehm. Found file in path collection that does not exist. Recovering by ignoring it and removing it from path collection.");
+                    }
                     it.remove();
                 } else {
                     hs.add(s);
@@ -76,19 +80,24 @@ public class CompressedPathCollection implements Serializable {
 
         ArrayList<String> dirs = new ArrayList<String>();
         ArrayList<String> files = new ArrayList<String>();
-        for(String s : hs) {
-            if (s.endsWith("/"))
+        for (String s : hs) {
+            if (s.endsWith("/")) {
                 dirs.add(s);
-            else
+            } else {
                 files.add(s);
+            }
         }
         Collections.sort(dirs);
         Collections.sort(files);
 
-        String[] sa = new String[dirs.size()+files.size()];
-        int i=0;
-        for(String s : dirs) sa[i++] = s;
-        for(String s : files) sa[i++] = s;
+        String[] sa = new String[dirs.size() + files.size()];
+        int i = 0;
+        for (String s : dirs) {
+            sa[i++] = s;
+        }
+        for (String s : files) {
+            sa[i++] = s;
+        }
         return sa;
     }
 }

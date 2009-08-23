@@ -10,6 +10,8 @@ import org.alliance.core.CoreSubsystem;
  * To change this template use File | Settings | File Templates.
  */
 public interface PlugIn {
+
     abstract void init(CoreSubsystem core) throws Exception;
+
     abstract void shutdown() throws Exception;
 }

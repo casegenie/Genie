@@ -9,7 +9,8 @@ import org.alliance.core.NeedsUserInteraction;
  * Time: 16:58:19
  */
 public class NewFriendConnectedUserInteraction implements NeedsUserInteraction {
-	private int guid;
+
+    private int guid;
 
     public NewFriendConnectedUserInteraction() {
     }

@@ -17,6 +17,7 @@ import java.nio.ByteBuffer;
  * Time: 14:22:13
  */
 public class NoEncryptionCryptoLayer extends BufferedCryptoLayer {
+
     public NoEncryptionCryptoLayer(CoreSubsystem core) {
         super(core);
     }

@@ -9,6 +9,8 @@ import com.stendahls.resourceloader.ResourceLoader;
  * Time: 16:47:11
  */
 public interface Subsystem {
+
     void init(ResourceLoader rl, Object... params) throws Exception;
+
     void shutdown();
 }

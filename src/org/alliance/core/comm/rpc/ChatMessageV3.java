@@ -16,7 +16,8 @@ import java.io.IOException;
  * Time: 18:42:48
  */
 public class ChatMessageV3 extends PersistantRPC {
-	private String message;
+
+    private String message;
     private boolean messageToAll;
     private long sentAtTick;
 
@@ -35,10 +36,11 @@ public class ChatMessageV3 extends PersistantRPC {
         messageToAll = in.readBoolean();
         sentAtTick = in.readLong();
         hasBeenQueuedForLaterSend = in.readBoolean();
-        if (messageToAll)
+        if (messageToAll) {
             manager.getCore().queNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid, sentAtTick, hasBeenQueuedForLaterSend));
-        else
+        } else {
             manager.getCore().queNeedsUserInteraction(new PostMessageInteraction(message, fromGuid, sentAtTick, hasBeenQueuedForLaterSend));
+        }
     }
 
     public Packet serializeTo(Packet p) {

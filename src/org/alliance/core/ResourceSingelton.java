@@ -11,9 +11,13 @@ import com.stendahls.resourceloader.ResourceLoader;
  * To change this template use File | Settings | File Templates.
  */
 public class ResourceSingelton {
+
     private static GeneralResourceLoader rl;
+
     public static ResourceLoader getRl() {
-        if (rl == null) rl = new GeneralResourceLoader(T.class, "res");
+        if (rl == null) {
+            rl = new GeneralResourceLoader(T.class, "res");
+        }
         return rl;
     }
 }

@@ -15,6 +15,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class GetDirectoryListing extends RPC {
+
     private String path;
     private int shareBaseIndex;
 
@@ -22,7 +23,9 @@ public class GetDirectoryListing extends RPC {
     }
 
     public GetDirectoryListing(int shareBaseIndex, String path) {
-        if(T.t)T.info("About to send GetDirectoryListing. ShareBaseIndex: "+shareBaseIndex+", path: "+path);
+        if (T.t) {
+            T.info("About to send GetDirectoryListing. ShareBaseIndex: " + shareBaseIndex + ", path: " + path);
+        }
         this.shareBaseIndex = shareBaseIndex;
         this.path = path;
     }
@@ -30,7 +33,9 @@ public class GetDirectoryListing extends RPC {
     public void execute(Packet data) throws IOException {
         shareBaseIndex = data.readInt();
         String path = data.readUTF();
-        if (path.startsWith("/")) path = path.substring(1);
+        if (path.startsWith("/")) {
+            path = path.substring(1);
+        }
         ShareBase sb = manager.getCore().getShareManager().getBaseByIndex(shareBaseIndex);
         String files[] = manager.getCore().getFileManager().getFileDatabase().getDirectoryListing(sb, path);
         send(new DirectoryListing(shareBaseIndex, path, files));

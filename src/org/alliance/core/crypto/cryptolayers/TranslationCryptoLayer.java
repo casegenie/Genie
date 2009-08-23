@@ -16,19 +16,26 @@ import java.nio.ByteBuffer;
  * Time: 14:22:13
  */
 public class TranslationCryptoLayer extends BufferedCryptoLayer {
+
     public TranslationCryptoLayer(CoreSubsystem core) {
         super(core);
-        if(T.t) T.info("Starting TranslationCryptoLayer");
+        if (T.t) {
+            T.info("Starting TranslationCryptoLayer");
+        }
     }
 
     public int encrypt(Connection c, ByteBuffer src, ByteBuffer dst) {
         int start = dst.position();
         dst.put(src);
         int end = dst.position();
-        if(T.t)T.ass(dst.hasArray(), "No array!");
+        if (T.t) {
+            T.ass(dst.hasArray(), "No array!");
+        }
         byte arr[] = dst.array();
-        for(int i=start;i<end;i++) arr[i] = arr[i] += 33;
-        return end-start;
+        for (int i = start; i < end; i++) {
+            arr[i] = arr[i] += 33;
+        }
+        return end - start;
 
     }
 
@@ -36,8 +43,12 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         int start = dst.position();
         dst.put(src);
         int end = dst.position();
-        if(T.t)T.ass(dst.hasArray(), "No array!");
+        if (T.t) {
+            T.ass(dst.hasArray(), "No array!");
+        }
         byte arr[] = dst.array();
-        for(int i=start;i<end;i++) arr[i] = arr[i] -= 33;
+        for (int i = start; i < end; i++) {
+            arr[i] = arr[i] -= 33;
+        }
     }
 }

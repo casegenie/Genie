@@ -16,8 +16,8 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class DownloadConnection extends TransferConnection {
-    public static final int CONNECTION_ID=2;
 
+    public static final int CONNECTION_ID = 2;
     private Download download;
     private ArrayList<DataConsumer> consumerQue = new ArrayList<DataConsumer>();
     private boolean inHandshake = true;
@@ -36,11 +36,15 @@ public class DownloadConnection extends TransferConnection {
         download.connectionEstablished(this);
         sendHash();
         if (download.getFd() == null && !download.isDownloadingFd()) {
-            if(T.t) T.info("Attempting to download FileDescriptor");
+            if (T.t) {
+                T.info("Attempting to download FileDescriptor");
+            }
             sendGetFD();
         }
         inHandshake = false;
-        if (download.getFd() != null) startDownloadingBlock();
+        if (download.getFd() != null) {
+            startDownloadingBlock();
+        }
     }
 
     public void bytesReceived(int n) {
@@ -52,7 +56,9 @@ public class DownloadConnection extends TransferConnection {
         sendCommand(Command.GET_FD);
         switchMode(Mode.RAW);
         consumerQue.add(new FileDescriptorConsumer(download, this));
-        if(T.t)T.ass(consumerQue.size() == 1,"Somethings strange with que "+consumerQue.size());
+        if (T.t) {
+            T.ass(consumerQue.size() == 1, "Somethings strange with que " + consumerQue.size());
+        }
     }
 
     public void sendGracefulClose() throws IOException {
@@ -66,10 +72,10 @@ public class DownloadConnection extends TransferConnection {
     }
 
     public void received(ByteBuffer buf) throws IOException {
-        if (mode == Mode.PACKET)
+        if (mode == Mode.PACKET) {
             super.received(buf);
-        else {
-            while(buf.remaining() > 0) {
+        } else {
+            while (buf.remaining() > 0) {
                 //this might seem weird, but when a consumer is done, it will compact the buffer,
                 // remove itself from the queue and return. This way we continue with the next consumer.
                 consumerQue.get(0).consume(buf);
@@ -79,11 +85,15 @@ public class DownloadConnection extends TransferConnection {
     }
 
     public void packetReceived(Packet p) throws IOException {
-        if(T.t)T.ass(false,"eh. We're not receiving any packets here");
+        if (T.t) {
+            T.ass(false, "eh. We're not receiving any packets here");
+        }
     }
 
     private void sendHash() throws IOException {
-        if(T.t)T.debug("Sending command HASH");
+        if (T.t) {
+            T.debug("Sending command HASH");
+        }
         Packet p = netMan.createPacketForSend();
         p.writeByte(Command.HASH.value());
         p.writeArray(download.getRoot().array());
@@ -91,19 +101,27 @@ public class DownloadConnection extends TransferConnection {
     }
 
     private void sendOneOrMoreGetBlocks(int blockNumber) throws IOException {
-        if(T.t)T.debug("Sending command GETBLOCK "+blockNumber);
+        if (T.t) {
+            T.debug("Sending command GETBLOCK " + blockNumber);
+        }
         switchMode(Mode.PACKET);
 
-        while(consumerQue.size() < core.getSettings().getInternal().getNumberofblockstopipeline()) {
+        while (consumerQue.size() < core.getSettings().getInternal().getNumberofblockstopipeline()) {
             if (blockNumber == -1) {
-                if(T.t)T.info("Trying to que another get block");
+                if (T.t) {
+                    T.info("Trying to que another get block");
+                }
                 blockNumber = download.selectBestBlockForDownload(getRemoteFriend());
                 if (blockNumber == -1) {
-                    if(T.t)T.info("Couldn't find block to queue");
+                    if (T.t) {
+                        T.info("Couldn't find block to queue");
+                    }
                     break;
                 }
             }
-            if(T.t)T.info("Queueing blocknumber "+blockNumber+" for download.");
+            if (T.t) {
+                T.info("Queueing blocknumber " + blockNumber + " for download.");
+            }
             Packet p = netMan.createPacketForSend();
             p.writeByte(Command.GETBLOCK.value());
             p.writeInt(blockNumber);
@@ -132,7 +150,9 @@ public class DownloadConnection extends TransferConnection {
     }
 
     public void blockDownloadComplete(int blockNumber) throws IOException {
-        if(T.t)T.info("Block "+blockNumber+" download complete.");
+        if (T.t) {
+            T.info("Block " + blockNumber + " download complete.");
+        }
         consumerQue.remove(0);
         download.signalBlockComplete(blockNumber);
     }
@@ -141,15 +161,21 @@ public class DownloadConnection extends TransferConnection {
         int blockNumber = download.selectBestBlockForDownload(getRemoteFriend());
         if (blockNumber == -1) {
             if (consumerQue.size() == 0) {
-                if(T.t)T.info("Did not find anything to download. Closing connection.");
+                if (T.t) {
+                    T.info("Did not find anything to download. Closing connection.");
+                }
                 sendGracefulClose();
             } else {
-                if(T.t)T.info("Nothing to download but something in queue. Don't shutdown quite yet.");
+                if (T.t) {
+                    T.info("Nothing to download but something in queue. Don't shutdown quite yet.");
+                }
             }
         } else {
-            setStatusString("Downloading block "+blockNumber);
+            setStatusString("Downloading block " + blockNumber);
 
-            if(T.t)T.info("Starting to download block "+blockNumber);
+            if (T.t) {
+                T.info("Starting to download block " + blockNumber);
+            }
             sendOneOrMoreGetBlocks(blockNumber);
         }
     }
@@ -168,11 +194,15 @@ public class DownloadConnection extends TransferConnection {
 
     public void fileDescriptorReceived() {
         consumerQue.remove(0);
-        if(T.t)T.ass(consumerQue.size() == 0,"Somethings in queue when it shouldn't");
+        if (T.t) {
+            T.ass(consumerQue.size() == 0, "Somethings in queue when it shouldn't");
+        }
     }
 
     public String toString() {
-        if (getRemoteFriend() == null) return "Establishing connection (download)";
-        return getRemoteFriend().getNickname()+" (download)";
+        if (getRemoteFriend() == null) {
+            return "Establishing connection (download)";
+        }
+        return getRemoteFriend().getNickname() + " (download)";
     }
 }

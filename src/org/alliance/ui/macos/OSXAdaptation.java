@@ -13,6 +13,7 @@ import javax.swing.*;
  * To change this template use File | Settings | File Templates.
  */
 public class OSXAdaptation {
+
     private UISubsystem ui;
 
     public OSXAdaptation(UISubsystem ui) {
@@ -24,13 +25,14 @@ public class OSXAdaptation {
                 OSXAdapter.setReOpenApplicationHandler(this, getClass().getMethod("show"));
                 OSXAdapter.setQuitHandler(this, getClass().getMethod("quit"));
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             ui.handleErrorInEventLoop(e);
         }
     }
 
     public void preferences() {
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 try {
                     ui.getMainWindow().EVENT_options(null);
@@ -43,6 +45,7 @@ public class OSXAdaptation {
 
     public void show() {
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 ui.getMainWindow().setVisible(true);
             }
@@ -51,6 +54,7 @@ public class OSXAdaptation {
 
     public void quit() {
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 ui.getCore().shutdown();
             }

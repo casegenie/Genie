@@ -8,6 +8,7 @@ package org.alliance.core.messageboard;
  * Represents a topic in the message board.
  */
 public class Topic extends Message {
+
     private String subject;
 
     public Topic(String subject, String text, int createdBy) {

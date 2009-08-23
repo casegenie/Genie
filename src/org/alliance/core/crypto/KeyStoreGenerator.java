@@ -20,8 +20,11 @@ import java.security.cert.X509Certificate;
  * To change this template use File | Settings | File Templates.
  */
 public class KeyStoreGenerator {
+
     public static void generate(String alias, char[] password, String outputFilename) throws Exception {
-        if(T.t)T.info("Generating a new keystore to "+outputFilename);
+        if (T.t) {
+            T.info("Generating a new keystore to " + outputFilename);
+        }
 
         KeyStore keyStore = KeyStore.getInstance("JKS");
         keyStore.load(null, password);
@@ -29,9 +32,13 @@ public class KeyStoreGenerator {
 
         sun.security.x509.X500Name x500Name = new sun.security.x509.X500Name("Alliance", "Alliance", "Alliance", "SE");
 
-        if(T.t)T.debug("Generating 1024 bit keypair...");
+        if (T.t) {
+            T.debug("Generating 1024 bit keypair...");
+        }
         keypair.generate(1024);
-        if(T.t)T.debug("done.");
+        if (T.t) {
+            T.debug("done.");
+        }
         PrivateKey privKey = keypair.getPrivateKey();
         X509Certificate[] chain = new X509Certificate[1];
         chain[0] = keypair.getSelfCertificate(x500Name, 100l * 1000 * 24 * 60 * 60);
@@ -42,6 +49,8 @@ public class KeyStoreGenerator {
         OutputStream out = new FileOutputStream(file);
         keyStore.store(out, password);
 
-        if(T.t)T.debug("Ketstore saved.");
+        if (T.t) {
+            T.debug("Ketstore saved.");
+        }
     }
 }

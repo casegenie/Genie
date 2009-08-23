@@ -14,12 +14,15 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public class NIOPacket extends Packet {
+
     private ByteBuffer buffer;
     private boolean hasLengthBytes;
 
     public NIOPacket(ByteBuffer buffer, boolean hasLengthBytes) {
         this.buffer = buffer;
-        if (hasLengthBytes) writeShort(0); //make space for packet length that will be sent later
+        if (hasLengthBytes) {
+            writeShort(0); //make space for packet length that will be sent later
+        }
         this.hasLengthBytes = hasLengthBytes;
     }
 
@@ -56,7 +59,7 @@ public class NIOPacket extends Packet {
     }
 
     public void skip(int n) {
-        buffer.position(buffer.position()+n);
+        buffer.position(buffer.position() + n);
     }
 
     public byte readByte() {
@@ -76,7 +79,7 @@ public class NIOPacket extends Packet {
     }
 
     public void writeBoolean(boolean v) {
-        buffer.put((byte)(v ? 1 : 0));
+        buffer.put((byte) (v ? 1 : 0));
     }
 
     public boolean readBoolean() {
@@ -112,13 +115,17 @@ public class NIOPacket extends Packet {
     }
 
     public void prepareForSend() throws IOException {
-        int len = buffer.position()-2; //two bytes to store length
-        if (len >= 0xffff) throw new IOException("Packet size overflow! Packet size: "+len);
+        int len = buffer.position() - 2; //two bytes to store length
+        if (len >= 0xffff) {
+            throw new IOException("Packet size overflow! Packet size: " + len);
+        }
         buffer.flip();
         mark();
         writeShort(len);
         reset();
-        if(T.netTrace)T.trace("Patched packet length: "+len);
+        if (T.netTrace) {
+            T.trace("Patched packet length: " + len);
+        }
     }
 
     public byte[] asArray() {
@@ -130,7 +137,9 @@ public class NIOPacket extends Packet {
             buffer.position(0);
         }
         byte[] buf = new byte[len];
-        for(int i=0;i<len;i++) buf[i] = buffer.get();
+        for (int i = 0; i < len; i++) {
+            buf[i] = buffer.get();
+        }
         buffer.position(len);
         return buf;
     }

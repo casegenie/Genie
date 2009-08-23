@@ -12,6 +12,7 @@ import java.util.HashMap;
  * Time: 13:50:55
  */
 public abstract class Node {
+
     protected String nickname;
     protected int guid;
     protected HashMap<Integer, UntrustedNode> friendsFriends;
@@ -26,8 +27,11 @@ public abstract class Node {
     }
 
     public abstract boolean isConnected();
+
     public abstract int getNumberOfInvitedFriends();
+
     public abstract boolean hasNotBeenOnlineForLongTime();
+
     public abstract long getLastSeenOnlineAt();
 
     public boolean isAway() {
@@ -51,29 +55,37 @@ public abstract class Node {
     }
 
     public String toString() {
-        return getNickname()+"["+guid+", "+ TextUtils.simplifyClassName(getClass())+"]";
+        return getNickname() + "[" + guid + ", " + TextUtils.simplifyClassName(getClass()) + "]";
     }
 
     public void addFriendsFriend(UntrustedNode untrustedNode) {
-        if (friendsFriends == null) friendsFriends = new HashMap<Integer, UntrustedNode>();
+        if (friendsFriends == null) {
+            friendsFriends = new HashMap<Integer, UntrustedNode>();
+        }
         friendsFriends.put(untrustedNode.getGuid(), untrustedNode);
     }
 
     public void removeAllFriendsOfFriend() {
-        if (friendsFriends != null) friendsFriends.clear();
+        if (friendsFriends != null) {
+            friendsFriends.clear();
+        }
     }
 
     public boolean friendsFriendsLoaded() {
         return friendsFriends != null;
     }
-    
+
     public Collection<UntrustedNode> friendsFriends() {
-        if (friendsFriends == null) return null;
+        if (friendsFriends == null) {
+            return null;
+        }
         return friendsFriends.values();
     }
 
     public UntrustedNode getFriendsFriend(int guid) {
-        if (friendsFriends == null) return null;
+        if (friendsFriends == null) {
+            return null;
+        }
         return friendsFriends.get(guid);
     }
 
@@ -124,8 +136,12 @@ public abstract class Node {
     public String calculateRatio() {
         long upload = getTotalBytesSent();
         long download = getTotalBytesReceived();
-        if (upload == 0 || download == 0) return "?";
-        if (upload > download) return ((double)Math.round(((double)upload)/download*10))/10 + ":1";
-        return "1:"+((double)Math.round(((double)download)/upload*10))/10;
+        if (upload == 0 || download == 0) {
+            return "?";
+        }
+        if (upload > download) {
+            return ((double) Math.round(((double) upload) / download * 10)) / 10 + ":1";
+        }
+        return "1:" + ((double) Math.round(((double) download) / upload * 10)) / 10;
     }
 }

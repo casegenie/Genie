@@ -18,6 +18,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class PluginManager extends Manager {
+
     private CoreSubsystem core;
     private URLClassLoader classLoader;
     private List<PlugIn> plugIns = new ArrayList<PlugIn>();
@@ -29,13 +30,13 @@ public class PluginManager extends Manager {
     public void init() throws Exception {
         if (core.getSettings().getPluginlist().size() > 0) {
             setupClassLoader();
-            for(org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
+            for (org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
                 try {
-                    PlugIn pi = (PlugIn)classLoader.loadClass(p.getPluginclass()).newInstance();
+                    PlugIn pi = (PlugIn) classLoader.loadClass(p.getPluginclass()).newInstance();
                     pi.init(core);
                     plugIns.add(pi);
-                } catch(Exception e) {
-                    throw new Exception("Could not start plugin "+p.getPluginclass(), e);
+                } catch (Exception e) {
+                    throw new Exception("Could not start plugin " + p.getPluginclass(), e);
                 }
             }
         }
@@ -43,9 +44,11 @@ public class PluginManager extends Manager {
 
     private void setupClassLoader() throws Exception {
         List<URL> l = new ArrayList<URL>();
-        for(org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
+        for (org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
             File f = new File(p.getJar());
-            if (!f.exists()) throw new IOException("Could not find jar: "+f);
+            if (!f.exists()) {
+                throw new IOException("Could not find jar: " + f);
+            }
             l.add(f.toURI().toURL());
         }
         URL[] u = new URL[l.size()];
@@ -54,6 +57,8 @@ public class PluginManager extends Manager {
     }
 
     public void shutdown() throws Exception {
-        for(PlugIn pi : plugIns) pi.shutdown();
+        for (PlugIn pi : plugIns) {
+            pi.shutdown();
+        }
     }
 }

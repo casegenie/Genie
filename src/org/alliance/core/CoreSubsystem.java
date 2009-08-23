@@ -62,18 +62,15 @@ import java.util.List;
  * Time: 16:38:25
  */
 public class CoreSubsystem implements Subsystem {
+
     public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = false; //don't forget to turn off trace, run with registered synthetica
     private static final int STATE_FILE_VERSION = 5;
-
     public final static int KB = 1024;
-    public final static int MB = 1024*KB;
-    public final static long GB = 1024*MB;
-
+    public final static int MB = 1024 * KB;
+    public final static long GB = 1024 * MB;
     public final static int BLOCK_SIZE = MB;
     public final static String ERROR_URL = "http://maciek.tv/alliance/errorreporter/";
-
     private ResourceLoader rl;
-
     private FriendManager friendManager;
     private FileManager fileManager;
     private NetworkManager networkManager;
@@ -82,39 +79,45 @@ public class CoreSubsystem implements Subsystem {
     private CryptoManager cryptoManager;
     private AwayManager awayManager;
     private PluginManager pluginManager;
-
     private PublicChatHistory publicChatHistory;
-
     private UICallback uiCallback = new NonWindowUICallback();
-
     private Settings settings;
     private String settingsFile;
-
     private Log errorLog, traceLog;
-
     ArrayList<NeedsUserInteraction> userInternactionQue = new ArrayList<NeedsUserInteraction>();
 
     public CoreSubsystem() {
     }
 
     public void init(ResourceLoader rl, Object... params) throws Exception {
-        StartupProgressListener progress = new StartupProgressListener() {public void updateProgress(String message) {}};
-        if (params != null && params.length >= 2 && params[1] != null) progress = (StartupProgressListener)params[1];
+        StartupProgressListener progress = new StartupProgressListener() {
+
+            public void updateProgress(String message) {
+            }
+        };
+        if (params != null && params.length >= 2 && params[1] != null) {
+            progress = (StartupProgressListener) params[1];
+        }
 
         progress.updateProgress("Loading core");
         setupLog();
         if (T.t && !isRunningAsTestSuite()) {
             final TraceHandler old = Trace.handler;
             Trace.handler = new TraceHandler() {
+
                 public void print(int level, Object message, Exception error) {
                     logTrace(level, message);
-                    if (old != null) old.print(level, message, error);
+                    if (old != null) {
+                        old.print(level, message, error);
+                    }
                     propagateTraceMessage(level, String.valueOf(message), error);
                 }
             };
         }
 
-        if(T.t)T.info("CoreSubsystem starting...");
+        if (T.t) {
+            T.info("CoreSubsystem starting...");
+        }
 
         this.rl = rl;
         this.settingsFile = String.valueOf(params[0]);
@@ -147,6 +150,7 @@ public class CoreSubsystem implements Subsystem {
 
         if (!isRunningAsTestSuite()) {
             Thread t = new Thread(new Runnable() {
+
                 public void run() {
                     try {
                         upnpManager.init();
@@ -159,12 +163,14 @@ public class CoreSubsystem implements Subsystem {
 
             if (OSInfo.isWindows() && settings.getInternal().getRestartEveryXHours() != 0) {
                 t = new Thread(new Runnable() {
+
                     public void run() {
                         try {
                             //on windows, where Alliance can be restarted, it will restart every X hours by default
-                            Thread.sleep(1000*60*60*settings.getInternal().getRestartEveryXHours());
+                            Thread.sleep(1000 * 60 * 60 * settings.getInternal().getRestartEveryXHours());
                             if (!getUICallback().isUIVisible()) {
                                 invokeLater(new Runnable() {
+
                                     public void run() {
                                         try {
                                             restartProgram(false);
@@ -174,27 +180,31 @@ public class CoreSubsystem implements Subsystem {
                                     }
                                 });
                             }
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException e) {
+                        }
                     }
                 });
                 t.start();
             }
         }
 
-        Thread.currentThread().setName(friendManager.getMe()+" main");
+        Thread.currentThread().setName(friendManager.getMe() + " main");
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
+
             public void run() {
                 shutdown();
             }
         });
 
-        System.setProperty("alliance.share.nfiles", ""+fileManager.getFileDatabase().getNumberOfFiles());
-        System.setProperty("alliance.share.size", ""+fileManager.getFileDatabase().getTotalSize());
-        System.setProperty("alliance.network.nfriends",""+friendManager.getNFriends());
-        System.setProperty("alliance.invites",""+getSettings().getMy().getInvitations());
+        System.setProperty("alliance.share.nfiles", "" + fileManager.getFileDatabase().getNumberOfFiles());
+        System.setProperty("alliance.share.size", "" + fileManager.getFileDatabase().getTotalSize());
+        System.setProperty("alliance.network.nfriends", "" + friendManager.getNFriends());
+        System.setProperty("alliance.invites", "" + getSettings().getMy().getInvitations());
 
-        if(T.t)T.info("CoreSubsystem stated.");
+        if (T.t) {
+            T.info("CoreSubsystem stated.");
+        }
     }
 
     private void setupLog() throws Exception {
@@ -202,7 +212,7 @@ public class CoreSubsystem implements Subsystem {
             new File("logs").mkdirs();
             errorLog = new Log("logs/error.log");
             traceLog = new Log("logs/trace.log");
-        } catch(FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             if (OSInfo.isMac()) {
                 OptionDialog.showErrorDialog(new JFrame(), "It seems that you are trying to run Alliance from a mounted image on Mac.[p]You need to drag'n'drop the Alliance icon you clicked on to your Applications folder and then start Alliance from there.[p]Alliance will now shut down.");
                 System.exit(1);
@@ -218,7 +228,7 @@ public class CoreSubsystem implements Subsystem {
 
     public void logTrace(int level, Object message) {
         try {
-            traceLog.log("^"+level+" "+message);
+            traceLog.log("^" + level + " " + message);
             System.out.println(message);
         } catch (IOException e) {
             reportError(e, null);
@@ -238,7 +248,9 @@ public class CoreSubsystem implements Subsystem {
     }
 
     private void loadSettings(boolean tryWithBackupIfFail) throws Exception {
-        if(T.t)T.info("Loading settings...");
+        if (T.t) {
+            T.info("Loading settings...");
+        }
         XMLSerializer s = new XMLSerializer();
         try {
             File file = new File(settingsFile);
@@ -252,19 +264,25 @@ public class CoreSubsystem implements Subsystem {
             settings = s.deserialize(
                     document,
                     Settings.class);
-        } catch(FileNotFoundException e) {
-            if(T.t)T.info("No settings file - creating default settings.");
+        } catch (FileNotFoundException e) {
+            if (T.t) {
+                T.info("No settings file - creating default settings.");
+            }
             File file = new File(settingsFile);
-            if (file.getParentFile() != null) file.getParentFile().mkdirs();
+            if (file.getParentFile() != null) {
+                file.getParentFile().mkdirs();
+            }
             settings = new Settings();
             saveSettings();
-        } catch(SAXParseException e) {
+        } catch (SAXParseException e) {
             if (tryWithBackupIfFail) {
-                if(T.t)T.info("Settings file is corrupt - trying to use backup version of settings..");
+                if (T.t) {
+                    T.info("Settings file is corrupt - trying to use backup version of settings..");
+                }
                 File file = new File(settingsFile);
-                File bak = new File(settingsFile+".bak");
+                File bak = new File(settingsFile + ".bak");
                 if (bak.exists()) {
-                    file.renameTo(new File(settingsFile+".corrupt@"+System.currentTimeMillis()));
+                    file.renameTo(new File(settingsFile + ".corrupt@" + System.currentTimeMillis()));
                     bak.renameTo(file);
                     //calls itself recursively but no infinite loop should occur since the .bak file has been moved
                     loadSettings(false);
@@ -278,9 +296,13 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public void saveState() throws IOException {
-        if(T.t)T.info("Saving core state");
+        if (T.t) {
+            T.info("Saving core state");
+        }
         File file = new File(settings.getInternal().getCorestatefile());
-        if (file.getParentFile() != null) file.getParentFile().mkdirs();
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
         out.writeInt(STATE_FILE_VERSION);
         invitaitonManager.save(out);
@@ -289,38 +311,54 @@ public class CoreSubsystem implements Subsystem {
         out.writeObject(publicChatHistory);
         out.flush();
         out.close();
-        if(T.t)T.info("Core state saved.");
+        if (T.t) {
+            T.info("Core state saved.");
+        }
     }
 
     @SuppressWarnings("unchecked")
     public void loadState() throws Exception {
         try {
-            if(T.t)T.info("Loading core state");
+            if (T.t) {
+                T.info("Loading core state");
+            }
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(settings.getInternal().getCorestatefile()));
             int ver = in.readInt();
             if (ver != STATE_FILE_VERSION) {
-                if(T.t)T.error("Incorrect state file version. Ignoring old state.");
+                if (T.t) {
+                    T.error("Incorrect state file version. Ignoring old state.");
+                }
                 in.close();
                 return;
             }
             invitaitonManager.load(in);
             networkManager.load(in);
-            userInternactionQue = (ArrayList<NeedsUserInteraction>)in.readObject();
-            publicChatHistory = (PublicChatHistory)in.readObject();
-            for(Iterator i = userInternactionQue.iterator();i.hasNext();) {
-                if (i.next() instanceof NeedsToRestartBecauseOfUpgradeInteraction) i.remove(); //we don't need to restart if it's a interaction from the last time we ran alliance
+            userInternactionQue = (ArrayList<NeedsUserInteraction>) in.readObject();
+            publicChatHistory = (PublicChatHistory) in.readObject();
+            for (Iterator i = userInternactionQue.iterator(); i.hasNext();) {
+                if (i.next() instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
+                    i.remove(); //we don't need to restart if it's a interaction from the last time we ran alliance
+                }
             }
             in.close();
-        } catch(FileNotFoundException e) {
-            if(T.t)T.info("No core state found.");
-        } catch(IOException e) {
-            if(T.t)T.error("Could not load state: "+e);
+        } catch (FileNotFoundException e) {
+            if (T.t) {
+                T.info("No core state found.");
+            }
+        } catch (IOException e) {
+            if (T.t) {
+                T.error("Could not load state: " + e);
+            }
         }
     }
 
     public void saveSettings() throws Exception {
-        if(T.t)T.info("Saving settings");
-        if (new File(settingsFile).exists()) AutomaticUpgrade.copyFile(new File(settingsFile), new File(settingsFile+".bak"));
+        if (T.t) {
+            T.info("Saving settings");
+        }
+        if (new File(settingsFile).exists()) {
+            AutomaticUpgrade.copyFile(new File(settingsFile), new File(settingsFile + ".bak"));
+        }
 
         XMLSerializer s = new XMLSerializer();
         Document doc = s.serialize(settings);
@@ -338,45 +376,89 @@ public class CoreSubsystem implements Subsystem {
     public FriendManager getFriendManager() {
         return friendManager;
     }
-
     private boolean shutdownInProgress;
+
     public synchronized void shutdown() {
-        if (shutdownInProgress) return;
+        if (shutdownInProgress) {
+            return;
+        }
         shutdownInProgress = true;
-        if(T.t)T.info("Shutting down core..");
-        try { fileManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down filemanager: "+e);
+        if (T.t) {
+            T.info("Shutting down core..");
         }
-        try { updateLastSeenOnlineForFriends(); } catch(Exception e) {
-            if(T.t)T.error("Problem when saving friends: "+e);
+        try {
+            fileManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down filemanager: " + e);
+            }
         }
-        try { friendManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down friendmanager: "+e);
+        try {
+            updateLastSeenOnlineForFriends();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when saving friends: " + e);
+            }
         }
-        try { networkManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down networkmanager: "+e);
+        try {
+            friendManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down friendmanager: " + e);
+            }
         }
-        try { upnpManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down upnpmanager: "+e);
+        try {
+            networkManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down networkmanager: " + e);
+            }
         }
-        try { awayManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down awaymanager: "+e);
+        try {
+            upnpManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down upnpmanager: " + e);
+            }
         }
-        try { pluginManager.shutdown(); } catch(Exception e) {
-            if(T.t)T.error("Problem when shutting down pluginmanager: "+e);
+        try {
+            awayManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down awaymanager: " + e);
+            }
         }
-        try { saveSettings(); } catch(Exception e) {
-            if(T.t)T.error("Problem when saving settings: "+e);
+        try {
+            pluginManager.shutdown();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when shutting down pluginmanager: " + e);
+            }
         }
-        try { saveState(); } catch(Exception e) {
-            if(T.t)T.error("Problem when saving state: "+e);
+        try {
+            saveSettings();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when saving settings: " + e);
+            }
         }
-        try { Thread.sleep(1500); //wait for GracefulClose RPCs to be sent
-        } catch (InterruptedException e) {}
+        try {
+            saveState();
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Problem when saving state: " + e);
+            }
+        }
+        try {
+            Thread.sleep(1500); //wait for GracefulClose RPCs to be sent
+        } catch (InterruptedException e) {
+        }
     }
 
     public void updateLastSeenOnlineForFriends() {
-        for(Friend f : friendManager.friends()) updateLastSeenOnlineFor(f);
+        for (Friend f : friendManager.friends()) {
+            updateLastSeenOnlineFor(f);
+        }
     }
 
     public void updateLastSeenOnlineFor(Friend f) {
@@ -409,11 +491,14 @@ public class CoreSubsystem implements Subsystem {
 
     public void setUICallback(UICallback uiCallback) {
         UICallback old = this.uiCallback;
-        if (uiCallback == null)
+        if (uiCallback == null) {
             this.uiCallback = new NonWindowUICallback();
-        else
+        } else {
             this.uiCallback = uiCallback;
-        if (old != null) old.callbackRemoved();
+        }
+        if (old != null) {
+            old.callbackRemoved();
+        }
     }
 
     /** Adds this callback using a DoubleUICallback class */
@@ -435,21 +520,27 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public void reportError(Throwable e, Object source) {
-        if (shutdownInProgress && e instanceof ClosedChannelException) return;
-        logError("Error for "+source+": ");
+        if (shutdownInProgress && e instanceof ClosedChannelException) {
+            return;
+        }
+        logError("Error for " + source + ": ");
         logError(e);
 
         if (e instanceof IOException) {
-            if(T.t)T.warn(e);
+            if (T.t) {
+                T.warn(e);
+            }
             return;
         }
         if (e instanceof UnresolvedAddressException) {
-            if(T.t)T.warn(e);
+            if (T.t) {
+                T.warn(e);
+            }
             return;
         }
 
         if (shutdownInProgress) {
-            System.err.println("Error while shutting down for "+source+": "+e);
+            System.err.println("Error while shutting down for " + source + ": " + e);
             e.printStackTrace();
             return;
         }
@@ -470,9 +561,9 @@ public class CoreSubsystem implements Subsystem {
         shutdown();
 
         Main.stopStartSignalThread(); //such a fucking hack. When we run using the normal UI we need to signal the launcher that he needs to stop this startsignalthread
-        String s = "."+System.getProperty("file.separator")+"alliance" + //must have exe/script/batch in current directory to start program
+        String s = "." + System.getProperty("file.separator") + "alliance" + //must have exe/script/batch in current directory to start program
                 (openWithUI ? "" : " /min") +
-                (restartDelay == 0 ? "" : " /w"+restartDelay);
+                (restartDelay == 0 ? "" : " /w" + restartDelay);
 
         Runtime.getRuntime().exec(s);
         System.exit(0);
@@ -491,8 +582,10 @@ public class CoreSubsystem implements Subsystem {
                 getSettings().getInternal().getAlwaysallowfriendstoconnect() > 0) {
             try {
                 //automatically forward this user invitation - the settings are set to do this.
-                if(T.t)T.info("Automatically forwarding invitation: "+ui);
-                getFriendManager().forwardInvitation((PleaseForwardInvitationInteraction)ui);
+                if (T.t) {
+                    T.info("Automatically forwarding invitation: " + ui);
+                }
+                getFriendManager().forwardInvitation((PleaseForwardInvitationInteraction) ui);
                 return;
             } catch (IOException e) {
                 reportError(e, ui);
@@ -500,10 +593,10 @@ public class CoreSubsystem implements Subsystem {
         } else if (ui instanceof ForwardedInvitationInteraction &&
                 getSettings().getInternal().getAlwaysallowfriendsoffriendstoconnecttome() > 0) {
             try {
-                ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction)ui;
+                ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) ui;
                 getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
                 return;
-            } catch(Exception e) {
+            } catch (Exception e) {
                 reportError(e, ui);
             }
         }
@@ -537,8 +630,10 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public boolean doesInterationQueContain(Class<? extends NeedsUserInteraction> c) {
-        for(NeedsUserInteraction u : userInternactionQue) {
-            if (u.getClass().equals(c)) return true;
+        for (NeedsUserInteraction u : userInternactionQue) {
+            if (u.getClass().equals(c)) {
+                return true;
+            }
         }
         return false;
     }
@@ -550,26 +645,29 @@ public class CoreSubsystem implements Subsystem {
 
     public void softRestart() throws IOException {
         if (uiCallback.isUIVisible()) {
-            if (!doesInterationQueContain(NeedsToRestartBecauseOfUpgradeInteraction.class))
+            if (!doesInterationQueContain(NeedsToRestartBecauseOfUpgradeInteraction.class)) {
                 queNeedsUserInteraction(new NeedsToRestartBecauseOfUpgradeInteraction());
+            }
         } else {
             restartProgram(false);
         }
     }
-
     private int GULCounter;
     private long GULTick = System.currentTimeMillis();
+
     /**
      * Temporary stuff needed to figure out a serious bug.
      */
     public void increaseGULCounter() {
         GULCounter++;
-        if (System.currentTimeMillis() - GULTick > 1000*60) {
-            if(T.t)T.trace("GUL counter: "+GULCounter);
+        if (System.currentTimeMillis() - GULTick > 1000 * 60) {
+            if (T.t) {
+                T.trace("GUL counter: " + GULCounter);
+            }
             if (GULCounter > 300) {
                 try {
-                    new ErrorDialog(new Exception("UserList flood detected: "+GULCounter+"! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
-                } catch(XUIException e) {
+                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
+                } catch (XUIException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
@@ -591,7 +689,7 @@ public class CoreSubsystem implements Subsystem {
 
     @SuppressWarnings("unchecked")
     public List<NeedsUserInteraction> getAllUserInteractionsInQue() {
-        return (List<NeedsUserInteraction>)userInternactionQue.clone();
+        return (List<NeedsUserInteraction>) userInternactionQue.clone();
     }
 
     public CryptoManager getCryptoManager() {
@@ -602,8 +700,10 @@ public class CoreSubsystem implements Subsystem {
         if (settings.getInternal().getUsedirectbuffers() > 0) {
             try {
                 return ByteBuffer.allocateDirect(size);
-            } catch(OutOfMemoryError e) {
-                if(T.t)T.warn("Falling back to non-direct buffers - out of direct buffer space!");
+            } catch (OutOfMemoryError e) {
+                if (T.t) {
+                    T.warn("Falling back to non-direct buffers - out of direct buffer space!");
+                }
                 return ByteBuffer.allocate(size);
             }
         } else {
@@ -620,7 +720,7 @@ public class CoreSubsystem implements Subsystem {
      * an invitation point
      */
     public void incInvitationPoints() {
-        getSettings().getMy().createChecksumAndSetInvitations(getSettings().getMy().getInvitations()+1);
+        getSettings().getMy().createChecksumAndSetInvitations(getSettings().getMy().getInvitations() + 1);
     }
 
     public void informFriendsOfAwayStatus(boolean away) throws IOException {

@@ -21,15 +21,15 @@ import java.util.Iterator;
  * To change this template use File | Settings | File Templates.
  */
 public class ConnectionsMDIWindow extends AllianceMDIWindow {
-	private JTable table;
-    private ConnectionsTableModel model;
 
+    private JTable table;
+    private ConnectionsTableModel model;
     private ArrayList<ConnectionWrapper> rows = new ArrayList<ConnectionWrapper>();
 
     public ConnectionsMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "connections", ui);
 
-        table = (JTable)xui.getComponent("table");
+        table = (JTable) xui.getComponent("table");
         table.setModel(model = new ConnectionsTableModel());
 
         updateConnectionData();
@@ -42,7 +42,7 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         boolean structureChanged = false;
 
         ArrayList<Connection> al = new ArrayList<Connection>(ui.getCore().getFriendManager().getNetMan().connections());
-        for(Connection c : al) {
+        for (Connection c : al) {
             ConnectionWrapper cw = getWrapperFor(c);
             if (cw == null) {
                 structureChanged = true;
@@ -52,23 +52,26 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
             cw.update();
         }
 
-        for(Iterator i = rows.iterator();i.hasNext();) {
-            ConnectionWrapper w = (ConnectionWrapper)i.next();
+        for (Iterator i = rows.iterator(); i.hasNext();) {
+            ConnectionWrapper w = (ConnectionWrapper) i.next();
             if (!ui.getCore().getFriendManager().getNetMan().contains(w.connection.getKey())) {
                 structureChanged = true;
                 i.remove();
             }
         }
 
-        if (structureChanged)
+        if (structureChanged) {
             model.fireTableStructureChanged();
-        else
+        } else {
             model.fireTableRowsUpdated(0, rows.size());
+        }
     }
 
     private ConnectionWrapper getWrapperFor(Connection c) {
-        for(ConnectionWrapper cw : rows) {
-            if (cw.connection == c) return cw;
+        for (ConnectionWrapper cw : rows) {
+            if (cw.connection == c) {
+                return cw;
+            }
         }
         return null;
     }
@@ -77,12 +80,21 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         return "connections";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 
     private class ConnectionWrapper {
+
         public Connection connection;
         public String name, status, sent, received, dir;
 
@@ -93,13 +105,14 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         public void update() {
             name = connection.toString();
             status = connection.getStatusString();
-            sent = TextUtils.formatByteSize(connection.getBytesSent())+" ("+connection.getBandwidthOut().getCPSHumanReadable()+")";
-            received = TextUtils.formatByteSize(connection.getBytesReceived())+" ("+connection.getBandwidthIn().getCPSHumanReadable()+")";
+            sent = TextUtils.formatByteSize(connection.getBytesSent()) + " (" + connection.getBandwidthOut().getCPSHumanReadable() + ")";
+            received = TextUtils.formatByteSize(connection.getBytesReceived()) + " (" + connection.getBandwidthIn().getCPSHumanReadable() + ")";
             dir = connection.getDirection().toString();
         }
     }
 
     private class ConnectionsTableModel extends AbstractTableModel {
+
         public int getRowCount() {
             return rows.size();
         }
@@ -109,7 +122,7 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         }
 
         public String getColumnName(int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "Connected to";
                 case 1:
@@ -126,7 +139,7 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return rows.get(rowIndex).name;
                 case 1:

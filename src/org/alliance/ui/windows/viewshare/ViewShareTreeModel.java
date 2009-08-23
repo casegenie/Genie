@@ -19,7 +19,8 @@ import java.util.ArrayList;
  * Time: 18:14:33
  */
 public class ViewShareTreeModel extends DefaultTreeModel {
-	private Node node;
+
+    private Node node;
     private CoreSubsystem core;
     private UISubsystem ui;
     private ViewShareMDIWindow win;
@@ -36,27 +37,29 @@ public class ViewShareTreeModel extends DefaultTreeModel {
         if (node instanceof Friend) {
             //send get share base list to remote - answer will come asynchronously
             core.invokeLater(new Runnable() {
+
                 public void run() {
                     if (node.isConnected()) {
                         try {
-                            ((Friend)node).getFriendConnection().send(new GetShareBaseList());
+                            ((Friend) node).getFriendConnection().send(new GetShareBaseList());
                         } catch (IOException e) {
                             core.reportError(e, this);
                         }
                     } else {
-                        if(T.t)T.error("Friend is not connected! "+node);
+                        if (T.t) {
+                            T.error("Friend is not connected! " + node);
+                        }
                     }
                 }
             });
         } else {
             ArrayList<String> al = new ArrayList<String>();
-            for(ShareBase sb : core.getFileManager().getShareManager().shareBases()) {
+            for (ShareBase sb : core.getFileManager().getShareManager().shareBases()) {
                 al.add(sb.getName());
             }
             getRoot().fill(al.toArray(new String[al.size()]));
         }
     }
-
 
     public ViewShareMDIWindow getWin() {
         return win;
@@ -68,7 +71,7 @@ public class ViewShareTreeModel extends DefaultTreeModel {
     }
 
     public ViewShareRootNode getRoot() {
-        return (ViewShareRootNode)super.getRoot();
+        return (ViewShareRootNode) super.getRoot();
     }
 
     public CoreSubsystem getCore() {

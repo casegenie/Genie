@@ -14,6 +14,7 @@ import java.util.Comparator;
  * Time: 14:13:14
  */
 public class SearchTreeTableModel extends DefaultTreeTableModel {
+
     private CoreSubsystem core;
 
     public SearchTreeTableModel(CoreSubsystem core, PacedRunner pacedRunner) {
@@ -23,7 +24,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     }
 
     public RootNode getRoot() {
-        return (RootNode)super.getRoot();
+        return (RootNode) super.getRoot();
     }
 
     public void addSearchHits(int sourceGuid, int hops, java.util.List<SearchHit> hits) {
@@ -35,16 +36,26 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     }
 
     public Class<?> getColumnClass(int columnIndex) {
-        if (columnIndex == 1) return Long.class;
-        if (columnIndex == 2) return String.class;
-        if (columnIndex == 3) return Integer.class;
-        if (columnIndex == 4) return Double.class;
-        if (columnIndex == 5) return Double.class;
+        if (columnIndex == 1) {
+            return Long.class;
+        }
+        if (columnIndex == 2) {
+            return String.class;
+        }
+        if (columnIndex == 3) {
+            return Integer.class;
+        }
+        if (columnIndex == 4) {
+            return Double.class;
+        }
+        if (columnIndex == 5) {
+            return Double.class;
+        }
         return super.getColumnClass(columnIndex);
     }
 
     public String getColumnName(int columnIndex) {
-        switch(columnIndex) {
+        switch (columnIndex) {
             case 0:
                 return "File";
             case 1:
@@ -63,12 +74,13 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     }
 
     public Object getValueAt(Object o, int i) {
-        SearchTreeNode n = (SearchTreeNode)o;
+        SearchTreeNode n = (SearchTreeNode) o;
         return n.getValueAt(i);
     }
 
     Comparator<SearchTreeNode> createNameComparator() {
         return new Comparator<SearchTreeNode>() {
+
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
                 return o1.getName().compareToIgnoreCase(o2.getName());
             }
@@ -77,32 +89,36 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
 
     Comparator<SearchTreeNode> createSourcesComparator() {
         return new Comparator<SearchTreeNode>() {
+
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
-                return (int)Math.round((o2.getSources() - o1.getSources())*1000);
+                return (int) Math.round((o2.getSources() - o1.getSources()) * 1000);
             }
         };
     }
 
     Comparator<SearchTreeNode> createDaysAgoComparator() {
         return new Comparator<SearchTreeNode>() {
+
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
-                return (int)Math.round((o1.getDaysAgo() - o2.getDaysAgo())*1000);
+                return (int) Math.round((o1.getDaysAgo() - o2.getDaysAgo()) * 1000);
             }
         };
     }
 
     Comparator<SearchTreeNode> createSizeComparator() {
         return new Comparator<SearchTreeNode>() {
+
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
-                return (int)(o2.getSize() - o1.getSize());
+                return (int) (o2.getSize() - o1.getSize());
             }
         };
     }
 
     Comparator<SearchTreeNode> createSpeedComparator() {
         return new Comparator<SearchTreeNode>() {
+
             public int compare(SearchTreeNode o1, SearchTreeNode o2) {
-                return (int)Math.round((o2.getSpeed() - o1.getSpeed())*1000);
+                return (int) Math.round((o2.getSpeed() - o1.getSpeed()) * 1000);
             }
         };
     }

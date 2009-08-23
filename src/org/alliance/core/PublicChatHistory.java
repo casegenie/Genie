@@ -11,10 +11,12 @@ import java.util.Collection;
  * Time: 15:24:52
  */
 public class PublicChatHistory implements Serializable {
-	private static final int NUMBERS_OF_MESSAGES_IN_HISTORY = 50;
+
+    private static final int NUMBERS_OF_MESSAGES_IN_HISTORY = 50;
 
     public static class Entry implements Serializable {
-		public long tick;
+
+        public long tick;
         public int fromGuid;
         public String message;
 
@@ -24,12 +26,13 @@ public class PublicChatHistory implements Serializable {
             this.message = message;
         }
     }
-
     private ArrayList<Entry> chatMessages = new ArrayList<Entry>();
 
     public void addMessage(long tick, int fromGuid, String message) {
         chatMessages.add(new Entry(tick, fromGuid, message));
-        if (chatMessages.size() > NUMBERS_OF_MESSAGES_IN_HISTORY) chatMessages.remove(0);
+        if (chatMessages.size() > NUMBERS_OF_MESSAGES_IN_HISTORY) {
+            chatMessages.remove(0);
+        }
     }
 
     public Collection<Entry> allMessages() {

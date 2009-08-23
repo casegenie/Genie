@@ -20,20 +20,17 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class DownloadManager extends Manager implements Runnable {
+
     private static final int NUMBER_OF_GETBLOCKMASK_REQUESTS_TO_SEND = 250;
     private static final byte SERIALIZATION_VERSION = 2;
-
     private NetworkManager netMan;
     private CoreSubsystem core;
     private HashMap<Hash, Download> downloads = new HashMap<Hash, Download>();
     private ArrayList<Download> downloadQue = new ArrayList<Download>();
-
     //list over what hashes a friend is interested in
     private HashMap<Hash, List<Friend>> interestedInHashes = new HashMap<Hash, List<Friend>>();
-
     private ArrayList<BlockMaskRequest> blockMaskRequestQue = new ArrayList<BlockMaskRequest>();
-
-    private boolean alive=true;
+    private boolean alive = true;
     private long lastSaveTick;
 
     public DownloadManager(CoreSubsystem core) {
@@ -44,21 +41,25 @@ public class DownloadManager extends Manager implements Runnable {
         netMan = core.getNetworkManager();
         load();
 
-        Thread thread = new Thread(this, "DownloadManager -- "+core.getSettings().getMy().getNickname());
+        Thread thread = new Thread(this, "DownloadManager -- " + core.getSettings().getMy().getNickname());
 
         thread.setPriority(Thread.MIN_PRIORITY);
         thread.start();
     }
 
     public void run() {
-        while(alive) {
-            for(int i=0;i<4;i++) {
-                try { Thread.sleep(250); } catch(InterruptedException e) {}
+        while (alive) {
+            for (int i = 0; i < 4; i++) {
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException e) {
+                }
                 core.invokeLater(new Runnable() {
+
                     public void run() {
                         try {
                             flushBlockMaskRequestQue();
-                        } catch(IOException e) {
+                        } catch (IOException e) {
                             core.reportError(e, this);
                         }
                     }
@@ -66,22 +67,26 @@ public class DownloadManager extends Manager implements Runnable {
             }
 
             core.invokeLater(new Runnable() {
+
                 public void run() {
                     try {
                         checkForDownloadsToStart();
-                    } catch(IOException e) {
+                    } catch (IOException e) {
                         core.reportError(e, this);
                     }
                 }
             });
 
-            if (System.currentTimeMillis()-lastSaveTick > 1000*60*10) {
+            if (System.currentTimeMillis() - lastSaveTick > 1000 * 60 * 10) {
                 core.invokeLater(new Runnable() {
+
                     public void run() {
                         try {
                             save();
-                        } catch(IOException e) {
-                            if(T.t)T.error(e);
+                        } catch (IOException e) {
+                            if (T.t) {
+                                T.error(e);
+                            }
                         }
                     }
                 });
@@ -91,9 +96,9 @@ public class DownloadManager extends Manager implements Runnable {
 
     private void flushBlockMaskRequestQue() throws IOException {
         int sent = 0;
-        while(sent < NUMBER_OF_GETBLOCKMASK_REQUESTS_TO_SEND && blockMaskRequestQue.size() > 0) {
-            BlockMaskRequest r = blockMaskRequestQue.get(blockMaskRequestQue.size()-1);
-            blockMaskRequestQue.remove(blockMaskRequestQue.size()-1);
+        while (sent < NUMBER_OF_GETBLOCKMASK_REQUESTS_TO_SEND && blockMaskRequestQue.size() > 0) {
+            BlockMaskRequest r = blockMaskRequestQue.get(blockMaskRequestQue.size() - 1);
+            blockMaskRequestQue.remove(blockMaskRequestQue.size() - 1);
             if (r.friend.isConnected() &&
                     downloads.containsKey(r.download.getRoot()) &&
                     r.download.isInterestedInBlockMasks()) {
@@ -101,7 +106,11 @@ public class DownloadManager extends Manager implements Runnable {
                 sent++;
             }
         }
-        if (sent != 0) if(T.t)T.trace("Sent "+sent+" GetBlockMasks to friend(s)");
+        if (sent != 0) {
+            if (T.t) {
+                T.trace("Sent " + sent + " GetBlockMasks to friend(s)");
+            }
+        }
     }
 
     public void queDownload(Hash root, String filename, ArrayList<Integer> guids) throws IOException {
@@ -109,50 +118,65 @@ public class DownloadManager extends Manager implements Runnable {
     }
 
     public void queDownload(Hash root, BlockStorage storage, String filename, ArrayList<Integer> guids, boolean highPrio) throws IOException {
-    	Download dl = new Download(this, root, storage, filename, guids);
+        Download dl = new Download(this, root, storage, filename, guids);
         queDownload(dl, highPrio);
     }
 
     public void queDownload(Download dl, boolean highPrio) throws IOException {
-        if(T.t)T.info("Queing download for "+dl);
+        if (T.t) {
+            T.info("Queing download for " + dl);
+        }
         if (core.getFileManager().containsComplete(dl.getRoot())) {
-            if(T.t)T.info("Already has file "+dl);
+            if (T.t) {
+                T.info("Already has file " + dl);
+            }
             return;
         }
 
         if (downloads.containsKey(dl.getRoot())) {
-            if(T.t)T.info("Already queued this item. Ignoring.");
+            if (T.t) {
+                T.info("Already queued this item. Ignoring.");
+            }
             return;
         }
 
         downloads.put(dl.getRoot(), dl);
-        if (highPrio)
-            downloadQue.add(0,dl);
-        else
+        if (highPrio) {
+            downloadQue.add(0, dl);
+        } else {
             downloadQue.add(dl);
+        }
     }
 
     private void checkForDownloadsToStart() throws IOException {
         HashSet<Integer> guidsCurrentlyDownloadingFrom = new HashSet<Integer>();
         HashSet<Integer> guidsTryingToDownloadFrom = new HashSet<Integer>();
-        for(Download d : downloadQue) if (d.isActive()) {
-            for(DownloadConnection dc : d.connections()) guidsCurrentlyDownloadingFrom.add(dc.getRemoteUserGUID());
-            guidsTryingToDownloadFrom.addAll(d.getAuxInfoGuids());
+        for (Download d : downloadQue) {
+            if (d.isActive()) {
+                for (DownloadConnection dc : d.connections()) {
+                    guidsCurrentlyDownloadingFrom.add(dc.getRemoteUserGUID());
+                }
+                guidsTryingToDownloadFrom.addAll(d.getAuxInfoGuids());
+            }
         }
 
-        for(int i : guidsCurrentlyDownloadingFrom) guidsTryingToDownloadFrom.remove(i);
+        for (int i : guidsCurrentlyDownloadingFrom) {
+            guidsTryingToDownloadFrom.remove(i);
+        }
 
         if (guidsCurrentlyDownloadingFrom.size() < core.getSettings().getInternal().getMaxdownloadconnections()) {
-            for(Download d : downloadQue) if (d.getState() == Download.State.WAITING_TO_START) {
-                if (d.getAuxInfoGuids() == null || d.getAuxInfoGuids().size() == 0) {//if we don't know whos got the file then start downloading immidiatly 
-                    startDownload(d);
-                    return;
-                }
-
-                for(int guid : d.getAuxInfoGuids()) {
-                    if (!guidsCurrentlyDownloadingFrom.contains(guid) && !guidsTryingToDownloadFrom.contains(guid)) {
+            for (Download d : downloadQue) {
+                if (d.getState() == Download.State.WAITING_TO_START) {
+                    if (d.getAuxInfoGuids() == null || d.getAuxInfoGuids().size() == 0) {//if we don't know whos got the file then start downloading immidiatly
                         startDownload(d);
                         return;
+                    }
+
+                    for (int guid : d.getAuxInfoGuids()) {
+                        if (!guidsCurrentlyDownloadingFrom.contains(guid) && !guidsTryingToDownloadFrom.contains(guid)) {
+                            startDownload(d);
+                            return;
+                        }
                     }
                 }
             }
@@ -169,7 +193,9 @@ public class DownloadManager extends Manager implements Runnable {
         if (d != null) {
             d.blockMaskReceived(srcGuid, hops, bm);
         } else {
-            if(T.t)T.trace("Ignoring blockmask for "+root);
+            if (T.t) {
+                T.trace("Ignoring blockmask for " + root);
+            }
         }
     }
 
@@ -201,8 +227,8 @@ public class DownloadManager extends Manager implements Runnable {
     }
 
     public void removeCompleteDownloads() {
-        for(Iterator i=downloadQue.iterator();i.hasNext();) {
-            Download d = ((Download)i.next());
+        for (Iterator i = downloadQue.iterator(); i.hasNext();) {
+            Download d = ((Download) i.next());
             if (d.isComplete()) {
                 i.remove();
                 downloads.remove(d.getRoot());
@@ -212,14 +238,24 @@ public class DownloadManager extends Manager implements Runnable {
 
     public void remove(Download d) {
         Object o = downloads.remove(d.getRoot());
-        if (o == null) if(T.t)T.error("Could not remove download "+d+" hash: "+d.getRoot());
+        if (o == null) {
+            if (T.t) {
+                T.error("Could not remove download " + d + " hash: " + d.getRoot());
+            }
+        }
         o = downloadQue.remove(d);
-        if (o == null) if(T.t)T.error("Could not remove download for que "+d+" hash: "+d.getRoot());
+        if (o == null) {
+            if (T.t) {
+                T.error("Could not remove download for que " + d + " hash: " + d.getRoot());
+            }
+        }
     }
 
     public void deleteDownload(Download d) throws IOException {
         try {
-            if (downloads.containsKey(d.getRoot())) d.abortAndRemovePerfmanently();
+            if (downloads.containsKey(d.getRoot())) {
+                d.abortAndRemovePerfmanently();
+            }
         } finally {
             d.setInvalid(true);
             downloads.remove(d.getRoot());
@@ -237,7 +273,7 @@ public class DownloadManager extends Manager implements Runnable {
     }
 
     public void signalFriendWentOnline(Friend friend) throws IOException {
-        for(Download d : downloadQue) {
+        for (Download d : downloadQue) {
             if (d.isInterestedInBlockMasks()) {
                 blockMaskRequestQue.add(new BlockMaskRequest(friend, d));
             }
@@ -259,14 +295,24 @@ public class DownloadManager extends Manager implements Runnable {
 
     public void save() throws IOException {
         File file = new File(core.getSettings().getInternal().getDownloadquefile());
-        if (file.getParentFile() != null) file.getParentFile().mkdirs();
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
         ArrayList<Download> al = new ArrayList<Download>();
-        for(Download d : downloadQue) if (!d.isComplete()) al.add(d);
-        if(T.t)T.trace("Saving download que with "+al.size()+" downloads in it.");
+        for (Download d : downloadQue) {
+            if (!d.isComplete()) {
+                al.add(d);
+            }
+        }
+        if (T.t) {
+            T.trace("Saving download que with " + al.size() + " downloads in it.");
+        }
         out.writeByte(SERIALIZATION_VERSION);
         out.writeInt(al.size());
-        for(Download d : al) d.serializeTo(out);
+        for (Download d : al) {
+            d.serializeTo(out);
+        }
         out.flush();
         out.close();
         lastSaveTick = System.currentTimeMillis();
@@ -276,65 +322,93 @@ public class DownloadManager extends Manager implements Runnable {
         try {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(core.getSettings().getInternal().getDownloadquefile()));
             if (in.readByte() != SERIALIZATION_VERSION) {
-                if(T.t)T.error("Incorrect version for download queue! Ignoring queue.");
+                if (T.t) {
+                    T.error("Incorrect version for download queue! Ignoring queue.");
+                }
                 return;
             }
             int n = in.readInt();
-            for(int i=0;i<n;i++) queDownload(Download.createFrom(in, this), false);
+            for (int i = 0; i < n; i++) {
+                queDownload(Download.createFrom(in, this), false);
+            }
             in.close();
-        } catch(FileNotFoundException e) {
-            if(T.t)T.info("Assuming there's no download info. Starting from scratch.");
-        } catch(Exception e) {
-            if(T.t)T.error("Could not load download queue: "+e);
+        } catch (FileNotFoundException e) {
+            if (T.t) {
+                T.info("Assuming there's no download info. Starting from scratch.");
+            }
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Could not load download queue: " + e);
+            }
         }
     }
 
     public void moveUp(Download d) {
         int i = downloadQue.indexOf(d);
-        if(T.t)T.ass(i != -1, "Cant find download!");
-        if (i==0) return;
+        if (T.t) {
+            T.ass(i != -1, "Cant find download!");
+        }
+        if (i == 0) {
+            return;
+        }
         downloadQue.remove(d);
-        downloadQue.add(i-1, d);
+        downloadQue.add(i - 1, d);
     }
 
     public void moveDown(Download d) {
         int i = downloadQue.indexOf(d);
-        if(T.t)T.ass(i != -1, "Cant find download!");
-        if (i==downloadQue.size()-1) return;
+        if (T.t) {
+            T.ass(i != -1, "Cant find download!");
+        }
+        if (i == downloadQue.size() - 1) {
+            return;
+        }
         downloadQue.remove(d);
-        downloadQue.add(i+1, d);
+        downloadQue.add(i + 1, d);
     }
-    
+
     public void moveTop(Download d) {
-    	int i = downloadQue.indexOf(d);
-    	if(T.t)T.ass(i != -1, "Cant find download!");
-    	if(i==0) return;
-    	downloadQue.remove(d);
-    	downloadQue.add(0, d);
+        int i = downloadQue.indexOf(d);
+        if (T.t) {
+            T.ass(i != -1, "Cant find download!");
+        }
+        if (i == 0) {
+            return;
+        }
+        downloadQue.remove(d);
+        downloadQue.add(0, d);
     }
 
     public void moveBottom(Download d) {
         int i = downloadQue.indexOf(d);
-        if(T.t)T.ass(i != -1, "Cant find download!");
-        if (i==downloadQue.size()-1) return;
+        if (T.t) {
+            T.ass(i != -1, "Cant find download!");
+        }
+        if (i == downloadQue.size() - 1) {
+            return;
+        }
         downloadQue.remove(d);
         downloadQue.add(d);
     }
 
     public void movePos(int pos, Download d) {
         int i = downloadQue.indexOf(d);
-        if(T.t)T.ass(i != -1, "Cant find download!");
+        if (T.t) {
+            T.ass(i != -1, "Cant find download!");
+        }
         downloadQue.remove(d);
-        if (pos > i) pos--;
+        if (pos > i) {
+            pos--;
+        }
         downloadQue.add(pos, d);
     }
 
     private static class BlockMaskRequest {
+
         public BlockMaskRequest(Friend friend, Download download) {
             this.friend = friend;
             this.download = download;
         }
-
         Friend friend;
         Download download;
     }

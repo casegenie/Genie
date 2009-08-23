@@ -12,104 +12,80 @@ import java.io.File;
  * Time: 17:40:27
  */
 public class Internal extends SettingClass {
+
     private static final String CURRENT_DIRECTORY;
     private static final String USER_DIRECTORY;
+
     static {
     }
 
-	static { 
-		if (OSInfo.isLinux()) { 
-			USER_DIRECTORY = System.getProperty("user.home")+"/.alliance/";
-			CURRENT_DIRECTORY = USER_DIRECTORY;
-		} else {
-	        String s = new File(".").getAbsoluteFile().toString();
-	        if (s.endsWith(".")) s = s.substring(0, s.length()-1);
-	        CURRENT_DIRECTORY = s;
-	        USER_DIRECTORY = "";
-		}
-	}
-
-    
-    private Integer tempcleareddups=0;
-
-	private String filedatabasefile = USER_DIRECTORY+"data/share.dat"; 
-	private String filedatabaseindexfile = USER_DIRECTORY+"data/share.idx"; 
-	private String downloadquefile = USER_DIRECTORY+"data/downloads.dat"; 
-	private String corestatefile = USER_DIRECTORY+"data/core.dat"; 
-
-
-    private String downloadfolder = CURRENT_DIRECTORY+"downloads";
-    private String cachefolder = CURRENT_DIRECTORY+"cache";
-    private String keystorefilename = CURRENT_DIRECTORY+"me.ks";
-
-    private Integer reconnectinterval = 60*10;
+    static {
+        if (OSInfo.isLinux()) {
+            USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
+            CURRENT_DIRECTORY = USER_DIRECTORY;
+        } else {
+            String s = new File(".").getAbsoluteFile().toString();
+            if (s.endsWith(".")) {
+                s = s.substring(0, s.length() - 1);
+            }
+            CURRENT_DIRECTORY = s;
+            USER_DIRECTORY = "";
+        }
+    }
+    private Integer tempcleareddups = 0;
+    private String filedatabasefile = USER_DIRECTORY + "data/share.dat";
+    private String filedatabaseindexfile = USER_DIRECTORY + "data/share.idx";
+    private String downloadquefile = USER_DIRECTORY + "data/downloads.dat";
+    private String corestatefile = USER_DIRECTORY + "data/core.dat";
+    private String downloadfolder = CURRENT_DIRECTORY + "downloads";
+    private String cachefolder = CURRENT_DIRECTORY + "cache";
+    private String keystorefilename = CURRENT_DIRECTORY + "me.ks";
+    private Integer reconnectinterval = 60 * 10;
     private Integer connectFriendInterval = 1;
     private Integer sharemanagercycle = 30;
-    private Integer sharemanagercyclewithfilesystemeventsactive = 60*2;
-    private Integer maxdownloadconnections=10;
-    private Integer recordoutspeed=0, recordinspeed=0;
-    private Integer totalmegabytesdownloaded =0, totalmegabytesuploaded =0;
-    private Integer connectionkeepaliveinterval=60;
-    private Integer numberofblockstopipeline=2;
-
-    private Integer usedirectbuffers=1; // Should direct nio buffers be used? 0=no 1=yes   - does no performance gain but it looks better in Task Manager, when looking at memory usage, not sure if the actual memory usage is better
-
-    private Integer restartEveryXHours=4; //this one only works on windows right now
-
+    private Integer sharemanagercyclewithfilesystemeventsactive = 60 * 2;
+    private Integer maxdownloadconnections = 10;
+    private Integer recordoutspeed = 0, recordinspeed = 0;
+    private Integer totalmegabytesdownloaded = 0, totalmegabytesuploaded = 0;
+    private Integer connectionkeepaliveinterval = 60;
+    private Integer numberofblockstopipeline = 2;
+    private Integer usedirectbuffers = 1; // Should direct nio buffers be used? 0=no 1=yes   - does no performance gain but it looks better in Task Manager, when looking at memory usage, not sure if the actual memory usage is better
+    private Integer restartEveryXHours = 4; //this one only works on windows right now
     private Long lastnaggedaboutinvitingafriend;
     private Integer hastriedtoinviteafriend;
-    private Integer hasneverdownloadedafile=1;
-
-    private Integer enablesupportfornonenglishcharacters=0;
-
-    private Integer alwaysautomaticallyconnecttoallfriendsoffriend=0;
-
-    private Integer invitationmayonlybeusedonce=1;
-
-    private Integer secondstoaway=60*5;
-
-    private String chipersuite=""; //user defined chipher suite, none by default
-
-    private Integer encryption=0; // 0: TranslationCryptoLayer 1: SSLCryptoLayer
-
-    private Integer daysnotconnectedwhenold=7*2; //after three weeks of disconnection from a friend hes concidered old
-
-    private Integer alwaysallowfriendstoconnect=1;
-    private Integer alwaysallowfriendsoffriendstoconnecttome=1;
-    private Integer automaticallydenyallinvitations=0;
-
-    private Integer showpublicchatmessagesintray=1;
-    private Integer showprivatechatmessagesintray=1;
-    private Integer showsystemmessagesintray=1;
-
-    private Integer rescansharewhenalliancestarts=1;
-
-    private Integer minimumtimebetweeninvitations = 60*24*2; //in minutes
-
+    private Integer hasneverdownloadedafile = 1;
+    private Integer enablesupportfornonenglishcharacters = 0;
+    private Integer alwaysautomaticallyconnecttoallfriendsoffriend = 0;
+    private Integer invitationmayonlybeusedonce = 1;
+    private Integer secondstoaway = 60 * 5;
+    private String chipersuite = ""; //user defined chipher suite, none by default
+    private Integer encryption = 0; // 0: TranslationCryptoLayer 1: SSLCryptoLayer
+    private Integer daysnotconnectedwhenold = 7 * 2; //after three weeks of disconnection from a friend hes concidered old
+    private Integer alwaysallowfriendstoconnect = 1;
+    private Integer alwaysallowfriendsoffriendstoconnecttome = 1;
+    private Integer automaticallydenyallinvitations = 0;
+    private Integer showpublicchatmessagesintray = 1;
+    private Integer showprivatechatmessagesintray = 1;
+    private Integer showsystemmessagesintray = 1;
+    private Integer rescansharewhenalliancestarts = 1;
+    private Integer minimumtimebetweeninvitations = 60 * 24 * 2; //in minutes
     /** Be polite when running on XP sp2 wich only allows 10 pending tcp/ip connections
      * before stopping the network stack. Set to 8 to be on the safe side. */
     private Integer maxpendingconnections = 8;
-
-    private Integer hashspeedinmbpersecond=3; //when in background mode
-
-    private Integer sosendbuf=-1, soreceivebuf=-1;
-    private Integer discwritebuffer=256*KB, //one instance of this one per download
-            socketsendbuffer=256*KB; //one instance per download
-    private Integer socketreadbuffer=256*KB; //only one instance of this one - at the network layer
-    private Integer maximumAlliancePacketSize=32*KB;
-
-    private Integer politehashingwaittimeinminutes=10;
-    private Integer politehashingintervalingigabytes=50;
-
-    private Integer maxfileexpandinblocks=50; //don't exceed file system size of file we're downloading to by more than this number
+    private Integer hashspeedinmbpersecond = 3; //when in background mode
+    private Integer sosendbuf = -1, soreceivebuf = -1;
+    private Integer discwritebuffer = 256 * KB, //one instance of this one per download
+            socketsendbuffer = 256 * KB; //one instance per download
+    private Integer socketreadbuffer = 256 * KB; //only one instance of this one - at the network layer
+    private Integer maximumAlliancePacketSize = 32 * KB;
+    private Integer politehashingwaittimeinminutes = 10;
+    private Integer politehashingintervalingigabytes = 50;
+    private Integer maxfileexpandinblocks = 50; //don't exceed file system size of file we're downloading to by more than this number
     //This is here because if we download the last block of a 4Gb file we seek to 4Gb into
     //an empry file. This makes XP grind to a halt. 100 means expand 100mb per block at most
-
-    private Integer uploadthrottle=0; //zero to disable
-
+    private Integer uploadthrottle = 0; //zero to disable
     private String serverlistenip = "";
-    
-    private Integer enableiprules=0;
+    private Integer enableiprules = 0;
 
     public Internal() {
     }
@@ -465,7 +441,6 @@ public class Internal extends SettingClass {
         this.invitationmayonlybeusedonce = invitationmayonlybeusedonce;
     }
 
-
     public Integer getSharemanagercyclewithfilesystemeventsactive() {
         return sharemanagercyclewithfilesystemeventsactive;
     }
@@ -506,7 +481,6 @@ public class Internal extends SettingClass {
         this.hasneverdownloadedafile = hasneverdownloadedafile;
     }
 
-
     public Integer getRescansharewhenalliancestarts() {
         return rescansharewhenalliancestarts;
     }
@@ -530,13 +504,13 @@ public class Internal extends SettingClass {
     public void setAlwaysautomaticallyconnecttoallfriendsoffriend(Integer alwaysautomaticallyconnecttoallfriendsoffriend) {
         this.alwaysautomaticallyconnecttoallfriendsoffriend = alwaysautomaticallyconnecttoallfriendsoffriend;
     }
-    
-    public void setEnableiprules(Integer rule){
-    	enableiprules= rule;
+
+    public void setEnableiprules(Integer rule) {
+        enableiprules = rule;
     }
-    
-    public Integer getEnableiprules(){
-    	return enableiprules;
+
+    public Integer getEnableiprules() {
+        return enableiprules;
     }
 
     public Integer getAutomaticallydenyallinvitations() {

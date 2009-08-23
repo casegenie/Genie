@@ -21,7 +21,8 @@ import java.util.Enumeration;
  * Time: 14:20:47
  */
 public class Invitation implements Serializable {
-	private int invitationPassKey;
+
+    private int invitationPassKey;
     private String completeInvitaitonString;
     private long createdAt;
     private Integer destinationGuid;
@@ -41,15 +42,21 @@ public class Invitation implements Serializable {
             myhost = core.getFriendManager().getMe().getExternalIp(core);
         }
 
-        if(T.t)T.trace("Creating invitation for host: "+myhost);
+        if (T.t) {
+            T.trace("Creating invitation for host: " + myhost);
+        }
         byte[] ip = InetAddress.getByName(myhost).getAddress();
-        if(T.t)T.trace("Got: "+ip[0]+"."+ip[1]+"."+ip[2]+"."+ip[3]);
+        if (T.t) {
+            T.trace("Got: " + ip[0] + "." + ip[1] + "." + ip[2] + "." + ip[3]);
+        }
 
         ByteArrayOutputStream o = new ByteArrayOutputStream();
         DataOutputStream out = new DataOutputStream(o);
 
         //ip
-        for(byte b : ip) out.write(b);
+        for (byte b : ip) {
+            out.write(b);
+        }
 
         //port
         out.writeShort(core.getSettings().getServer().getPort());
@@ -57,23 +64,27 @@ public class Invitation implements Serializable {
         //passkey
         invitationPassKey = new Random().nextInt();
         out.writeInt(invitationPassKey);
-        if(T.t)T.trace("passkey: "+invitationPassKey);
+        if (T.t) {
+            T.trace("passkey: " + invitationPassKey);
+        }
 
         out.flush();
         completeInvitaitonString = HumanReadableEncoder.toBase64SHumanReadableString(o.toByteArray()).trim();
 
         createdAt = System.currentTimeMillis();
-        if(T.t)T.info("Created invitation. String: "+completeInvitaitonString);
+        if (T.t) {
+            T.info("Created invitation. String: " + completeInvitaitonString);
+        }
     }
 
     private String getLocalIPNumber() throws SocketException, UnknownHostException {
         //get the local ip number of machine
-        Enumeration netInterfaces= NetworkInterface.getNetworkInterfaces();
-        while(netInterfaces.hasMoreElements()){
-            NetworkInterface ni=(NetworkInterface)netInterfaces.nextElement();
+        Enumeration netInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (netInterfaces.hasMoreElements()) {
+            NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
             if (ni.getInetAddresses().hasMoreElements()) {
-                InetAddress ip=(InetAddress)ni.getInetAddresses().nextElement();
-                if(!ip.isSiteLocalAddress() && !ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":")==-1){
+                InetAddress ip = (InetAddress) ni.getInetAddresses().nextElement();
+                if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":") == -1) {
                     return ip.getHostAddress();
                 }
             }

@@ -36,12 +36,12 @@ import java.util.Iterator;
  * To change this template use File | Settings | File Templates.
  */
 public class DownloadsMDIWindow extends AllianceMDIWindow {
-	private DownloadsTableModel model;
+
+    private DownloadsTableModel model;
     private JDownloadGrid downloadGrid;
     private JXTable table;
     private JPopupMenu popup;
     private JLabel status, downloadingFromText, uploadingToText;
-
     private ArrayList<DownloadWrapper> rows = new ArrayList<DownloadWrapper>();
     private DownloadWrapper interestingDownloadWrapper;
 
@@ -55,7 +55,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         table.getColumnModel().getColumn(0).setPreferredWidth(300);
         table.getColumnModel().getColumn(1).setPreferredWidth(80);
 
-        status = (JLabel)xui.getComponent("status");
+        status = (JLabel) xui.getComponent("status");
         downloadingFromText = (JLabel) xui.getComponent("downloadingfromtext");
         uploadingToText = (JLabel) xui.getComponent("uploadingtotext");
 
@@ -66,8 +66,9 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
         table.setColumnControlVisible(true);
 
-        downloadGrid = (JDownloadGrid)xui.getComponent("downloadgrid");
+        downloadGrid = (JDownloadGrid) xui.getComponent("downloadgrid");
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
             public void valueChanged(ListSelectionEvent e) {
                 if (e.getFirstIndex() < 0 || e.getFirstIndex() >= rows.size()) {
                     downloadGrid.setDownload(null);
@@ -80,6 +81,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         });
 
         table.addMouseListener(new MouseAdapter() {
+
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -95,13 +97,15 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 if (e.isPopupTrigger()) {
                     int row = table.rowAtPoint(e.getPoint());
                     boolean b = false;
-                    for(int r : table.getSelectedRows()) {
+                    for (int r : table.getSelectedRows()) {
                         if (r == row) {
                             b = true;
                             break;
                         }
                     }
-                    if (!b) table.getSelectionModel().setSelectionInterval(row,row);
+                    if (!b) {
+                        table.getSelectionModel().setSelectionInterval(row, row);
+                    }
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -110,9 +114,9 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 //        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setColumnSelectionAllowed(false);
 
-        ((JScrollPane)xui.getComponent("scroll")).setViewportView(table);
+        ((JScrollPane) xui.getComponent("scroll")).setViewportView(table);
 
-        popup = (JPopupMenu)xui.getComponent("popup");
+        popup = (JPopupMenu) xui.getComponent("popup");
 
         update();
 
@@ -132,12 +136,14 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 d = selectDownloadToShowOnDownloadGridIgnoringSelection();
             }
         }
-        if (d != null && downloadGrid != null) downloadGrid.setDownload(d.download);
+        if (d != null && downloadGrid != null) {
+            downloadGrid.setDownload(d.download);
+        }
         interestingDownloadWrapper = d;
     }
 
     private DownloadWrapper selectDownloadToShowOnDownloadGridIgnoringSelection() {
-        for(DownloadWrapper dw : rows) {
+        for (DownloadWrapper dw : rows) {
             if (dw.download != null && !dw.download.isComplete() && dw.download.isActive()) {
                 return dw;
             }
@@ -146,21 +152,24 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     }
 
     private void showTotalBytesReceived() {
-        status.setText("Total bytes received: "+ TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes()));
+        status.setText("Total bytes received: " + TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes()));
     }
 
     private String getDownloadingFromText(DownloadWrapper w) {
         String text = null;
         final String s;
-        for(DownloadConnection c : w.download.connections()) {
-            if (text == null) text = "Downloading from ";
-            if (c.getRemoteFriend() != null)
-                text += c.getRemoteFriend().nickname()+" ("+c.getBandwidthIn().getCPSHumanReadable()+"), ";
-            else
+        for (DownloadConnection c : w.download.connections()) {
+            if (text == null) {
+                text = "Downloading from ";
+            }
+            if (c.getRemoteFriend() != null) {
+                text += c.getRemoteFriend().nickname() + " (" + c.getBandwidthIn().getCPSHumanReadable() + "), ";
+            } else {
                 text += "<unknown>, ";
+            }
         }
         if (text != null) {
-            text = text.substring(0,text.length()-2);
+            text = text.substring(0, text.length() - 2);
             s = text;
         } else {
             s = " ";
@@ -172,20 +181,23 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         String text = null;
         final String s;
         ArrayList<Connection> al = new ArrayList<Connection>(ui.getCore().getFriendManager().getNetMan().connections());
-        for(Connection c : al) {
+        for (Connection c : al) {
             if (c instanceof UploadConnection) {
-                UploadConnection uc = (UploadConnection)c;
+                UploadConnection uc = (UploadConnection) c;
                 if (uc.getRoot() != null && uc.getRoot().equals(w.download.getRoot())) {
-                    if (text == null) text = "Uploading to ";
-                    if (uc.getRemoteFriend() != null)
-                        text += uc.getRemoteFriend().nickname()+" ("+c.getBandwidthOut().getCPSHumanReadable()+"), ";
-                    else
+                    if (text == null) {
+                        text = "Uploading to ";
+                    }
+                    if (uc.getRemoteFriend() != null) {
+                        text += uc.getRemoteFriend().nickname() + " (" + c.getBandwidthOut().getCPSHumanReadable() + "), ";
+                    } else {
                         text += "<unknown>, ";
+                    }
                 }
             }
         }
         if (text != null) {
-            text = text.substring(0,text.length()-2);
+            text = text.substring(0, text.length() - 2);
             s = text;
         } else {
             s = " ";
@@ -203,7 +215,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         boolean structureChanged = false;
 
         ArrayList<Download> al = new ArrayList<Download>(ui.getCore().getNetworkManager().getDownloadManager().downloads());
-        for(Download d : al) {
+        for (Download d : al) {
             DownloadWrapper dw = getWrapperFor(d);
             if (dw == null) {
                 structureChanged = true;
@@ -213,8 +225,8 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             dw.update();
         }
 
-        for(Iterator i = rows.iterator();i.hasNext();) {
-            DownloadWrapper w = (DownloadWrapper)i.next();
+        for (Iterator i = rows.iterator(); i.hasNext();) {
+            DownloadWrapper w = (DownloadWrapper) i.next();
             if (!ui.getCore().getNetworkManager().getDownloadManager().contains(w.download)) {
                 structureChanged = true;
                 i.remove();
@@ -247,8 +259,10 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     }
 
     private DownloadWrapper getWrapperFor(Download d) {
-        for(DownloadWrapper cw : rows) {
-            if (cw.download == d) return cw;
+        for (DownloadWrapper cw : rows) {
+            if (cw.download == d) {
+                return cw;
+            }
         }
         return null;
     }
@@ -257,12 +271,21 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         return "downloads";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 
     private class DownloadWrapper {
+
         public Download download;
         public String name, speed, size;
         public int percentComplete, numberOfConnections;
@@ -280,7 +303,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     if (download.getNConnections() == 0) {
                         name = download.getAuxInfoFilename();
                     } else {
-                        name = download.getAuxInfoFilename()+ " - starting...";
+                        name = download.getAuxInfoFilename() + " - starting...";
                     }
                     size = "?";
                 } else {
@@ -292,31 +315,34 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 speed = download.getBandwidth().getCPSHumanReadable();
                 complete = download.isComplete();
                 state = download.getState();
-                if (download.getBandwidth().hasGoodAverage())
+                if (download.getBandwidth().hasGoodAverage()) {
                     eta = formatETA(download.getETAInMinutes());
-                else
+                } else {
                     eta = "?";
-            } catch(IOException e) {
-                if(T.t)T.error("Exception while updating downloadwrapper: "+e);
+                }
+            } catch (IOException e) {
+                if (T.t) {
+                    T.error("Exception while updating downloadwrapper: " + e);
+                }
             }
         }
 
         private String formatETA(int eta) {
             if (eta < 0) {
                 return "?";
-            } else 	if (eta<=60) {
-                return eta+" sec";
-            } else if (eta/60<60) {
-                return eta/60+" min";
+            } else if (eta <= 60) {
+                return eta + " sec";
+            } else if (eta / 60 < 60) {
+                return eta / 60 + " min";
             } else {
-                return (eta/60/60)+"h "+(eta/60%60)+"m";
+                return (eta / 60 / 60) + "h " + (eta / 60 % 60) + "m";
             }
         }
     }
 
     private class DownloadsTableModel extends AbstractTableModel {
 
-		public int getRowCount() {
+        public int getRowCount() {
             return rows.size();
         }
 
@@ -325,7 +351,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         }
 
         public String getColumnName(int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "Name";
                 case 1:
@@ -344,7 +370,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return rows.get(rowIndex).name;
                 case 1:
@@ -365,9 +391,11 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
     public void EVENT_cleanup(ActionEvent e) {
         ui.getCore().invokeLater(new Runnable() {
+
             public void run() {
                 ui.getCore().getNetworkManager().getDownloadManager().removeCompleteDownloads();
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         update();
                     }
@@ -379,10 +407,11 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     public void EVENT_moveDown(ActionEvent e) {
         int selection[] = table.getSelectedRows();
         if (selection != null && selection.length > 0) {
-            for(int i : selection) {
+            for (int i : selection) {
                 DownloadWrapper dw = rows.get(i);
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
+
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveDown(d);
                     }
@@ -390,17 +419,22 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 moveDown(i, dw);
             }
             model.fireTableStructureChanged();
-            for(int i : selection) if (i<rows.size()-1) table.getSelectionModel().addSelectionInterval(i+1,i+1);
+            for (int i : selection) {
+                if (i < rows.size() - 1) {
+                    table.getSelectionModel().addSelectionInterval(i + 1, i + 1);
+                }
+            }
         }
     }
 
     public void EVENT_moveUp(ActionEvent e) {
         int selection[] = table.getSelectedRows();
         if (selection != null && selection.length > 0) {
-            for(int i : selection) {
+            for (int i : selection) {
                 DownloadWrapper dw = rows.get(i);
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
+
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveUp(d);
                     }
@@ -408,19 +442,24 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 moveUp(i, dw);
             }
             model.fireTableStructureChanged();
-            for(int i : selection) if (i>0) table.getSelectionModel().addSelectionInterval(i-1,i-1);
+            for (int i : selection) {
+                if (i > 0) {
+                    table.getSelectionModel().addSelectionInterval(i - 1, i - 1);
+                }
+            }
         }
     }
 
     public void EVENT_moveTop(ActionEvent e) {
         int selection[] = table.getSelectedRows();
-        int offset = 0; 
+        int offset = 0;
         if (selection != null && selection.length > 0) {
-            for(int j = selection.length - 1; j >= 0 ; j--) {
-            	int i = selection[j];
+            for (int j = selection.length - 1; j >= 0; j--) {
+                int i = selection[j];
                 DownloadWrapper dw = rows.get(i + offset);
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
+
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveTop(d);
                     }
@@ -433,16 +472,17 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             table.getSelectionModel().addSelectionInterval(0, selection.length - 1);
         }
     }
-    
+
     public void EVENT_moveBottom(ActionEvent e) {
         int selection[] = table.getSelectedRows();
 
         int offset = 0;
         if (selection != null && selection.length > 0) {
-            for(int i : selection) {
+            for (int i : selection) {
                 DownloadWrapper dw = rows.get(i - offset);
                 final Download d = dw.download;
                 ui.getCore().invokeLater(new Runnable() {
+
                     public void run() {
                         ui.getCore().getNetworkManager().getDownloadManager().moveBottom(d);
                     }
@@ -456,64 +496,84 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             sm.addSelectionInterval(rows.size() - selection.length, rows.size() - 1);
         }
     }
+
     public void moveUp(int i, DownloadWrapper dw) {
-        if (i==0) return;
+        if (i == 0) {
+            return;
+        }
         rows.remove(i);
-        rows.add(i-1, dw);
+        rows.add(i - 1, dw);
     }
 
     public void moveDown(int i, DownloadWrapper dw) {
-        if (i==rows.size()-1) return;
+        if (i == rows.size() - 1) {
+            return;
+        }
         rows.remove(dw);
-        rows.add(i+1, dw);
+        rows.add(i + 1, dw);
     }
+
     public void moveTop(int i, DownloadWrapper dw) {
-    	if (i==0) return;
-    	rows.remove(i);
-    	rows.add(0, dw);
+        if (i == 0) {
+            return;
+        }
+        rows.remove(i);
+        rows.add(0, dw);
     }
+
     public void movePos(int pos, int i, DownloadWrapper dw) {
-    	rows.remove(i);
-    	if (pos > i) pos--;
-    	rows.add(pos, dw);
+        rows.remove(i);
+        if (pos > i) {
+            pos--;
+        }
+        rows.add(pos, dw);
     }
+
     public void moveBottom(int i, DownloadWrapper dw) {
-    	if (i==rows.size()-1) return;
-    	rows.remove(dw);
-    	rows.add(dw);
+        if (i == rows.size() - 1) {
+            return;
+        }
+        rows.remove(dw);
+        rows.add(dw);
     }
 
     public void EVENT_remove(ActionEvent e) {
         int selection[] = table.getSelectedRows();
 
         if (selection != null && selection.length > 0) {
-            for(int i : selection) {
+            for (int i : selection) {
                 Download d = rows.get(i).download;
                 if (!d.isComplete()) {
                     if (OptionDialog.showQuestionDialog(
                             ui.getMainWindow(),
                             "Are you sure you want to remove the selected downloads from your harddrive and download queue?")) {
                         break;
-                    } else return;
+                    } else {
+                        return;
+                    }
                 }
             }
 
             final ArrayList<Download> dls = new ArrayList<Download>();
-            for(int i : selection) dls.add(rows.get(i).download);
+            for (int i : selection) {
+                dls.add(rows.get(i).download);
+            }
             ui.getCore().invokeLater(new Runnable() {
+
                 public void run() {
-                    for(Download d : dls) {
+                    for (Download d : dls) {
                         if (d.isComplete()) {
                             ui.getCore().getNetworkManager().getDownloadManager().remove(d);
                         } else {
                             try {
                                 ui.getCore().getNetworkManager().getDownloadManager().deleteDownload(d);
-                            } catch(IOException e1) {
+                            } catch (IOException e1) {
                                 ui.handleErrorInEventLoop(e1);
                             }
                         }
                     }
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             update();
                         }
@@ -524,16 +584,17 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     }
 
     public class ProgressBarCellRenderer extends JProgressBar implements TableCellRenderer {
-		public ProgressBarCellRenderer() {
+
+        public ProgressBarCellRenderer() {
             super(0, 100);
             setOpaque(true);
         }
 
         public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
+                boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
             if (value != null && value instanceof Integer) {
                 setStringPainted(true);
-                int v = (Integer)value;
+                int v = (Integer) value;
                 DownloadWrapper w = rows.get(rowIndex);
                 if (w.state == Download.State.WAITING_TO_START) {
                     setString("queued");
@@ -543,16 +604,24 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     setValue(100);
                 } else {
                     setValue(v);
-                    setString(v+"%");
+                    setString(v + "%");
                 }
                 setToolTipText(getDownloadingFromText(w));
             }
 
             return this;
         }
-        public void validate() {}
-        public void revalidate() {}
-        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+        public void validate() {
+        }
+
+        public void revalidate() {
+        }
+
+        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        }
+
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        }
     }
 }

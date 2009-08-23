@@ -21,6 +21,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class IsFriend extends RPC {
+
     private boolean reply;
     private int guid;
 
@@ -38,22 +39,30 @@ public class IsFriend extends RPC {
 
         Friend wantsToConnectToRemote = manager.getFriend(guid);
         if (wantsToConnectToRemote == null) {
-            if(T.t)T.warn("Should be our trusted friend, but he's not");
+            if (T.t) {
+                T.warn("Should be our trusted friend, but he's not");
+            }
             return;
         }
 
         if (!res) {
-            if(T.t)T.warn("Hacked client? "+wantsToConnectToRemote +" said "+con.getRemoteFriend()+" was his friend. But he's not!");
+            if (T.t) {
+                T.warn("Hacked client? " + wantsToConnectToRemote + " said " + con.getRemoteFriend() + " was his friend. But he's not!");
+            }
         } else {
             if (wantsToConnectToRemote.getFriendsFriend(con.getRemoteUserGUID()) != null &&
-                !wantsToConnectToRemote.getFriendsFriend(con.getRemoteUserGUID()).isConnected()) {
+                    !wantsToConnectToRemote.getFriendsFriend(con.getRemoteUserGUID()).isConnected()) {
                 if (wantsToConnectToRemote.getFriendConnection() == null) {
-                    if(T.t)T.warn("No connection for friend!");
+                    if (T.t) {
+                        T.warn("No connection for friend!");
+                    }
                 } else {
                     wantsToConnectToRemote.getFriendConnection().send(new ConnectionInfo(con.getRemoteFriend()));
                 }
             } else {
-                if(T.t)T.warn("Wanted to send connection info to remote but he already connected to connectee ("+wantsToConnectToRemote.getFriendsFriend(guid)+", "+guid+")");
+                if (T.t) {
+                    T.warn("Wanted to send connection info to remote but he already connected to connectee (" + wantsToConnectToRemote.getFriendsFriend(guid) + ", " + guid + ")");
+                }
             }
         }
     }

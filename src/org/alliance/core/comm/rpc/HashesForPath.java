@@ -19,6 +19,7 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class HashesForPath extends CompressedRPC {
+
     private String path;
     private Hash[] hashes;
     private String[] paths;
@@ -31,7 +32,7 @@ public class HashesForPath extends CompressedRPC {
         hashes = new Hash[c.size()];
         paths = new String[c.size()];
         int i = 0;
-        for(FileDescriptor fd : c) {
+        for (FileDescriptor fd : c) {
             hashes[i] = fd.getRootHash();
             paths[i] = fd.getSubpath();
             i++;
@@ -41,7 +42,7 @@ public class HashesForPath extends CompressedRPC {
     public void serializeCompressed(DataOutputStream out) throws IOException {
         out.writeUTF(path);
         out.writeInt(hashes.length);
-        for(int i=0;i<hashes.length;i++) {
+        for (int i = 0; i < hashes.length; i++) {
             out.write(hashes[i].array());
             out.writeUTF(paths[i]);
         }
@@ -52,70 +53,75 @@ public class HashesForPath extends CompressedRPC {
         int len = in.readInt();
         hashes = new Hash[len];
         paths = new String[len];
-        for(int i=0;i<hashes.length;i++) {
+        for (int i = 0; i < hashes.length; i++) {
             hashes[i] = new Hash();
             in.readFully(hashes[i].array());
             paths[i] = in.readUTF();
-            if(T.t)T.trace("Read path: "+paths[i]);
+            if (T.t) {
+                T.trace("Read path: " + paths[i]);
+            }
         }
-        if(T.t)T.info("Loaded "+hashes.length+" hashes for path "+path);
+        if (T.t) {
+            T.info("Loaded " + hashes.length + " hashes for path " + path);
+        }
 
         //@todo: this is soo messed up - client starts downloading without any state
 
         ArrayList<Integer> guid = new ArrayList<Integer>();
         guid.add(con.getRemoteUserGUID());
-        
+
         //We have to loop over all the hashes first to get the common path length
         String common = "";
-        int cut = 0; 
-        if(hashes.length > 1){
-        	common = paths[0];
-        	for(int i=1;i<hashes.length;i++) {
-        		common = getCommonPath(TextUtils.makeSurePathIsMultiplatform(paths[i]), TextUtils.makeSurePathIsMultiplatform(common));
-        		if ("".equals(common)) {
-        			break;
-        		}
-        	}
-        	//this is needed to add back in the last folder if a folder is clicked
-        	for(int i=common.lastIndexOf("/")-1; i>=0; i--){
-        		if(common.charAt(i) == '/'){
-        			cut = i+1;
-        			break;
-        		}
-        	}
-        	if(cut<0) {
-        		cut = common.length();
-        	} else {
-        		cut = Math.min(cut,common.length());
-        	}
+        int cut = 0;
+        if (hashes.length > 1) {
+            common = paths[0];
+            for (int i = 1; i < hashes.length; i++) {
+                common = getCommonPath(TextUtils.makeSurePathIsMultiplatform(paths[i]), TextUtils.makeSurePathIsMultiplatform(common));
+                if ("".equals(common)) {
+                    break;
+                }
+            }
+            //this is needed to add back in the last folder if a folder is clicked
+            for (int i = common.lastIndexOf("/") - 1; i >= 0; i--) {
+                if (common.charAt(i) == '/') {
+                    cut = i + 1;
+                    break;
+                }
+            }
+            if (cut < 0) {
+                cut = common.length();
+            } else {
+                cut = Math.min(cut, common.length());
+            }
         }
-        for(int i=0;i<hashes.length;i++) {
-        	if(paths.length>1){
-        		//We have selected a folder
-        		paths[i] = paths[i].substring(cut);
-        	} else{
-        		paths[i] = paths[i].substring(common.length());
-        	}
-        	if (core.getFileManager().containsComplete(hashes[i])) {
-                core.getUICallback().statusMessage("You already have the file "+paths[i]+"!");
+        for (int i = 0; i < hashes.length; i++) {
+            if (paths.length > 1) {
+                //We have selected a folder
+                paths[i] = paths[i].substring(cut);
+            } else {
+                paths[i] = paths[i].substring(common.length());
+            }
+            if (core.getFileManager().containsComplete(hashes[i])) {
+                core.getUICallback().statusMessage("You already have the file " + paths[i] + "!");
             } else if (core.getNetworkManager().getDownloadManager().getDownload(hashes[i]) != null) {
-                core.getUICallback().statusMessage("You are already downloading "+paths[i]+"!");
+                core.getUICallback().statusMessage("You are already downloading " + paths[i] + "!");
             } else {
                 core.getNetworkManager().getDownloadManager().queDownload(hashes[i], paths[i], guid);
             }
         }
     }
-    public String getCommonPath(String path1, String path2) {		
-		String[] path1_split = path1.split("/");
-		String[] path2_split = path2.split("/");
-		String common = "";
-		for (int i = 0; i < path1_split.length && i < path2_split.length; i++) {
-			if (path1_split[i].equals(path2_split[i])) {
-				common = common + (path1_split[i] + "/");
-			} else {
-				break;
-			}
-		}
-		return common;
-	}
+
+    public String getCommonPath(String path1, String path2) {
+        String[] path1_split = path1.split("/");
+        String[] path2_split = path2.split("/");
+        String common = "";
+        for (int i = 0; i < path1_split.length && i < path2_split.length; i++) {
+            if (path1_split[i].equals(path2_split[i])) {
+                common = common + (path1_split[i] + "/");
+            } else {
+                break;
+            }
+        }
+        return common;
+    }
 }

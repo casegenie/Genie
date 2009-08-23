@@ -14,16 +14,18 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
-	private int guid;
+
+    private int guid;
 
     public PrivateChatMessageMDIWindow(UISubsystem ui, int guid) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "chatmessage", ui);
         this.guid = guid;
 
-        setTitle("Private chat with "+ui.getCore().getFriendManager().nickname(guid));
+        setTitle("Private chat with " + ui.getCore().getFriendManager().nickname(guid));
 
         postInit();
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 chat.setText("Type here and then press 'send' to start chatting.");
                 chat.requestFocus();
@@ -37,6 +39,7 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         manager.selectWindow(this);
         ui.getMainWindow().toFront();
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
                 chat.requestFocus();
             }
@@ -44,12 +47,15 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
     }
 
     protected void send(final String text) throws IOException {
-        if (text == null || text.trim().length() == 0) return;
+        if (text == null || text.trim().length() == 0) {
+            return;
+        }
         ui.getCore().invokeLater(new Runnable() {
+
             public void run() {
                 try {
                     ui.getCore().getFriendManager().getNetMan().sendPersistantly(new ChatMessageV3(text, false), ui.getCore().getFriendManager().getFriend(guid));
-                } catch(IOException e) {
+                } catch (IOException e) {
                     ui.getCore().reportError(e, this);
                 }
             }
@@ -59,6 +65,6 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
     }
 
     public String getIdentifier() {
-        return "msg"+guid;
+        return "msg" + guid;
     }
 }

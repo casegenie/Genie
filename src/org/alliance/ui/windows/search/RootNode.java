@@ -17,14 +17,12 @@ import java.util.*;
  * Time: 14:15:33
  */
 public class RootNode extends SearchTreeNode {
+
     private ArrayList<SearchTreeNode> children = new ArrayList<SearchTreeNode>();
     private HashMap<String, FolderNode> folderMapping = new HashMap<String, FolderNode>();
-
     private SearchTreeTableModel model;
     private Comparator<SearchTreeNode> comparator, secondaryComparator;
-
     private HashMap<Hash, FileNode> nodeCache = new HashMap<Hash, FileNode>();
-
     private PacedRunner pacedRunner;
 
     public void setModel(SearchTreeTableModel model, PacedRunner pacedRunner) {
@@ -33,8 +31,10 @@ public class RootNode extends SearchTreeNode {
         secondaryComparator = model.createDaysAgoComparator();
         this.pacedRunner = pacedRunner;
         pacedRunner.setRunner(new Runnable() {
+
             public void run() {
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         resortTable();
                     }
@@ -44,71 +44,79 @@ public class RootNode extends SearchTreeNode {
     }
 
     public void addSearchHits(int sourceGuid, int hops, java.util.List<SearchHit> hits) {
-        for(SearchHit h : hits) {
+        for (SearchHit h : hits) {
             //don't show files that i already have
             //actually it's more user friendly to show these too
 //            if (model.getCore().getFileManager().getFileDatabase().contains(h.getRoot())) continue;
 
             //ignore alliance.upgade files
-            if (h.getPath().endsWith(".upgrade") && h.getPath().indexOf("alliance") != -1) continue;
+            if (h.getPath().endsWith(".upgrade") && h.getPath().indexOf("alliance") != -1) {
+                continue;
+            }
 
             String fn = TextUtils.makeSurePathIsMultiplatform(h.getPath());
 
             String filename = fn;
-            if (filename.indexOf('/') != -1) filename = filename.substring(filename.lastIndexOf('/')+1);
+            if (filename.indexOf('/') != -1) {
+                filename = filename.substring(filename.lastIndexOf('/') + 1);
+            }
 
             String filenameWithoutExtention = filename;
-            if (filenameWithoutExtention.indexOf('.') != -1)
+            if (filenameWithoutExtention.indexOf('.') != -1) {
                 filenameWithoutExtention = filenameWithoutExtention.substring(0, filenameWithoutExtention.lastIndexOf('.'));
+            }
 
             String folder;
             if (fn.length() > filename.length()) {
-                folder = fn.substring(0, fn.length()-filename.length()-1);
+                folder = fn.substring(0, fn.length() - filename.length() - 1);
                 if (folder.indexOf('/') != -1) {
-                    if (Character.isDigit(folder.charAt(folder.length()-1)) && folder.length()-folder.lastIndexOf('/') < 10) {
+                    if (Character.isDigit(folder.charAt(folder.length() - 1)) && folder.length() - folder.lastIndexOf('/') < 10) {
                         //extract parent AND grandparent folder
                         int i = folder.lastIndexOf('/');
-                        int j = folder.substring(0, i-1).lastIndexOf('/');
+                        int j = folder.substring(0, i - 1).lastIndexOf('/');
                         if (j != -1) {
-                            folder = folder.substring(j+1);
+                            folder = folder.substring(j + 1);
                         }
                     } else {
                         //extract parent folder
-                        folder = folder.substring(folder.lastIndexOf('/')+1);
+                        folder = folder.substring(folder.lastIndexOf('/') + 1);
                     }
                 }
             } else {
                 folder = "";
             }
 
-            if (folder.equalsIgnoreCase(filenameWithoutExtention)) folder = ""; //skip folder if is has same name as file
-
+            if (folder.equalsIgnoreCase(filenameWithoutExtention)) {
+                folder = ""; //skip folder if is has same name as file
+            }
             if (nodeCache.get(h.getRoot()) != null) {
                 FileNode n = nodeCache.get(h.getRoot());
                 if (n.getParent() instanceof FolderNode) {
-                    ((FolderNode)n.getParent()).addHit(sourceGuid,  filename, h);
+                    ((FolderNode) n.getParent()).addHit(sourceGuid, filename, h);
                 } else {
                     n.addHit(sourceGuid);
                 }
             } else {
                 if (folder.length() == 0) {
-                    for(SearchTreeNode n : children) {
+                    for (SearchTreeNode n : children) {
                         if (n instanceof FileNode) {
-                            FileNode f = (FileNode)n;
+                            FileNode f = (FileNode) n;
                             if (f.getSh().getRoot().equals(h.getRoot())) {
                                 f.addHit(sourceGuid);
-                                h=null;
+                                h = null;
                                 break;
                             }
                         }
                     }
-                    if (h != null) children.add(new FileNode(this, model, filename, h, sourceGuid));
+                    if (h != null) {
+                        children.add(new FileNode(this, model, filename, h, sourceGuid));
+                    }
                 } else {
                     FolderNode n = folderMapping.get(folder.toLowerCase());
                     if (n == null) {
                         n = new FolderNode(this, folder);
                         children.add(n);
-                        folderMapping.put(folder.toLowerCase(),  n);
+                        folderMapping.put(folder.toLowerCase(), n);
                     }
                     n.addHit(sourceGuid, filename, h);
                 }
@@ -119,7 +127,9 @@ public class RootNode extends SearchTreeNode {
     }
 
     private void resortTable() {
-        if (secondaryComparator != null) Collections.sort(children, secondaryComparator);
+        if (secondaryComparator != null) {
+            Collections.sort(children, secondaryComparator);
+        }
         Collections.sort(children, comparator);
         model.nodeStructureChanged(this);
     }

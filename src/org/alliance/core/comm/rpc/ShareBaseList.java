@@ -16,24 +16,29 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class ShareBaseList extends RPC {
+
     public ShareBaseList() {
     }
 
     public void execute(Packet data) throws IOException {
         int n = data.readInt();
         String shareBaseName[] = new String[n];
-        for(int i=0;i<n;i++) {
+        for (int i = 0; i < n; i++) {
             shareBaseName[i] = data.readUTF();
-            if(T.t) T.trace("Found share base name: "+shareBaseName[i]);
+            if (T.t) {
+                T.trace("Found share base name: " + shareBaseName[i]);
+            }
         }
-        
+
         core.getUICallback().receivedShareBaseList(con.getRemoteFriend(), shareBaseName);
     }
 
     public Packet serializeTo(Packet p) {
         Collection<ShareBase> c = manager.getCore().getShareManager().shareBases();
         p.writeInt(c.size());
-        for(ShareBase sb : c) p.writeUTF(sb.getName());
+        for (ShareBase sb : c) {
+            p.writeUTF(sb.getName());
+        }
         return p;
     }
 }

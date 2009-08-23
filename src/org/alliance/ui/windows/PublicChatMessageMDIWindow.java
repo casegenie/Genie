@@ -15,7 +15,7 @@ import java.io.IOException;
  */
 public class PublicChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
 
-	public PublicChatMessageMDIWindow(UISubsystem ui) throws Exception {
+    public PublicChatMessageMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "publicchat", ui);
 
         setTitle("Chat");
@@ -24,14 +24,17 @@ public class PublicChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
     }
 
     public void send(final String text) throws Exception {
-        if (text == null || text.trim().length() == 0) return;
+        if (text == null || text.trim().length() == 0) {
+            return;
+        }
         ui.getCore().invokeLater(new Runnable() {
+
             public void run() {
                 try {
-                    for(Friend f : ui.getCore().getFriendManager().friends()) {
+                    for (Friend f : ui.getCore().getFriendManager().friends()) {
                         ui.getCore().getFriendManager().getNetMan().sendPersistantly(new ChatMessageV3(text, true), f);
                     }
-                } catch(IOException e) {
+                } catch (IOException e) {
                     ui.getCore().reportError(e, this);
                 }
             }

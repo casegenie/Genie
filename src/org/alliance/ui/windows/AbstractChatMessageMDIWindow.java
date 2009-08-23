@@ -31,23 +31,22 @@ import java.util.TreeSet;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow implements Runnable {
+
     protected final static DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     protected final static DateFormat SHORT_FORMAT = new SimpleDateFormat("HH:mm");
     protected final static Color COLORS[] = {
-            new Color(0x0068a7),
-            new Color(0x009606),
-            new Color(0xa13eaa),
-            new Color(0x008b76),
-            new Color(0xb77e24),
-            new Color(0xef0000),
-            new Color(0xb224b7),
-            new Color(0xb77e24)
+        new Color(0x0068a7),
+        new Color(0x009606),
+        new Color(0xa13eaa),
+        new Color(0x008b76),
+        new Color(0xb77e24),
+        new Color(0xef0000),
+        new Color(0xb224b7),
+        new Color(0xb77e24)
     };
-
     protected JEditorPane textarea;
     protected JTextField chat;
     protected String html = "";
-
     private TreeSet<ChatLine> chatLines;
     private static final int MAXIMUM_NUMBER_OF_CHAT_LINES = 50;
     private boolean needToUpdateHtml;
@@ -57,52 +56,63 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     protected AbstractChatMessageMDIWindow(MDIManager manager, String mdiWindowIdentifier, UISubsystem ui) throws Exception {
         super(manager, mdiWindowIdentifier, ui);
         chatLines = new TreeSet<ChatLine>(new Comparator<ChatLine>() {
+
             public int compare(ChatLine o1, ChatLine o2) {
                 long diff = o1.tick - o2.tick;
-                if (diff <= Integer.MIN_VALUE) diff = Integer.MIN_VALUE+1;
-                if (diff >= Integer.MAX_VALUE) diff = Integer.MAX_VALUE-1;
-                return (int)diff;
+                if (diff <= Integer.MIN_VALUE) {
+                    diff = Integer.MIN_VALUE + 1;
+                }
+                if (diff >= Integer.MAX_VALUE) {
+                    diff = Integer.MAX_VALUE - 1;
+                }
+                return (int) diff;
             }
         });
     }
 
     protected abstract void send(final String text) throws IOException, Exception;
+
     public abstract String getIdentifier();
 
     protected void postInit() {
         textarea = new JEditorPane("text/html", "");
         new CutCopyPastePopup(textarea);
 
-        JScrollPane sp = (JScrollPane)xui.getComponent("scrollpanel");
+        JScrollPane sp = (JScrollPane) xui.getComponent("scrollpanel");
         sp.setViewportView(textarea);
 
-        chat = (JTextField)xui.getComponent("chat1");
+        chat = (JTextField) xui.getComponent("chat1");
         new CutCopyPastePopup(chat);
 
         textarea.setEditable(false);
         textarea.setBackground(Color.white);
         textarea.addHyperlinkListener(new HyperlinkListener() {
+
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     try {
                         String link = e.getDescription();
                         if (link.startsWith("http://")) {
-                            String allowedChars ="abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-.;/?:@&=+$_.!~*'()#";
-                            for(int i=0;i<link.length();i++) {
+                            String allowedChars = "abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-.;/?:@&=+$_.!~*'()#";
+                            for (int i = 0; i < link.length(); i++) {
                                 if (allowedChars.indexOf(link.toLowerCase().charAt(i)) == -1) {
-                                    OptionDialog.showInformationDialog(ui.getMainWindow(), "Character "+link.charAt(i)+" is not allowed in link.");
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), "Character " + link.charAt(i) + " is not allowed in link.");
                                     return;
                                 }
                             }
                             ui.openURL(link);
                         } else {
                             String[] hashes = link.split("\\|");
-                            for(String s : hashes) if(T.t) T.trace("Part: "+s);
+                            for (String s : hashes) {
+                                if (T.t) {
+                                    T.trace("Part: " + s);
+                                }
+                            }
                             int guid = Integer.parseInt(hashes[0]);
-                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Add "+(hashes.length-1)+" files to downloads?")) {
+                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Add " + (hashes.length - 1) + " files to downloads?")) {
                                 ArrayList<Integer> al = new ArrayList<Integer>();
                                 al.add(guid);
-                                for(int i=1;i<hashes.length;i++) {
+                                for (int i = 1; i < hashes.length; i++) {
                                     ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);
                                 }
                                 ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
@@ -126,7 +136,9 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     }
 
     private void chatMessage() throws Exception {
-        if (chat.getText().trim().length() == 0) return;
+        if (chat.getText().trim().length() == 0) {
+            return;
+        }
         if (chat.getText().trim().equals("/clear")) {
             chatLines.clear();
             regenerateHtml();
@@ -144,14 +156,18 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     private String escapeHTML(String text) {
         text = text.replace("<", "&lt;");
         String pattern = "http://";
-        int i=0;
-        while((i = text.indexOf(pattern, i)) != -1) {
+        int i = 0;
+        while ((i = text.indexOf(pattern, i)) != -1) {
             int end = text.indexOf(' ', i);
-            if (end == -1) end = text.length();
+            if (end == -1) {
+                end = text.length();
+            }
             String s = text.substring(0, i);
-            s += "<a href=\""+text.substring(i, end)+"\">"+text.substring(i, end)+"</a>";
+            s += "<a href=\"" + text.substring(i, end) + "\">" + text.substring(i, end) + "</a>";
             i = s.length();
-            if (end < text.length()-1) s += text.substring(end);
+            if (end < text.length() - 1) {
+                s += text.substring(end);
+            }
             text = s;
         }
         return text;
@@ -173,16 +189,22 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         }
 
         int n = from.hashCode();
-        if (n<0)n=-n;
-        n%= COLORS.length;
+        if (n < 0) {
+            n = -n;
+        }
+        n %= COLORS.length;
         Color c = COLORS[n];
 
-        while(chatLinesContainTick(tick)) tick++;
+        while (chatLinesContainTick(tick)) {
+            tick++;
+        }
 
         ChatLine cl = new ChatLine(from, message, tick, c);
         chatLines.add(cl);
         boolean removeFirstLine = chatLines.size() > MAXIMUM_NUMBER_OF_CHAT_LINES;
-        if (removeFirstLine) chatLines.remove(chatLines.first());
+        if (removeFirstLine) {
+            chatLines.remove(chatLines.first());
+        }
         if (chatLines.last() == cl && !removeFirstLine) {
             html += creattHtmlChatLine(cl);
         } else {
@@ -193,14 +215,18 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     }
 
     private boolean chatLinesContainTick(long tick) {
-        for(ChatLine cl : chatLines) {
-            if (cl.tick == tick) return true;
+        for (ChatLine cl : chatLines) {
+            if (cl.tick == tick) {
+                return true;
+            }
         }
         return false;
     }
 
     private void regenerateHtml() {
-        if(T.t)T.info("Regenerating entire html for chat");
+        if (T.t) {
+            T.info("Regenerating entire html for chat");
+        }
         html = "";
         for (ChatLine chatLine : chatLines) {
             html += creattHtmlChatLine(chatLine);
@@ -208,16 +234,20 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     }
 
     public void run() {
-        while(alive) {
+        while (alive) {
             if (needToUpdateHtml) {
                 needToUpdateHtml = false;
                 SwingUtilities.invokeLater(new Runnable() {
+
                     public void run() {
                         textarea.setText(html);
                     }
                 });
             }
-            try { Thread.sleep(1000); } catch (InterruptedException e) {}
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
         }
     }
 
@@ -225,24 +255,24 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         String s;
         DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
         if (previousChatLine != null &&
-        		f.format(new Date(cl.tick)).equals(
-        				f.format(new Date(previousChatLine.tick))
-        				)) {
-        	s = "["+ SHORT_FORMAT.format(new Date(cl.tick))+"]";
+                f.format(new Date(cl.tick)).equals(
+                f.format(new Date(previousChatLine.tick)))) {
+            s = "[" + SHORT_FORMAT.format(new Date(cl.tick)) + "]";
         } else {
-        	s = "<b>["+ FORMAT.format(new Date(cl.tick))+"]</b>";
+            s = "<b>[" + FORMAT.format(new Date(cl.tick)) + "]</b>";
         }
-       	s = "<font color=\"#9f9f9f\">"+ s +" <font color=\""+toHexColor(cl.color)+"\">"+cl.from+":</font> <font color=\""+toHexColor(cl.color.darker())+"\">"+cl.message+"</font><br>";
-       
+        s = "<font color=\"#9f9f9f\">" + s + " <font color=\"" + toHexColor(cl.color) + "\">" + cl.from + ":</font> <font color=\"" + toHexColor(cl.color.darker()) + "\">" + cl.message + "</font><br>";
+
         previousChatLine = cl;
         return s;
     }
 
     protected String toHexColor(Color color) {
-        return "#"+Integer.toHexString(color.getRGB()&0xffffff);
+        return "#" + Integer.toHexString(color.getRGB() & 0xffffff);
     }
 
     private class ChatLine {
+
         String from, message;
         long tick;
         Color color;
@@ -260,8 +290,16 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         alive = false;
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 }

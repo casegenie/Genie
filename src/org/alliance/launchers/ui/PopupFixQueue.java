@@ -2,10 +2,10 @@ package org.alliance.launchers.ui;
 
 import java.awt.*;
 
-
 //This is a dirty hack to get around java sucking, found the code here http://weblogs.java.net/blog/ixmal/archive/2006/05/using_jpopupmen.html
 //otherwise linux will give you wonderful class cast exceptions
 public class PopupFixQueue extends EventQueue {
+
     private PopupMenu popup;
 
     public PopupFixQueue(PopupMenu m) {

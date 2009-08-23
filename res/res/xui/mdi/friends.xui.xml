@@ -1,3 +1,4 @@
+
 <xui>
     <title value=""/>
     <body>
@@ -8,7 +9,8 @@
         <scrollpanel expand="both" scrollbars="optional" id="treepanel">
         </scrollpanel>
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">
-            <label id="status" text=" "/><filler expand="horiz"/>
+            <label id="status" text=" "/>
+            <filler expand="horiz"/>
         </panel>
     </body>
 </xui>

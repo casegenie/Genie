@@ -8,6 +8,7 @@ package org.alliance.core.messageboard;
  * To change this template use File | Settings | File Templates.
  */
 public class Reply extends Message {
+
     private int replyToMessageId;
 
     public Reply(String text, int createdBy, int replyToMessageId) {

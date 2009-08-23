@@ -1,3 +1,4 @@
+
 <xui>
     <title value="Options" image="gfx/icons/alliance.png"/>
     <body>
@@ -93,14 +94,18 @@
             <tab text="Share" tooltip="Add or remove directories to share">
                 <panel axis="y" bordertype="etched" bordertitle="Shared folders:">
                     <panel border="0,0,0,5" axis="x" expand="horiz">
-                        <label text="Select what folders you want to share with your friends: "/><filler/>
+                        <label text="Select what folders you want to share with your friends: "/>
+                        <filler/>
                     </panel>
 
                     <scrollpanel bordertype="lowered">
                         <list id="shareList"/>
                     </scrollpanel>
                     <panel border="0,5,0,0" axis="x" expand="horiz">
-                        <filler/><button text="Add..." eventid="addfolder"/><strut width="5"/><button text="Remove" eventid="removefolder"/>
+                        <filler/>
+                        <button text="Add..." eventid="addfolder"/>
+                        <strut width="5"/>
+                        <button text="Remove" eventid="removefolder"/>
                     </panel>
                     <strut height="25"/>
                 </panel>
@@ -109,19 +114,24 @@
             <tab text="Security &amp; System tray" tooltip="Encryption and network expansion details">
                 <panel axis="y" bordertype="etched" bordertitle="Network expansion defaults">
                     <panel axis="x" border="0" expand="horiz">
-                        <checkbox id="internal.alwaysallowfriendstoconnect" text="Always allow my friends to connect to each other"/><filler/>
+                        <checkbox id="internal.alwaysallowfriendstoconnect" text="Always allow my friends to connect to each other"/>
+                        <filler/>
                     </panel>
                     <panel axis="x" border="0" expand="horiz">
-                        <checkbox id="internal.alwaysallowfriendsoffriendstoconnecttome" text="Always allow friends of my friends to connect to me"/><filler/>
+                        <checkbox id="internal.alwaysallowfriendsoffriendstoconnecttome" text="Always allow friends of my friends to connect to me"/>
+                        <filler/>
                     </panel>
                     <panel axis="x" border="0" expand="horiz">
-                        <checkbox id="internal.alwaysautomaticallyconnecttoallfriendsoffriend" text="When a new friend connects to me automatically connect to all his friends"/><filler/>
+                        <checkbox id="internal.alwaysautomaticallyconnecttoallfriendsoffriend" text="When a new friend connects to me automatically connect to all his friends"/>
+                        <filler/>
                     </panel>
                     <panel axis="x" border="0" expand="horiz">
-                        <checkbox id="internal.invitationmayonlybeusedonce" text="Connection codes I create may only be used once"/><filler/>
+                        <checkbox id="internal.invitationmayonlybeusedonce" text="Connection codes I create may only be used once"/>
+                        <filler/>
                     </panel>
                     <panel axis="x" border="0" expand="horiz">
-                        <checkbox id="internal.automaticallydenyallinvitations" text="Automatically deny all invitations from friends of friends"/><filler/>
+                        <checkbox id="internal.automaticallydenyallinvitations" text="Automatically deny all invitations from friends of friends"/>
+                        <filler/>
                     </panel>
                 </panel>
                 <panel axis="y" bordertype="etched" bordertitle="Encryption">
@@ -135,7 +145,8 @@
                     </panel>
                     <strut height="10"/>
                     <mlabel html="true">
-                        [b]ALL your friends must change encryption layer and restart Alliance at the same time for a switch of encryption to work.[/b]</mlabel>
+                        [b]ALL your friends must change encryption layer and restart Alliance at the same time for a switch of encryption to work.[/b]
+                    </mlabel>
                 </panel>
                 <panel axis="y" bordertype="etched" bordertitle="System tray notification">
                     <panel axis="x" expand="horiz">
@@ -154,7 +165,8 @@
                     </panel>
                     <panel border="0" axis="x" expand="horiz">
                         <strut width="15"/>
-                        <checkbox id="internal.showsystemmessagesintray" text="Alliance needs my attention"/><filler/>
+                        <checkbox id="internal.showsystemmessagesintray" text="Alliance needs my attention"/>
+                        <filler/>
                         <filler/>
                     </panel>
                 </panel>
@@ -175,7 +187,8 @@
                         </mlabel>
                     </panel>
                     <panel axis="x" border="1,7,1,1" expand="horiz">
-                        <checkbox id="internal.enableiprules" text="Enable Alliance firewall with following rules:"/><filler/>
+                        <checkbox id="internal.enableiprules" text="Enable Alliance firewall with following rules:"/>
+                        <filler/>
                     </panel>
                     <panel axis="x" border="5,0,5,5">
                         <scrollpanel bordertype="lowered">
@@ -184,10 +197,14 @@
                     </panel>
                     <panel border="5,5,5,0" axis="x" expand="horiz">
                         <filler/>
-                        <button text="" tooltip="Add new rule" image="gfx/icons/add.png" type="flat" eventid="addrule"/><strut width="5"/>
-                        <button text="" tooltip="Remove selected rule" image="gfx/icons/remove.png" type="flat" eventid="removerule"/><strut width="5"/>
-                        <button text="" tooltip="Move selected rule up" image="gfx/icons/up.png" type="flat" eventid="moveruleup"/><strut width="5"/>
-                        <button text="" tooltip="More selected rule down" image="gfx/icons/down.png" type="flat" eventid="moveruledown"/><strut width="5"/>
+                        <button text="" tooltip="Add new rule" image="gfx/icons/add.png" type="flat" eventid="addrule"/>
+                        <strut width="5"/>
+                        <button text="" tooltip="Remove selected rule" image="gfx/icons/remove.png" type="flat" eventid="removerule"/>
+                        <strut width="5"/>
+                        <button text="" tooltip="Move selected rule up" image="gfx/icons/up.png" type="flat" eventid="moveruleup"/>
+                        <strut width="5"/>
+                        <button text="" tooltip="More selected rule down" image="gfx/icons/down.png" type="flat" eventid="moveruledown"/>
+                        <strut width="5"/>
                         <button text="" tooltip="Edit selected rule" image="gfx/icons/edit.png" type="flat" eventid="editrule"/>
                     </panel>
                     <strut height="5"/>
@@ -281,7 +298,11 @@
         </tabbedpanel>
         <panel border="5" axis="x" expand="horiz">
             <filler axis="x"/>
-            <button width="85" eventid="ok" text="OK"/><strut width="5"/><button width="85" eventid="cancel" text="Cancel"/><strut width="5"/><button width="85" eventid="apply" text="Apply"/>
+            <button width="85" eventid="ok" text="OK"/>
+            <strut width="5"/>
+            <button width="85" eventid="cancel" text="Cancel"/>
+            <strut width="5"/>
+            <button width="85" eventid="apply" text="Apply"/>
         </panel>
     </body>
 </xui>

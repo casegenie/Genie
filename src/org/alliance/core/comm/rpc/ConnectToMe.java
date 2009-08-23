@@ -16,6 +16,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class ConnectToMe extends RPC {
+
     private int connectionId;
 
     public ConnectToMe() {
@@ -27,7 +28,9 @@ public class ConnectToMe extends RPC {
 
     public void execute(Packet data) throws IOException {
         connectionId = data.readInt();
-        if(T.t) T.debug(con.getRemoteFriend()+" want to rev connect with connectionId "+connectionId+". Lets do it.");
+        if (T.t) {
+            T.debug(con.getRemoteFriend() + " want to rev connect with connectionId " + connectionId + ". Lets do it.");
+        }
 
         ReverseConnection c = new ReverseConnection(core.getNetworkManager(), Connection.Direction.OUT, con.getRemoteUserGUID(), connectionId);
         manager.getNetMan().connect(con.getRemoteUserGUID(), c);

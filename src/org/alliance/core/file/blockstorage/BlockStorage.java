@@ -15,7 +15,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
-
 /**
  * The BlockStorage keeps track of a list of incomplete files. Information about these files (what blocks of the file
  * are complete and where they're located on disk) is contained here.
@@ -38,71 +37,76 @@ import java.util.concurrent.ArrayBlockingQueue;
  * Time: 13:01:14
  */
 public abstract class BlockStorage extends Thread {
-    private static final int SAVE_INTERVAL_IN_BLOCKS_COMPLETED = 10;
 
+    private static final int SAVE_INTERVAL_IN_BLOCKS_COMPLETED = 10;
     private HashSet<Hash> blockFiles = new HashSet<Hash>();
     private File storagePath, completeFilePath;
     private HashMap<Hash, BlockFile> blockFileCache = new HashMap<Hash, BlockFile>(); //@todo: clean this up once in a while
     protected CoreSubsystem core;
     private ArrayBlockingQueue<BlockFile> queue = new ArrayBlockingQueue<BlockFile>(1000);
     private boolean alive = true;
-
     private int blocksCompletedCounter;
     private HashSet<Hash> recentlyDownloaded = new HashSet<Hash>();
-
     private boolean currentlyDefragmentingFile;
-
     protected boolean isSequential;
 
     public BlockStorage(String storagePath, String completeFilePath, CoreSubsystem core) throws IOException {
-        if(T.t)T.info("BlockStorage <init> - "+storagePath+" "+completeFilePath);
+        if (T.t) {
+            T.info("BlockStorage <init> - " + storagePath + " " + completeFilePath);
+        }
         this.core = core;
         this.storagePath = new File(storagePath);
         this.completeFilePath = new File(completeFilePath);
         if (!this.storagePath.exists() && !this.storagePath.mkdirs()) {
-            throw new IOException("Permission problem: can't create "+storagePath+".");
+            throw new IOException("Permission problem: can't create " + storagePath + ".");
         }
         this.completeFilePath.mkdirs();
 
         loadHashes();
 
-        setName("Defragmenter -- "+core.getSettings().getMy().getNickname());
+        setName("Defragmenter -- " + core.getSettings().getMy().getNickname());
         start();
     }
 
     protected abstract void signalFileComplete(BlockFile bf);
+
     public abstract int getStorageTypeId();
 
     public void run() {
-        while(alive) {
+        while (alive) {
             try {
                 final BlockFile bf = queue.take();
                 currentlyDefragmentingFile = true;
                 try {
-                    if(T.t)T.info("Took from BlockStorage finishing que: "+bf);
-                    core.getUICallback().statusMessage("Verifying ard defragmenting "+bf.getFd().getSubpath()+"...");
+                    if (T.t) {
+                        T.info("Took from BlockStorage finishing que: " + bf);
+                    }
+                    core.getUICallback().statusMessage("Verifying ard defragmenting " + bf.getFd().getSubpath() + "...");
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
+
                         public void run() {
                             try {
-                                if(T.t)T.ass(!bf.isOpen(),"Open!");
+                                if (T.t) {
+                                    T.ass(!bf.isOpen(), "Open!");
+                                }
                                 remove(bf.getFd().getRootHash());
                                 bf.getFd().updateModifiedAt();
                                 core.getFileManager().getFileDatabase().add(bf.getFd());
                                 signalFileComplete(bf);
-                            } catch(IOException e) {
+                            } catch (IOException e) {
                                 core.reportError(e, bf.getFd().getSubpath());
                             }
                         }
                     });
-                    core.getUICallback().statusMessage("File complete: "+bf.getFd().getSubpath());
-                } catch(Exception e) {
+                    core.getUICallback().statusMessage("File complete: " + bf.getFd().getSubpath());
+                } catch (Exception e) {
                     core.reportError(e, bf.getFd() == null ? bf : bf);
                 }
-            } catch(InterruptedException e) {
+            } catch (InterruptedException e) {
             } finally {
                 currentlyDefragmentingFile = false;
-                synchronized(this) {
+                synchronized (this) {
                     notifyAll(); //notifies if someone is waiting for us to complete
                 }
             }
@@ -111,20 +115,29 @@ public abstract class BlockStorage extends Thread {
 
     private void loadHashes() {
         File hashes[] = storagePath.listFiles(new FilenameFilter() {
+
             public boolean accept(File dir, String name) {
                 return name != null && name.endsWith(".dir");
             }
         });
 
-        if (hashes != null) for(File h : hashes) {
-            if (h == null) continue;
-            String s = h.getName();
-            s = s.substring(0, s.lastIndexOf('.'));
-            if(T.t)T.trace("Found hash in blockstorage: "+s);
-            Hash hash = Hash.createFrom(s);
-            blockFiles.add(hash);
+        if (hashes != null) {
+            for (File h : hashes) {
+                if (h == null) {
+                    continue;
+                }
+                String s = h.getName();
+                s = s.substring(0, s.lastIndexOf('.'));
+                if (T.t) {
+                    T.trace("Found hash in blockstorage: " + s);
+                }
+                Hash hash = Hash.createFrom(s);
+                blockFiles.add(hash);
+            }
         }
-        if(T.t)T.info("Loaded "+blockFiles.size()+" hashes from "+storagePath);
+        if (T.t) {
+            T.info("Loaded " + blockFiles.size() + " hashes from " + storagePath);
+        }
     }
 
     /**
@@ -132,31 +145,45 @@ public abstract class BlockStorage extends Thread {
      * @return Number of bytes written
      */
     public synchronized int saveSlice(Hash root, int blockNumber, int sliceOffset, ByteBuffer slice, FileDescriptor fd) throws IOException {
-        if(T.t)T.ass(fd.getRootHash().equals(root),"Root hash mismatch in block storage! "+root+" "+fd.getRootHash());
+        if (T.t) {
+            T.ass(fd.getRootHash().equals(root), "Root hash mismatch in block storage! " + root + " " + fd.getRootHash());
+        }
 
         BlockFile bf;
 
         if (blockFiles.contains(root)) {
             bf = getBlockFile(root);
-            if (bf == null) throw new IOException("Could not load BlockFile - maybe you have you removed files from the incomplete folder?");
-            if(T.t)T.ass(bf.getFd().getRootHash().equals(root),"Root hash mismatch in block storage! "+bf.getFd().getRootHash()+" "+root+" "+fd.getRootHash());
+            if (bf == null) {
+                throw new IOException("Could not load BlockFile - maybe you have you removed files from the incomplete folder?");
+            }
+            if (T.t) {
+                T.ass(bf.getFd().getRootHash().equals(root), "Root hash mismatch in block storage! " + bf.getFd().getRootHash() + " " + root + " " + fd.getRootHash());
+            }
         } else {
-            if(T.t)T.trace("New BlockFile created");
+            if (T.t) {
+                T.trace("New BlockFile created");
+            }
             bf = new BlockFile(fd, this);
             bf.save();
             blockFiles.add(bf.getFd().getRootHash());
             blockFileCache.put(root, bf);
         }
 
-        if(T.t)T.ass(slice.remaining() <= BLOCK_SIZE,"Wow. About to write too much data. This is NOT good.");
+        if (T.t) {
+            T.ass(slice.remaining() <= BLOCK_SIZE, "Wow. About to write too much data. This is NOT good.");
+        }
 
         //save slice
         bf.assureOpen();
         int r = bf.write(blockNumber, sliceOffset, slice);
-        if (sliceOffset+r >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
+        if (sliceOffset + r >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
             //block is complete
-            if(T.t)T.ass(sliceOffset+r <= BlockFile.getBlockSize(blockNumber, fd.getSize()), "Writing outside of block!!!");
-            if(T.t)T.debug("Block complete for "+fd.getRootHash());
+            if (T.t) {
+                T.ass(sliceOffset + r <= BlockFile.getBlockSize(blockNumber, fd.getSize()), "Writing outside of block!!!");
+            }
+            if (T.t) {
+                T.debug("Block complete for " + fd.getRootHash());
+            }
 
             //@todo: this is a stupid way of verifying hash - should do it while downloading - this very bad for performance when download at higher speelds too
             //verify that hash is correct on disk.
@@ -164,7 +191,9 @@ public abstract class BlockStorage extends Thread {
             if (!h.equals(bf.getFd().getSubHash(blockNumber))) {
                 bf.blockCorrupted(blockNumber);
                 core.getUICallback().statusMessage("Part of file corrupted while downloading!! Retrying...");
-                if(T.t)T.error("Tiger hash incorrect for block "+blockNumber+" when saved to disk!!!");
+                if (T.t) {
+                    T.error("Tiger hash incorrect for block " + blockNumber + " when saved to disk!!!");
+                }
             } else {
                 bf.blockCompleted(blockNumber);
                 blocksCompletedCounter++;
@@ -174,7 +203,9 @@ public abstract class BlockStorage extends Thread {
                 }
 
                 if (bf.isComplete()) {
-                    if(T.t)T.info("Download complete!");
+                    if (T.t) {
+                        T.info("Download complete!");
+                    }
                     bf.save();
                     String dir = completeFilePath.toString();
                     bf.getFd().setBasePath(dir);
@@ -187,33 +218,48 @@ public abstract class BlockStorage extends Thread {
     }
 
     private void queForCompletion(BlockFile bf) {
-        if (queue.contains(bf)) return;
+        if (queue.contains(bf)) {
+            return;
+        }
         queue.add(bf);
     }
 
     public synchronized void waitForUnfinishedTasks() {
         //if there is a save in progress we won't be let into this method before its done (because of 'synchornized')
-        while(queue.size() > 0 || currentlyDefragmentingFile) {
+        while (queue.size() > 0 || currentlyDefragmentingFile) {
             try {
                 wait();
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 
     private synchronized void remove(Hash root) {
-        if(T.t)T.info("Removing hash "+root+" from BlockStorage");
+        if (T.t) {
+            T.info("Removing hash " + root + " from BlockStorage");
+        }
         blockFileCache.remove(root);
         blockFiles.remove(root);
-        File f = new File(storagePath+"/"+root.getRepresentation()+".dat");
+        File f = new File(storagePath + "/" + root.getRepresentation() + ".dat");
         if (f.exists()) {
-            if (!f.delete()) if(T.t)T.error("Could not delete "+f);
+            if (!f.delete()) {
+                if (T.t) {
+                    T.error("Could not delete " + f);
+                }
+            }
         }
-        f = new File(storagePath+"/"+root.getRepresentation()+".dir");
+        f = new File(storagePath + "/" + root.getRepresentation() + ".dir");
 
         if (f.exists()) {
-            if (!f.delete()) if(T.t)T.error("Could not delete "+f);
+            if (!f.delete()) {
+                if (T.t) {
+                    T.error("Could not delete " + f);
+                }
+            }
         } else {
-            if(T.t)T.warn("File "+f+" did not exists. This should be because we aborted a download that had not started yet.");
+            if (T.t) {
+                T.warn("File " + f + " did not exists. This should be because we aborted a download that had not started yet.");
+            }
         }
     }
 
@@ -235,7 +281,9 @@ public abstract class BlockStorage extends Thread {
     public BlockFile getBlockFile(Hash root) throws IOException {
         BlockFile bf = blockFileCache.get(root);
         if (bf == null) {
-            if(T.t)T.trace("Cache miss for "+root+ " - loading.");
+            if (T.t) {
+                T.trace("Cache miss for " + root + " - loading.");
+            }
             bf = load(root);
             blockFileCache.put(root, bf);
         }
@@ -244,7 +292,7 @@ public abstract class BlockStorage extends Thread {
 
     private void close() throws IOException {
         ArrayList<BlockFile> al = new ArrayList<BlockFile>(blockFileCache.values());
-        for(BlockFile f : al) {
+        for (BlockFile f : al) {
             f.close();
         }
     }
@@ -258,23 +306,33 @@ public abstract class BlockStorage extends Thread {
     }
 
     public BlockMask getBlockMaskFor(Hash root) throws IOException {
-        if (!contains(root)) return null;
+        if (!contains(root)) {
+            return null;
+        }
         BlockFile f = getBlockFile(root);
-        if (f != null) return f.getBlockMask();
+        if (f != null) {
+            return f.getBlockMask();
+        }
         return null;
     }
 
     public FileDescriptor getFD(Hash root) throws IOException {
-        if (!contains(root)) return null;
+        if (!contains(root)) {
+            return null;
+        }
         BlockFile f = getBlockFile(root);
-        if (f != null) return f.getFd();
+        if (f != null) {
+            return f.getFd();
+        }
         return null;
     }
 
     public void shutdown() throws IOException {
         waitForUnfinishedTasks();
-        for(BlockFile bf : blockFileCache.values()) {
-            if (bf != null) bf.save();
+        for (BlockFile bf : blockFileCache.values()) {
+            if (bf != null) {
+                bf.save();
+            }
         }
         close();
         alive = false;
@@ -286,8 +344,12 @@ public abstract class BlockStorage extends Thread {
 
     public void removePermanently(Hash root) throws IOException {
         BlockFile bf = getBlockFile(root);
-        if(T.t)T.info("Block file did not exist.");
-        if (bf != null) bf.close();
+        if (T.t) {
+            T.info("Block file did not exist.");
+        }
+        if (bf != null) {
+            bf.close();
+        }
         remove(root);
     }
 
@@ -317,7 +379,9 @@ public abstract class BlockStorage extends Thread {
         } else if (id == CacheStorage.TYPE_ID) {
             return core.getFileManager().getCache();
         } else {
-            if(T.t)T.ass(false,"Unknown block storage type! "+id);
+            if (T.t) {
+                T.ass(false, "Unknown block storage type! " + id);
+            }
             return null;
         }
     }

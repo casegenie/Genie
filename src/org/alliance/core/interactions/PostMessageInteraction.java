@@ -10,7 +10,8 @@ import org.alliance.core.SynchronizedNeedsUserInteraction;
  * To change this template use File | Settings | File Templates.
  */
 public class PostMessageInteraction extends SynchronizedNeedsUserInteraction {
-	private String message;
+
+    private String message;
     private long sentAtTick;
     private int fromGuid;
     private boolean messageWasPersisted;

@@ -15,23 +15,29 @@ import java.nio.ByteBuffer;
  * Time: 17:04:21
  */
 public class BlockStorageBlockProvider extends BlockProvider {
+
     private BlockFile bf;
     private boolean doneFilling;
-
     private CompleteFileBlockProvider wrapped;
 
     public BlockStorageBlockProvider(int blockNumber, Hash root, CoreSubsystem core) throws IOException {
         super(blockNumber, root, core);
         BlockStorage storage = core.getFileManager().getBlockStorageFor(root);
         bf = storage.getBlockFile(root);
-        if(T.t)T.ass(bf != null, "Could not find block file when about to send block from block storage "+storage +", fd: "+fd);
+        if (T.t) {
+            T.ass(bf != null, "Could not find block file when about to send block from block storage " + storage + ", fd: " + fd);
+        }
     }
 
     public int fill(ByteBuffer buf) throws IOException {
-        if (doneFilling) return -1;
+        if (doneFilling) {
+            return -1;
+        }
 
         if (core.getFileManager().containsComplete(root)) {
-            if(T.t)T.info("Hmm! We have this file complete now! Should not read from the block storage - this could re-open the file.");
+            if (T.t) {
+                T.info("Hmm! We have this file complete now! Should not read from the block storage - this could re-open the file.");
+            }
             if (wrapped == null) {
                 wrapped = new CompleteFileBlockProvider(blockNumber, root, core);
                 wrapped.updateRead(read);
@@ -44,8 +50,12 @@ public class BlockStorageBlockProvider extends BlockProvider {
         read += n;
 
         if (n == -1 || read >= bs) {
-            if(T.t)T.ass(read == bs, "read more then needed!");
-            if(T.t)T.info("Block successfulyl provided. Rest is in buffer. Used block storage so we're not closing file.");
+            if (T.t) {
+                T.ass(read == bs, "read more then needed!");
+            }
+            if (T.t) {
+                T.info("Block successfulyl provided. Rest is in buffer. Used block storage so we're not closing file.");
+            }
             //@todo: maybe should decide some way if we need to close the file channel - will probably leak open files..
             doneFilling = true;
         }

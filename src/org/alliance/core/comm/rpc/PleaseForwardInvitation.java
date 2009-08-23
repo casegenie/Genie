@@ -16,7 +16,8 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class PleaseForwardInvitation extends PersistantRPC {
-	private String invitationCode;
+
+    private String invitationCode;
     private int toGuid;
 
     public PleaseForwardInvitation() {
@@ -30,7 +31,7 @@ public class PleaseForwardInvitation extends PersistantRPC {
         super.init(rpcc);
         try {
             invitationCode = core.getInvitaitonManager().createInvitation(toGuid, con.getRemoteUserGUID()).getCompleteInvitaitonString();
-        } catch(Exception e) {
+        } catch (Exception e) {
             core.reportError(e, this);
         }
         return this;

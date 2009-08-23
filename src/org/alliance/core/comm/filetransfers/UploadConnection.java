@@ -16,8 +16,8 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class UploadConnection extends TransferConnection {
-    public static final int CONNECTION_ID=3;
 
+    public static final int CONNECTION_ID = 3;
     private Hash root;
     private ByteBuffer buffer;
     private ArrayList<DataProvider> providerQue = new ArrayList<DataProvider>();
@@ -43,38 +43,53 @@ public class UploadConnection extends TransferConnection {
         } else if (cmd == Command.GRACEFULCLOSE.value()) {
             receivedCommand_GRACEFULCLOSE(p);
         } else {
-            throw new IOException("Unknown transfer command: "+cmd);
+            throw new IOException("Unknown transfer command: " + cmd);
         }
     }
 
     private void receivedCommand_GRACEFULCLOSE(Packet p) throws IOException {
-        if(T.t)T.debug("Got command: GRACEFULCLOSE");
+        if (T.t) {
+            T.debug("Got command: GRACEFULCLOSE");
+        }
         close();
     }
 
     private void receivedCommand_HASH(Packet p) throws IOException {
-        if(T.t)T.debug("Got command: HASH");
+        if (T.t) {
+            T.debug("Got command: HASH");
+        }
         root = new Hash();
         p.readArray(root.array());
         setStatusString(core.getFileManager().getFd(root).getSubpath());
-        if(T.t)T.info("Remote wants to download "+root+" from me.");
+        if (T.t) {
+            T.info("Remote wants to download " + root + " from me.");
+        }
     }
 
     private void receivedCommand_GETFD(Packet p) throws IOException {
-        if(T.t)T.ass(root != null,"Did not receive root before GETFD!");
-        if(T.t)T.debug("Got command: GETFD");
+        if (T.t) {
+            T.ass(root != null, "Did not receive root before GETFD!");
+        }
+        if (T.t) {
+            T.debug("Got command: GETFD");
+        }
         providerQue.add(new FileDescriptorProvider(core.getFileManager().getFd(root)));
         switchMode(Mode.RAW);
 
-        if (NetworkManager.DIRECTLY_CALL_READYTOSEND)
+        if (NetworkManager.DIRECTLY_CALL_READYTOSEND) {
             readyToSend();
-        else
+        } else {
             netMan.signalInterestToSend(this);
+        }
     }
 
     private void receivedCommand_GETBLOCK(Packet p) throws IOException {
-        if(T.t)T.ass(root != null,"Did not receive root before GETBLOCK!");
-        if(T.t)T.debug("Got command: GETBLOCK");
+        if (T.t) {
+            T.ass(root != null, "Did not receive root before GETBLOCK!");
+        }
+        if (T.t) {
+            T.debug("Got command: GETBLOCK");
+        }
         int blockNumber = p.readInt();
         if (core.getFileManager().containsComplete(root)) {
             providerQue.add(new CompleteFileBlockProvider(blockNumber, root, core));
@@ -83,10 +98,11 @@ public class UploadConnection extends TransferConnection {
         }
         switchMode(Mode.RAW);
 
-        if (NetworkManager.DIRECTLY_CALL_READYTOSEND)
+        if (NetworkManager.DIRECTLY_CALL_READYTOSEND) {
             readyToSend();
-        else
+        } else {
             netMan.signalInterestToSend(this);
+        }
     }
 
     public void readyToSend() throws IOException {
@@ -95,7 +111,9 @@ public class UploadConnection extends TransferConnection {
         } else if (mode == Mode.RAW) {
             for (;;) {
                 if (providerQue.get(0).fill(buffer) < 0 && buffer.position() == 0) {
-                    if(T.t)T.info("Done with sending from provider");
+                    if (T.t) {
+                        T.info("Done with sending from provider");
+                    }
                     buffer.clear();
                     providerQue.remove(0);
                     if (providerQue.size() == 0) {
@@ -108,30 +126,32 @@ public class UploadConnection extends TransferConnection {
                 }
                 //todo: erics change -- tested it and it did not work.
                 //if (buffer.remaining() != 0) {
-                    int toSend = netMan.getUploadThrottle().request(this, buffer.position());
-                    if (toSend == 0) {
-                        netMan.noInterestToSend(this); //not sure this is needed
-                        break;
-                    }
-                    buffer.flip();
+                int toSend = netMan.getUploadThrottle().request(this, buffer.position());
+                if (toSend == 0) {
+                    netMan.noInterestToSend(this); //not sure this is needed
+                    break;
+                }
+                buffer.flip();
 
-                    int r = netMan.send(this, buffer, toSend);
-                    if (r == -1) throw new IOException("Connection ended");
-                    netMan.getUploadThrottle().bytesProcessed(r);
-                    buffer.compact();
+                int r = netMan.send(this, buffer, toSend);
+                if (r == -1) {
+                    throw new IOException("Connection ended");
+                }
+                netMan.getUploadThrottle().bytesProcessed(r);
+                buffer.compact();
 
-    /*                if (netMan.getUploadThrottle().update(this, r)) {
-                        //this means that we exeeded our bandwidth limit - return and let BandwidthThrottler kickstart us later (by invoking readyToSend)
-                        netMan.noInterestToSend(this); //not sure this is needed
-                        break;
-                    }
-    */
-                    if (r == 0) {
-    //                    if(T.t)T.trace("OS Send buffer full - buffer: "+buffer.remaining()+" - standing down and waiting from event from NetworkLayer");
-                        netMan.signalInterestToSend(this);
-                        break;
-                    } else {
-                        //do nothing
+                /*                if (netMan.getUploadThrottle().update(this, r)) {
+                //this means that we exeeded our bandwidth limit - return and let BandwidthThrottler kickstart us later (by invoking readyToSend)
+                netMan.noInterestToSend(this); //not sure this is needed
+                break;
+                }
+                 */
+                if (r == 0) {
+                    //                    if(T.t)T.trace("OS Send buffer full - buffer: "+buffer.remaining()+" - standing down and waiting from event from NetworkLayer");
+                    netMan.signalInterestToSend(this);
+                    break;
+                } else {
+                    //do nothing
                     }
                 //}
             }
@@ -150,12 +170,14 @@ public class UploadConnection extends TransferConnection {
         super.switchMode(m);
         if (m == Mode.RAW) {
         } else if (m == Mode.PACKET) {
-            if(T.t)T.ass(providerQue.size() <= 1,"Theres something in the que!");
+            if (T.t) {
+                T.ass(providerQue.size() <= 1, "Theres something in the que!");
+            }
             providerQue.clear();
         }
     }
 
     public String toString() {
-        return (getRemoteFriend() == null ? "unknown" : getRemoteFriend().getNickname()) +" (upload)";
+        return (getRemoteFriend() == null ? "unknown" : getRemoteFriend().getNickname()) + " (upload)";
     }
 }

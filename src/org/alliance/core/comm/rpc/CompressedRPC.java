@@ -17,7 +17,9 @@ import java.util.zip.InflaterInputStream;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class CompressedRPC extends RPC {
+
     public abstract void executeCompressed(DataInputStream in) throws IOException;
+
     public abstract void serializeCompressed(DataOutputStream out) throws IOException;
 
     public void execute(Packet data) throws IOException {
@@ -42,7 +44,9 @@ public abstract class CompressedRPC extends RPC {
         byte arr[] = buf.toByteArray();
         p.writeInt(arr.length);
         p.writeArray(arr);
-        if(T.t)T.debug("Compressed RPC: from "+out.size()+" bytes to "+arr.length+" bytes.");
+        if (T.t) {
+            T.debug("Compressed RPC: from " + out.size() + " bytes to " + arr.length + " bytes.");
+        }
         return p;
     }
 }

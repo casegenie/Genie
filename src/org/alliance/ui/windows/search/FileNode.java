@@ -16,20 +16,17 @@ import java.util.Enumeration;
  * Time: 14:20:28
  */
 public class FileNode extends SearchTreeNode implements Comparable {
+
     private SearchTreeNode parent;
     private String filename;
     private double sources;
-
     private double speed;
     private long size;
     private int daysAgo;
     ArrayList<Integer> userGuids = new ArrayList<Integer>();
-
     private SearchHit sh;
-
     private String extension;
     private String originalFilename;
-
     private SearchTreeTableModel model;
 
     public FileNode(SearchTreeNode parent, SearchTreeTableModel model, String filename, SearchHit h, int guid) {
@@ -49,7 +46,7 @@ public class FileNode extends SearchTreeNode implements Comparable {
                 this.filename = filename;
             } else {
                 this.filename = filename.substring(0, i);
-                extension = filename.substring(i+1).toUpperCase();
+                extension = filename.substring(i + 1).toUpperCase();
             }
         }
 
@@ -63,13 +60,15 @@ public class FileNode extends SearchTreeNode implements Comparable {
     }
 
     private void updateSpeed() {
-        speed = getTotalMaxCPS()/model.getCore().getSettings().getInternal().getRecordinspeed();
+        speed = getTotalMaxCPS() / model.getCore().getSettings().getInternal().getRecordinspeed();
     }
 
     private void addToTreeNodeCache() {
-        SearchTreeNode n = (SearchTreeNode)getParent();
-        if (!(n instanceof RootNode)) n = (SearchTreeNode)n.getParent();
-        ((RootNode)n).addToCache(this);
+        SearchTreeNode n = (SearchTreeNode) getParent();
+        if (!(n instanceof RootNode)) {
+            n = (SearchTreeNode) n.getParent();
+        }
+        ((RootNode) n).addToCache(this);
     }
 
     public String getOriginalFilename() {
@@ -127,7 +126,7 @@ public class FileNode extends SearchTreeNode implements Comparable {
     }
 
     public int compareTo(Object o) {
-        FileNode n = (FileNode)o;
+        FileNode n = (FileNode) o;
         return getName().compareToIgnoreCase(n.getName());
     }
 
@@ -142,15 +141,17 @@ public class FileNode extends SearchTreeNode implements Comparable {
     public SearchHit getSh() {
         return sh;
     }
-
-    private int cachedUsers=-1;
+    private int cachedUsers = -1;
     private String cachedListOfUsers;
+
     public String getListOfUsers(CoreSubsystem core) {
         if (cachedUsers != userGuids.size()) {
             StringBuffer sb = new StringBuffer();
-            for(int i=0;i<userGuids.size();i++) {
+            for (int i = 0; i < userGuids.size(); i++) {
                 sb.append(core.getFriendManager().nickname(userGuids.get(i)));
-                if (i < userGuids.size()-1) sb.append(", ");
+                if (i < userGuids.size() - 1) {
+                    sb.append(", ");
+                }
             }
             cachedListOfUsers = sb.toString();
         }
@@ -162,9 +163,11 @@ public class FileNode extends SearchTreeNode implements Comparable {
         double d = 0;
         for (Integer userGuid : userGuids) {
             Friend f = core.getFriendManager().getFriend(userGuid);
-            if (f != null) d += f.getHighestOutgoingCPS();
+            if (f != null) {
+                d += f.getHighestOutgoingCPS();
+            }
         }
-        return d*0.8;
+        return d * 0.8;
     }
 
     public ArrayList<Integer> getUserGuids() {

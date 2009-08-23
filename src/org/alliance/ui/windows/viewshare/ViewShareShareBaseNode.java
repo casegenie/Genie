@@ -7,6 +7,7 @@ package org.alliance.ui.windows.viewshare;
  * Time: 18:16:51
  */
 public class ViewShareShareBaseNode extends ViewShareTreeNode {
+
     private int shareBaseIndex;
 
     public ViewShareShareBaseNode(String name, ViewShareRootNode root, int shareBaseIndex) {

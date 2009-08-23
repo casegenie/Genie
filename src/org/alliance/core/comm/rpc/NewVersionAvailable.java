@@ -16,6 +16,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class NewVersionAvailable extends RPC {
+
     private Hash hash;
 
     public NewVersionAvailable(Hash hash) {
@@ -28,10 +29,14 @@ public class NewVersionAvailable extends RPC {
     public void execute(Packet p) throws IOException {
         hash = new Hash();
         p.readArray(hash.array());
-        if(T.t)T.info("Received new version info. Queing for download.");
+        if (T.t) {
+            T.info("Received new version info. Queing for download.");
+        }
         core.getFileManager().getAutomaticUpgrade().setNewVersionHash(hash);
         if (core.getFileManager().getFileDatabase().contains(hash)) {
-            if(T.t)T.info("Upgrade already in my share. Start upgrade.");
+            if (T.t) {
+                T.info("Upgrade already in my share. Start upgrade.");
+            }
             try {
                 core.getFileManager().getAutomaticUpgrade().performUpgrade();
             } catch (Exception e) {

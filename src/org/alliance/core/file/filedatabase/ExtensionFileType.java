@@ -8,6 +8,7 @@ package org.alliance.core.file.filedatabase;
  * To change this template use File | Settings | File Templates.
  */
 public class ExtensionFileType extends FileTypeIdentifier {
+
     private String extensions[];
 
     public ExtensionFileType(String[] extensions) {
@@ -15,7 +16,11 @@ public class ExtensionFileType extends FileTypeIdentifier {
     }
 
     public boolean matches(String s) {
-        for(String e : extensions) if (s.toLowerCase().endsWith(e)) return true;
+        for (String e : extensions) {
+            if (s.toLowerCase().endsWith(e)) {
+                return true;
+            }
+        }
         return false;
     }
 }

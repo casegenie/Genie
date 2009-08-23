@@ -17,9 +17,9 @@ import org.alliance.ui.UISubsystem;
  */
 public class ConnectedToNewFriendDialog extends XUIDialog {
 
-	public ConnectedToNewFriendDialog(UISubsystem ui, JFrame f, String name) throws Exception {
+    public ConnectedToNewFriendDialog(UISubsystem ui, JFrame f, String name) throws Exception {
         super(ui.getRl(), ui.getRl().getResourceStream("xui/newfriendconnection.xui.xml"), f, true);
-        ((JHtmlLabel)xui.getComponent("label")).replaceString("$$NAME$$", name);
+        ((JHtmlLabel) xui.getComponent("label")).replaceString("$$NAME$$", name);
         ui.getMainWindow().setConnectedToNewFriendDialogShowing(true);
         display();
         JCheckBox cb = (JCheckBox) xui.getComponent("dontshow");

@@ -26,36 +26,30 @@ import java.net.URLConnection;
  * Time: 14:54:04
  */
 public class AddFriendWizard extends JWizard {
-	public static final int STEP_INTRO=0;
-    public static final int STEP_SELECT_INVITATION_TYPE=1;
-    public static final int STEP_ENTER_INVITATION=2;
-    public static final int STEP_INCORRECT_INVITATION_CODE=3;
-    public static final int STEP_ATTEMPT_CONNECT=4;
-    public static final int STEP_CONNECTION_FAILED=5;
-    public static final int STEP_FORWARD_INVITATIONS=6;
-    public static final int STEP_FORWARD_INVITATIONS_COMPLETE=7;
-    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD=8;
-    public static final int STEP_MANUAL_INVITE=9;
-    public static final int STEP_PORT_OPEN_TEST=10;
-    public static final int STEP_PORT_NOT_OPEN=11;
-    public static final int STEP_INVITE_MSN=12;
-    public static final int STEP_INVITE_EMAIL=13;
 
+    public static final int STEP_INTRO = 0;
+    public static final int STEP_SELECT_INVITATION_TYPE = 1;
+    public static final int STEP_ENTER_INVITATION = 2;
+    public static final int STEP_INCORRECT_INVITATION_CODE = 3;
+    public static final int STEP_ATTEMPT_CONNECT = 4;
+    public static final int STEP_CONNECTION_FAILED = 5;
+    public static final int STEP_FORWARD_INVITATIONS = 6;
+    public static final int STEP_FORWARD_INVITATIONS_COMPLETE = 7;
+    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD = 8;
+    public static final int STEP_MANUAL_INVITE = 9;
+    public static final int STEP_PORT_OPEN_TEST = 10;
+    public static final int STEP_PORT_NOT_OPEN = 11;
+    public static final int STEP_INVITE_MSN = 12;
+    public static final int STEP_INVITE_EMAIL = 13;
     private int radioButtonSelected;
-
     private UISubsystem ui;
-
     private XUIDialog outerDialog;
-
     private JTextField codeinput;
     private JTextArea invitationCode;
     private JScrollPane listScrollPane;
     private ArrayList<JRadioButton> radioButtons = new ArrayList<JRadioButton>();
-
     private Thread connectionThread;
-
     private ForwardInvitationNodesList forwardInvitationNodesList;
-
     private Integer invitationFromGuid;
     private static final String PORT_OPEN_TEST_URL = "http://maciek.tv/porttest?port=";
 
@@ -65,7 +59,9 @@ public class AddFriendWizard extends JWizard {
 
     public void EVENT_cancel(ActionEvent e) throws Exception {
         Component c = getParent();
-        while (!(c instanceof Window)) c = c.getParent();
+        while (!(c instanceof Window)) {
+            c = c.getParent();
+        }
         ((Window) c).setVisible(false);
         ((Window) c).dispose();
     }
@@ -79,19 +75,20 @@ public class AddFriendWizard extends JWizard {
 
         invitationCode = (JTextArea) innerXUI.getComponent("code");
         new CutCopyPastePopup(invitationCode);
-        codeinput = (JTextField)innerXUI.getComponent("codeinput");
+        codeinput = (JTextField) innerXUI.getComponent("codeinput");
         new CutCopyPastePopup(codeinput);
-        listScrollPane = (JScrollPane)innerXUI.getComponent("scrollpanel");
+        listScrollPane = (JScrollPane) innerXUI.getComponent("scrollpanel");
 
-        radioButtons.add((JRadioButton)innerXUI.getComponent("radio1_1"));
-        radioButtons.add((JRadioButton)innerXUI.getComponent("radio1_2"));
-        radioButtons.add((JRadioButton)innerXUI.getComponent("radio1_3"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_1"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_2"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_3"));
 
         JHtmlLabel l = (JHtmlLabel) innerXUI.getComponent("portclosed");
-        l.replaceString("$PORT$", ""+ui.getCore().getSettings().getServer().getPort());
+        l.replaceString("$PORT$", "" + ui.getCore().getSettings().getServer().getPort());
         l.addHyperlinkListener(new HyperlinkListener() {
+
             public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() ==  HyperlinkEvent.EventType.ACTIVATED) {
+                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     ui.openURL(e.getDescription());
                 }
             }
@@ -100,11 +97,13 @@ public class AddFriendWizard extends JWizard {
         //disable looking for friends in secondary connections if we have no friends
         //or if we have no friends to forward invitations to  
         if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui).getSize() == 0 ||
-                ui.getCore().getFriendManager().friends().size() == 0)
+                ui.getCore().getFriendManager().friends().size() == 0) {
             innerXUI.getComponent("radio1_3").setEnabled(false);
+        }
 
-        final JHtmlLabel l2 = (JHtmlLabel)innerXUI.getComponent("text");
+        final JHtmlLabel l2 = (JHtmlLabel) innerXUI.getComponent("text");
         l2.addHyperlinkListener(new HyperlinkListener() {
+
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     goToManualInvite();
@@ -112,8 +111,9 @@ public class AddFriendWizard extends JWizard {
             }
         });
 
-        final JHtmlLabel l3 = (JHtmlLabel)innerXUI.getComponent("newcode");
+        final JHtmlLabel l3 = (JHtmlLabel) innerXUI.getComponent("newcode");
         l3.addHyperlinkListener(new HyperlinkListener() {
+
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
                     EVENT_createnew(null);
@@ -124,7 +124,7 @@ public class AddFriendWizard extends JWizard {
 
     public void EVENT_email(ActionEvent e) {
         try {
-            final JLabel label = (JLabel)innerXUI.getComponent("waittext");
+            final JLabel label = (JLabel) innerXUI.getComponent("waittext");
             label.setText("Please wait...");
             String subject = "";
             String body = "\r\n\r\n\r\n" +
@@ -137,7 +137,7 @@ public class AddFriendWizard extends JWizard {
                     "\r\n" +
                     "2. After installation Alliance will ask you for a code. Enter this code:\r\n" +
                     "\r\n" +
-                    ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString()+"\r\n"+
+                    ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString() + "\r\n" +
                     "\r\n" +
                     "Using this code you will connect to our private Alliance network.\r\n";
 
@@ -147,7 +147,7 @@ public class AddFriendWizard extends JWizard {
             body = body.replace(" ", "%20");
             subject = subject.replace(" ", "%20");
             String s;
-            s = "mailto:?body="+body+"&subject="+subject+"\"";
+            s = "mailto:?body=" + body + "&subject=" + subject + "\"";
 //            if (OSInfo.isWindows())
 //                s = "cmd /k \"start mailto:?body="+body+"^&subject="+subject+"\"";
 //            else
@@ -156,9 +156,14 @@ public class AddFriendWizard extends JWizard {
             ui.openURL(s);
 
             Thread t = new Thread(new Runnable() {
+
                 public void run() {
-                    try { Thread.sleep(1000*10); } catch (InterruptedException e1) {}
+                    try {
+                        Thread.sleep(1000 * 10);
+                    } catch (InterruptedException e1) {
+                    }
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             label.setText("");
                         }
@@ -173,16 +178,17 @@ public class AddFriendWizard extends JWizard {
 
     public static AddFriendWizard open(UISubsystem ui, int startAtStep) throws Exception {
         XUIDialog f = new XUIDialog(ui.getRl(), ui.getRl().getResourceStream("xui/addfriendwizard.xui.xml"), ui.getMainWindow());
-        final AddFriendWizard wizard = (AddFriendWizard)f.getXUI().getComponent("wizard");
+        final AddFriendWizard wizard = (AddFriendWizard) f.getXUI().getComponent("wizard");
         wizard.XUILayoutComplete(ui, f);
-        if (startAtStep == STEP_FORWARD_INVITATIONS)
+        if (startAtStep == STEP_FORWARD_INVITATIONS) {
             wizard.goToForwardInvitations();
-        else if (startAtStep == STEP_ATTEMPT_CONNECT)
+        } else if (startAtStep == STEP_ATTEMPT_CONNECT) {
             wizard.goToAttemptConnect();
-        else if (startAtStep == STEP_PORT_OPEN_TEST)
+        } else if (startAtStep == STEP_PORT_OPEN_TEST) {
             wizard.goToPortTest();
-        else if (startAtStep != STEP_INTRO)
-            throw new Exception("No support for starting at step "+startAtStep);
+        } else if (startAtStep != STEP_INTRO) {
+            throw new Exception("No support for starting at step " + startAtStep);
+        }
 
         return wizard;
     }
@@ -212,18 +218,23 @@ public class AddFriendWizard extends JWizard {
         cancel.setEnabled(false);
 
         Thread t = new Thread(new Runnable() {
+
             public void run() {
                 try {
-                    String result = getResponseFromURL(PORT_OPEN_TEST_URL+ui.getCore().getSettings().getServer().getPort());
-                    if(T.t)T.info("Result from port test: "+result);
+                    String result = getResponseFromURL(PORT_OPEN_TEST_URL + ui.getCore().getSettings().getServer().getPort());
+                    if (T.t) {
+                        T.info("Result from port test: " + result);
+                    }
                     if ("OPEN".equals(result)) {
                         SwingUtilities.invokeLater(new Runnable() {
+
                             public void run() {
                                 goToCreateInvitation();
                             }
                         });
                     } else if ("CLOSED".equals(result)) {
                         SwingUtilities.invokeLater(new Runnable() {
+
                             public void run() {
                                 prev.setEnabled(true);
                                 next.setEnabled(false);
@@ -233,8 +244,11 @@ public class AddFriendWizard extends JWizard {
                             }
                         });
                     } else {
-                        if(T.t)T.error("Could not test if port is open: "+result);
+                        if (T.t) {
+                            T.error("Could not test if port is open: " + result);
+                        }
                         SwingUtilities.invokeLater(new Runnable() {
+
                             public void run() {
                                 goToCreateInvitation();
                             }
@@ -254,7 +268,9 @@ public class AddFriendWizard extends JWizard {
         StringBuffer result = new StringBuffer();
         BufferedReader r = new BufferedReader(new InputStreamReader(in));
         String line;
-        while((line = r.readLine()) != null) result.append(line);
+        while ((line = r.readLine()) != null) {
+            result.append(line);
+        }
 
         line = result.toString();
         return line;
@@ -273,11 +289,11 @@ public class AddFriendWizard extends JWizard {
     private void goToConnectionFailed() {
         next.setEnabled(false);
         if (invitationFromGuid != null) {
-/*          this should not be needed - is made automatically
+            /*          this should not be needed - is made automatically
             try {
-                ui.getCore().getFriendManager().forwardInvitationTo(invitationFromGuid);
+            ui.getCore().getFriendManager().forwardInvitationTo(invitationFromGuid);
             } catch(Exception e) {
-                ui.handleErrorInEventLoop(e);
+            ui.handleErrorInEventLoop(e);
             }*/
             setStep(STEP_CONNECTION_FAILED_FOR_FORWARD);
             next.setEnabled(false);
@@ -294,7 +310,11 @@ public class AddFriendWizard extends JWizard {
     }
 
     private void resetAllRadioButtons() {
-        for(JRadioButton b : radioButtons) if (b != null) b.setSelected(false);
+        for (JRadioButton b : radioButtons) {
+            if (b != null) {
+                b.setSelected(false);
+            }
+        }
     }
 
     public void nextStep() {
@@ -318,33 +338,41 @@ public class AddFriendWizard extends JWizard {
             } else if (isRadioButtonSelected("invite_manual")) {
                 goToManualInvite();
             } else {
-                if(T.t)T.error("Could not find selected ratiobutton! Internal error");
+                if (T.t) {
+                    T.error("Could not find selected ratiobutton! Internal error");
+                }
             }
         } else if (getStep() == STEP_ENTER_INVITATION) {
             handleInvitationCode();
         } else if (getStep() == STEP_CONNECTION_FAILED) {
             goToPortTest();
-/*            if (radioButtonSelected == 0) {
-                goToPortTest();
+            /*            if (radioButtonSelected == 0) {
+            goToPortTest();
             } else {
-                goToEnterInvitation();
+            goToEnterInvitation();
             }*/
         } else if (getStep() == STEP_FORWARD_INVITATIONS) {
-            if (forwardInvitationNodesList != null) forwardInvitationNodesList.forwardSelectedInvitations();
+            if (forwardInvitationNodesList != null) {
+                forwardInvitationNodesList.forwardSelectedInvitations();
+            }
             setStep(STEP_FORWARD_INVITATIONS_COMPLETE);
             next.setEnabled(false);
             cancel.setText("Finish");
         } else {
-            if(T.t)T.ass(false, "Reached step in wizard that was unexcpected ("+getStep()+")");
+            if (T.t) {
+                T.ass(false, "Reached step in wizard that was unexcpected (" + getStep() + ")");
+            }
         }
     }
 
     private boolean isRadioButtonSelected(String s) {
-        return ((JRadioButton)innerXUI.getComponent(s)).isSelected();
+        return ((JRadioButton) innerXUI.getComponent(s)).isSelected();
     }
 
     public void connectionWasSuccessful() {
-        if (connectionThread != null) connectionThread.interrupt();
+        if (connectionThread != null) {
+            connectionThread.interrupt();
+        }
     }
 
     public void goToForwardInvitations() {
@@ -365,10 +393,10 @@ public class AddFriendWizard extends JWizard {
             try {
                 ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(invitation.trim(), null);
                 goToAttemptConnect();
-            } catch(EOFException ex) {
+            } catch (EOFException ex) {
                 OptionDialog.showErrorDialog(ui.getMainWindow(), "Your connection code is corrupt. It seems to be too short. Maybe you did not enter all characters? Please try again. If that doesn't help try with a new code.");
                 goToEnterInvitation();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 ui.handleErrorInEventLoop(e);
                 goToConnectionFailed();
             }
@@ -377,16 +405,20 @@ public class AddFriendWizard extends JWizard {
 
     public void goToAttemptConnect() {
         connectionThread = new Thread(new Runnable() {
+
             public void run() {
                 try {
-                    Thread.sleep(1000*20);
+                    Thread.sleep(1000 * 20);
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             goToConnectionFailed();
                         }
                     });
                 } catch (InterruptedException e) {
-                    if(T.t)T.info("Looks like we connected succesfully.");
+                    if (T.t) {
+                        T.info("Looks like we connected succesfully.");
+                    }
                 }
             }
         });
@@ -445,10 +477,12 @@ public class AddFriendWizard extends JWizard {
         invitationCode.setText("Generating code...");
         invitationCode.revalidate();
         Thread t = new Thread(new Runnable() {
+
             public void run() {
                 try {
                     final Invitation i = ui.getCore().getInvitaitonManager().createInvitation();
                     SwingUtilities.invokeLater(new Runnable() {
+
                         public void run() {
                             invitationCode.setText("");
                             invitationCode.append("You have been invited to a private Alliance network!\n\n");
@@ -458,14 +492,14 @@ public class AddFriendWizard extends JWizard {
                             invitationCode.append(i.getCompleteInvitaitonString());
                             invitationCode.requestFocus();
                             SwingUtilities.invokeLater(new Runnable() {
+
                                 public void run() {
                                     invitationCode.selectAll();
                                 }
-
                             });
                         }
                     });
-                } catch(Exception e) {
+                } catch (Exception e) {
                     ui.handleErrorInEventLoop(e);
                 }
             }

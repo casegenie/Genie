@@ -14,22 +14,27 @@ import java.io.IOException;
  * Time: 19:30:23
  * To change this template use File | Settings | File Templates.
  */
-public class CryptoManager  {
+public class CryptoManager {
+
     private CryptoLayer cryptoLayer;
     private CoreSubsystem core;
 
     public CryptoManager(CoreSubsystem core) throws Exception {
-        switch(core.getSettings().getInternal().getEncryption()) {
+        switch (core.getSettings().getInternal().getEncryption()) {
             case 1:
-                if(T.t)T.info("Launching SSL cryptolayer");
+                if (T.t) {
+                    T.info("Launching SSL cryptolayer");
+                }
                 this.cryptoLayer = new SSLCryptoLayer(core);
                 break;
             default:
-                if(T.t)T.info("Launching translation cryptolayer");
+                if (T.t) {
+                    T.info("Launching translation cryptolayer");
+                }
                 this.cryptoLayer = new TranslationCryptoLayer(core);
                 break;
         }
-        
+
         this.core = core;
     }
 

@@ -17,13 +17,14 @@ import java.io.ObjectOutputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class TraceMDIWindow extends AllianceMDIWindow {
-	private TraceWindow tw;
+
+    private TraceWindow tw;
 
     public TraceMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "trace", ui);
 
         tw = new TraceWindow(false);
-        JPanel p = (JPanel)xui.getComponent("panel");
+        JPanel p = (JPanel) xui.getComponent("panel");
         p.removeAll();
         p.add(tw.getContentPane());
 
@@ -39,8 +40,16 @@ public class TraceMDIWindow extends AllianceMDIWindow {
         return "trace";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 }

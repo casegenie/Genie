@@ -14,6 +14,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class AwayStatus extends RPC {
+
     private boolean away;
 
     public AwayStatus() {
@@ -25,7 +26,9 @@ public class AwayStatus extends RPC {
 
     public void execute(Packet data) throws IOException {
         away = data.readBoolean();
-        if(T.t)T.info("User "+con.getRemoteFriend()+" changes away status: "+away);
+        if (T.t) {
+            T.info("User " + con.getRemoteFriend() + " changes away status: " + away);
+        }
         con.getRemoteFriend().setAway(away);
         core.getUICallback().nodeOrSubnodesUpdated(con.getRemoteFriend());
     }

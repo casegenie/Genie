@@ -13,6 +13,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class GetUserList extends RPC {
+
     public GetUserList() {
         routable = true;
     }

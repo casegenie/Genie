@@ -13,8 +13,8 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class ReverseConnection extends AuthenticatedConnection {
-    public static final int CONNECTION_ID=5;
 
+    public static final int CONNECTION_ID = 5;
     private int reverseConnectionId;
 
     protected ReverseConnection(NetworkManager netMan, Direction direction) {
@@ -41,7 +41,9 @@ public class ReverseConnection extends AuthenticatedConnection {
     public void init() throws IOException {
         super.init();
         if (direction == Direction.OUT) {
-            if(T.t)T.debug("Sending reverse connect connectionId ("+reverseConnectionId+")");
+            if (T.t) {
+                T.debug("Sending reverse connect connectionId (" + reverseConnectionId + ")");
+            }
             Packet p = netMan.createPacketForSend();
             p.writeInt(reverseConnectionId);
             send(p);
@@ -54,10 +56,14 @@ public class ReverseConnection extends AuthenticatedConnection {
     public void packetReceived(Packet p) throws IOException {
         if (direction == Direction.IN) {
             reverseConnectionId = p.readInt();
-            if(T.t)T.debug("Reveived reverse connection id "+reverseConnectionId);
+            if (T.t) {
+                T.debug("Reveived reverse connection id " + reverseConnectionId);
+            }
             AuthenticatedConnection c = netMan.fetchReveresedConnection(reverseConnectionId);
             if (c == null) {
-                if(T.t)T.error("Could not find reversed connection with ID "+reverseConnectionId+"!!!");
+                if (T.t) {
+                    T.error("Could not find reversed connection with ID " + reverseConnectionId + "!!!");
+                }
                 return;
             }
             netMan.replaceConnection(getKey(), c);
@@ -65,7 +71,9 @@ public class ReverseConnection extends AuthenticatedConnection {
             c.sendConnectionIdentifier();
             c.init();
         } else {
-            if(T.t)T.error("Ehh! Should not receive any packets here!");
+            if (T.t) {
+                T.error("Ehh! Should not receive any packets here!");
+            }
         }
     }
 

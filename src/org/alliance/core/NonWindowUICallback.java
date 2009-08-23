@@ -14,6 +14,7 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class NonWindowUICallback implements UICallback {
+
     public void nodeOrSubnodesUpdated(Node node) {
     }
 
@@ -34,12 +35,14 @@ public class NonWindowUICallback implements UICallback {
     }
 
     public void handleError(Throwable e, Object source) {
-        System.err.println("Error for : "+source+": ");
+        System.err.println("Error for : " + source + ": ");
         e.printStackTrace();
     }
 
     public void statusMessage(String s) {
-        if (!CoreSubsystem.isRunningAsTestSuite()) System.out.println(s);
+        if (!CoreSubsystem.isRunningAsTestSuite()) {
+            System.out.println(s);
+        }
     }
 
     public void toFront() {
@@ -55,16 +58,17 @@ public class NonWindowUICallback implements UICallback {
     public void logNetworkEvent(String event) {
     }
 
-    public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {}
+    public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
+    }
 
     public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
     }
 
     public void newUserInteractionQueued(NeedsUserInteraction ui) {
-        
     }
 
-    public void firstDownloadEverFinished() {}
+    public void firstDownloadEverFinished() {
+    }
 
     public void callbackRemoved() {
     }

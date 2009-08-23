@@ -25,38 +25,41 @@ import java.util.HashMap;
  * Time: 13:04:46
  */
 public final class BlockFile {
-    private static final int DIRECTORY_MAGIC = 0xbaceface;
 
+    private static final int DIRECTORY_MAGIC = 0xbaceface;
     private final FileDescriptor fd;
     private final int blockOffsets[]; //-1 means no offset yet. Multiply offset value by BLOCK_SIZE to get actual offset
     private BlockMask blockMask = new BlockMask(); //what blocks are completed?
-
     private RandomAccessFile raf;
     private BlockStorage parent;
-
     private HashMap<Integer, Integer> bytesCompleteForBlock = new HashMap<Integer, Integer>();
 
     public BlockFile(FileDescriptor fd, BlockStorage parent) {
         this.fd = fd;
         this.parent = parent;
         blockOffsets = new int[getNumberOfBlocks()];
-        for(int i=0;i<blockOffsets.length;i++) blockOffsets[i] = -1;
-        if (fd.getSize()>30*GB) {
+        for (int i = 0; i < blockOffsets.length; i++) {
+            blockOffsets[i] = -1;
+        }
+        if (fd.getSize() > 30 * GB) {
             //a limit becasue blockOffsets are saves as signed shorts. No more then around 32000 blocks is supported
             throw new RuntimeException("File seems to be larger then 30GB. This system does not handle files over 30GB.");
         }
     }
 
     private int getNumberOfBlocks() {
-        if (blockOffsets == null)
+        if (blockOffsets == null) {
             return getNumberOfBlockForSize(fd.getSize());
-        else
+        } else {
             return blockOffsets.length;
+        }
     }
 
     public static int getNumberOfBlockForSize(long size) {
-        int n = (int)(size/BLOCK_SIZE);
-        if (size%BLOCK_SIZE > 0) n++;
+        int n = (int) (size / BLOCK_SIZE);
+        if (size % BLOCK_SIZE > 0) {
+            n++;
+        }
         return n;
     }
 
@@ -66,14 +69,15 @@ public final class BlockFile {
     }
 
     private long getOffset(int blockNumber) {
-        return ((long)blockOffsets[blockNumber])*BLOCK_SIZE;
+        return ((long) blockOffsets[blockNumber]) * BLOCK_SIZE;
     }
 
     private void startBlock(int blockNumber) {
-        if (parent.isSequential())
+        if (parent.isSequential()) {
             blockOpened(blockNumber, blockNumber);
-        else
+        } else {
             blockOpened(blockNumber, getNumberOfBlocksStartedOrComplete());
+        }
     }
 
     public boolean isBlockComplete(int blockNumber) {
@@ -82,21 +86,31 @@ public final class BlockFile {
 
     public BitSet getBlocksInProgress() {
         BitSet bs = new BitSet();
-        for(int i=0;i<blockOffsets.length;i++) {
-            if (isBlockStartedOrComplete(i) && !isBlockComplete(i)) bs.set(i);
+        for (int i = 0; i < blockOffsets.length; i++) {
+            if (isBlockStartedOrComplete(i) && !isBlockComplete(i)) {
+                bs.set(i);
+            }
         }
         return bs;
     }
 
     public int getNumberOfBlocksStartedOrComplete() {
-        int n=0;
-        for(int i=0;i<blockOffsets.length;i++) if (isBlockStartedOrComplete(i)) n++;
+        int n = 0;
+        for (int i = 0; i < blockOffsets.length; i++) {
+            if (isBlockStartedOrComplete(i)) {
+                n++;
+            }
+        }
         return n;
     }
 
     public int getNumberOfBlocksComplete() {
-        int n=0;
-        for(int i=0;i<blockOffsets.length;i++) if (isBlockComplete(i)) n++;
+        int n = 0;
+        for (int i = 0; i < blockOffsets.length; i++) {
+            if (isBlockComplete(i)) {
+                n++;
+            }
+        }
         return n;
     }
 
@@ -105,12 +119,14 @@ public final class BlockFile {
     }
 
     public void blockCorrupted(int blockNumber) {
-        if(T.t)T.info("Block was downloaded but appears to be corrupt - marking as need to be downloaded.");
+        if (T.t) {
+            T.info("Block was downloaded but appears to be corrupt - marking as need to be downloaded.");
+        }
         blockOffsets[blockNumber] = -1;
     }
 
     public boolean isComplete() {
-        for(int i=0;i<getNumberOfBlocks();i++) {
+        for (int i = 0; i < getNumberOfBlocks(); i++) {
             if (!blockMask.get(i)) {
                 return false;
             }
@@ -131,48 +147,68 @@ public final class BlockFile {
         ObjectOutputStream out = new ObjectOutputStream(o);
         out.writeInt(DIRECTORY_MAGIC);
         fd.serializeTo(out);
-        for(int s : blockOffsets) out.writeShort(s);
+        for (int s : blockOffsets) {
+            out.writeShort(s);
+        }
         out.writeObject(blockMask);
     }
 
     public static BlockFile createFrom(BlockStorage parent, InputStream is, CoreSubsystem core) throws IOException {
         ObjectInputStream in = new ObjectInputStream(is);
-        if (in.readInt() != DIRECTORY_MAGIC) throw new IOException("Corrupt block file!");
+        if (in.readInt() != DIRECTORY_MAGIC) {
+            throw new IOException("Corrupt block file!");
+        }
         FileDescriptor fd = FileDescriptor.createFrom(in, core);
-        if (fd == null) return null;
+        if (fd == null) {
+            return null;
+        }
         BlockFile bf = new BlockFile(fd, parent);
-        for(int i=0;i<bf.blockOffsets.length;i++) bf.blockOffsets[i] = in.readShort();
+        for (int i = 0; i < bf.blockOffsets.length; i++) {
+            bf.blockOffsets[i] = in.readShort();
+        }
         try {
-            bf.blockMask = (BlockMask)in.readObject();
-        } catch(ClassNotFoundException e) {
+            bf.blockMask = (BlockMask) in.readObject();
+        } catch (ClassNotFoundException e) {
             throw new IOException(e.toString());
         }
-        if(T.t)T.ass(is.available()  <= 0, "File corrupt - data at end of file: "+in.available());
+        if (T.t) {
+            T.ass(is.available() <= 0, "File corrupt - data at end of file: " + in.available());
+        }
         return bf;
     }
 
     public synchronized void save() throws IOException {
-        String s = parent.getStoragePath()+"/"+fd.getRootHash().getRepresentation()+".dir";
-        if(T.t)T.debug("Saving "+s);
+        String s = parent.getStoragePath() + "/" + fd.getRootHash().getRepresentation() + ".dir";
+        if (T.t) {
+            T.debug("Saving " + s);
+        }
         SimpleTimer st = new SimpleTimer();
         FileOutputStream out = new FileOutputStream(s);
         serializeTo(out);
         out.flush();
         out.close();
-        if (raf != null) raf.getFD().sync();
-        if(T.t)T.trace("Saved in "+st.getTime()+".");
+        if (raf != null) {
+            raf.getFD().sync();
+        }
+        if (T.t) {
+            T.trace("Saved in " + st.getTime() + ".");
+        }
     }
 
     public static BlockFile loadFrom(BlockStorage parent, Hash root, CoreSubsystem core) throws IOException {
         try {
-            String s = TextUtils.makeSurePathIsMultiplatform(parent.getStoragePath()+"/"+root.getRepresentation()+".dir");
-            if(T.t)T.debug("Loading "+s);
+            String s = TextUtils.makeSurePathIsMultiplatform(parent.getStoragePath() + "/" + root.getRepresentation() + ".dir");
+            if (T.t) {
+                T.debug("Loading " + s);
+            }
             FileInputStream in = new FileInputStream(s);
             BlockFile bf = createFrom(parent, in, core);
             in.close();
             return bf;
-        } catch(FileNotFoundException e) {
-            if(T.t)T.trace("Could not find BlockFile for root: "+root);
+        } catch (FileNotFoundException e) {
+            if (T.t) {
+                T.trace("Could not find BlockFile for root: " + root);
+            }
             return null;
         }
     }
@@ -186,16 +222,23 @@ public final class BlockFile {
     }
 
     public void open() throws IOException {
-        if(T.t)T.ass(!isOpen(),"BlockFile already open!");
-        if(T.t)T.info("Opening RAF for "+this+" instance hashcode: "+hashCode());
+        if (T.t) {
+            T.ass(!isOpen(), "BlockFile already open!");
+        }
+        if (T.t) {
+            T.info("Opening RAF for " + this + " instance hashcode: " + hashCode());
+        }
         raf = new RandomAccessFile(createDatFile(), "rw");
     }
 
     private File createDatFile() {
-        return new File(parent.getStoragePath()+"/"+fd.getRootHash().getRepresentation()+".dat");
+        return new File(parent.getStoragePath() + "/" + fd.getRootHash().getRepresentation() + ".dat");
     }
+
     public void assureOpen() throws IOException {
-        if (!isOpen()) open();
+        if (!isOpen()) {
+            open();
+        }
     }
 
     /**
@@ -203,25 +246,37 @@ public final class BlockFile {
      * @throws IOException
      */
     public int write(int blockNumber, int sliceOffset, ByteBuffer slice) throws IOException {
-        if(T.t)T.ass(isOpen(),"File not open!");
-        if (!isBlockStartedOrComplete(blockNumber)) startBlock(blockNumber);
+        if (T.t) {
+            T.ass(isOpen(), "File not open!");
+        }
+        if (!isBlockStartedOrComplete(blockNumber)) {
+            startBlock(blockNumber);
+        }
 
-        raf.seek(getOffset(blockNumber)+sliceOffset);
+        raf.seek(getOffset(blockNumber) + sliceOffset);
         byte buf[] = new byte[slice.remaining()];
         slice.get(buf);
-        if(T.t)T.ass(sliceOffset+buf.length <= getBlockSize(blockNumber), "Writing outside of block!!! "+(sliceOffset+buf.length)+" - "+getBlockSize(blockNumber));
+        if (T.t) {
+            T.ass(sliceOffset + buf.length <= getBlockSize(blockNumber), "Writing outside of block!!! " + (sliceOffset + buf.length) + " - " + getBlockSize(blockNumber));
+        }
         raf.write(buf);
 
-        bytesCompleteForBlock.put(blockNumber, sliceOffset+buf.length);
+        bytesCompleteForBlock.put(blockNumber, sliceOffset + buf.length);
 
         return buf.length;
     }
 
     public int read(int blockNumber, int sliceOffset, ByteBuffer buf) throws IOException {
-        if (!isOpen()) open();
-        if(T.t)T.ass(isOpen(),"File not open!");
-        if(T.t)T.ass(isBlockComplete(blockNumber), "Block is not complete and we're trying to send it to a upload!");
-        raf.seek(getOffset(blockNumber)+sliceOffset);
+        if (!isOpen()) {
+            open();
+        }
+        if (T.t) {
+            T.ass(isOpen(), "File not open!");
+        }
+        if (T.t) {
+            T.ass(isBlockComplete(blockNumber), "Block is not complete and we're trying to send it to a upload!");
+        }
+        raf.seek(getOffset(blockNumber) + sliceOffset);
         return raf.getChannel().read(buf);
     }
 
@@ -229,31 +284,45 @@ public final class BlockFile {
         byte buf[] = new byte[getBlockSize(blockNumber)];
         raf.seek(getOffset(blockNumber));
         int r = raf.read(buf);
-        if(T.t)T.ass(r == buf.length,"wtf");
+        if (T.t) {
+            T.ass(r == buf.length, "wtf");
+        }
         Tiger t = new Tiger();
         t.update(buf);
         return new Hash(t.digest());
     }
 
     public int getBlockSize(int blockNumber) {
-        if (blockNumber < getNumberOfBlocks()-1) return BLOCK_SIZE;
-        int s = (int)(fd.getSize() % BLOCK_SIZE);
-        if (s == 0) s = BLOCK_SIZE;
+        if (blockNumber < getNumberOfBlocks() - 1) {
+            return BLOCK_SIZE;
+        }
+        int s = (int) (fd.getSize() % BLOCK_SIZE);
+        if (s == 0) {
+            s = BLOCK_SIZE;
+        }
         return s;
     }
 
     public static int getBlockSize(int blockNumber, long size) {
-        if (blockNumber < getNumberOfBlockForSize(size)-1) return BLOCK_SIZE;
-        int s = (int)(size % BLOCK_SIZE);
-        if (s == 0) s = BLOCK_SIZE;
+        if (blockNumber < getNumberOfBlockForSize(size) - 1) {
+            return BLOCK_SIZE;
+        }
+        int s = (int) (size % BLOCK_SIZE);
+        if (s == 0) {
+            s = BLOCK_SIZE;
+        }
         return s;
     }
 
     public void moveToComplete(String directory) throws Exception {
-        if(T.t)T.info("Defragmenting file and moving to "+directory);
-        if(T.t)T.ass(isComplete(),"File not complete and we're going for a move!");
+        if (T.t) {
+            T.info("Defragmenting file and moving to " + directory);
+        }
+        if (T.t) {
+            T.ass(isComplete(), "File not complete and we're going for a move!");
+        }
 
-        File file = new File(directory+"/"+fd.getSubpath());
+        File file = new File(directory + "/" + fd.getSubpath());
         if (file.exists()) {
             file = createUniqueFilename(file);
             fd.setSubpath(fd.createSubpath(file.toString()));
@@ -263,7 +332,7 @@ public final class BlockFile {
         if (parent.isSequential()) {
             close();
             if (!createDatFile().renameTo(file)) {
-                throw new Exception("Could not rename file "+createDatFile()+" to "+ file +"!");
+                throw new Exception("Could not rename file " + createDatFile() + " to " + file + "!");
             }
         } else {
             defragmentTo(file);
@@ -274,25 +343,31 @@ public final class BlockFile {
 
     private void defragmentTo(File dest) throws IOException {
         SimpleTimer st = new SimpleTimer();
-        File file = new File(dest+".incomplete");
+        File file = new File(dest + ".incomplete");
         FileOutputStream out = new FileOutputStream(file);
         byte buf[] = new byte[BLOCK_SIZE];
         Hash hl[] = new Hash[getNumberOfBlocks()];
         Tiger tiger = new Tiger();
-        for(int i=0;i<getNumberOfBlocks();i++) {
-            if(T.t)T.ass(isOpen(), "File seems to be closed!");
+        for (int i = 0; i < getNumberOfBlocks(); i++) {
+            if (T.t) {
+                T.ass(isOpen(), "File seems to be closed!");
+            }
             raf.seek(getOffset(i));
             int read = raf.read(buf, 0, getBlockSize(i));
-            if(T.t)T.ass(read == getBlockSize(i),"could not read entire block");
+            if (T.t) {
+                T.ass(read == getBlockSize(i), "could not read entire block");
+            }
             tiger.reset();
             tiger.update(buf, 0, read);
             hl[i] = new Hash(tiger.digest());
-            out.write(buf,0,read);
+            out.write(buf, 0, read);
         }
 
         //dest moved. Lets check to root hash
         tiger.reset();
-        for(Hash h : hl) tiger.update(h.array());
+        for (Hash h : hl) {
+            tiger.update(h.array());
+        }
         Hash root = new Hash(tiger.digest());
 
         if (!root.equals(fd.getRootHash())) {
@@ -303,8 +378,12 @@ public final class BlockFile {
         out.flush();
         out.close();
 
-        if (!file.renameTo(dest)) throw new IOException("Could not rename from "+file+" to "+dest);
-        if(T.t)T.info("Defragmented and verified integrity in "+st.getTime()+".");
+        if (!file.renameTo(dest)) {
+            throw new IOException("Could not rename from " + file + " to " + dest);
+        }
+        if (T.t) {
+            T.info("Defragmented and verified integrity in " + st.getTime() + ".");
+        }
     }
 
     private File createUniqueFilename(File dest) {
@@ -316,18 +395,22 @@ public final class BlockFile {
         String s = dest.toString();
         int i = s.indexOf('.');
         if (i == -1) {
-            res = new File(s+" ("+n+")");
+            res = new File(s + " (" + n + ")");
         } else {
-            res = new File(s.substring(0, i)+" ("+n+")"+s.substring(i));
+            res = new File(s.substring(0, i) + " (" + n + ")" + s.substring(i));
         }
 
-        if (res.exists()) res = createUniqueFilename(dest, n+1);
+        if (res.exists()) {
+            res = createUniqueFilename(dest, n + 1);
+        }
         return res;
     }
 
     public boolean close() throws IOException {
         if (isOpen()) {
-            if(T.t)T.info("Closing RAF: "+this);
+            if (T.t) {
+                T.info("Closing RAF: " + this);
+            }
             raf.getFD().sync();
             raf.close();
             raf = null;
@@ -342,19 +425,27 @@ public final class BlockFile {
     }
 
     public String toString() {
-        return "BlockFile: "+fd + " - "+blockMask;
+        return "BlockFile: " + fd + " - " + blockMask;
     }
 
     public int getHighestCompleteBlock() {
         int max = 0;
-        for(int off : blockOffsets) if (off > max) max = off;
+        for (int off : blockOffsets) {
+            if (off > max) {
+                max = off;
+            }
+        }
         return max;
     }
 
     public int getBytesCompleteForBlock(int blockNumber) {
-        if (isBlockComplete(blockNumber)) return BLOCK_SIZE;
+        if (isBlockComplete(blockNumber)) {
+            return BLOCK_SIZE;
+        }
         Integer integer = bytesCompleteForBlock.get(blockNumber);
-        if (integer == null) return 0;
+        if (integer == null) {
+            return 0;
+        }
         return integer;
     }
 }

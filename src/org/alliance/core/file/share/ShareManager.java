@@ -20,9 +20,9 @@ import com.stendahls.util.TextUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class ShareManager {
-    private HashMap<String , ShareBase> shareBases = new HashMap<String, ShareBase>();
-    private ArrayList<ShareBase> shareBaseOrder = new ArrayList<ShareBase>();
 
+    private HashMap<String, ShareBase> shareBases = new HashMap<String, ShareBase>();
+    private ArrayList<ShareBase> shareBaseOrder = new ArrayList<ShareBase>();
     private FileDatabase fileDatabase;
     private ShareScanner shareScanner;
     private FileSystemMonitor fileSystemMonitor;
@@ -44,29 +44,37 @@ public class ShareManager {
     public void updateShareBases() throws IOException {
         shareBases.clear();
         shareBaseOrder.clear();
-        for(Share s : settings.getSharelist()) {
+        for (Share s : settings.getSharelist()) {
             add(new ShareBase(s.getPath()));
         }
-        if (!isShared(settings.getInternal().getCachefolder()))
+        if (!isShared(settings.getInternal().getCachefolder())) {
             add(new ShareBase(settings.getInternal().getCachefolder()));
-        if (!isShared(settings.getInternal().getDownloadfolder()))
+        }
+        if (!isShared(settings.getInternal().getDownloadfolder())) {
             add(new ShareBase(settings.getInternal().getDownloadfolder()));
+        }
 
-        if (fileSystemMonitor != null) fileSystemMonitor.launch();
+        if (fileSystemMonitor != null) {
+            fileSystemMonitor.launch();
+        }
     }
 
     private boolean isShared(String folder) {
         folder = TextUtils.makeSurePathIsMultiplatform(folder);
-        for(ShareBase sb : shareBases.values()) {
-            if (folder.startsWith(TextUtils.makeSurePathIsMultiplatform(sb.getPath()))) return true;
+        for (ShareBase sb : shareBases.values()) {
+            if (folder.startsWith(TextUtils.makeSurePathIsMultiplatform(sb.getPath()))) {
+                return true;
+            }
         }
         return false;
     }
 
     public ShareBase getShareBaseByFile(String file) {
         file = TextUtils.makeSurePathIsMultiplatform(file);
-        for(ShareBase sb : shareBases.values()) {
-            if (file.startsWith(TextUtils.makeSurePathIsMultiplatform(sb.getPath()))) return sb;
+        for (ShareBase sb : shareBases.values()) {
+            if (file.startsWith(TextUtils.makeSurePathIsMultiplatform(sb.getPath()))) {
+                return sb;
+            }
         }
         return null;
     }

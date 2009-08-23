@@ -8,6 +8,7 @@ package org.alliance.core.settings;
  * To change this template use File | Settings | File Templates.
  */
 public class Plugin {
+
     private String jar, pluginclass;
 
     public String getJar() {

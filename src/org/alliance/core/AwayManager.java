@@ -1,6 +1,7 @@
 package org.alliance.core;
 
-import java.awt.*;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -12,11 +13,14 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class AwayManager extends Manager implements Runnable {
-    public interface AwayStatusListener { abstract void awayStatusChanged(boolean away) throws IOException; }
+
+    public interface AwayStatusListener {
+
+        abstract void awayStatusChanged(boolean away) throws IOException;
+    }
     private Thread thread;
     private boolean away = false;
     private CoreSubsystem core;
-
     private ArrayList<AwayStatusListener> listeners = new ArrayList<AwayStatusListener>();
 
     public AwayManager(CoreSubsystem core) {
@@ -24,7 +28,9 @@ public class AwayManager extends Manager implements Runnable {
     }
 
     public void init() throws IOException, Exception {
-        if(T.t)T.info("AwayManger - <init>");
+        if (T.t) {
+            T.info("AwayManger - <init>");
+        }
         thread = new Thread(this);
         thread.setDaemon(true);
         thread.start();
@@ -36,15 +42,17 @@ public class AwayManager extends Manager implements Runnable {
 
     public void run() {
         try {
-            if(T.t)T.info("Away manager thread starting.");
+            if (T.t) {
+                T.info("Away manager thread starting.");
+            }
             long lastTimeMouseMoved = System.currentTimeMillis();
-            while(true) {
+            while (true) {
                 Point p = MouseInfo.getPointerInfo().getLocation();
                 Thread.sleep(1000);
                 if ((p.y > 100000 || p.x > 100000 || p.x < -100000 || p.y < -100000) || //big coords are bougus, disregard them (this happens when user has a minimized remote desktop on windows)
                         p.equals(MouseInfo.getPointerInfo().getLocation())) {
                     //mouse has not moved
-                    if (System.currentTimeMillis()-lastTimeMouseMoved > core.getSettings().getInternal().getSecondstoaway()*1000) {
+                    if (System.currentTimeMillis() - lastTimeMouseMoved > core.getSettings().getInternal().getSecondstoaway() * 1000) {
                         updateAway(true);
                     }
                 } else {
@@ -54,9 +62,13 @@ public class AwayManager extends Manager implements Runnable {
                 }
             }
         } catch (InterruptedException e) {
-            if(T.t)T.info("Away loop interrupted");
+            if (T.t) {
+                T.info("Away loop interrupted");
+            }
         } catch (Throwable e) {
-            if(T.t)T.error("Error in away loop: "+e);
+            if (T.t) {
+                T.error("Error in away loop: " + e);
+            }
         }
     }
 
@@ -64,11 +76,16 @@ public class AwayManager extends Manager implements Runnable {
         if (b != away) {
             away = b;
             core.invokeLater(new Runnable() {
+
                 public void run() {
                     try {
-                        if(T.t)T.info("Away status changed for me: "+away);
+                        if (T.t) {
+                            T.info("Away status changed for me: " + away);
+                        }
                         core.informFriendsOfAwayStatus(away);
-                        for (AwayStatusListener listener : listeners) listener.awayStatusChanged(away);
+                        for (AwayStatusListener listener : listeners) {
+                            listener.awayStatusChanged(away);
+                        }
                     } catch (IOException e) {
                         core.reportError(e, this);
                     }

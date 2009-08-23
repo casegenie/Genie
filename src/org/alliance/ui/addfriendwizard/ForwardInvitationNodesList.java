@@ -21,7 +21,8 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class ForwardInvitationNodesList extends JList {
-	private UISubsystem ui;
+
+    private UISubsystem ui;
     private AddFriendWizard addFriendWizard;
 
     public ForwardInvitationNodesList(UISubsystem ui, final AddFriendWizard addFriendWizard) {
@@ -30,12 +31,17 @@ public class ForwardInvitationNodesList extends JList {
         this.addFriendWizard = addFriendWizard;
 
         addMouseListener(new MouseAdapter() {
+
             public void mouseClicked(MouseEvent e) {
                 int index = locationToIndex(e.getPoint());
-                if (index == -1) return;
+                if (index == -1) {
+                    return;
+                }
                 ListRow item = (ListRow) getModel().getElementAt(index);
                 item.selected = !item.selected;
-                if (item.selected) addFriendWizard.enableNext();
+                if (item.selected) {
+                    addFriendWizard.enableNext();
+                }
                 Rectangle rect = getCellBounds(index, index);
                 repaint(rect);
             }
@@ -55,13 +61,13 @@ public class ForwardInvitationNodesList extends JList {
 
     private static class CheckListRenderer extends JCheckBox implements ListCellRenderer {
 
-		public CheckListRenderer() {
+        public CheckListRenderer() {
             setBackground(UIManager.getColor("List.textBackground"));
             setForeground(UIManager.getColor("List.textForeground"));
         }
 
         public Component getListCellRendererComponent(JList list, Object value,
-                                                      int index, boolean isSelected, boolean hasFocus) {
+                int index, boolean isSelected, boolean hasFocus) {
             setEnabled(list.isEnabled());
             setSelected(((ListRow) value).selected);
             setFont(list.getFont());
@@ -71,6 +77,7 @@ public class ForwardInvitationNodesList extends JList {
     }
 
     public static class ListRow {
+
         public String nickname, connectedThrough;
         public int guid;
         public String toString;
@@ -90,12 +97,14 @@ public class ForwardInvitationNodesList extends JList {
     }
 
     public static class ForwardInvitationListModel extends DefaultListModel {
-		private UISubsystem ui;
+
+        private UISubsystem ui;
 
         public ForwardInvitationListModel(final UISubsystem ui) {
             this.ui = ui;
 
             TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
+
                 public int compare(Integer o1, Integer o2) {
                     String n1 = ui.getCore().getFriendManager().nickname(o1);
                     String n2 = ui.getCore().getFriendManager().nickname(o2);
@@ -112,14 +121,17 @@ public class ForwardInvitationNodesList extends JList {
                     Collection<UntrustedNode> ff = f.friendsFriends();
                     for (UntrustedNode n : ff.toArray(new UntrustedNode[ff.size()])) {
                         if (ui.getCore().getFriendManager().getFriend(n.getGuid()) == null &&
-                                ui.getCore().getFriendManager().getMyGUID() != n.getGuid())
+                                ui.getCore().getFriendManager().getMyGUID() != n.getGuid()) {
                             secondaryNodeGuids.add(n.getGuid());
+                        }
                     }
                 }
             }
 
-            for(Invitation i : ui.getCore().getInvitaitonManager().allInvitations()) {
-                if (i.getDestinationGuid() == null) continue;
+            for (Invitation i : ui.getCore().getInvitaitonManager().allInvitations()) {
+                if (i.getDestinationGuid() == null) {
+                    continue;
+                }
                 if (ui.getCore().getInvitaitonManager().hasBeenRecentlyInvited(i)) {
                     secondaryNodeGuids.remove(i.getDestinationGuid()); //often the guid won't exist in the list - that's fine.
                 }
@@ -134,7 +146,9 @@ public class ForwardInvitationNodesList extends JList {
             String s = "";
             for (Friend f : ui.getCore().getFriendManager().friends()) {
                 if (f.getFriendsFriend(guid) != null) {
-                    if (s.length() > 0) s += ", ";
+                    if (s.length() > 0) {
+                        s += ", ";
+                    }
                     s += f.getNickname();
                 }
             }
@@ -147,6 +161,7 @@ public class ForwardInvitationNodesList extends JList {
             final ListRow r = (ListRow) getModel().getElementAt(i);
             if (r.selected) {
                 ui.getCore().invokeLater(new Runnable() {
+
                     public void run() {
                         try {
                             ui.getCore().getFriendManager().forwardInvitationTo(r.guid);

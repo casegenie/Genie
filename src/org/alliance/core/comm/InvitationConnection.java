@@ -17,12 +17,11 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class InvitationConnection extends AuthenticatedConnection {
-    public static final int CONNECTION_ID=4;
+
+    public static final int CONNECTION_ID = 4;
     private int passkey;
     private Friend middleman;
-
     private Runnable connectionFailedEvent;
-
 
     public InvitationConnection(NetworkManager netMan, Direction direction, int passkey, Friend middleman) {
         super(netMan, direction);
@@ -30,42 +29,57 @@ public class InvitationConnection extends AuthenticatedConnection {
         this.middleman = middleman;
     }
 
-    public InvitationConnection(NetworkManager netMan, Direction direction, Object key,  int passkey, Integer middlemanGuid) {
+    public InvitationConnection(NetworkManager netMan, Direction direction, Object key, int passkey, Integer middlemanGuid) {
         super(netMan, direction, key);
         this.passkey = passkey;
         if (middlemanGuid != null && middlemanGuid != 0) {
             middleman = core.getFriendManager().getFriend(middlemanGuid);
-            if (middleman == null) if(T.t)T.error("Could not find middleman: "+middlemanGuid);
+            if (middleman == null) {
+                if (T.t) {
+                    T.error("Could not find middleman: " + middlemanGuid);
+                }
+            }
         }
 
-        if(T.t)T.ass(direction == Direction.IN, "Only supports incoming connections!");
+        if (T.t) {
+            T.ass(direction == Direction.IN, "Only supports incoming connections!");
+        }
         sendMyInfoWrapped();
     }
 
     public void sendConnectionIdentifier() throws IOException {
-        if(T.t)T.trace("InvitationConnection succeded - remove connection error event");
+        if (T.t) {
+            T.trace("InvitationConnection succeded - remove connection error event");
+        }
         connectionFailedEvent = null;
 
-        if(T.t)T.trace("Sending special authentication for InvitationConnection");
+        if (T.t) {
+            T.trace("Sending special authentication for InvitationConnection");
+        }
         Packet p = netMan.createPacketForSend();
         p.writeInt(Version.PROTOCOL_VERSION);
-        p.writeByte((byte)getConnectionIdForRemote());
+        p.writeByte((byte) getConnectionIdForRemote());
         p.writeInt(passkey);
         send(p);
 
-        if(T.t)T.ass(direction == Direction.OUT, "Only supports outgoing connections!");
+        if (T.t) {
+            T.ass(direction == Direction.OUT, "Only supports outgoing connections!");
+        }
         sendMyInfoWrapped();
     }
 
     private void sendMyInfoWrapped() {
         try {
             sendMyInfo();
-        } catch(IOException e) {
+        } catch (IOException e) {
             core.reportError(e, this);
         }
     }
+
     private void sendMyInfo() throws IOException {
-        if(T.t)T.info("Sending my info because remote had correct invitation passkey");
+        if (T.t) {
+            T.info("Sending my info because remote had correct invitation passkey");
+        }
         Packet p = netMan.createPacketForSend();
         p.writeInt(core.getFriendManager().getMyGUID());
 
@@ -84,14 +98,18 @@ public class InvitationConnection extends AuthenticatedConnection {
 
         send(p);
     }
-
     private boolean friendInfoReceived = false;
+
     public void packetReceived(Packet p) throws IOException {
         if (friendInfoReceived) {
-            if(T.t)T.info("InvitationConnection complete - both side has agreed on closing connection - so lets close it");
+            if (T.t) {
+                T.info("InvitationConnection complete - both side has agreed on closing connection - so lets close it");
+            }
             close();
         } else {
-            if(T.t)T.info("Received info of new friend!");
+            if (T.t) {
+                T.info("Received info of new friend!");
+            }
             friendInfoReceived = true;
             int guid = p.readInt();
             String host = p.readUTF();
@@ -99,16 +117,18 @@ public class InvitationConnection extends AuthenticatedConnection {
             String name = p.readUTF();
 
             org.alliance.core.settings.Friend newFriend = new org.alliance.core.settings.Friend(name, host, guid, port, middleman == null ? null : middleman.getGuid());
-            for(org.alliance.core.settings.Friend f : core.getSettings().getFriendlist()) if (f.getGuid() == guid) {
-                //friend already my friend, update ip number
-                org.alliance.core.node.Friend friend = core.getFriendManager().getFriend(f.getGuid());
-                if (friend != null && !friend.isConnected()) {
-                    if (friend.updateLastKnownHostInfo(host, port)) {
-                        core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
+            for (org.alliance.core.settings.Friend f : core.getSettings().getFriendlist()) {
+                if (f.getGuid() == guid) {
+                    //friend already my friend, update ip number
+                    org.alliance.core.node.Friend friend = core.getFriendManager().getFriend(f.getGuid());
+                    if (friend != null && !friend.isConnected()) {
+                        if (friend.updateLastKnownHostInfo(host, port)) {
+                            core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
+                        }
                     }
+                    core.queNeedsUserInteraction(new FriendAlreadyInListUserInteraction(newFriend.getGuid()));
+                    return;
                 }
-                core.queNeedsUserInteraction(new FriendAlreadyInListUserInteraction(newFriend.getGuid()));
-                return;
             }
 
             //new friend connected!
@@ -116,9 +136,9 @@ public class InvitationConnection extends AuthenticatedConnection {
             try {
                 core.saveSettings();
                 Friend f = core.getFriendManager().addFriend(newFriend, true, middleman != null);
-                core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(f, (int)(Math.random()*1000+1000));
+                core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(f, (int) (Math.random() * 1000 + 1000));
 
-            } catch(Exception e) {
+            } catch (Exception e) {
                 core.reportError(e, this);
             }
 

@@ -15,8 +15,8 @@ import java.io.RandomAccessFile;
  * To change this template use File | Settings | File Templates.
  */
 public class ChunkStorage {
-    private final static byte MAGIC_ALIVE = 123, MAGIC_MARKED_FOR_DELETION=101;
 
+    private final static byte MAGIC_ALIVE = 123, MAGIC_MARKED_FOR_DELETION = 101;
     private RandomAccessFile raf;
 
     public ChunkStorage(String file) throws IOException {
@@ -24,15 +24,17 @@ public class ChunkStorage {
     }
 
     public int getSize() throws IOException {
-        return (int)raf.length();
+        return (int) raf.length();
     }
 
     /**
      * @return The offset in our storage where this chunk is located
      */
     public synchronized int appendChunk(byte buf[]) throws IOException {
-        if(T.t)T.trace("Appending "+buf.length+" bytes to chunk storage.");
-        int pos = (int)raf.length();
+        if (T.t) {
+            T.trace("Appending " + buf.length + " bytes to chunk storage.");
+        }
+        int pos = (int) raf.length();
         raf.seek(pos);
         raf.write(MAGIC_ALIVE);
         raf.writeInt(buf.length);
@@ -54,7 +56,11 @@ public class ChunkStorage {
         int len = raf.readInt();
         byte buf[] = new byte[len];
         int r = raf.read(buf);
-        if (r != len) if(T.t)T.error("Inconsistency in getChunk! Read less then expected");
+        if (r != len) {
+            if (T.t) {
+                T.error("Inconsistency in getChunk! Read less then expected");
+            }
+        }
         return new ByteArrayInputStream(buf);
     }
 
@@ -63,7 +69,9 @@ public class ChunkStorage {
     }
 
     public void markAsRemoved(int off) throws IOException {
-        if(T.t)T.trace("Marking offset "+off+" as removed.");
+        if (T.t) {
+            T.trace("Marking offset " + off + " as removed.");
+        }
         raf.seek(off);
         raf.writeByte(MAGIC_MARKED_FOR_DELETION);
     }
@@ -73,11 +81,11 @@ public class ChunkStorage {
         long bytesUsed = 0;
         long off = 0;
 
-        while(off < raf.length()) {
+        while (off < raf.length()) {
             raf.seek(off);
             int magic = raf.readByte();
             long size = raf.readInt();
-            off += size+1+4;
+            off += size + 1 + 4;
             if (magic == MAGIC_MARKED_FOR_DELETION) {
                 bytesDeleted += size;
                 continue;
@@ -86,6 +94,6 @@ public class ChunkStorage {
             }
             bytesUsed += size;
         }
-        return (bytesDeleted*100) / (bytesUsed+bytesDeleted) + "%";
+        return (bytesDeleted * 100) / (bytesUsed + bytesDeleted) + "%";
     }
 }

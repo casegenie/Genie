@@ -1,8 +1,7 @@
 package org.alliance;
 
-import org.alliance.core.ResourceSingelton;
-
 import java.util.Properties;
+import org.alliance.core.ResourceSingelton;
 
 /**
  * Created by IntelliJ IDEA.
@@ -12,7 +11,8 @@ import java.util.Properties;
  * To change this template use File | Settings | File Templates.
  */
 public class Version {
-    public static final String VERSION="1.0.6";
+
+    public static final String VERSION = "1.0.6";
     public static final int BUILD_NUMBER;
     public static final int PROTOCOL_VERSION = 3;
 
@@ -23,7 +23,7 @@ public class Version {
             p.load(ResourceSingelton.getRl().getResourceStream("build.properties"));
             n = Integer.parseInt(p.get("build.number").toString());
         } catch (Exception e) {
-            System.err.println("Could not load buildnumber: "+e);
+            System.err.println("Could not load buildnumber: " + e);
         } finally {
             BUILD_NUMBER = n;
         }

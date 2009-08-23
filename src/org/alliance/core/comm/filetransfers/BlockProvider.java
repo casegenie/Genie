@@ -15,6 +15,7 @@ import java.nio.ByteBuffer;
  * Time: 16:59:13
  */
 public abstract class BlockProvider implements DataProvider {
+
     protected int blockNumber;
     protected FileDescriptor fd;
     protected int read = 0;
@@ -26,18 +27,24 @@ public abstract class BlockProvider implements DataProvider {
         this.root = root;
         this.core = core;
 
-        if(T.t)T.trace("Loading");
+        if (T.t) {
+            T.trace("Loading");
+        }
         fd = core.getFileManager().getFd(root);
-        if(T.t)T.ass(fd!=null, "Could not load FD for "+root);
+        if (T.t) {
+            T.ass(fd != null, "Could not load FD for " + root);
+        }
 
-        if(T.t)T.debug("BlockProvider <init> - block "+blockNumber+" from complete file: "+fd);
+        if (T.t) {
+            T.debug("BlockProvider <init> - block " + blockNumber + " from complete file: " + fd);
+        }
     }
 
     protected int prepare(ByteBuffer buf) {
         int bs = BlockFile.getBlockSize(blockNumber, fd.getSize());
 //        if(T.t)T.trace("read: "+read+", bs: "+bs+" rem: "+buf.remaining());
-        if (buf.remaining() > bs-read) {
-            int l = bs-read+buf.position();
+        if (buf.remaining() > bs - read) {
+            int l = bs - read + buf.position();
 //            if(T.t)T.trace("Setting limit to "+l);
             buf.limit(l);
         }

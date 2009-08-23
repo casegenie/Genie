@@ -19,7 +19,6 @@ import org.alliance.ui.nodetreemodel.NodeTreeNode;
 
 import javax.swing.*;
 import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -29,14 +28,13 @@ import java.lang.reflect.Method;
  * Time: 16:13:14
  */
 public class UISubsystem implements UINexus, Subsystem {
-    public static final boolean NODE_TREE_MODEL_DISABLED = !T.t; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
 
+    public static final boolean NODE_TREE_MODEL_DISABLED = !T.t; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
     private MainWindow mainWindow;
     private ResourceLoader rl;
     private CoreSubsystem core;
     private NodeTreeModel nodeTreeModel;
     private FriendListModel friendListModel;
-
     private StartupProgressListener progress;
 
     public UISubsystem() {
@@ -50,16 +48,20 @@ public class UISubsystem implements UINexus, Subsystem {
         core = (CoreSubsystem) params[0];
 
         progress = new StartupProgressListener() {
+
             public void updateProgress(String message) {
             }
         };
-        if (params != null && params.length >= 2 && params[1] != null) progress = (StartupProgressListener) params[1];
+        if (params != null && params.length >= 2 && params[1] != null) {
+            progress = (StartupProgressListener) params[1];
+        }
         progress.updateProgress("Loading user interface");
 
         if (SwingUtilities.isEventDispatchThread()) {
             realInit(params);
         } else {
             SwingUtilities.invokeAndWait(new Runnable() {
+
                 public void run() {
                     realInit(params);
                 }
@@ -70,6 +72,7 @@ public class UISubsystem implements UINexus, Subsystem {
     private void realInit(Object... params) {
         ErrorDialog.setErrorReportUrl(ERROR_URL);
         ErrorDialog.setExceptionTranslator(new ErrorDialog.ExceptionTranslator() {
+
             public String translate(Throwable t) {
                 Throwable innerError = t;
 
@@ -84,7 +87,7 @@ public class UISubsystem implements UINexus, Subsystem {
                 return innerError.toString();
             }
         });
-        
+
 
         try {
             //SyntheticaLookAndFeel.setAntiAliasEnabled(true);
@@ -103,8 +106,9 @@ public class UISubsystem implements UINexus, Subsystem {
 
         Thread.setDefaultUncaughtExceptionHandler(new GlobalExceptionHandler());
 
-        if (T.t)
+        if (T.t) {
             SwingDeadlockWarningRepaintManager.hookRepaints(true, new String[]{"NetworkIndicator", "SystemMonitor"});
+        }
 
         try {
             new OSXAdaptation(this);
@@ -170,7 +174,9 @@ public class UISubsystem implements UINexus, Subsystem {
             //make sure we have a labaled thread name - for testsuite
             if (Thread.currentThread().getName().indexOf(core.getFriendManager().getMe().getNickname()) == -1) {
                 String n = Thread.currentThread().getName();
-                if (n.indexOf(' ') != -1) n = n.substring(0, n.indexOf(' '));
+                if (n.indexOf(' ') != -1) {
+                    n = n.substring(0, n.indexOf(' '));
+                }
                 Thread.currentThread().setName(n + " -- " + core.getFriendManager().getMe().getNickname());
             }
         }
@@ -193,7 +199,9 @@ public class UISubsystem implements UINexus, Subsystem {
     }
 
     public FriendListModel getFriendListModel() {
-        if (friendListModel == null) friendListModel = new FriendListModel(core);
+        if (friendListModel == null) {
+            friendListModel = new FriendListModel(core);
+        }
         return friendListModel;
     }
 
@@ -211,19 +219,21 @@ public class UISubsystem implements UINexus, Subsystem {
                 Runtime.getRuntime().exec(s);
             } else { //assume Unix or Linux
                 String[] browsers = {
-                        "firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
+                    "firefox", "opera", "konqueror", "epiphany", "mozilla", "netscape"};
                 String browser = null;
-                for (int count = 0; count < browsers.length && browser == null; count++)
+                for (int count = 0; count < browsers.length && browser == null; count++) {
                     if (Runtime.getRuntime().exec(
-                            new String[]{"which", browsers[count]}).waitFor() == 0)
+                            new String[]{"which", browsers[count]}).waitFor() == 0) {
                         browser = browsers[count];
-                if (browser == null)
+                    }
+                }
+                if (browser == null) {
                     throw new Exception("Could not find web browser");
-                else
+                } else {
                     Runtime.getRuntime().exec(new String[]{browser, url});
+                }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             OptionDialog.showErrorDialog(getMainWindow(), "Could not open url: " + e);
         }
     }

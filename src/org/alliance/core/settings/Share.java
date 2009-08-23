@@ -8,6 +8,7 @@ package org.alliance.core.settings;
  * To change this template use File | Settings | File Templates.
  */
 public class Share {
+
     private String path;
 
     public Share() {
@@ -18,9 +19,15 @@ public class Share {
     }
 
     public String getPath() {
-        if (path == null) return null;
-        if (path.endsWith("/")) path = path.substring(0,path.length()-1);
-        if (path.endsWith("\\")) path = path.substring(0,path.length()-1); 
+        if (path == null) {
+            return null;
+        }
+        if (path.endsWith("/")) {
+            path = path.substring(0, path.length() - 1);
+        }
+        if (path.endsWith("\\")) {
+            path = path.substring(0, path.length() - 1);
+        }
         return path;
     }
 

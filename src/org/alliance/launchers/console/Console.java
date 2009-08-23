@@ -35,16 +35,17 @@ import java.util.StringTokenizer;
  * To change this template use File | Settings | File Templates.
  */
 public class Console {
+
     public interface Printer {
+
         void println(String line);
     }
-
     private final static Printer PLAIN_PRINTER = new Printer() {
+
         public void println(String line) {
             System.out.println(line);
         }
     };
-
     private CoreSubsystem core;
     private FriendManager manager;
     private Subsystem ui;
@@ -67,13 +68,16 @@ public class Console {
         StringTokenizer st = new StringTokenizer(line);
         if (st.hasMoreTokens()) {
             command = st.nextToken();
-            while(st.hasMoreTokens()) params.add(st.nextToken());
+            while (st.hasMoreTokens()) {
+                params.add(st.nextToken());
+            }
         }
 
         if ("list".equals(command)) {
             list();
         } else if ("test".equals(command)) {
             Thread t = new Thread(new Runnable() {
+
                 public void run() {
                     try {
                         Thread.sleep(1000);
@@ -112,14 +116,16 @@ public class Console {
             if (core.isRunningAsTestSuite()) {
                 printer.println("Sending a bunch of pings at random intervals");
                 Thread t = new Thread(new Runnable() {
+
                     public void run() {
-                        for(int i=0;i<10000;i++) {
+                        for (int i = 0; i < 10000; i++) {
                             Collection<Friend> c = core.getFriendManager().friends();
                             Friend fa[] = new Friend[c.size()];
                             c.toArray(fa);
-                            int n = (int)(c.size()*Math.random());
+                            int n = (int) (c.size() * Math.random());
                             final Friend f = fa[n];
                             core.invokeLater(new Runnable() {
+
                                 public void run() {
                                     try {
                                         f.getFriendConnection().send(new Ping());
@@ -128,7 +134,10 @@ public class Console {
                                     }
                                 }
                             });
-                            try {Thread.sleep((long)(Math.random()*50));} catch (InterruptedException e) {}
+                            try {
+                                Thread.sleep((long) (Math.random() * 50));
+                            } catch (InterruptedException e) {
+                            }
                         }
                     }
                 });
@@ -142,7 +151,9 @@ public class Console {
             String sharebase = params.get(0);
             params.remove(0);
             String p = "";
-            for(String s : params) p += s+" ";
+            for (String s : params) {
+                p += s + " ";
+            }
             p = p.trim();
             dir(sharebase, p);
         } else if ("remotedir".equals(command)) {
@@ -152,7 +163,9 @@ public class Console {
             params.remove(0);
 
             String p = "";
-            for(String s : params) p += s+" ";
+            for (String s : params) {
+                p += s + " ";
+            }
             p = p.trim();
             remotedir(sharebaseIndex, user, p);
         } else if ("remotesharebases".equals(command)) {
@@ -178,13 +191,13 @@ public class Console {
         } else if ("error".equals(command)) {
             throw new Exception("test error");
         } else {
-            printer.println("Unknown command "+command);
+            printer.println("Unknown command " + command);
         }
     }
 
     private void showbuilds() {
-        for(Friend f : core.getFriendManager().friends()) {
-            printer.println(f.getAllianceBuildNumber()+": "+core.getFriendManager().nickname(f.getGuid()));
+        for (Friend f : core.getFriendManager().friends()) {
+            printer.println(f.getAllianceBuildNumber() + ": " + core.getFriendManager().nickname(f.getGuid()));
         }
     }
 
@@ -203,10 +216,10 @@ public class Console {
     }
 
     private void forcesslhandshake() throws IOException {
-        for(Friend f: manager.friends()) {
+        for (Friend f : manager.friends()) {
             if (f.getFriendConnection() != null) {
-                printer.println("Starting SSL handshake for "+f);
-                ((SSLCryptoLayer)core.getCryptoManager().getCryptoLayer()).resendHandshake(f.getFriendConnection());
+                printer.println("Starting SSL handshake for " + f);
+                ((SSLCryptoLayer) core.getCryptoManager().getCryptoLayer()).resendHandshake(f.getFriendConnection());
             }
         }
     }
@@ -218,27 +231,27 @@ public class Console {
 
     private void remotedir(int sharebaseIndex, String user, String path) throws IOException {
         Friend f = manager.getFriend(user);
-        printer.println("Found friend: "+f+" for "+user);
-        f.getFriendConnection().send(new GetDirectoryListing(sharebaseIndex,  path));
+        printer.println("Found friend: " + f + " for " + user);
+        f.getFriendConnection().send(new GetDirectoryListing(sharebaseIndex, path));
     }
 
     private void sharebases() {
         printer.println("Sharebases: ");
-        for(ShareBase b : core.getFileManager().getShareManager().shareBases()) {
-            printer.println("  "+b);
+        for (ShareBase b : core.getFileManager().getShareManager().shareBases()) {
+            printer.println("  " + b);
         }
     }
 
     private void dir(String sharebase, String path) {
-        printer.println("Directory listing for "+path+": ");
+        printer.println("Directory listing for " + path + ": ");
         sharebase = TextUtils.makeSurePathIsMultiplatform(sharebase);
         ShareBase b = core.getFileManager().getShareManager().getBaseByPath(sharebase);
         if (b == null) {
-            printer.println("Could not find share base for "+sharebase);
+            printer.println("Could not find share base for " + sharebase);
             return;
         }
-        printer.println("Found share base: "+b);
-        for(String s : core.getFileManager().getFileDatabase().getDirectoryListing(b, path)) {
+        printer.println("Found share base: " + b);
+        for (String s : core.getFileManager().getFileDatabase().getDirectoryListing(b, path)) {
             printer.println(s);
         }
     }
@@ -251,21 +264,23 @@ public class Console {
         netLog = true;
         printer.println("Net log is now on.");
     }
-
     private final static DateFormat FORMAT = new SimpleDateFormat("HH:mm yyyyMMdd");
+
     public void logNetworkEvent(String event) {
-        if (netLog) printer.println(FORMAT.format(new Date())+" "+event);
+        if (netLog) {
+            printer.println(FORMAT.format(new Date()) + " " + event);
+        }
     }
 
     private void dups() throws IOException {
         Collection<String> dups = new ArrayList<String>(core.getFileManager().getFileDatabase().getDuplicates());
         printer.println("Duplicates: ");
-        for(String s : dups) {
+        for (String s : dups) {
             Hash h = core.getFileManager().getFileDatabase().getHashForDuplicate(s);
             FileDescriptor fd = core.getFileManager().getFileDatabase().getFd(h);
-            printer.println("  "+s+" -> "+fd.getSubpath());
+            printer.println("  " + s + " -> " + fd.getSubpath());
         }
-        printer.println(dups.size()+" duplicates in share.");
+        printer.println(dups.size() + " duplicates in share.");
     }
 
     private void search(ArrayList<String> params) throws IOException {
@@ -275,7 +290,9 @@ public class Console {
 
     private Thread[] getAllThreads() {
         ThreadGroup g = Thread.currentThread().getThreadGroup();
-        while(g.getParent() != null) g = g.getParent();
+        while (g.getParent() != null) {
+            g = g.getParent();
+        }
         Thread threads[] = new Thread[1000];
         g.enumerate(threads);
         return threads;
@@ -283,18 +300,22 @@ public class Console {
 
     private void threads() {
         printer.println("All threads: ");
-        for(Thread t : getAllThreads()) {
-            if (t == null) break;
-            if (t.getThreadGroup() != null)
-                printer.println("  "+t.getName()+" ("+t.getThreadGroup().getName()+")");
-            else
-                printer.println("  "+t.getName());
+        for (Thread t : getAllThreads()) {
+            if (t == null) {
+                break;
+            }
+            if (t.getThreadGroup() != null) {
+                printer.println("  " + t.getName() + " (" + t.getThreadGroup().getName() + ")");
+            } else {
+                printer.println("  " + t.getName());
+            }
 
 
             StackTraceElement[] elems = t.getStackTrace();
             if (elems != null) {
-                for(StackTraceElement e : elems)
-                    printer.println("    "+e.toString());
+                for (StackTraceElement e : elems) {
+                    printer.println("    " + e.toString());
+                }
             }
         }
     }
@@ -312,65 +333,69 @@ public class Console {
         }
 
         String query = "";
-        for(String s : params) query += s+" ";
+        for (String s : params) {
+            query += s + " ";
+        }
 
-        printer.println("Searching in "+ft.description()+"...");
+        printer.println("Searching in " + ft.description() + "...");
         SimpleTimer st = new SimpleTimer();
         int indices[] = core.getShareManager().getFileDatabase().getKeywordIndex().search(query, 100, ft);
-        printer.println("...completed in "+st.getTime()+".");
-        for(int i : indices) {
-            printer.println("  "+core.getShareManager().getFileDatabase().getFd(i));
+        printer.println("...completed in " + st.getTime() + ".");
+        for (int i : indices) {
+            printer.println("  " + core.getShareManager().getFileDatabase().getFd(i));
         }
     }
 
     private void gc() {
         System.gc();
         System.gc();
-        long used = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
-        printer.println("Garbage collected. Using "+ TextUtils.formatNumber(""+used)+" bytes of memory.");
+        long used = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        printer.println("Garbage collected. Using " + TextUtils.formatNumber("" + used) + " bytes of memory.");
     }
 
     private void contains(ArrayList<String> params) {
-        printer.println("Result: "+core.getShareManager().getFileDatabase().contains(Hash.createFrom(params.get(0))));
+        printer.println("Result: " + core.getShareManager().getFileDatabase().contains(Hash.createFrom(params.get(0))));
     }
 
     private void share(ArrayList<String> params) throws IOException {
         printer.println("All complete files: ");
         ArrayList<Hash> al = new ArrayList<Hash>(core.getFileManager().getFileDatabase().getAllHashes());
-        for(Hash h : al) {
+        for (Hash h : al) {
             FileDescriptor fd = core.getFileManager().getFileDatabase().getFd(h);
-            printer.println("  "+fd);
+            printer.println("  " + fd);
         }
         printer.println("");
 
         printer.println("Incomplete files in cache: ");
-        for(Hash h : core.getFileManager().getCache().rootHashes()) {
+        for (Hash h : core.getFileManager().getCache().rootHashes()) {
             BlockFile bf = core.getFileManager().getCache().getBlockFile(h);
-            printer.println("  "+bf);
+            printer.println("  " + bf);
         }
         printer.println("");
 
         printer.println("Incomplete files in downloads: ");
-        for(Hash h : core.getFileManager().getDownloadStorage().rootHashes()) {
+        for (Hash h : core.getFileManager().getDownloadStorage().rootHashes()) {
             BlockFile bf = core.getFileManager().getDownloadStorage().getBlockFile(h);
-            printer.println("  "+bf);
+            printer.println("  " + bf);
         }
         printer.println("");
 
-        printer.println("Sharing "+
-                TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getTotalSize())+ " in "+core.getShareManager().getFileDatabase().getNumberOfFiles()+" files.");
+        printer.println("Sharing " +
+                TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getTotalSize()) + " in " + core.getShareManager().getFileDatabase().getNumberOfFiles() + " files.");
         printer.println("");
     }
 
     private void ui() throws Exception {
-        Runnable r = (Runnable)Class.forName("org.alliance.launchers.SplashWindow").newInstance();
-        ui = (Subsystem)Class.forName("org.alliance.ui.UISubsystem").newInstance();
+        Runnable r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+        ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();
         ui.init(ResourceSingelton.getRl(), core);
         r.run(); //closes splashwindow
     }
 
     private void killUI() {
-        if (ui!= null) ui.shutdown();
+        if (ui != null) {
+            ui.shutdown();
+        }
         printer = PLAIN_PRINTER;
         ui = null;
         printer.println("UI Shutdown.");
@@ -387,15 +412,15 @@ public class Console {
     }
 
     private void connect(String nickname) throws IOException {
-        printer.println("Connecting to "+nickname+"...");
+        printer.println("Connecting to " + nickname + "...");
         Friend f = manager.getFriend(nickname);
         manager.getNetMan().connect(f.getLastKnownHost(), f.getLastKnownPort(), new FriendConnection(manager.getNetMan(), Connection.Direction.OUT, f.getGuid()));
     }
 
     private void list() {
         printer.println("Friends: ");
-        for(Friend f : manager.friends()) {
-            printer.println("  "+f.getNickname()+" "+
+        for (Friend f : manager.friends()) {
+            printer.println("  " + f.getNickname() + " " +
                     (f.getFriendConnection() == null ? "disconnected" : f.getFriendConnection().getSocketAddress()));
         }
     }

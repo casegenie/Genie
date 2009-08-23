@@ -14,7 +14,8 @@ import java.io.IOException;
  * Time: 18:42:48
  */
 public class ChatMessage extends PersistantRPC {
-	private String message;
+
+    private String message;
     private boolean messageToAll;
 
     public ChatMessage() {
@@ -29,10 +30,11 @@ public class ChatMessage extends PersistantRPC {
     public void execute(Packet in) throws IOException {
         message = in.readUTF();
         messageToAll = in.readBoolean();
-        if (messageToAll)
+        if (messageToAll) {
             manager.getCore().queNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid));
-        else
+        } else {
             manager.getCore().queNeedsUserInteraction(new PostMessageInteraction(message, fromGuid));
+        }
     }
 
     public Packet serializeTo(Packet p) {

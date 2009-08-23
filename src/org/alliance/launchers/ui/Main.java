@@ -22,44 +22,60 @@ import java.net.Socket;
  * To change this template use File | Settings | File Templates.
  */
 public class Main {
+
     private static final int STARTED_SIGNAL_PORT = 56345;
 
     public static void main(String[] args) {
         try {
-            System.out.println("Launching Alliance v"+ Version.VERSION+" build "+Version.BUILD_NUMBER);
-            System.setProperty("alliance.build", ""+Version.BUILD_NUMBER);
+            System.out.println("Launching Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
+            System.setProperty("alliance.build", "" + Version.BUILD_NUMBER);
 
             boolean allowMultipleInstances = argsContain(args, "/allowMultipleInstances") || new File("allowMultipleInstances").exists();
             boolean runMinimized = argsContain(args, "/min");
 
-            if (!allowMultipleInstances) checkIfAlreadyRunning(!runMinimized);
+            if (!allowMultipleInstances) {
+                checkIfAlreadyRunning(!runMinimized);
+            }
 
             Runnable r = null;
-            if (!runMinimized) r = (Runnable)Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+            if (!runMinimized) {
+                r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+            }
 
             String s = getSettingsFile();
-            for(int i=0;i<args.length;i++) if (!args[i].startsWith("/")) s = args[i];
-            Subsystem core = initCore(s, (StartupProgressListener)r);
-            if (core == null) return; //oops. core crashed. Error message has been displayd. just bail.
-
+            for (int i = 0; i < args.length; i++) {
+                if (!args[i].startsWith("/")) {
+                    s = args[i];
+                }
+            }
+            Subsystem core = initCore(s, (StartupProgressListener) r);
+            if (core == null) {
+                return; //oops. core crashed. Error message has been displayd. just bail.
+            }
             Subsystem tray = null;
             try {
                 tray = initTrayIcon(core);
                 OSInfo.setSupportsTrayIcon(true);
-            } catch(Throwable t) {
+            } catch (Throwable t) {
                 OSInfo.setSupportsTrayIcon(false);
             }
 
             if (OSInfo.supportsTrayIcon()) {
                 if (!runMinimized) {
-                    ((Runnable)tray).run(); //open ui
-                    if (r != null) r.run(); //close splashwindow
+                    ((Runnable) tray).run(); //open ui
+                    if (r != null) {
+                        r.run(); //close splashwindow
+                    }
                 }
 
-                if (!allowMultipleInstances) startStartSignalThread(tray);
+                if (!allowMultipleInstances) {
+                    startStartSignalThread(tray);
+                }
             } else {
                 initUI(core);
-                if (r != null) r.run();
+                if (r != null) {
+                    r.run();
+                }
             }
         } catch (Throwable e) {
             try {
@@ -73,22 +89,28 @@ public class Main {
         }
     }
 
-	private static String getSettingsFile() {
-		String s = "data/settings.xml"; 
+    private static String getSettingsFile() {
+        String s = "data/settings.xml";
 
-		String home = System.getProperty("user.home"); 
-		String system = System.getProperty("os.name"); 
-		if(OSInfo.isLinux()) {
-			home = home+"/.alliance/"; 
-		} else {
-			home = "";
-		}
+        String home = System.getProperty("user.home");
+        String system = System.getProperty("os.name");
+        if (OSInfo.isLinux()) {
+            home = home + "/.alliance/";
+        } else {
+            home = "";
+        }
 
-    	return home+s; 
+        return home + s;
     }
-    
+
     private static boolean argsContain(String[] args, String pattern) {
-        if (args != null) for(String s : args) if (pattern.equalsIgnoreCase(s)) return true;
+        if (args != null) {
+            for (String s : args) {
+                if (pattern.equalsIgnoreCase(s)) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -101,32 +123,42 @@ public class Main {
             Thread.sleep(1000);
             System.out.println("Program already running. Closing this program instance.");
             System.exit(0);
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Program does not seem to be running. Starting.");
         }
     }
-
     private static Thread signalThread;
     private static ServerSocket signalServerSocket;
+
     private static void startStartSignalThread(final Subsystem tray) {
         signalThread = new Thread(new Runnable() {
+
             public void run() {
                 try {
                     signalServerSocket = new ServerSocket(STARTED_SIGNAL_PORT, 0, InetAddress.getByName("127.0.0.1"));
-                    while(true) {
+                    while (true) {
                         try {
                             Socket s = signalServerSocket.accept(); //connection is made on this port if user wants to open the ui
-                            if (signalThread == null) return;
+                            if (signalThread == null) {
+                                return;
+                            }
                             int b = s.getInputStream().read();
                             s.close();
-                            if (b == 1) ((Runnable)tray).run(); //open ui
-                        } catch(IOException e) {
-                            if (signalThread == null) return;
+                            if (b == 1) {
+                                ((Runnable) tray).run(); //open ui
+                            }
+                        } catch (IOException e) {
+                            if (signalThread == null) {
+                                return;
+                            }
                             e.printStackTrace();
-                            try { Thread.sleep(10000); } catch(InterruptedException e1) {}
+                            try {
+                                Thread.sleep(10000);
+                            } catch (InterruptedException e1) {
+                            }
                         }
                     }
-                } catch(IOException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
@@ -139,20 +171,30 @@ public class Main {
         if (signalThread != null) {
             Thread t = signalThread;
             signalThread = null;
-            try { signalServerSocket.close(); } catch(Exception e) {}
-            try { t.join(); } catch(InterruptedException e) {}
+            try {
+                signalServerSocket.close();
+            } catch (Exception e) {
+            }
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+            }
         }
     }
 
     private static Subsystem initTrayIcon(Subsystem core) throws Throwable {
         try {
-            if(T.t)T.info("Starting Java 6 tray icon...");
-            Subsystem tray = (Subsystem)Class.forName("org.alliance.launchers.ui.Java6TrayIconSubsystem").newInstance();
+            if (T.t) {
+                T.info("Starting Java 6 tray icon...");
+            }
+            Subsystem tray = (Subsystem) Class.forName("org.alliance.launchers.ui.Java6TrayIconSubsystem").newInstance();
             tray.init(ResourceSingelton.getRl(), core);
             return tray;
-        } catch(Throwable e) {
-            if(T.t)T.warn("Java 6 tray icon not supported. Falling back to old code.");
-            Subsystem tray = (Subsystem)Class.forName("org.alliance.launchers.ui.JDesktopTrayIconSubsystem").newInstance();
+        } catch (Throwable e) {
+            if (T.t) {
+                T.warn("Java 6 tray icon not supported. Falling back to old code.");
+            }
+            Subsystem tray = (Subsystem) Class.forName("org.alliance.launchers.ui.JDesktopTrayIconSubsystem").newInstance();
             tray.init(ResourceSingelton.getRl(), core);
             return tray;
         }
@@ -161,12 +203,14 @@ public class Main {
     private static Subsystem initCore(String settings, StartupProgressListener l) {
         try {
             SimpleTimer s = new SimpleTimer();
-            Subsystem core = (Subsystem)Class.forName("org.alliance.core.CoreSubsystem").newInstance();
+            Subsystem core = (Subsystem) Class.forName("org.alliance.core.CoreSubsystem").newInstance();
             core.init(ResourceSingelton.getRl(), settings, l);
-            if(T.t)T.info("" +
-                    "Subsystem CORE started in "+s.getTime());
+            if (T.t) {
+                T.info("" +
+                        "Subsystem CORE started in " + s.getTime());
+            }
             return core;
-        } catch(Throwable t) {
+        } catch (Throwable t) {
             reportError(t);
             System.err.println(t);
             return null;
@@ -190,10 +234,12 @@ public class Main {
         try {
             System.out.println("starting ui");
             SimpleTimer s = new SimpleTimer();
-            Subsystem ui = (Subsystem)Class.forName("org.alliance.ui.UISubsystem").newInstance();
+            Subsystem ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();
             ui.init(ResourceSingelton.getRl(), core);
-            if(T.t)T.trace("Subsystem UI started in "+s.getTime());
-        } catch(Exception t) {
+            if (T.t) {
+                T.trace("Subsystem UI started in " + s.getTime());
+            }
+        } catch (Exception t) {
             reportError(t);
         }
     }

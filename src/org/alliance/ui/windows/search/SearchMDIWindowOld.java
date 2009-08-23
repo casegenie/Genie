@@ -30,33 +30,33 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class SearchMDIWindowOld extends AllianceMDIWindow {
-	private HashMap<Hash, HashHit> hashHits = new HashMap<Hash, HashHit>();
+
+    private HashMap<Hash, HashHit> hashHits = new HashMap<Hash, HashHit>();
     private ArrayList<HashHit> rows = new ArrayList<HashHit>(5000);
-
     private int totalHits;
-
     private JTable table;
     private SearchMDIWindowOld.SearchTableModel model;
     private TableSorter sorter;
     private JComboBox type;
     private JRadioButton newfiles, keywords;
     private JPopupMenu popup;
-
     private JTextField search;
 
     public SearchMDIWindowOld(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "search", ui);
 
-        search = (JTextField)xui.getComponent("search1");
-        table = (JTable)xui.getComponent("table");
-        type = (JComboBox)xui.getComponent("type");
-        popup = (JPopupMenu)xui.getComponent("popup");
+        search = (JTextField) xui.getComponent("search1");
+        table = (JTable) xui.getComponent("table");
+        type = (JComboBox) xui.getComponent("type");
+        popup = (JPopupMenu) xui.getComponent("popup");
 
-        newfiles = (JRadioButton)xui.getComponent("newfiles");
-        keywords = (JRadioButton)xui.getComponent("keywords");
+        newfiles = (JRadioButton) xui.getComponent("newfiles");
+        keywords = (JRadioButton) xui.getComponent("keywords");
         keywords.setSelected(true);
 
-        for(FileType v : FileType.values()) type.addItem(v.description());
+        for (FileType v : FileType.values()) {
+            type.addItem(v.description());
+        }
 
         model = new SearchMDIWindowOld.SearchTableModel();
         sorter = new TableSorter(model);
@@ -78,6 +78,7 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         table.getColumnModel().getColumn(4).setPreferredWidth(50);
 
         table.addMouseListener(new MouseAdapter() {
+
             public void mouseReleased(MouseEvent e) {
                 maybeShowPopup(e);
             }
@@ -93,13 +94,15 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
                 if (e.isPopupTrigger()) {
                     int row = table.rowAtPoint(e.getPoint());
                     boolean b = false;
-                    for(int r : table.getSelectedRows()) {
+                    for (int r : table.getSelectedRows()) {
                         if (r == row) {
                             b = true;
                             break;
                         }
                     }
-                    if (!b) table.getSelectionModel().setSelectionInterval(row,row);
+                    if (!b) {
+                        table.getSelectionModel().setSelectionInterval(row, row);
+                    }
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -118,35 +121,42 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
     public void EVENT_download(ActionEvent e) {
         int selection[] = table.getSelectedRows();
 
-        if (selection != null && selection.length > 0) for(int i : selection) {
-            boolean changeWindow = false;
-            if (i >= 0 && i < rows.size()) {
-                final HashHit h = rows.get(sorter.modelIndex(i));
-                if (ui.getCore().getFileManager().containsComplete(h.hash)) {
-                    ui.getCore().getUICallback().statusMessage("You already have the file "+h.filename+"!");
-                } else if (ui.getCore().getNetworkManager().getDownloadManager().getDownload(h.hash) != null) {
-                    ui.getCore().getUICallback().statusMessage("You are already downloading "+h.filename+"!");
-                } else {
-                    ui.getCore().invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                ui.getCore().getNetworkManager().getDownloadManager().queDownload(h.hash, h.filename, h.getUserGuids());
-                            } catch(IOException e1) {
-                                ui.handleErrorInEventLoop(e1);
+        if (selection != null && selection.length > 0) {
+            for (int i : selection) {
+                boolean changeWindow = false;
+                if (i >= 0 && i < rows.size()) {
+                    final HashHit h = rows.get(sorter.modelIndex(i));
+                    if (ui.getCore().getFileManager().containsComplete(h.hash)) {
+                        ui.getCore().getUICallback().statusMessage("You already have the file " + h.filename + "!");
+                    } else if (ui.getCore().getNetworkManager().getDownloadManager().getDownload(h.hash) != null) {
+                        ui.getCore().getUICallback().statusMessage("You are already downloading " + h.filename + "!");
+                    } else {
+                        ui.getCore().invokeLater(new Runnable() {
+
+                            public void run() {
+                                try {
+                                    ui.getCore().getNetworkManager().getDownloadManager().queDownload(h.hash, h.filename, h.getUserGuids());
+                                } catch (IOException e1) {
+                                    ui.handleErrorInEventLoop(e1);
+                                }
                             }
-                        }
-                    });
-                    changeWindow = true;
+                        });
+                        changeWindow = true;
+                    }
+                }
+                if (changeWindow) {
+                    ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                 }
             }
-            if (changeWindow) ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
         }
     }
 
     public void searchHits(int sourceGuid, int hops, java.util.List<SearchHit> hits) {
-        for(SearchHit sh : hits) {
+        for (SearchHit sh : hits) {
             Hash hash = sh.getRoot();
-            if (ui.getCore().getFileManager().getFileDatabase().contains(hash)) continue;
+            if (ui.getCore().getFileManager().getFileDatabase().contains(hash)) {
+                continue;
+            }
             String filename = sh.getPath();
             long size = sh.getSize();
             HashHit hh = hashHits.get(hash);
@@ -158,7 +168,7 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
             hh.addHit(hops, size, filename, sourceGuid, sh.getHashedDaysAgo());
             totalHits++;
         }
-        ((JLabel)xui.getComponent("status")).setText(totalHits +" hits");
+        ((JLabel) xui.getComponent("status")).setText(totalHits + " hits");
 
         model.fireTableDataChanged();
     }
@@ -178,7 +188,9 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
 
     private void search(String text) throws IOException {
         search(text, FileType.values()[type.getSelectedIndex()]);
-        if (keywords.isSelected()) search.setText("");
+        if (keywords.isSelected()) {
+            search.setText("");
+        }
     }
 
     public void searchForNewFilesOfType(FileType ft) throws IOException {
@@ -194,20 +206,22 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         final String t = text;
 
         String s;
-        if (t.trim().length() == 0)
-            s = "Searching for all files of type "+ft.description();
-        else
-            s = "Searching for "+t +" in "+ft.description()+"...";
-        ((JLabel)xui.getComponent("status")).setText(s);
-        totalHits=0;
+        if (t.trim().length() == 0) {
+            s = "Searching for all files of type " + ft.description();
+        } else {
+            s = "Searching for " + t + " in " + ft.description() + "...";
+        }
+        ((JLabel) xui.getComponent("status")).setText(s);
+        totalHits = 0;
         hashHits.clear();
         rows.clear();
         model.fireTableDataChanged();
         ui.getCore().invokeLater(new Runnable() {
+
             public void run() {
                 try {
                     ui.getCore().getFriendManager().getNetMan().sendSearch(t, ft);
-                } catch(IOException e) {
+                } catch (IOException e) {
                     ui.handleErrorInEventLoop(e);
                 }
             }
@@ -218,14 +232,22 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         return "Search";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
 
-    public class SearchTableModel extends AbstractTableModel  {
+    public void revert() throws Exception {
+    }
 
-		public int getRowCount() {
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
+
+    public class SearchTableModel extends AbstractTableModel {
+
+        public int getRowCount() {
             return rows.size();
         }
 
@@ -234,14 +256,20 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         }
 
         public Class<?> getColumnClass(int columnIndex) {
-            if (columnIndex == 2) return Long.class;
-            if (columnIndex == 3) return Integer.class;
-            if (columnIndex == 4) return Integer.class;
+            if (columnIndex == 2) {
+                return Long.class;
+            }
+            if (columnIndex == 3) {
+                return Integer.class;
+            }
+            if (columnIndex == 4) {
+                return Integer.class;
+            }
             return super.getColumnClass(columnIndex);
         }
 
         public String getColumnName(int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "File";
                 case 1:
@@ -258,7 +286,7 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return rows.get(rowIndex).filename;
                 case 1:
@@ -275,53 +303,77 @@ public class SearchMDIWindowOld extends AllianceMDIWindow {
         }
     }
 
-
     public class StringCellRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
-            super.getTableCellRendererComponent(table, value,  isSelected,  hasFocus,  rowIndex, vColIndex);
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
             HashHit h = rows.get(sorter.modelIndex(rowIndex));
-            setToolTipText("<html>"+h.path+"<br>"+h.getListOfUsers()+"<br>"+h.hash.getRepresentation());
+            setToolTipText("<html>" + h.path + "<br>" + h.getListOfUsers() + "<br>" + h.hash.getRepresentation());
             return this;
         }
-        public void validate() {}
-        public void revalidate() {}
-        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+        public void validate() {
+        }
+
+        public void revalidate() {
+        }
+
+        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        }
+
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        }
     }
 
     public class BytesizeCellRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
-            super.getTableCellRendererComponent(table, value,  isSelected,  hasFocus,  rowIndex, vColIndex);
-            setText(TextUtils.formatByteSize((Long)value));
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
+            setText(TextUtils.formatByteSize((Long) value));
             setToolTipText(String.valueOf(value));
             return this;
         }
-        public void validate() {}
-        public void revalidate() {}
-        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+        public void validate() {
+        }
+
+        public void revalidate() {
+        }
+
+        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        }
+
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        }
     }
 
     public class DaysOldCellRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
-            super.getTableCellRendererComponent(table, value,  isSelected,  hasFocus,  rowIndex, vColIndex);
-            int val = (Integer)value;
-            if (val == 255)
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                boolean isSelected, boolean hasFocus, int rowIndex, int vColIndex) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
+            int val = (Integer) value;
+            if (val == 255) {
                 setText("Old");
-            else
+            } else {
                 setText(String.valueOf(val));
+            }
             return this;
         }
-        public void validate() {}
-        public void revalidate() {}
-        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {}
-        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {}
+
+        public void validate() {
+        }
+
+        public void revalidate() {
+        }
+
+        protected void firePropertyChange(String propertyName, Object oldValue, Object newValue) {
+        }
+
+        public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {
+        }
     }
 
     public void EVENT_keywords(ActionEvent e) {

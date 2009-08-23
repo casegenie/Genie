@@ -18,7 +18,8 @@ import java.io.ObjectOutputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Printer {
-	private JTextArea textarea;
+
+    private JTextArea textarea;
     private JTextField chat;
     private Console console;
 
@@ -28,8 +29,8 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
         console = new Console(ui.getCore());
         console.setPrinter(this);
 
-        textarea = (JTextArea)xui.getComponent("textarea");
-        chat = (JTextField)xui.getComponent("chat");
+        textarea = (JTextArea) xui.getComponent("textarea");
+        chat = (JTextField) xui.getComponent("chat");
 
         setTitle("Debug console");
         postInit();
@@ -53,15 +54,24 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
         return "console";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 
     public void println(final String line) {
         SwingUtilities.invokeLater(new Runnable() {
+
             public void run() {
-                textarea.append(line+"\n");
+                textarea.append(line + "\n");
             }
         });
     }

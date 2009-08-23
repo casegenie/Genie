@@ -14,7 +14,8 @@ import java.util.HashMap;
  * To change this template use File | Settings | File Templates.
  */
 public class NodeTreeModel extends DefaultTreeModel {
-	private HashMap<Integer, NodeTreeNode> cache = new HashMap<Integer, NodeTreeNode>();
+
+    private HashMap<Integer, NodeTreeNode> cache = new HashMap<Integer, NodeTreeNode>();
 
     public NodeTreeModel() {
         super(null);
@@ -30,7 +31,9 @@ public class NodeTreeModel extends DefaultTreeModel {
     }
 
     public void nodeAdded(NodeTreeNode nodeTreeNode) {
-        if (nodeTreeNode.getNode() == null) return;
+        if (nodeTreeNode.getNode() == null) {
+            return;
+        }
         cache.put(nodeTreeNode.getNode().getGuid(), nodeTreeNode);
     }
 
@@ -40,11 +43,13 @@ public class NodeTreeModel extends DefaultTreeModel {
 
     public void signalNoRouteToHost(Node node) {
         NodeTreeNode n = get(node);
-        if (n != null) n.reportError("No Route to host");
+        if (n != null) {
+            n.reportError("No Route to host");
+        }
 
     }
 
     public void signalStructureChanged() {
-        nodeStructureChanged((TreeNode)getRoot());
+        nodeStructureChanged((TreeNode) getRoot());
     }
 }

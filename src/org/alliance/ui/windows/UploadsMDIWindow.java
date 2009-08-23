@@ -23,15 +23,15 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class UploadsMDIWindow extends AllianceMDIWindow {
-	private UploadsMDIWindow.UploadsTableModel model;
-    private JTable table;
 
+    private UploadsMDIWindow.UploadsTableModel model;
+    private JTable table;
     private ArrayList<UploadWrapper> rows = new ArrayList<UploadsMDIWindow.UploadWrapper>();
 
     public UploadsMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "uploads", ui);
 
-        table = (JTable)xui.getComponent("table");
+        table = (JTable) xui.getComponent("table");
         table.setModel(model = new UploadsMDIWindow.UploadsTableModel());
         table.setAutoCreateColumnsFromModel(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(50);
@@ -48,12 +48,14 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
     public void update() {
         boolean structureChanged = false;
 
-        for(UploadWrapper w : rows) w.speed = "Complete";
+        for (UploadWrapper w : rows) {
+            w.speed = "Complete";
+        }
 
         ArrayList<Connection> al = new ArrayList<Connection>(ui.getCore().getNetworkManager().connections());
-        for(Connection c : al) {
+        for (Connection c : al) {
             if (c instanceof UploadConnection) {
-                UploadConnection uc = (UploadConnection)c;
+                UploadConnection uc = (UploadConnection) c;
                 UploadWrapper w = getWrapperFor(uc);
                 if (w == null) {
                     w = new UploadWrapper(uc);
@@ -66,14 +68,19 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
 
         if (structureChanged) {
             model.fireTableStructureChanged();
-        } else
+        } else {
             model.fireTableRowsUpdated(0, rows.size());
+        }
 
-        ((JLabel)xui.getComponent("status")).setText("Total bytes sent: "+ TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes()));
+        ((JLabel) xui.getComponent("status")).setText("Total bytes sent: " + TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes()));
     }
 
     private UploadWrapper getWrapperFor(UploadConnection u) {
-        for(UploadWrapper cw : rows) if (cw.upload == u) return cw;
+        for (UploadWrapper cw : rows) {
+            if (cw.upload == u) {
+                return cw;
+            }
+        }
         return null;
     }
 
@@ -81,12 +88,21 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         return "uploads";
     }
 
-    public void save() throws Exception {}
-    public void revert() throws Exception {}
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+    public void save() throws Exception {
+    }
+
+    public void revert() throws Exception {
+    }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 
     private class UploadWrapper {
+
         public UploadConnection upload;
         public String nickname, filename, speed, sent;
 
@@ -96,13 +112,17 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
 
         public void update() {
             try {
-                if (upload == null || upload.getRemoteFriend() == null) return;
+                if (upload == null || upload.getRemoteFriend() == null) {
+                    return;
+                }
                 nickname = upload.getRemoteFriend().nickname();
                 FileDescriptor fd = ui.getCore().getFileManager().getFd(upload.getRoot());
-                if (fd != null) filename = fd.getSubpath();
-                speed = TextUtils.formatByteSize((long)upload.getBandwidthOut().getCPS())+"/s";
+                if (fd != null) {
+                    filename = fd.getSubpath();
+                }
+                speed = TextUtils.formatByteSize((long) upload.getBandwidthOut().getCPS()) + "/s";
                 sent = TextUtils.formatByteSize(upload.getBytesSent());
-            } catch(IOException e) {
+            } catch (IOException e) {
                 ui.handleErrorInEventLoop(e);
             }
         }
@@ -110,7 +130,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
 
     private class UploadsTableModel extends AbstractTableModel {
 
-		public int getRowCount() {
+        public int getRowCount() {
             return rows.size();
         }
 
@@ -119,7 +139,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         }
 
         public String getColumnName(int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "Upload to";
                 case 1:
@@ -134,7 +154,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return rows.get(rowIndex).nickname;
                 case 1:
@@ -150,9 +170,11 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
     }
 
     public void EVENT_cleanup(ActionEvent a) {
-        if (rows.size() == 0) return;
+        if (rows.size() == 0) {
+            return;
+        }
         int n = rows.size();
         rows.clear();
-        model.fireTableRowsDeleted(0,n-1);
+        model.fireTableRowsDeleted(0, n - 1);
     }
 }

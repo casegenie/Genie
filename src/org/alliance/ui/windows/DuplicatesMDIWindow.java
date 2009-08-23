@@ -28,14 +28,15 @@ import com.stendahls.util.TextUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class DuplicatesMDIWindow extends AllianceMDIWindow {
-	private DuplicatesMDIWindow.TableModel model;
+
+    private DuplicatesMDIWindow.TableModel model;
     private JTable table;
     private ArrayList<Dup> dups = new ArrayList<Dup>();
 
     public DuplicatesMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "duplicates", ui);
 
-        table = (JTable)xui.getComponent("table");
+        table = (JTable) xui.getComponent("table");
         table.setModel(model = new DuplicatesMDIWindow.TableModel());
         table.setAutoCreateColumnsFromModel(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
@@ -48,22 +49,26 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         setTitle("Duplicates in my share");
 
         TreeSet<String> ts = new TreeSet<String>(ui.getCore().getFileManager().getFileDatabase().getDuplicates());
-        for(String s : ts) {
+        for (String s : ts) {
             Hash h = ui.getCore().getFileManager().getFileDatabase().getHashForDuplicate(s);
             if (h == null) {
                 dups.add(new Dup(s, "<lost>"));
             } else {
                 FileDescriptor fd = ui.getCore().getFileManager().getFd(h);
-                if (fd != null) dups.add(new Dup(fd.getFullPath(), s));
+                if (fd != null) {
+                    dups.add(new Dup(fd.getFullPath(), s));
+                }
             }
         }
 
-        ((JLabel)xui.getComponent("status")).setText("Number of duplicates: "+dups.size());
+        ((JLabel) xui.getComponent("status")).setText("Number of duplicates: " + dups.size());
         postInit();
     }
 
     public void EVENT_delete(ActionEvent e) throws Exception {
-        if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) return;
+        if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) {
+            return;
+        }
         if (table.getSelectedColumnCount() > 1) {
             OptionDialog.showErrorDialog(ui.getMainWindow(), "Please select files on only one column - not both.");
             return;
@@ -71,7 +76,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
         ArrayList<String> filesThatNeedHashing = new ArrayList<String>();
         ArrayList<String> al = new ArrayList<String>();
-        for(int i : table.getSelectedRows()) {
+        for (int i : table.getSelectedRows()) {
             if (table.getSelectedColumn() == 0) {
                 al.add(dups.get(i).inShare);
                 filesThatNeedHashing.add(dups.get(i).duplicate);
@@ -80,10 +85,10 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
             }
         }
 
-        if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to delete "+al.size()+" file(s)?")) {
-            int deleted=0;
+        if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to delete " + al.size() + " file(s)?")) {
+            int deleted = 0;
 
-            for(String s : al) {
+            for (String s : al) {
                 if (!new File(s).delete()) {
                     /*OptionDialog.showErrorDialog(ui.getMainWindow(), "Could not delete "+s+".");
                     return;*/
@@ -97,7 +102,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
                 ui.getCore().getShareManager().getShareScanner().signalFileCreated(f);
             }
 
-            OptionDialog.showInformationDialog(ui.getMainWindow(), deleted+"/"+al.size()+" files deleted. Note that it might take a while before the duplicate list is updated.");
+            OptionDialog.showInformationDialog(ui.getMainWindow(), deleted + "/" + al.size() + " files deleted. Note that it might take a while before the duplicate list is updated.");
             revert();
         }
     }
@@ -106,16 +111,23 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         return "duplicates";
     }
 
-    public void save() throws Exception {}
+    public void save() throws Exception {
+    }
+
     public void revert() throws Exception {
         manager.recreateWindow(this, new DuplicatesMDIWindow(ui));
     }
-    public void serialize(ObjectOutputStream out) throws IOException {}
-    public MDIWindow deserialize(ObjectInputStream in) throws IOException { return null; }
+
+    public void serialize(ObjectOutputStream out) throws IOException {
+    }
+
+    public MDIWindow deserialize(ObjectInputStream in) throws IOException {
+        return null;
+    }
 
     private class TableModel extends AbstractTableModel {
 
-		public int getRowCount() {
+        public int getRowCount() {
             return dups.size();
         }
 
@@ -124,7 +136,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         }
 
         public String getColumnName(int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return "In share";
                 case 1:
@@ -135,7 +147,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            switch(columnIndex) {
+            switch (columnIndex) {
                 case 0:
                     return dups.get(rowIndex).inShare;
                 case 1:
@@ -147,6 +159,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
     }
 
     private class Dup {
+
         public Dup(String inShare, String duplicate) {
             this.inShare = TextUtils.makeSurePathIsMultiplatform(inShare);
             this.duplicate = TextUtils.makeSurePathIsMultiplatform(duplicate);
@@ -156,11 +169,13 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
     private class MyCellRenderer extends DefaultTableCellRenderer {
 
-		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             String s = String.valueOf(value);
             int i = s.lastIndexOf('/');
-            if (i != -1) s = s.substring(i+1) + " ("+s.substring(0,i)+")";
+            if (i != -1) {
+                s = s.substring(i + 1) + " (" + s.substring(0, i) + ")";
+            }
             setText(s);
             return this;
         }

@@ -12,9 +12,12 @@ import org.alliance.core.comm.T;
  * To change this template use File | Settings | File Templates.
  */
 public class Pong extends RPC {
+
     public void execute(Packet p) {
-        String s = "Received Pong from "+con.getRemoteFriend().getNickname()+". RTT: "+(System.currentTimeMillis()-con.getLastPacketSentAt())+"ms";
-        if(T.t)T.info(s);
+        String s = "Received Pong from " + con.getRemoteFriend().getNickname() + ". RTT: " + (System.currentTimeMillis() - con.getLastPacketSentAt()) + "ms";
+        if (T.t) {
+            T.info(s);
+        }
         con.pongReceived();
         core.updateLastSeenOnlineFor(con.getRemoteFriend());
     }

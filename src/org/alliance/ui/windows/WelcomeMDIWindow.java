@@ -17,11 +17,11 @@ import java.io.*;
  * Time: 14:12:18
  */
 public class WelcomeMDIWindow extends AllianceMDIWindow {
-	public static final String IDENTIFIER = "welcome";
+
+    public static final String IDENTIFIER = "welcome";
     private JHtmlLabel label;
     private JLabel imageLabel;
     private UISubsystem ui;
-
     private String html, image;
 
     public WelcomeMDIWindow() {
@@ -34,7 +34,9 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
         BufferedReader r = new BufferedReader(new InputStreamReader(ui.getRl().getResourceStream("welcome.html")));
         StringBuffer data = new StringBuffer();
         String line = null;
-        while((line = r.readLine()) != null) data.append(line);
+        while ((line = r.readLine()) != null) {
+            data.append(line);
+        }
         init(data.toString(), "Changelog");
     }
 
@@ -45,9 +47,10 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
         label.setText(html);
 
         label.addHyperlinkListener(new HyperlinkListener() {
+
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 String s = e.getURL().toString();
-                s = s.substring(s.length()-1);
+                s = s.substring(s.length() - 1);
                 FileType ft = FileType.getFileTypeById(Integer.parseInt(s));
 
                 if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
@@ -58,7 +61,7 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
                         ui.handleErrorInEventLoop(e1);
                     }
                 } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-                    ui.getMainWindow().setStatusMessage("Click here to search for new files in type "+ft.description());
+                    ui.getMainWindow().setStatusMessage("Click here to search for new files in type " + ft.description());
                 }
             }
         });

@@ -16,6 +16,7 @@ import java.io.IOException;
  * Time: 18:42:48
  */
 public class Search extends RPC {
+
     private String query;
     private byte fileTypeId;
 
@@ -31,17 +32,25 @@ public class Search extends RPC {
     public void execute(Packet in) throws IOException {
         query = in.readUTF();
 
-        core.logNetworkEvent("Search query "+query+" from "+con.getRemoteFriend());
-        
+        core.logNetworkEvent("Search query " + query + " from " + con.getRemoteFriend());
+
         FileType ft = FileType.EVERYTHING;
         int ftid = in.readByte();
-        if (FileType.getFileTypeById(ftid) != null) ft = FileType.getFileTypeById(ftid);
+        if (FileType.getFileTypeById(ftid) != null) {
+            ft = FileType.getFileTypeById(ftid);
+        }
 
         FileDescriptor fd[] = manager.getCore().getFileManager().search(query, SearchHits.MAX_SEARCH_HITS, ft);
         SearchHitsV2 sh = new SearchHitsV2();
-        for(FileDescriptor f : fd) if (f != null) sh.addHit(f);
+        for (FileDescriptor f : fd) {
+            if (f != null) {
+                sh.addHit(f);
+            }
+        }
 
-        if(T.t)T.info("Found "+sh.getNHits()+" hits.");
+        if (T.t) {
+            T.info("Found " + sh.getNHits() + " hits.");
+        }
         if (sh.getNHits() > 0) {
             //reply with Search hits
             send(fromGuid, sh);

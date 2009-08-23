@@ -14,6 +14,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class DirectoryListing extends CompressedRPC {
+
     private String files[];
     private int shareBaseIndex;
     private String path;
@@ -31,26 +32,38 @@ public class DirectoryListing extends CompressedRPC {
         shareBaseIndex = in.readInt();
         path = in.readUTF();
         int nFiles = in.readInt();
-        if(T.t)T.info("Decompressing "+nFiles+" files for share base "+shareBaseIndex+" and path "+path);
+        if (T.t) {
+            T.info("Decompressing " + nFiles + " files for share base " + shareBaseIndex + " and path " + path);
+        }
 
         files = new String[nFiles];
-        for(int i=0;i<files.length;i++) files[i] = in.readUTF();
+        for (int i = 0; i < files.length; i++) {
+            files[i] = in.readUTF();
+        }
 
-        if(T.t)T.info("Found the following files:");
-        for(String s : files) {
-            if(T.t)T.info("  "+s);
+        if (T.t) {
+            T.info("Found the following files:");
+        }
+        for (String s : files) {
+            if (T.t) {
+                T.info("  " + s);
+            }
         }
 
         core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, files);
     }
 
     public void serializeCompressed(DataOutputStream out) throws IOException {
-        if(T.t)T.info("compressing directory listing and sending..");
+        if (T.t) {
+            T.info("compressing directory listing and sending..");
+        }
 
         out.writeInt(shareBaseIndex);
         out.writeUTF(path);
 
         out.writeInt(files.length);
-        for(String s : files) out.writeUTF(s);
+        for (String s : files) {
+            out.writeUTF(s);
+        }
     }
 }

@@ -14,6 +14,7 @@ import java.util.Enumeration;
  * Time: 18:15:45
  */
 public class ViewShareRootNode extends ViewShareTreeNode {
+
     private ArrayList<ViewShareShareBaseNode> shareBases = new ArrayList<ViewShareShareBaseNode>();
     private ViewShareTreeModel model;
 
@@ -23,8 +24,10 @@ public class ViewShareRootNode extends ViewShareTreeNode {
 
     void fill(String[] shareBaseNames) {
         shareBases.clear();
-        for(int i=0;i<shareBaseNames.length;i++) {
-            if (!shareBaseNames[i].equals("cache")) shareBases.add(new ViewShareShareBaseNode(shareBaseNames[i], this, i));
+        for (int i = 0; i < shareBaseNames.length; i++) {
+            if (!shareBaseNames[i].equals("cache")) {
+                shareBases.add(new ViewShareShareBaseNode(shareBaseNames[i], this, i));
+            }
         }
     }
 
@@ -37,7 +40,9 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     }
 
     protected String getFileItemPath() {
-        if(T.t)T.warn("This should not be called");
+        if (T.t) {
+            T.warn("This should not be called");
+        }
         return null;
     }
 
@@ -50,8 +55,10 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     }
 
     public int getIndex(TreeNode node) {
-        if (!(node instanceof ViewShareShareBaseNode)) return -1;
-        return shareBases.indexOf((ViewShareShareBaseNode)node);
+        if (!(node instanceof ViewShareShareBaseNode)) {
+            return -1;
+        }
+        return shareBases.indexOf((ViewShareShareBaseNode) node);
     }
 
     public boolean getAllowsChildren() {
@@ -75,8 +82,10 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     }
 
     public ViewShareShareBaseNode getByShareBase(int shareBaseIndex) {
-        for(ViewShareShareBaseNode s : shareBases) {
-            if (s.getShareBaseIndex() == shareBaseIndex) return s;
+        for (ViewShareShareBaseNode s : shareBases) {
+            if (s.getShareBaseIndex() == shareBaseIndex) {
+                return s;
+            }
         }
         return null;
     }

@@ -12,6 +12,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class DownloadStorage extends BlockStorage {
+
     public static final int TYPE_ID = 1;
 
     public DownloadStorage(String storagePath, String completeFilePath, CoreSubsystem core) throws IOException {
@@ -20,7 +21,9 @@ public class DownloadStorage extends BlockStorage {
     }
 
     protected void signalFileComplete(BlockFile bf) {
-        if(T.t)T.info("File downloaded successfully: "+bf.getFd());
+        if (T.t) {
+            T.info("File downloaded successfully: " + bf.getFd());
+        }
     }
 
     public int getStorageTypeId() {

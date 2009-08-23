@@ -10,5 +10,6 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class Manager {
+
     public abstract void init() throws IOException, Exception;
 }

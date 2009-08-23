@@ -19,8 +19,8 @@ import java.net.URLConnection;
  * To change this template use File | Settings | File Templates.
  */
 public class MyNode extends Node {
-    private static final String WHATSMYIPURL = "http://www.alliancep2p.com/myip";
 
+    private static final String WHATSMYIPURL = "http://www.alliancep2p.com/myip";
     private String externalIp;
     private CoreSubsystem core;
 
@@ -57,8 +57,8 @@ public class MyNode extends Node {
     public void setExternalIp(String externalIp) {
         this.externalIp = externalIp;
     }
-
     private boolean alreadyTriedAutodetect = false;
+
     public void autodetectExternalIp(CoreSubsystem core) throws IOException {
         if (externalIp == null && !alreadyTriedAutodetect) {
             try {
@@ -67,21 +67,26 @@ public class MyNode extends Node {
                 StringBuffer result = new StringBuffer();
                 BufferedReader r = new BufferedReader(new InputStreamReader(in));
                 String line;
-                while((line = r.readLine()) != null) result.append(line);
+                while ((line = r.readLine()) != null) {
+                    result.append(line);
+                }
 
                 line = result.toString();
                 externalIp = line.trim();
 
-                if(T.t)T.info("Detected external ip: "+externalIp);
-            } catch(Exception e) {
-                if(T.t)T.error("Could not detected external ip: "+e);
-                throw new IOException("Could not detect your external IP: "+e);
-            } finally{
+                if (T.t) {
+                    T.info("Detected external ip: " + externalIp);
+                }
+            } catch (Exception e) {
+                if (T.t) {
+                    T.error("Could not detected external ip: " + e);
+                }
+                throw new IOException("Could not detect your external IP: " + e);
+            } finally {
                 alreadyTriedAutodetect = true;
             }
         }
     }
-
 
     public int getAllianceBuildNumber() {
         return Version.BUILD_NUMBER;

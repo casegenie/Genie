@@ -13,13 +13,16 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class ShareBase {
+
     private String path;
 
     public ShareBase(String path) {
         try {
             path = new File(path).getCanonicalFile().getPath();
         } catch (IOException e) {
-            if(T.t)T.error("Could not resolve canonical share path: "+e);
+            if (T.t) {
+                T.error("Could not resolve canonical share path: " + e);
+            }
         }
         this.path = TextUtils.makeSurePathIsMultiplatform(path);
     }
@@ -29,7 +32,7 @@ public class ShareBase {
     }
 
     public String toString() {
-        return "ShareBase "+path;
+        return "ShareBase " + path;
     }
 
     /**
@@ -39,7 +42,9 @@ public class ShareBase {
      */
     public String getName() {
         int i = path.lastIndexOf('/');
-        if (i == -1) return path;
-        return path.substring(i+1);
+        if (i == -1) {
+            return path;
+        }
+        return path.substring(i + 1);
     }
 }

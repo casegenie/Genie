@@ -25,20 +25,17 @@ import java.util.zip.InflaterInputStream;
  * To change this template use File | Settings | File Templates.
  */
 public class FileDatabase {
-    public static final int MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS = 1000*60*10;
-    public static final int VERSION=12;
 
+    public static final int MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS = 1000 * 60 * 10;
+    public static final int VERSION = 12;
     private ChunkStorage chunkStorage;
-
     private FileDescriptorAllocationTable allocationTable = new FileDescriptorAllocationTable();
     private KeywordIndex keywordIndex;
     private HashMap<Hash, Integer> baseHashTable = new HashMap<Hash, Integer>();
     private HashMap<String, Hash> duplicates = new HashMap<String, Hash>();
     private CompressedPathCollection indexedFilenames = new CompressedPathCollection();
-
     //this cache does not seem to work very well - not 100% sure tho. It might be that there's nothing in this cache. BUT I'm afraid there might be new problems if this cache is implemented correctly: If there are cached items FDs that are no longer valid (removed on disk) might be returned anyway..  maybe. this is sketchy.
     private WeakValueHashMap<Hash, FileDescriptor> fileDescriptorCache = new WeakValueHashMap<Hash, FileDescriptor>();
-
     private String indexFilePath;
     private long totalSize;
     private long lastFlushedAt;
@@ -53,8 +50,10 @@ public class FileDatabase {
 
         try {
             loadIndices();
-        } catch(Exception e) {
-            if(T.t)T.error("Could not load indices: "+e);
+        } catch (Exception e) {
+            if (T.t) {
+                T.error("Could not load indices: " + e);
+            }
             e.printStackTrace();
         }
     }
@@ -71,29 +70,43 @@ public class FileDatabase {
      */
     public synchronized FileDescriptor add(FileDescriptor fd) throws IOException {
         if (contains(fd.getRootHash())) {
-            if(T.t)T.info("Maybe found duplicate: "+fd);
+            if (T.t) {
+                T.info("Maybe found duplicate: " + fd);
+            }
             FileDescriptor old = getFd(fd.getRootHash());
             if (old != null && old.existsAndSeemsEqual()) {
                 if (TextUtils.makeSurePathIsMultiplatform(old.getCanonicalPath()).equals(
-                    TextUtils.makeSurePathIsMultiplatform(fd.getCanonicalPath()))) {
-                    if(T.t)T.warn("Problem in file database! Tried to add identical file as duplicate! "+fd);
+                        TextUtils.makeSurePathIsMultiplatform(fd.getCanonicalPath()))) {
+                    if (T.t) {
+                        T.warn("Problem in file database! Tried to add identical file as duplicate! " + fd);
+                    }
                     if (contains(fd.getCanonicalPath())) {
-                        if(T.t)T.info("File is contained in filename index! wtf?");
+                        if (T.t) {
+                            T.info("File is contained in filename index! wtf?");
+                        }
                     } else {
                         if (contains(fd.getFullPath())) {
-                            if(T.t)T.info("AHA! Cannonical file not in filename index - but regular filename is.");
+                            if (T.t) {
+                                T.info("AHA! Cannonical file not in filename index - but regular filename is.");
+                            }
                         } else {
-                            if(T.t)T.info("Neither cannonical or regular filename is in filename index.");
+                            if (T.t) {
+                                T.info("Neither cannonical or regular filename is in filename index.");
+                            }
                         }
-                        if(T.t)T.info("Adding connocinal filename to filename index.");
+                        if (T.t) {
+                            T.info("Adding connocinal filename to filename index.");
+                        }
                         indexedFilenames.addPath(fd.getCanonicalPath());
                     }
                     return old;
                 }
                 if (old.getCanonicalPath().toLowerCase().indexOf("sample") != -1 ||
-                        old.getCanonicalPath().toLowerCase().indexOf("copy") != -1 || 
+                        old.getCanonicalPath().toLowerCase().indexOf("copy") != -1 ||
                         TextUtils.makeSurePathIsMultiplatform(old.getCanonicalPath().toLowerCase()).indexOf("/old/") != -1) {
-                    if(T.t)T.trace("Found duplicate with less significant path name");
+                    if (T.t) {
+                        T.trace("Found duplicate with less significant path name");
+                    }
                     remove(old);
                     addDuplicate(old.getCanonicalPath(), old.getRootHash());
                     //continue adding fd
@@ -102,11 +115,17 @@ public class FileDatabase {
                     return old;
                 }
             } else {
-                if(T.t)T.info("Nope. Original did not exist.");
-                if (old != null) remove(old);
+                if (T.t) {
+                    T.info("Nope. Original did not exist.");
+                }
+                if (old != null) {
+                    remove(old);
+                }
             }
         }
-        if(T.t)T.info("Adding new fd to db: "+fd);
+        if (T.t) {
+            T.info("Adding new fd to db: " + fd);
+        }
 
         //save to file descriptor
         ByteArrayOutputStream out = new ByteArrayOutputStream(512);
@@ -129,14 +148,18 @@ public class FileDatabase {
         totalSize += fd.getSize();
 
         //save and flush database and indices
-        if (System.currentTimeMillis() - lastFlushedAt > MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS) flush();
+        if (System.currentTimeMillis() - lastFlushedAt > MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS) {
+            flush();
+        }
 
         return null; //null means everything went ok.
     }
 
     private void addDuplicate(String fullPath, Hash rootHash) {
         fullPath = TextUtils.makeSurePathIsMultiplatform(fullPath);
-        if(T.t)T.info("Adding duplicate: "+fullPath);
+        if (T.t) {
+            T.info("Adding duplicate: " + fullPath);
+        }
         duplicates.put(fullPath, rootHash);
     }
 
@@ -154,19 +177,27 @@ public class FileDatabase {
                 return null;
             }
             fd = FileDescriptor.createFrom(is, true, core);
-        } catch(FileHasBeenRemovedOrChanged fileHasBeenRemoved) {
+        } catch (FileHasBeenRemovedOrChanged fileHasBeenRemoved) {
             remove(fileHasBeenRemoved.getFd());
             return null;
         }
-        if (addToCache) fileDescriptorCache.put(fd.getRootHash(), fd);
+        if (addToCache) {
+            fileDescriptorCache.put(fd.getRootHash(), fd);
+        }
         return fd;
     }
 
     private synchronized void remove(FileDescriptor fd) throws IOException {
-        if(T.t)T.info("Remoiving: "+fd);
-        if (baseHashTable == null) throw new IOException("Internal error 0 in filedatabase!");
+        if (T.t) {
+            T.info("Remoiving: " + fd);
+        }
+        if (baseHashTable == null) {
+            throw new IOException("Internal error 0 in filedatabase!");
+        }
         Integer index = baseHashTable.get(fd.getRootHash());
-        if (index == null) throw new IOException("Internal error in remove in filedatabase!");
+        if (index == null) {
+            throw new IOException("Internal error in remove in filedatabase!");
+        }
         int off = allocationTable.getOffset(index);
         keywordIndex.remove(index);
         chunkStorage.markAsRemoved(off);
@@ -179,10 +210,14 @@ public class FileDatabase {
     public synchronized FileDescriptor getFd(Hash hash) throws IOException {
         if (contains(hash)) {
             FileDescriptor fd = fileDescriptorCache.get(hash);
-            if (fd != null) return fd;
+            if (fd != null) {
+                return fd;
+            }
         }
         Integer i = baseHashTable.get(hash);
-        if (i == null) return null;
+        if (i == null) {
+            return null;
+        }
         return getFd(i);
     }
 
@@ -191,7 +226,7 @@ public class FileDatabase {
     }
 
     public synchronized void printToSout() throws IOException {
-        System.out.println(TextUtils.formatByteSize(totalSize)+" in "+TextUtils.formatNumber(getNumberOfFiles())+" files.");
+        System.out.println(TextUtils.formatByteSize(totalSize) + " in " + TextUtils.formatNumber(getNumberOfFiles()) + " files.");
     }
 
     public synchronized void flush() throws IOException {
@@ -200,14 +235,16 @@ public class FileDatabase {
         chunkStorage.flush();
         saveIndices();
         lastFlushedAt = System.currentTimeMillis();
-        core.getUICallback().statusMessage("Flushed file database and search index in "+st.getTime());
+        core.getUICallback().statusMessage("Flushed file database and search index in " + st.getTime());
     }
 
     private void saveIndices() throws IOException {
         String fn = indexFilePath;
         File file = new File(fn);
-        if (file.getParentFile() != null) file.getParentFile().mkdirs();
-        File bak = new File(fn+".bak");
+        if (file.getParentFile() != null) {
+            file.getParentFile().mkdirs();
+        }
+        File bak = new File(fn + ".bak");
         bak.delete();
         file.renameTo(bak);
         file = new File(fn);
@@ -234,7 +271,9 @@ public class FileDatabase {
     private void loadIndices(String path) throws IOException {
         File file = new File(path);
         if (!file.exists()) {
-            if(T.t)T.warn("Assuming we're starting for the first time with no index.");
+            if (T.t) {
+                T.warn("Assuming we're starting for the first time with no index.");
+            }
             return;
         }
 
@@ -242,38 +281,46 @@ public class FileDatabase {
             ObjectInputStream in = new ObjectInputStream(new InflaterInputStream(new FileInputStream(file)));
             try {
                 if (in.readInt() != VERSION) {
-                    if(T.t)T.warn("Incorrect database version! Starting from scratch!");
+                    if (T.t) {
+                        T.warn("Incorrect database version! Starting from scratch!");
+                    }
                     return;
                 }
                 totalSize = in.readLong();
-                baseHashTable = (HashMap<Hash, Integer>)in.readObject();
+                baseHashTable = (HashMap<Hash, Integer>) in.readObject();
                 allocationTable.load(in);
                 keywordIndex.load(in);
-                indexedFilenames = (CompressedPathCollection)in.readObject();
-                duplicates = (HashMap<String, Hash>)in.readObject();
+                indexedFilenames = (CompressedPathCollection) in.readObject();
+                duplicates = (HashMap<String, Hash>) in.readObject();
 
                 //make sure all duplicates are stored as multiplatform paths - remove this once this version has been out for a while - this is here only for backward compatibility
                 HashMap<String, Hash> hm = new HashMap<String, Hash>();
-                for (String d : duplicates.keySet()) hm.put(TextUtils.makeSurePathIsMultiplatform(d), duplicates.get(d));
+                for (String d : duplicates.keySet()) {
+                    hm.put(TextUtils.makeSurePathIsMultiplatform(d), duplicates.get(d));
+                }
                 duplicates = hm;
-                
-            } catch(ClassNotFoundException e) {
-                throw new IOException("Could not load indices: "+e);
+
+            } catch (ClassNotFoundException e) {
+                throw new IOException("Could not load indices: " + e);
             }
             in.close();
-        } catch(IOException e) {
+        } catch (IOException e) {
             if (path.endsWith(".bak")) {
                 throw e;
             } else {
-                if(T.t)T.error("Error when loading index. Trying with backup index. "+e);
-                loadIndices(indexFilePath+".bak");
+                if (T.t) {
+                    T.error("Error when loading index. Trying with backup index. " + e);
+                }
+                loadIndices(indexFilePath + ".bak");
             }
         }
     }
 
     public synchronized void cleanupDuplicates() {
-        for(Iterator<String> i = duplicates.keySet().iterator();i.hasNext();) {
-            if (!new File(i.next()).exists()) i.remove();
+        for (Iterator<String> i = duplicates.keySet().iterator(); i.hasNext();) {
+            if (!new File(i.next()).exists()) {
+                i.remove();
+            }
         }
     }
 
@@ -303,14 +350,17 @@ public class FileDatabase {
      * @return
      * @throws IOException
      */
-
     public Collection<FileDescriptor> getFDsByPath(String path) throws IOException {
         FileDescriptor fd[] = search(path, 1000, FileType.EVERYTHING);
         ArrayList<FileDescriptor> al = new ArrayList<FileDescriptor>();
-        for(FileDescriptor f : fd) {
+        for (FileDescriptor f : fd) {
             if (f != null) {
-                if(T.t)T.trace(f.getFullPath()+" - "+path);
-                if (f.getFullPath().startsWith(path)) al.add(f);
+                if (T.t) {
+                    T.trace(f.getFullPath() + " - " + path);
+                }
+                if (f.getFullPath().startsWith(path)) {
+                    al.add(f);
+                }
             }
         }
         return al;
@@ -319,7 +369,7 @@ public class FileDatabase {
     public synchronized FileDescriptor[] search(String query, int maxHits, FileType ft) throws IOException {
         int indices[] = keywordIndex.search(query, maxHits, ft);
         FileDescriptor fd[] = new FileDescriptor[indices.length];
-        for(int i=0;i<indices.length;i++) {
+        for (int i = 0; i < indices.length; i++) {
             fd[i] = getFd(indices[i]);
         }
         return fd;
@@ -342,7 +392,7 @@ public class FileDatabase {
     }
 
     public String[] getDirectoryListing(ShareBase base, String path) {
-        return indexedFilenames.getDirectoryListing(base.getPath()+"/"+path);
+        return indexedFilenames.getDirectoryListing(base.getPath() + "/" + path);
     }
 
     public Collection<String> getDuplicates() {
@@ -354,19 +404,21 @@ public class FileDatabase {
     }
 
     public void clearDuplicates() {
-        if(T.t)T.info("Removing all duplicate entries.");
+        if (T.t) {
+            T.info("Removing all duplicate entries.");
+        }
         duplicates.clear();
     }
 
     public void printStats(Console.Printer printer) throws IOException {
         printer.println("Filedatabse stats:");
-        printer.println("  FileDescriptor Allocation Table size: "+allocationTable.getNumberOfFiles());
-        printer.println("  keywords in index: "+keywordIndex.getNumbefOfKeywords());
-        printer.println("  keys in base hashtable: "+baseHashTable.size());
-        printer.println("  duplicates: "+duplicates.size());
-        printer.println("  filename list: "+indexedFilenames.getNmberOfPaths());
-        printer.println("  filedescriptors cahced: "+fileDescriptorCache.size());
-        printer.println("  % of filedescriptor databse marked for deletion: "+chunkStorage.getPercetMarkedForDeletion());
+        printer.println("  FileDescriptor Allocation Table size: " + allocationTable.getNumberOfFiles());
+        printer.println("  keywords in index: " + keywordIndex.getNumbefOfKeywords());
+        printer.println("  keys in base hashtable: " + baseHashTable.size());
+        printer.println("  duplicates: " + duplicates.size());
+        printer.println("  filename list: " + indexedFilenames.getNmberOfPaths());
+        printer.println("  filedescriptors cahced: " + fileDescriptorCache.size());
+        printer.println("  % of filedescriptor databse marked for deletion: " + chunkStorage.getPercetMarkedForDeletion());
 
     }
 

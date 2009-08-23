@@ -19,24 +19,33 @@ import java.nio.channels.FileChannel;
  * To change this template use File | Settings | File Templates.
  */
 public class CompleteFileBlockProvider extends BlockProvider {
+
     protected FileChannel fileChannel;
 
     public CompleteFileBlockProvider(int blockNumber, Hash root, CoreSubsystem core) throws IOException {
         super(blockNumber, root, core);
 
         File f = new File(fd.getFullPath());
-        if (!f.exists()) throw new FileNotFoundException("Could not find: "+fd+" in complete files!");
+        if (!f.exists()) {
+            throw new FileNotFoundException("Could not find: " + fd + " in complete files!");
+        }
 
         FileInputStream in = new FileInputStream(f);
         fileChannel = in.getChannel();
-        fileChannel.position(((long)blockNumber)*BLOCK_SIZE);
+        fileChannel.position(((long) blockNumber) * BLOCK_SIZE);
 
-        if(T.t)T.ass(fileChannel.isOpen(), "FileChannel closed!");
-        if(T.t)T.trace("Ready to start sending block");
+        if (T.t) {
+            T.ass(fileChannel.isOpen(), "FileChannel closed!");
+        }
+        if (T.t) {
+            T.trace("Ready to start sending block");
+        }
     }
 
     public int fill(ByteBuffer buf) throws IOException {
-        if (!fileChannel.isOpen()) return -1;
+        if (!fileChannel.isOpen()) {
+            return -1;
+        }
 
         int bs = prepare(buf);
 
@@ -44,8 +53,12 @@ public class CompleteFileBlockProvider extends BlockProvider {
         read += n;
 
         if (n == -1 || read >= bs) {
-            if(T.t)T.ass(read == bs, "read more then needed!");
-            if(T.t)T.info("Block successfulyl provided. Rest is in buffer. Closing file channel.");
+            if (T.t) {
+                T.ass(read == bs, "read more then needed!");
+            }
+            if (T.t) {
+                T.info("Block successfulyl provided. Rest is in buffer. Closing file channel.");
+            }
             fileChannel.close();
         }
         return n;
@@ -53,6 +66,6 @@ public class CompleteFileBlockProvider extends BlockProvider {
 
     public void updateRead(int read) throws IOException {
         this.read = read;
-        fileChannel.position(((long)blockNumber)*BLOCK_SIZE+read);
+        fileChannel.position(((long) blockNumber) * BLOCK_SIZE + read);
     }
 }

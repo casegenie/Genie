@@ -23,6 +23,7 @@ import java.util.ArrayList;
  * To change this template use File | Settings | File Templates.
  */
 public class ShareScanner extends Thread {
+
     private boolean alive = true;
     private ShareManager manager;
     private long bytesScanned;
@@ -30,7 +31,6 @@ public class ShareScanner extends Thread {
     private boolean shouldBeFastScan = false;
     private boolean scanInProgress = false;
     private boolean scannerHasBeenStarted = false;
-
     private ArrayList<String> filesQueuedForHashing = new ArrayList<String>();
     private long lastFullScanCompletedAt;
     private long lastFlushCompletedAt;
@@ -38,16 +38,22 @@ public class ShareScanner extends Thread {
     public ShareScanner(CoreSubsystem core, ShareManager manager) {
         this.core = core;
         this.manager = manager;
-        setName("ShareScanner -- "+core.getSettings().getMy().getNickname());
+        setName("ShareScanner -- " + core.getSettings().getMy().getNickname());
         setPriority(MIN_PRIORITY);
     }
 
     public void run() {
-        try { Thread.sleep(60*1000); } catch (InterruptedException e) {} //wait a while before starting first scan
+        try {
+            Thread.sleep(60 * 1000);
+        } catch (InterruptedException e) {
+        } //wait a while before starting first scan
         core.getAwayManager().addListener(new AwayManager.AwayStatusListener() {
+
             public void awayStatusChanged(boolean away) throws IOException {
-                if (away && System.currentTimeMillis()-lastFlushCompletedAt > 1000*60*20 && !scanInProgress) {
-                    if(T.t)T.trace("Flushing database because user is away and it was a while since we did it.");
+                if (away && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20 && !scanInProgress) {
+                    if (T.t) {
+                        T.trace("Flushing database because user is away and it was a while since we did it.");
+                    }
                     manager.getFileDatabase().flush();
                     core.saveState();
                 }
@@ -55,8 +61,10 @@ public class ShareScanner extends Thread {
         });
 
         scannerHasBeenStarted = true;
-        if (core.getSettings().getInternal().getRescansharewhenalliancestarts() != null && core.getSettings().getInternal().getRescansharewhenalliancestarts() != 1) waitForNextScan();
-        while(alive) {
+        if (core.getSettings().getInternal().getRescansharewhenalliancestarts() != null && core.getSettings().getInternal().getRescansharewhenalliancestarts() != 1) {
+            waitForNextScan();
+        }
+        while (alive) {
             scanInProgress = true;
             filesScannedCounter = 0;
             if (filesQueuedForHashing.size() > 0) {
@@ -65,16 +73,24 @@ public class ShareScanner extends Thread {
                 for (String file : al) {
                     try {
                         if (manager.getFileDatabase().getFDsByPath(file).size() > 0) {
-                            if(T.t)T.trace("File already is hashed: "+file);
+                            if (T.t) {
+                                T.trace("File already is hashed: " + file);
+                            }
                             continue;
                         }
                         File f = new File(file);
-                        if (!f.isDirectory() && f.canRead()) hash(file);
+                        if (!f.isDirectory() && f.canRead()) {
+                            hash(file);
+                        }
                     } catch (FileNotFoundException e) {
-                        if(T.t)T.error("Problem while hashing file "+file+": "+e+", trying again later");
+                        if (T.t) {
+                            T.error("Problem while hashing file " + file + ": " + e + ", trying again later");
+                        }
                         queFileForHashing(file, true);
                     } catch (IOException e) {
-                        if(T.t)T.error("Could not hash file "+file+": "+e);
+                        if (T.t) {
+                            T.error("Could not hash file " + file + ": " + e);
+                        }
                     }
                 }
             }
@@ -85,12 +101,16 @@ public class ShareScanner extends Thread {
                 cleanup();
 
                 ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
-                for(ShareBase base : al) {
-                    if (!alive) break;
+                for (ShareBase base : al) {
+                    if (!alive) {
+                        break;
+                    }
                     try {
                         scanPath(base);
-                    } catch(Exception e) {
-                        if(T.t)T.error("Could not scan "+base+": "+e);
+                    } catch (Exception e) {
+                        if (T.t) {
+                            T.error("Could not scan " + base + ": " + e);
+                        }
                     }
                 }
 
@@ -100,96 +120,127 @@ public class ShareScanner extends Thread {
 
             try {
                 //flush fairly often when user is away - the UI locks when you flush so we want to avoid doing that while the user is by the computer
-                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis()-lastFlushCompletedAt > 1000*60*20)
-                        || System.currentTimeMillis()-lastFlushCompletedAt > 1000*60*60*2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
+                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20) || System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
                     manager.getFileDatabase().flush();
                     core.saveState();
                     lastFlushCompletedAt = System.currentTimeMillis();
                 }
-            } catch(IOException e) {
+            } catch (IOException e) {
                 core.reportError(e, this);
             }
 
             shouldBeFastScan = false;
             scanInProgress = false;
-            if (!alive) break;
+            if (!alive) {
+                break;
+            }
             waitForNextScan();
         }
     }
 
     private void waitForNextScan() {
         try {
-            if(T.t)T.info("Wating for next share scan.");
+            if (T.t) {
+                T.info("Wating for next share scan.");
+            }
             if (filesQueuedForHashing.size() > 0) {
-                if(T.t)T.info("Files are in hash que so don't wait for too long");
-                Thread.sleep(1000*5);
-            } else  {
+                if (T.t) {
+                    T.info("Files are in hash que so don't wait for too long");
+                }
+                Thread.sleep(1000 * 5);
+            } else {
                 Thread.sleep(getShareManagerCycle());
             }
-        } catch(Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     private long getShareManagerCycle() {
-        if (OSInfo.isWindows())
-            return 1000*60*manager.getSettings().getInternal().getSharemanagercyclewithfilesystemeventsactive();
-        else
-            return 1000*60*manager.getSettings().getInternal().getSharemanagercycle();
+        if (OSInfo.isWindows()) {
+            return 1000 * 60 * manager.getSettings().getInternal().getSharemanagercyclewithfilesystemeventsactive();
+        } else {
+            return 1000 * 60 * manager.getSettings().getInternal().getSharemanagercycle();
+        }
     }
 
     private void cleanup() {
-        if(T.t)T.info("Cleaning up index...");
+        if (T.t) {
+            T.info("Cleaning up index...");
+        }
         FileDatabase fd = manager.getFileDatabase();
 
         int n = fd.getNumberOfFiles();
-        for(int i = 0; i < n; i++) {
-            if(!alive) return;
+        for (int i = 0; i < n; i++) {
+            if (!alive) {
+                return;
+            }
             try {
                 // If file is missing the descriptor will automatically be removed from the index
                 fd.getFd(i, false);
 
                 int sleepEveryXFiles = shouldBeFastScan ? 500 : 100;
-                if(i % sleepEveryXFiles == 0) {
-                    manager.getCore().getUICallback().statusMessage("Checking share for removed files ("+(i*100/n)+"%)...");
+                if (i % sleepEveryXFiles == 0) {
+                    manager.getCore().getUICallback().statusMessage("Checking share for removed files (" + (i * 100 / n) + "%)...");
                     try {
                         Thread.sleep(100);
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                 }
             } catch (IOException e) {
-                if(T.t)T.warn("Unable to retrieve file descriptor: "+e);
+                if (T.t) {
+                    T.warn("Unable to retrieve file descriptor: " + e);
+                }
             }
         }
     }
 
     private void scanPath(ShareBase base) throws IOException {
-        if(T.t)T.info("Scanning "+base.getPath()+"...");
-        scanPathRecursive(base.getPath(),base,1);
+        if (T.t) {
+            T.info("Scanning " + base.getPath() + "...");
+        }
+        scanPathRecursive(base.getPath(), base, 1);
     }
+    private int filesScannedCounter = 0;
 
-    private int filesScannedCounter=0;
     private void scanPathRecursive(String dir, ShareBase base, int level) throws IOException {
-        if (!alive) return;
+        if (!alive) {
+            return;
+        }
 
-        if (shouldSkip(dir)) return;
+        if (shouldSkip(dir)) {
+            return;
+        }
 
         File top = new File(dir);
 
         File files[] = top.listFiles();
-        if (files != null) for(int i=0;i<files.length;i++) {
-            File file = files[i];
-            file = file.getCanonicalFile();
-            if (!shouldBeFastScan && (filesScannedCounter % 100) == 0) try {Thread.sleep(100);} catch (InterruptedException e) {}
-            filesScannedCounter++;
-            if (file.isDirectory()) {
-                if(T.t)T.trace("Scanning "+file.getPath()+"...");
-                manager.getCore().getUICallback().statusMessage("Scanning "+file.getPath()+"...");
-                scanPathRecursive(file.getPath(),base,level+1);
-            } else {
-                try {
-                    if (!manager.getFileDatabase().contains(file.toString())) {
-                        hash(base, file);
+        if (files != null) {
+            for (int i = 0; i < files.length; i++) {
+                File file = files[i];
+                file = file.getCanonicalFile();
+                if (!shouldBeFastScan && (filesScannedCounter % 100) == 0) {
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
                     }
-                } catch(IOException e) {
-                    if(T.t)T.warn("Could not hash file "+file+": "+e);
+                }
+                filesScannedCounter++;
+                if (file.isDirectory()) {
+                    if (T.t) {
+                        T.trace("Scanning " + file.getPath() + "...");
+                    }
+                    manager.getCore().getUICallback().statusMessage("Scanning " + file.getPath() + "...");
+                    scanPathRecursive(file.getPath(), base, level + 1);
+                } else {
+                    try {
+                        if (!manager.getFileDatabase().contains(file.toString())) {
+                            hash(base, file);
+                        }
+                    } catch (IOException e) {
+                        if (T.t) {
+                            T.warn("Could not hash file " + file + ": " + e);
+                        }
+                    }
                 }
             }
         }
@@ -197,12 +248,16 @@ public class ShareScanner extends Thread {
 
     private void hash(String file) throws IOException {
         if (manager.getShareBaseByFile(file) == null) {
-            if(T.t)T.info("Share base not found for "+file+" - cant hash");
+            if (T.t) {
+                T.info("Share base not found for " + file + " - cant hash");
+            }
             return;
         }
         File f = new File(file);
         if (!f.exists()) {
-            if(T.t)T.warn("File "+file+" does not exist - cant hash!");
+            if (T.t) {
+                T.warn("File " + file + " does not exist - cant hash!");
+            }
             return;
         }
         hash(manager.getShareBaseByFile(file), f);
@@ -210,43 +265,56 @@ public class ShareScanner extends Thread {
 
     private void hash(ShareBase base, File file) throws IOException {
         if (file.isHidden() || file.length() == 0) {
-            if(T.t)T.debug("Skipping hidden or empty file "+file);
+            if (T.t) {
+                T.debug("Skipping hidden or empty file " + file);
+            }
             return;
         }
-        if (manager.getFileDatabase().isDuplicate(file.getCanonicalPath())) return;
+        if (manager.getFileDatabase().isDuplicate(file.getCanonicalPath())) {
+            return;
+        }
 
         SimpleTimer st = new SimpleTimer();
         FileDescriptor fd;
         try {
             fd = new FileDescriptor(base.getPath(), file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
-        } catch(FileDescriptor.FileModifiedWhileHashingException e) {
-            manager.getCore().getUICallback().statusMessage("File modified while hashing: "+file);
+        } catch (FileDescriptor.FileModifiedWhileHashingException e) {
+            manager.getCore().getUICallback().statusMessage("File modified while hashing: " + file);
             queFileForHashing(file.toString(), true);
             return;
         }
-        manager.getCore().getUICallback().statusMessage("Hashed "+fd.getFilename()+" in "+st.getTime()+" ("+ TextUtils.formatByteSize((long)(fd.getSize()/(st.getTimeInMs()/1000.)))+"/s)");
+        manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime() + " (" + TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.))) + "/s)");
         manager.getFileDatabase().add(fd);
 
         bytesScanned += fd.getSize();
-        if (bytesScanned > manager.getCore().getSettings().getInternal().getPolitehashingintervalingigabytes()*GB) {
+        if (bytesScanned > manager.getCore().getSettings().getInternal().getPolitehashingintervalingigabytes() * GB) {
             bytesScanned = 0;
             try {
-                if(T.t)T.info("Polite scanning in progress. Sleeping for "+manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes()+" minutes for harddrive to cool down.");
-                Thread.sleep(manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes()*60*1000);
-            } catch(InterruptedException e) {}
+                if (T.t) {
+                    T.info("Polite scanning in progress. Sleeping for " + manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() + " minutes for harddrive to cool down.");
+                }
+                Thread.sleep(manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() * 60 * 1000);
+            } catch (InterruptedException e) {
+            }
         }
     }
 
     private void queFileForHashing(String file, boolean lowPriority) {
         try {
             if (manager.getFileDatabase().getFDsByPath(file).size() > 0) {
-                if(T.t)T.trace("File already is hashed: "+file);
+                if (T.t) {
+                    T.trace("File already is hashed: " + file);
+                }
                 return;
             }
-        } catch(Exception e) {
-            if(T.t)T.warn("Problem while cheking if file already is hashed: "+e);
+        } catch (Exception e) {
+            if (T.t) {
+                T.warn("Problem while cheking if file already is hashed: " + e);
+            }
         }
-        if (filesQueuedForHashing.contains(file)) return;
+        if (filesQueuedForHashing.contains(file)) {
+            return;
+        }
         if (!lowPriority) {
             filesQueuedForHashing.add(0, file);
             interrupt();
@@ -257,7 +325,9 @@ public class ShareScanner extends Thread {
 
     private boolean shouldSkip(String dir) {
         String s = TextUtils.makeSurePathIsMultiplatform(dir);
-        if (s.endsWith("/")) s = s.substring(0,s.length()-1);
+        if (s.endsWith("/")) {
+            s = s.substring(0, s.length() - 1);
+        }
         return s.endsWith(FileManager.INCOMPLETE_FOLDER_NAME);
     }
 
@@ -276,8 +346,11 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileRenamed(final String oldFile, final String newFile) {
-        if (!scannerHasBeenStarted || newFile.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) return;
+        if (!scannerHasBeenStarted || newFile.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+            return;
+        }
         core.invokeLater(new Runnable() {
+
             public void run() {
                 try {
                     manager.getFileDatabase().getFDsByPath(oldFile);
@@ -290,13 +363,16 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileDeleted(final String file) {
-        if (!scannerHasBeenStarted|| file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) return;
+        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+            return;
+        }
         core.invokeLater(new Runnable() {
+
             public void run() {
                 try {
                     manager.getFileDatabase().removeFromDuplicates(file); //in case the file exists in duplicates it will be removed
                     manager.getFileDatabase().getFDsByPath(file); //will notice that the file is no longer avail and remove it from index
-                    manager.getCore().getUICallback().statusMessage("Removed file "+file+" from share.");
+                    manager.getCore().getUICallback().statusMessage("Removed file " + file + " from share.");
                 } catch (IOException e) {
                     core.reportError(e, this);
                 }
@@ -305,7 +381,9 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileCreated(final String file) {
-        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) return;
+        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+            return;
+        }
         queFileForHashing(file, false);
     }
 }

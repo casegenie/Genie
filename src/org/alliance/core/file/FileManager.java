@@ -32,6 +32,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class FileManager extends Manager {
+
     private CacheStorage cache;
     private DownloadStorage downloads;
     private ShareManager shareManager;
@@ -46,8 +47,8 @@ public class FileManager extends Manager {
     }
 
     public void init() throws IOException {
-        cache = new CacheStorage(settings.getInternal().getCachefolder()+"/"+FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
-        downloads = new DownloadStorage(settings.getInternal().getDownloadfolder()+"/"+FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
+        cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
+        downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
         automaticUpgrade = new AutomaticUpgrade(core, cache);
         shareManager = new ShareManager(core, settings);
     }
@@ -63,9 +64,15 @@ public class FileManager extends Manager {
     }
 
     public boolean contains(Hash root) {
-        if (cache.contains(root)) return true;
-        if (downloads.contains(root)) return true;
-        if (shareManager.getFileDatabase().contains(root)) return true;
+        if (cache.contains(root)) {
+            return true;
+        }
+        if (downloads.contains(root)) {
+            return true;
+        }
+        if (shareManager.getFileDatabase().contains(root)) {
+            return true;
+        }
         return false;
     }
 
@@ -83,25 +90,35 @@ public class FileManager extends Manager {
 
     public BlockMask getBlockMask(Hash root) throws IOException {
         BlockMask bm = downloads.getBlockMaskFor(root);
-        if (bm != null) return bm;
+        if (bm != null) {
+            return bm;
+        }
         return cache.getBlockMaskFor(root);
     }
 
     public FileDescriptor getFd(Hash root) throws IOException {
         FileDescriptor fd = shareManager.getFileDatabase().getFd(root);
-        if (fd != null) return fd;
+        if (fd != null) {
+            return fd;
+        }
         fd = downloads.getFD(root);
-        if (fd != null) return fd;
+        if (fd != null) {
+            return fd;
+        }
         fd = cache.getFD(root);
         return fd;
     }
 
     public BlockStorage getBlockStorageFor(Hash root) {
-        if (downloads.contains(root)) return downloads;
-        if (cache.contains(root)) return cache;
+        if (downloads.contains(root)) {
+            return downloads;
+        }
+        if (cache.contains(root)) {
+            return cache;
+        }
         return null;
     }
-    
+
     public CacheStorage getCache() {
         return cache;
     }
@@ -111,8 +128,12 @@ public class FileManager extends Manager {
     }
 
     public boolean hasBlock(Hash rootHash, int blockNumber) throws IOException {
-        if (shareManager.getFileDatabase().contains(rootHash)) return true;
-        if (downloads.contains(rootHash) && downloads.getBlockMaskFor(rootHash).get(blockNumber)) return true;
+        if (shareManager.getFileDatabase().contains(rootHash)) {
+            return true;
+        }
+        if (downloads.contains(rootHash) && downloads.getBlockMaskFor(rootHash).get(blockNumber)) {
+            return true;
+        }
         return cache.contains(rootHash) && cache.getBlockMaskFor(rootHash).get(blockNumber);
     }
 
@@ -121,8 +142,12 @@ public class FileManager extends Manager {
     }
 
     public boolean isRecentlyDownloadedOrComplete(Hash rootHash) {
-        if (containsComplete(rootHash)) return true;
-        if (downloads.isRecentlyDownloaded(rootHash)) return true;
+        if (containsComplete(rootHash)) {
+            return true;
+        }
+        if (downloads.isRecentlyDownloaded(rootHash)) {
+            return true;
+        }
         return cache.isRecentlyDownloaded(rootHash);
     }
 

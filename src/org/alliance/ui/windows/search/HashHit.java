@@ -16,6 +16,7 @@ import com.stendahls.util.TextUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class HashHit implements Comparable {
+
     Hash hash;
     int hits;
     String filename;
@@ -32,9 +33,13 @@ public class HashHit implements Comparable {
     }
 
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        return hash.equals(((HashHit)obj).hash);
+        if (this == obj) {
+            return true;
+        }
+        if ((obj == null) || (obj.getClass() != this.getClass())) {
+            return false;
+        }
+        return hash.equals(((HashHit) obj).hash);
     }
 
     public int hashCode() {
@@ -42,9 +47,11 @@ public class HashHit implements Comparable {
     }
 
     public int compareTo(Object o) {
-        if(T.t)T.ass(o instanceof HashHit,"");
-        HashHit h = (HashHit)o;
-        return hits-h.hits;
+        if (T.t) {
+            T.ass(o instanceof HashHit, "");
+        }
+        HashHit h = (HashHit) o;
+        return hits - h.hits;
     }
 
     public void addHit(int hopsAway, long size, String fn, int guid, int daysAgo) {
@@ -54,14 +61,20 @@ public class HashHit implements Comparable {
 
         path = fn;
 
-        if (daysAgo > this.daysAgo) this.daysAgo = daysAgo;
+        if (daysAgo > this.daysAgo) {
+            this.daysAgo = daysAgo;
+        }
 
         filename = fn;
-        if (filename.indexOf('/') != -1) filename = filename.substring(filename.lastIndexOf('/')+1);
+        if (filename.indexOf('/') != -1) {
+            filename = filename.substring(filename.lastIndexOf('/') + 1);
+        }
 
         if (fn.length() > filename.length()) {
-            folder = fn.substring(0, fn.length()-filename.length()-1);
-            if (folder.indexOf('/') != -1) folder = folder.substring(folder.lastIndexOf('/')+1);
+            folder = fn.substring(0, fn.length() - filename.length() - 1);
+            if (folder.indexOf('/') != -1) {
+                folder = folder.substring(folder.lastIndexOf('/') + 1);
+            }
         } else {
             folder = "";
         }
@@ -69,15 +82,17 @@ public class HashHit implements Comparable {
         this.size = size;
         userGuids.add(guid);
     }
-
-    private int cachedUsers=-1;
+    private int cachedUsers = -1;
     private String cachedListOfUsers;
+
     public String getListOfUsers() {
         if (cachedUsers != userGuids.size()) {
             StringBuffer sb = new StringBuffer();
-            for(int i=0;i<userGuids.size();i++) {
+            for (int i = 0; i < userGuids.size(); i++) {
                 sb.append(core.getFriendManager().nickname(userGuids.get(i)));
-                if (i < userGuids.size()-1) sb.append(", ");
+                if (i < userGuids.size() - 1) {
+                    sb.append(", ");
+                }
             }
             cachedListOfUsers = sb.toString();
         }

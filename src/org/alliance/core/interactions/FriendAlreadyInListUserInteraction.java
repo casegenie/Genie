@@ -9,7 +9,8 @@ import org.alliance.core.SynchronizedNeedsUserInteraction;
  * Time: 16:58:19
  */
 public class FriendAlreadyInListUserInteraction extends SynchronizedNeedsUserInteraction {
-	private int guid;
+
+    private int guid;
 
     public FriendAlreadyInListUserInteraction() {
     }

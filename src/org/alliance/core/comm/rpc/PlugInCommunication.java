@@ -15,7 +15,8 @@ import java.io.IOException;
  * Time: 18:42:48
  */
 public class PlugInCommunication extends PersistantRPC {
-	private String data;
+
+    private String data;
 
     public PlugInCommunication() {
     }

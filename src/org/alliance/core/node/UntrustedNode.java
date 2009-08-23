@@ -11,6 +11,7 @@ package org.alliance.core.node;
  * Time: 13:51:42
  */
 public class UntrustedNode extends Node {
+
     private boolean connected;
 
     private UntrustedNode(String nickname, int guid, boolean connected) {
@@ -23,7 +24,9 @@ public class UntrustedNode extends Node {
             UntrustedNode n = new UntrustedNode(nickname, guid, connected);
             man.addUntrustedNode(n);
             return n;
-        } else return man.getUntrustedNode(guid);
+        } else {
+            return man.getUntrustedNode(guid);
+        }
     }
 
     /**

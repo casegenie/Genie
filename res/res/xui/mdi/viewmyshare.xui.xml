@@ -1,3 +1,4 @@
+
 <xui>
     <title value=""/>
     <body>
@@ -13,7 +14,9 @@
         </panel>
         <scrollpanel expand="both" scrollbars="optional" id="treepanel">
             <panel axis="x">
-                <filler/><label text="Please wait..."/><filler/>
+                <filler/>
+                <label text="Please wait..."/>
+                <filler/>
             </panel>
         </scrollpanel>
         <panel border="0" axis="x" expand="horiz" bgcolor="ffffff">
@@ -21,7 +24,13 @@
             <filler/>
         </panel>
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">
-            <label id="status" text=" "/><filler expand="horiz"/><label id="status2" text=" "/><filler expand="horiz"/><label id="status3" text=" "/><filler expand="horiz"/><label id="status4" text=" "/>
+            <label id="status" text=" "/>
+            <filler expand="horiz"/>
+            <label id="status2" text=" "/>
+            <filler expand="horiz"/>
+            <label id="status3" text=" "/>
+            <filler expand="horiz"/>
+            <label id="status4" text=" "/>
         </panel>
     </body>
 </xui>

@@ -10,16 +10,14 @@ import com.stendahls.util.TextUtils;
  * To change this template use File | Settings | File Templates.
  */
 public class BandwidthAnalyzer {
-    public static final int INNER_INVERVAL=1000, OUTER_INTERVAL=10000;
 
+    public static final int INNER_INVERVAL = 1000, OUTER_INTERVAL = 10000;
     private long tick = -1;
     private int nBytes;
     private double highestCps;
     private long totalBytes;
     private int updateInterval = 1000;
-
     private double cps, averageCps; // bytes per second or Chars Per Second
-
     private double[] rollingAverage = new double[30];
     private int index;
 
@@ -38,28 +36,32 @@ public class BandwidthAnalyzer {
     public BandwidthAnalyzer(int updateInterval, int highestCps, long totalBytesStartingAt) {
         this.updateInterval = updateInterval;
         this.highestCps = highestCps;
-        if (totalBytesStartingAt < 0) totalBytesStartingAt = 0;
+        if (totalBytesStartingAt < 0) {
+            totalBytesStartingAt = 0;
+        }
         this.totalBytes = totalBytesStartingAt;
     }
 
     public void update(int bytes) {
-        if (tick == -1) tick = System.currentTimeMillis();
-        nBytes+=bytes;
-        totalBytes+=bytes;
+        if (tick == -1) {
+            tick = System.currentTimeMillis();
+        }
+        nBytes += bytes;
+        totalBytes += bytes;
         updateCps();
     }
 
     private void updateCps() {
         if (System.currentTimeMillis() - tick > updateInterval) {
-            cps = ((double)nBytes) / ((System.currentTimeMillis()-tick)/1000.);
+            cps = ((double) nBytes) / ((System.currentTimeMillis() - tick) / 1000.);
             tick = System.currentTimeMillis();
             nBytes = 0;
 
-            rollingAverage[(index++)%rollingAverage.length] = cps;
+            rollingAverage[(index++) % rollingAverage.length] = cps;
 
-            double n=0;
-            averageCps =0;
-            for(int i=0;i<index && i < rollingAverage.length;i++) {
+            double n = 0;
+            averageCps = 0;
+            for (int i = 0; i < index && i < rollingAverage.length; i++) {
                 averageCps += rollingAverage[i];
                 n++;
             }
@@ -67,7 +69,9 @@ public class BandwidthAnalyzer {
         }
 
 //        if (highestCps < averageCps) highestCps = averageCps;
-        if (highestCps < cps) highestCps = cps;
+        if (highestCps < cps) {
+            highestCps = cps;
+        }
     }
 
     public double getCPS() {
@@ -81,7 +85,7 @@ public class BandwidthAnalyzer {
     }
 
     public static String getHumanReadable(double cps) {
-        return TextUtils.formatByteSize((int)cps)+"/s";
+        return TextUtils.formatByteSize((int) cps) + "/s";
     }
 
     public double getHighestCPS() {

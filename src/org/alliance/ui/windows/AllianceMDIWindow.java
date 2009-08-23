@@ -12,7 +12,8 @@ import org.alliance.ui.UISubsystem;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AllianceMDIWindow extends StendahlsThemeMDIWindow {
-	protected UISubsystem ui;
+
+    protected UISubsystem ui;
 
     protected AllianceMDIWindow(MDIManager manager, String title) {
         super(manager, title);

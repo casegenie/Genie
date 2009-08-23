@@ -12,7 +12,8 @@ import org.alliance.core.node.Friend;
  * To change this template use File | Settings | File Templates.
  */
 public class ForwardedInvitationInteraction extends SynchronizedNeedsUserInteraction {
-	private String invitationCode;
+
+    private String invitationCode;
     private int middlemanGuid;
     private String remoteName;
     private int fromGuid;

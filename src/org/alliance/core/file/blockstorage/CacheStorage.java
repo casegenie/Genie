@@ -12,6 +12,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class CacheStorage extends BlockStorage {
+
     public static final int TYPE_ID = 2;
 
     public CacheStorage(String storagePath, String completeFilePath, CoreSubsystem core) throws IOException {
@@ -21,12 +22,14 @@ public class CacheStorage extends BlockStorage {
 
     protected void signalFileComplete(BlockFile bf) {
         String path = bf.getFd().getFullPath();
-        if(T.t)T.info("File in cache complete: "+path);
+        if (T.t) {
+            T.info("File in cache complete: " + path);
+        }
 
         if (bf.getFd().getRootHash().equals(core.getFileManager().getAutomaticUpgrade().getNewVersionHash())) {
             try {
                 core.getFileManager().getAutomaticUpgrade().performUpgrade();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 core.reportError(new Exception("Automatic upgrade failed!", e), null);
             }
         }

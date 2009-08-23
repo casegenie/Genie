@@ -14,6 +14,7 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class NoRouteToHost extends RPC {
+
     private int hostGuid;
 
     public NoRouteToHost() {
@@ -26,7 +27,9 @@ public class NoRouteToHost extends RPC {
 
     public void execute(Packet in) throws IOException {
         int i = in.readInt();
-        if(T.t)T.error("No Route to host: "+i);
+        if (T.t) {
+            T.error("No Route to host: " + i);
+        }
         manager.getCore().getUICallback().noRouteToHost(manager.getNode(i));
     }
 

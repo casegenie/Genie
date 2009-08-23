@@ -14,13 +14,18 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public class TestBlockMaskSerialization extends TestCase {
+
     public void testSerialize() throws Exception {
-        for(int i=0;i<100;i++) tryOnce();
+        for (int i = 0; i < 100; i++) {
+            tryOnce();
+        }
     }
 
     private void tryOnce() throws Exception {
         BlockMask bm = new BlockMask();
-        for(int i=0;i<500;i++) bm.set((int)(Math.random()*1000));
+        for (int i = 0; i < 500; i++) {
+            bm.set((int) (Math.random() * 1000));
+        }
 
         NIOPacket p = new NIOPacket(ByteBuffer.allocate(200), false);
 
@@ -29,10 +34,14 @@ public class TestBlockMaskSerialization extends TestCase {
 
         BlockMask bm2 = BlockMask.createFrom(p);
 
-        if (bm.length() != bm2.length()) throw new Exception("Length mismatch");
+        if (bm.length() != bm2.length()) {
+            throw new Exception("Length mismatch");
+        }
 
-        for(int i=0;i<bm.length();i++) {
-            if (bm.get(i) != bm2.get(i)) throw new Exception("Mismatch at bit "+i);
+        for (int i = 0; i < bm.length(); i++) {
+            if (bm.get(i) != bm2.get(i)) {
+                throw new Exception("Mismatch at bit " + i);
+            }
         }
     }
 }

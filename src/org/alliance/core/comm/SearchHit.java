@@ -12,6 +12,7 @@ import org.alliance.core.file.hash.Hash;
  * To change this template use File | Settings | File Templates.
  */
 public class SearchHit {
+
     private Hash root;
     private String path;
     private long size;
@@ -31,8 +32,10 @@ public class SearchHit {
         root = fd.getRootHash();
         path = fd.getSubpath();
         size = fd.getSize();
-        hashedDaysAgo = (int)((System.currentTimeMillis()-fd.getModifiedAt())/1000/60/60/24);
-        if (hashedDaysAgo > 255) hashedDaysAgo = 255;
+        hashedDaysAgo = (int) ((System.currentTimeMillis() - fd.getModifiedAt()) / 1000 / 60 / 60 / 24);
+        if (hashedDaysAgo > 255) {
+            hashedDaysAgo = 255;
+        }
     }
 
     public Hash getRoot() {

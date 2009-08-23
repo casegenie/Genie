@@ -37,43 +37,41 @@ import java.util.*;
  */
 public class NetworkManager extends Manager {
 //    public static final boolean DIRECTLY_CALL_READYTOSEND = false;  //setting false here produces weird results - not sure anymore now that encryption is implemented - anyway. It seems to be working well with this flag on.
-    public static final boolean DIRECTLY_CALL_READYTOSEND = true;
 
+    public static final boolean DIRECTLY_CALL_READYTOSEND = true;
     private int serverPort;
     private boolean alive = true;
-
     private TCPNIONetworkLayer networkLayer;
     private CryptoLayer cryptoLayer;
     private FriendManager friendManager;
     private CoreSubsystem core;
     private DownloadManager downloadManager;
     private BandwidthThrottle uploadThrottle;
-
     private HashMap<Object, Connection> connections = new HashMap<Object, Connection>();
     private Router router;
-
     private HashSet<InetAddress> bannedHosts = new HashSet<InetAddress>();
     private long lastClearOfBannedHostsTick = System.currentTimeMillis();
-
     protected BandwidthAnalyzer bandwidthIn, bandwidthOut, bandwidthInHighRefresh, bandwidthOutHighRefresh;
-
     private ArrayList<PersistantRPC> queuedPersistantRPCs = new ArrayList<PersistantRPC>();
-
     private HashMap<Integer, AuthenticatedConnection> connectionsWaitingForReverseConnect = new HashMap<Integer, AuthenticatedConnection>();
 
     public NetworkManager(CoreSubsystem core, Settings settings) throws IOException {
         this.core = core;
         this.friendManager = core.getFriendManager();
-        uploadThrottle = new BandwidthThrottle(core, settings.getInternal().getUploadthrottle()*KB);
+        uploadThrottle = new BandwidthThrottle(core, settings.getInternal().getUploadthrottle() * KB);
         Integer p = settings.getServer().getPort();
         if (p == null) {
             p = new Integer(Server.createRandomPort());
-            if(T.t)T.info("Generated random port for new installation: "+p);
+            if (T.t) {
+                T.info("Generated random port for new installation: " + p);
+            }
             settings.getServer().setPort(p);
             try {
                 core.saveSettings();
-            } catch(Exception e) {
-                if(T.t)T.error("Could not save settings: "+e);
+            } catch (Exception e) {
+                if (T.t) {
+                    T.error("Could not save settings: " + e);
+                }
             }
         }
         this.serverPort = p;
@@ -82,37 +80,44 @@ public class NetworkManager extends Manager {
         cryptoLayer = core.getCryptoManager().getCryptoLayer();
         downloadManager = new DownloadManager(friendManager.getCore());
         router = new Router(friendManager);
-        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(), ((long)settings.getInternal().getTotalmegabytesdownloaded()*MB));
-        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(), ((long)settings.getInternal().getTotalmegabytesuploaded()*MB));
+        bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordinspeed(), ((long) settings.getInternal().getTotalmegabytesdownloaded() * MB));
+        bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.OUTER_INTERVAL, settings.getInternal().getRecordoutspeed(), ((long) settings.getInternal().getTotalmegabytesuploaded() * MB));
         bandwidthInHighRefresh = new BandwidthAnalyzer(1500);
         bandwidthOutHighRefresh = new BandwidthAnalyzer(1500);
 
         // keep-alive thread
         Thread t = new Thread(new Runnable() {
+
             public void run() {
-                while(alive) {
-                    final int ms = NetworkManager.this.core.getSettings().getInternal().getConnectionkeepaliveinterval()*1000;
+                while (alive) {
+                    final int ms = NetworkManager.this.core.getSettings().getInternal().getConnectionkeepaliveinterval() * 1000;
                     try {
                         Thread.sleep(ms);
-                    } catch (InterruptedException e) {}
+                    } catch (InterruptedException e) {
+                    }
                     invokeLater(new Runnable() {
+
                         public void run() {
                             try {
-                                for(Connection c : connections.values()) {
+                                for (Connection c : connections.values()) {
                                     if (c instanceof FriendConnection) {
-                                        FriendConnection fc = (FriendConnection)c;
-                                        if (fc.getNetworkLatency() > 15*1000) {
-                                            if(T.t)T.error(fc.getRemoteFriend().getNickname()+" has a very high network latency - this is probably a bug. Reconnecting to friend.");
+                                        FriendConnection fc = (FriendConnection) c;
+                                        if (fc.getNetworkLatency() > 15 * 1000) {
+                                            if (T.t) {
+                                                T.error(fc.getRemoteFriend().getNickname() + " has a very high network latency - this is probably a bug. Reconnecting to friend.");
+                                            }
                                             fc.getRemoteFriend().reconnect();
                                         } else {
-                                            if (System.currentTimeMillis()-fc.getLastPacketSentAt() > ms) {
+                                            if (System.currentTimeMillis() - fc.getLastPacketSentAt() > ms) {
                                                 fc.send(new Ping());
                                             }
                                         }
                                     }
                                 }
-                            } catch(Exception e) {
-                                if(T.t)T.error("Error in keep-alive loop: "+e);
+                            } catch (Exception e) {
+                                if (T.t) {
+                                    T.error("Error in keep-alive loop: " + e);
+                                }
                             }
                         }
                     });
@@ -129,10 +134,10 @@ public class NetworkManager extends Manager {
     }
 
     public void shutdown() throws IOException {
-        core.getSettings().getInternal().setRecordinspeed((int)bandwidthIn.getHighestCPS());
-        core.getSettings().getInternal().setRecordoutspeed((int)bandwidthOut.getHighestCPS());
-        core.getSettings().getInternal().setTotalmegabytesdownloaded((int)(bandwidthIn.getTotalBytes()/MB));
-        core.getSettings().getInternal().setTotalmegabytesuploaded((int)(bandwidthOut.getTotalBytes()/MB));
+        core.getSettings().getInternal().setRecordinspeed((int) bandwidthIn.getHighestCPS());
+        core.getSettings().getInternal().setRecordoutspeed((int) bandwidthOut.getHighestCPS());
+        core.getSettings().getInternal().setTotalmegabytesdownloaded((int) (bandwidthIn.getTotalBytes() / MB));
+        core.getSettings().getInternal().setTotalmegabytesuploaded((int) (bandwidthOut.getTotalBytes() / MB));
         alive = false;
         networkLayer.shutdown();
         downloadManager.shutdown();
@@ -153,13 +158,15 @@ public class NetworkManager extends Manager {
     }
 
     public void reportError(String source, Object key, Exception e) {
-        if (!(e instanceof ConnectException)) core.reportError(e, source+": "+connections.get(key));
+        if (!(e instanceof ConnectException)) {
+            core.reportError(e, source + ": " + connections.get(key));
+        }
         if (connections.containsKey(key)) {
             Connection c = connections.get(key);
-            if (c!=null) {
+            if (c != null) {
                 try {
                     c.close();
-                } catch(IOException e1) {
+                } catch (IOException e1) {
                     core.reportError(e1, c);
                 }
             }
@@ -167,8 +174,10 @@ public class NetworkManager extends Manager {
 
         if (!(e instanceof IOException)) {
             if (e.toString().indexOf("Connection refused: no further information") == -1) {
-                if(T.t)T.warn("Error for "+source+": "+e, e);
-                System.err.println("Error for "+friendManager.getMe()+": ");
+                if (T.t) {
+                    T.warn("Error for " + source + ": " + e, e);
+                }
+                System.err.println("Error for " + friendManager.getMe() + ": ");
                 e.printStackTrace();
             }
         }
@@ -182,11 +191,19 @@ public class NetworkManager extends Manager {
     }
 
     public Connection replaceConnection(Object key, Connection connection) {
-        if (!connections.containsKey(key)) if(T.t)T.warn("Could not find connection!");
-        if(T.t)T.trace("Connection before: "+connections.get(key));
+        if (!connections.containsKey(key)) {
+            if (T.t) {
+                T.warn("Could not find connection!");
+            }
+        }
+        if (T.t) {
+            T.trace("Connection before: " + connections.get(key));
+        }
         connections.remove(key);
         addConnection(key, connection);
-        if(T.t)T.trace("Connection after: "+connections.get(key));
+        if (T.t) {
+            T.trace("Connection after: " + connections.get(key));
+        }
         return connection;
     }
 
@@ -211,7 +228,9 @@ public class NetworkManager extends Manager {
 
         if (f.getFriendConnection() != null && f.getFriendConnection().getDirection() == Connection.Direction.IN) {
 //        if (f.getFriendConnection() != null && true) {
-            if(T.t)T.info("Attemting reverse connect to circument firewall");
+            if (T.t) {
+                T.info("Attemting reverse connect to circument firewall");
+            }
             f.getFriendConnection().send(new ConnectToMe(registerForReverseConnect(connection)));
         } else {
             networkLayer.connect(f.getLastKnownHost(), f.getLastKnownPort(), connection);
@@ -224,7 +243,9 @@ public class NetworkManager extends Manager {
     }
 
     private int registerForReverseConnect(AuthenticatedConnection connection) {
-        if(T.t)T.debug("Registering "+connection+" for reverse connect.");
+        if (T.t) {
+            T.debug("Registering " + connection + " for reverse connect.");
+        }
         int id = connection.hashCode();
         connectionsWaitingForReverseConnect.put(id, connection);
         return id;
@@ -249,11 +270,13 @@ public class NetworkManager extends Manager {
     }
 
     public void addConnection(Object key, Connection connection) {
-        if(T.t)T.info("Adding new connection: "+connection);
+        if (T.t) {
+            T.info("Adding new connection: " + connection);
+        }
         connections.put(key, connection);
     }
 
-    public boolean contains(Object  key) {
+    public boolean contains(Object key) {
         return connections.containsKey(key);
     }
 
@@ -264,20 +287,25 @@ public class NetworkManager extends Manager {
     public boolean isAlive() {
         return alive;
     }
+
     public int getServerPort() {
         return serverPort;
     }
 
     /* **** methods below are part of interface between Connection classes and the network layer ***** */
     public int send(Connection c, Packet p) throws IOException {
-        if (!(p instanceof NIOPacket)) throw new IOException("Internal error: unknown type of packet: "+p.getClass().getName());
-        return cryptoLayer.send(c, ((NIOPacket)p).getBuffer());
+        if (!(p instanceof NIOPacket)) {
+            throw new IOException("Internal error: unknown type of packet: " + p.getClass().getName());
+        }
+        return cryptoLayer.send(c, ((NIOPacket) p).getBuffer());
     }
 
     public int send(Connection c, ByteBuffer buf, int bytesToSend) throws IOException {
         int orig = buf.limit();
-        int newPos = buf.position()+bytesToSend;
-        if (newPos < buf.limit()) buf.limit(newPos);
+        int newPos = buf.position() + bytesToSend;
+        if (newPos < buf.limit()) {
+            buf.limit(newPos);
+        }
 
         int wrote = cryptoLayer.send(c, buf);
 
@@ -302,26 +330,33 @@ public class NetworkManager extends Manager {
     }
     /* ************************************************************************************************* */
 
-
     public void sendToAllFriends(RPC rpc) throws IOException {
         ArrayList<Connection> al = new ArrayList<Connection>();
-        for(Connection c : connections.values()) al.add(c);
+        for (Connection c : connections.values()) {
+            al.add(c);
+        }
 
-        for(Connection c : al) {
+        for (Connection c : al) {
             if (c instanceof FriendConnection) {
-                if(T.t)T.trace("Sending rpc "+rpc+" to: "+c);
-                ((FriendConnection)c).send(rpc);
+                if (T.t) {
+                    T.trace("Sending rpc " + rpc + " to: " + c);
+                }
+                ((FriendConnection) c).send(rpc);
             }
         }
     }
 
     public void broadcast(RPC rpc) throws IOException {
-        if(T.t)T.info("Broadcasting rpc: "+rpc+"!");
-        short msgId = (short)(Math.random()*0xffff);
-        for(Connection c : connections.values()) {
+        if (T.t) {
+            T.info("Broadcasting rpc: " + rpc + "!");
+        }
+        short msgId = (short) (Math.random() * 0xffff);
+        for (Connection c : connections.values()) {
             if (c instanceof FriendConnection) {
-                if(T.t)T.info("Sending to "+c);
-                ((FriendConnection)c).broadcast(msgId, rpc);
+                if (T.t) {
+                    T.info("Sending to " + c);
+                }
+                ((FriendConnection) c).broadcast(msgId, rpc);
             }
         }
     }
@@ -336,8 +371,12 @@ public class NetworkManager extends Manager {
 
     public void route(int dstGuid, RPC rpc) throws IOException {
         Friend f = router.findClosestFriend(dstGuid);
-        if (f == null) throw new IOException("No Route to host: "+dstGuid);
-        if (f.getFriendConnection() == null) throw new IOException("No Route to host: "+dstGuid);
+        if (f == null) {
+            throw new IOException("No Route to host: " + dstGuid);
+        }
+        if (f.getFriendConnection() == null) {
+            throw new IOException("No Route to host: " + dstGuid);
+        }
         f.getFriendConnection().send(dstGuid, rpc);
     }
 
@@ -366,7 +405,6 @@ public class NetworkManager extends Manager {
         return bandwidthOut;
     }
 
-
     public BandwidthAnalyzer getBandwidthInHighRefresh() {
         return bandwidthInHighRefresh;
     }
@@ -380,8 +418,12 @@ public class NetworkManager extends Manager {
     }
 
     public int getNConnectionsOfType(Class<? extends Connection> clazz) {
-        int n=0;
-        for(Connection c : connections.values()) if (c.getClass() == clazz) n++;
+        int n = 0;
+        for (Connection c : connections.values()) {
+            if (c.getClass() == clazz) {
+                n++;
+            }
+        }
         return n;
     }
 
@@ -392,9 +434,9 @@ public class NetworkManager extends Manager {
     public void blockConnectionsTemporarilyFrom(Connection connection) {
         bannedHosts.add(getSocketFor(connection).getInetAddress());
     }
-    
+
     public boolean isAddressBlocked(InetAddress a) {
-        if (System.currentTimeMillis() - lastClearOfBannedHostsTick > 1000*30) {
+        if (System.currentTimeMillis() - lastClearOfBannedHostsTick > 1000 * 30) {
             bannedHosts.clear();
             lastClearOfBannedHostsTick = System.currentTimeMillis();
         }
@@ -410,14 +452,20 @@ public class NetworkManager extends Manager {
      * @throws IOException
      */
     public void sendPersistantly(PersistantRPC rpc, Friend destination) throws IOException {
-        if (rpc == null || destination == null) return;
+        if (rpc == null || destination == null) {
+            return;
+        }
         rpc.setDestinationGuid(destination.getGuid());
         rpc.resetTimestamp();
         if (destination.getFriendConnection() != null) {
-            if(T.t)T.trace("Sending persistant RPC immidiatly.");
+            if (T.t) {
+                T.trace("Sending persistant RPC immidiatly.");
+            }
             destination.getFriendConnection().send(rpc);
         } else {
-            if(T.t)T.trace("Queueing persistant RPC: "+rpc+", destination "+destination);
+            if (T.t) {
+                T.trace("Queueing persistant RPC: " + rpc + ", destination " + destination);
+            }
             rpc.notifyRPCQueuedForLaterSend();
             queuedPersistantRPCs.add(rpc);
         }
@@ -429,29 +477,35 @@ public class NetworkManager extends Manager {
 
     public void load(ObjectInputStream in) throws IOException {
         try {
-            queuedPersistantRPCs = (ArrayList<PersistantRPC>)in.readObject();
-            for(Iterator i = queuedPersistantRPCs.iterator();i.hasNext();) {
-                PersistantRPC r = (PersistantRPC)i.next();
+            queuedPersistantRPCs = (ArrayList<PersistantRPC>) in.readObject();
+            for (Iterator i = queuedPersistantRPCs.iterator(); i.hasNext();) {
+                PersistantRPC r = (PersistantRPC) i.next();
                 if (r.hasExpired()) {
-                    if(T.t)T.trace("Removing expired PersistantRPC "+r);
+                    if (T.t) {
+                        T.trace("Removing expired PersistantRPC " + r);
+                    }
                     i.remove();
                 }
             }
-        } catch(ClassNotFoundException e) {
-            throw new IOException("wtf: "+e);
+        } catch (ClassNotFoundException e) {
+            throw new IOException("wtf: " + e);
         }
     }
 
     public void signalFriendConnected(Friend friend) {
-        if(T.t)T.debug("SignalFriendConnected: "+friend);
-        for(Iterator i = queuedPersistantRPCs.iterator();i.hasNext();) {
-            PersistantRPC r = (PersistantRPC)i.next();
+        if (T.t) {
+            T.debug("SignalFriendConnected: " + friend);
+        }
+        for (Iterator i = queuedPersistantRPCs.iterator(); i.hasNext();) {
+            PersistantRPC r = (PersistantRPC) i.next();
             if (r.getDestinationGuid() == friend.getGuid()) {
                 try {
-                    if(T.t)T.debug("Found persistant RPC that needs to be sent. Sending. "+r);
+                    if (T.t) {
+                        T.debug("Found persistant RPC that needs to be sent. Sending. " + r);
+                    }
                     friend.getFriendConnection().send(r);
                     i.remove();
-                } catch(IOException e) {
+                } catch (IOException e) {
                     core.reportError(e, friend.getFriendConnection());
                 }
             }

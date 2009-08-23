@@ -3,14 +3,14 @@
 File: OSXAdapter.java
 
 Abstract: Hooks existing preferences/about/quit functionality from an
-    existing Java app into handlers for the Mac OS X application menu.
-    Uses a Proxy object to dynamically implement the 
-    com.apple.eawt.ApplicationListener interface and register it with the
-    com.apple.eawt.Application object.  This allows the complete project
-    to be both built and run on any platform without any stubs or 
-    placeholders. Useful for developers looking to implement Mac OS X 
-    features while supporting multiple platforms with minimal impact.
-			
+existing Java app into handlers for the Mac OS X application menu.
+Uses a Proxy object to dynamically implement the 
+com.apple.eawt.ApplicationListener interface and register it with the
+com.apple.eawt.Application object.  This allows the complete project
+to be both built and run on any platform without any stubs or 
+placeholders. Useful for developers looking to implement Mac OS X 
+features while supporting multiple platforms with minimal impact.
+
 Version: 2.0
 
 Disclaimer: IMPORTANT:  This Apple software is supplied to you by 
@@ -53,18 +53,16 @@ POSSIBILITY OF SUCH DAMAGE.
 
 Copyright 2003-2007 Apple, Inc., All Rights Reserved
 
-*/
-
+ */
 package org.alliance.ui.macos;
 
 import java.lang.reflect.*;
 
-
 public class OSXAdapter implements InvocationHandler {
+
     protected Object targetObject;
     protected Method targetMethod;
     protected String proxySignature;
-
     static Object macOSXApplication;
 
     public static void setOpenApplicationHandler(Object target, Method handler) {
@@ -124,6 +122,7 @@ public class OSXAdapter implements InvocationHandler {
         setHandler(new OSXAdapter("handleOpenFile", target, fileHandler) {
             // Override OSXAdapter.callTarget to send information on the
             // file to be opened
+
             public boolean callTarget(Object appleEvent) {
                 if (appleEvent != null) {
                     try {
@@ -131,7 +130,6 @@ public class OSXAdapter implements InvocationHandler {
                         String filename = (String) getFilenameMethod.invoke(appleEvent, (Object[]) null);
                         this.targetMethod.invoke(this.targetObject, new Object[]{filename});
                     } catch (Exception ex) {
-
                     }
                 }
                 return true;

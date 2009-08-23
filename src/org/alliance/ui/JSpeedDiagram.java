@@ -12,7 +12,8 @@ import java.awt.*;
  * Time: 16:49:43
  */
 public class JSpeedDiagram extends JComponent {
-	private double scale = 400;
+
+    private double scale = 400;
     private double diagramr[] = new double[2048];
     private double diagramw[] = new double[2048];
 
@@ -21,7 +22,7 @@ public class JSpeedDiagram extends JComponent {
     }
 
     public Dimension getPreferredSize() {
-        return new Dimension(400,30);
+        return new Dimension(400, 30);
     }
 
     public synchronized void paint(Graphics g) {
@@ -30,23 +31,23 @@ public class JSpeedDiagram extends JComponent {
 
         scale = getNewScale();
 
-     /*   g.setColor(new Color(82/2,199/2,156/2));
+        /*   g.setColor(new Color(82/2,199/2,156/2));
         g.fillRect(0,0,xlen,ylen);*/
 
-        for(int x = 0;x<xlen;x++) {
-            int l = (int)((diagramr[x+(diagramr.length-xlen)]/scale)*ylen);
+        for (int x = 0; x < xlen; x++) {
+            int l = (int) ((diagramr[x + (diagramr.length - xlen)] / scale) * ylen);
             if (x <= 50) {
-                g.setColor(new Color(0,0,0,x));
+                g.setColor(new Color(0, 0, 0, x));
             }
-            g.drawLine(x,ylen-l,x,ylen);
+            g.drawLine(x, ylen - l, x, ylen);
         }
 
-        for(int x = 0;x<xlen;x++) {
-            int l = (int)((diagramw[x+(diagramw.length-xlen)]/scale)*ylen);
+        for (int x = 0; x < xlen; x++) {
+            int l = (int) ((diagramw[x + (diagramw.length - xlen)] / scale) * ylen);
             if (x <= 50) {
-                g.setColor(new Color(0,0,0,x));
+                g.setColor(new Color(0, 0, 0, x));
             }
-            g.drawLine(x,ylen-l,x,ylen);
+            g.drawLine(x, ylen - l, x, ylen);
         }
 
 //        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -58,27 +59,33 @@ public class JSpeedDiagram extends JComponent {
     }
 
     private double getNewScale() {
-        double max=0;
-        for(int i=0;i<diagramr.length;i++)
-            if (max < diagramr[i]) max = diagramr[i];
+        double max = 0;
+        for (int i = 0; i < diagramr.length; i++) {
+            if (max < diagramr[i]) {
+                max = diagramr[i];
+            }
+        }
 
-        for(int i=0;i<diagramw.length;i++)
-            if (max < diagramw[i]) max = diagramw[i];
+        for (int i = 0; i < diagramw.length; i++) {
+            if (max < diagramw[i]) {
+                max = diagramw[i];
+            }
+        }
 
-        int t = (int)(max/100);
-        t = (t+1)*100;
+        int t = (int) (max / 100);
+        t = (t + 1) * 100;
         return t;
     }
+    private int counter = 0;
 
-    private int counter=0;
     public synchronized void update(CoreSubsystem core) {
         counter++;
         if (counter % 10 == 0) {
             System.arraycopy(diagramr, 1, diagramr, 0, diagramr.length - 1);
-            diagramr[diagramr.length-1] = core.getNetworkManager().getBandwidthIn().getCPS()/1024;
+            diagramr[diagramr.length - 1] = core.getNetworkManager().getBandwidthIn().getCPS() / 1024;
 
             System.arraycopy(diagramw, 1, diagramw, 0, diagramw.length - 1);
-            diagramw[diagramw.length-1] = core.getNetworkManager().getBandwidthOut().getCPS()/1024;
+            diagramw[diagramw.length - 1] = core.getNetworkManager().getBandwidthOut().getCPS() / 1024;
             repaint();
         }
     }

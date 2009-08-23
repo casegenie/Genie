@@ -15,21 +15,19 @@ import com.stendahls.util.TextUtils;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class Connection {
-    public static enum Direction {IN, OUT}
 
+    public static enum Direction {
+
+        IN, OUT
+    }
     protected NetworkManager netMan;
     protected CoreSubsystem core;
-
     protected Object key;
     protected Direction direction;
-
     protected boolean hasWriteInterest;
-
     protected long bytesSent, bytesReceived;
     protected BandwidthAnalyzer bandwidthIn = new BandwidthAnalyzer(BandwidthAnalyzer.INNER_INVERVAL), bandwidthOut = new BandwidthAnalyzer(BandwidthAnalyzer.INNER_INVERVAL);
-
     protected String statusString;
-
     protected boolean connected;
 
     protected Connection(NetworkManager netMan, Direction direction) {
@@ -47,7 +45,9 @@ public abstract class Connection {
     }
 
     public abstract void received(ByteBuffer buf) throws IOException;
+
     public abstract void readyToSend() throws IOException;
+
     protected abstract int getConnectionId();
 
     //can be overridden by connection to perform stuff when connection breaks - used by 
@@ -90,7 +90,7 @@ public abstract class Connection {
     }
 
     public String toString() {
-        return TextUtils.simplifyClassName(getClass())+" ["+key+"]";
+        return TextUtils.simplifyClassName(getClass()) + " [" + key + "]";
     }
 
     /** Close this connection */
@@ -123,7 +123,6 @@ public abstract class Connection {
     public void setStatusString(String statusString) {
         this.statusString = statusString;
     }
-
 
     public BandwidthAnalyzer getBandwidthIn() {
         return bandwidthIn;

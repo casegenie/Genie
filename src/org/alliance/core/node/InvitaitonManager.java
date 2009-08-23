@@ -20,11 +20,10 @@ import java.util.Iterator;
  * Time: 14:20:39
  */
 public class InvitaitonManager {
-    public static final long INVITATION_TIMEOUT_IN_MINUTES = 60*24*31;
-    public static final long INVITATION_TIMEOUT = 1000*60*60*INVITATION_TIMEOUT_IN_MINUTES;
 
+    public static final long INVITATION_TIMEOUT_IN_MINUTES = 60 * 24 * 31;
+    public static final long INVITATION_TIMEOUT = 1000 * 60 * 60 * INVITATION_TIMEOUT_IN_MINUTES;
     private CoreSubsystem core;
-
     private HashMap<Integer, Invitation> invitations = new HashMap<Integer, Invitation>();
 
     public InvitaitonManager(CoreSubsystem core, Settings settings) {
@@ -46,11 +45,11 @@ public class InvitaitonManager {
     }
 
     public boolean isValid(int key) {
-        return System.currentTimeMillis()-invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT;
+        return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT;
     }
 
     public void attemptToBecomeFriendWith(String invitation, Friend middleman) throws IOException {
-        attemptToBecomeFriendWith(invitation,  middleman, null);
+        attemptToBecomeFriendWith(invitation, middleman, null);
     }
 
     public void attemptToBecomeFriendWith(String invitation, Friend middleman, final Integer fromGuid) throws IOException {
@@ -58,23 +57,34 @@ public class InvitaitonManager {
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
 
         byte iparray[] = new byte[4];
-        for(int i=0;i<iparray.length;i++) iparray[i] = in.readByte();
+        for (int i = 0; i < iparray.length; i++) {
+            iparray[i] = in.readByte();
+        }
 
         InetAddress ip = InetAddress.getByAddress(iparray);
         int port = in.readUnsignedShort();
         int passkey = in.readInt();
 
-        if(T.t)T.info("Deserialized invitation: "+ip+", "+port+", "+passkey);
+        if (T.t) {
+            T.info("Deserialized invitation: " + ip + ", " + port + ", " + passkey);
+        }
 
         InvitationConnection ic = new InvitationConnection(core.getNetworkManager(), Connection.Direction.OUT, passkey, middleman);
         ic.setConnectionFailedEvent(new Runnable() {
+
             public void run() {
-                if(T.t)T.info("Attemted to connect using invitation but failed. From guid: "+fromGuid);
-                if (fromGuid != null) try {
-                    if(T.t)T.info(" - trying to send an invitation the other way around (in order to get around a firewall)");
-                    core.getFriendManager().forwardInvitationTo(fromGuid);
-                } catch (Exception e) {
-                    core.reportError(e, this);
+                if (T.t) {
+                    T.info("Attemted to connect using invitation but failed. From guid: " + fromGuid);
+                }
+                if (fromGuid != null) {
+                    try {
+                        if (T.t) {
+                            T.info(" - trying to send an invitation the other way around (in order to get around a firewall)");
+                        }
+                        core.getFriendManager().forwardInvitationTo(fromGuid);
+                    } catch (Exception e) {
+                        core.reportError(e, this);
+                    }
                 }
             }
         });
@@ -95,20 +105,26 @@ public class InvitaitonManager {
 
     public void load(ObjectInputStream in) throws IOException {
         try {
-            invitations = (HashMap<Integer, Invitation>)in.readObject();
+            invitations = (HashMap<Integer, Invitation>) in.readObject();
         } catch (ClassNotFoundException e) {
-            throw new IOException("Could not instance class "+e);
+            throw new IOException("Could not instance class " + e);
         }
         //remove old, invalid invitations
-        for(Iterator<Integer> it = invitations.keySet().iterator(); it.hasNext();) {
+        for (Iterator<Integer> it = invitations.keySet().iterator(); it.hasNext();) {
             Integer key = it.next();
-            if (!isValid(key)) it.remove();
+            if (!isValid(key)) {
+                it.remove();
+            }
         }
     }
 
     public boolean hasBeenRecentlyInvited(int guid) {
-        if (getMostRecentByGuid(guid) == null) return false;
-        if (System.currentTimeMillis() - getMostRecentByGuid(guid).getCreatedAt() < core.getSettings().getInternal().getMinimumtimebetweeninvitations()*1000*60) return true;
+        if (getMostRecentByGuid(guid) == null) {
+            return false;
+        }
+        if (System.currentTimeMillis() - getMostRecentByGuid(guid).getCreatedAt() < core.getSettings().getInternal().getMinimumtimebetweeninvitations() * 1000 * 60) {
+            return true;
+        }
         return false;
     }
 
@@ -119,13 +135,14 @@ public class InvitaitonManager {
     private Invitation getMostRecentByGuid(int guid) {
         Invitation mostRecent = null;
         Collection<Invitation> invitations = this.invitations.values();
-        for(Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
+        for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
             if (i.getDestinationGuid() != null && i.getDestinationGuid() == guid) {
-                if (mostRecent == null)
+                if (mostRecent == null) {
                     mostRecent = i;
-                else {
-                    if (mostRecent.getCreatedAt() < i.getCreatedAt())
+                } else {
+                    if (mostRecent.getCreatedAt() < i.getCreatedAt()) {
                         mostRecent = i;
+                    }
                 }
             }
         }

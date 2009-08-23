@@ -16,7 +16,8 @@ import java.util.List;
  * Time: 11:16:30
  * To change this template use File | Settings | File Templates.
  */
-public class DoubleUICallback implements UICallback  {
+public class DoubleUICallback implements UICallback {
+
     private UICallback first, second;
 
     public DoubleUICallback(UICallback first, UICallback second) {

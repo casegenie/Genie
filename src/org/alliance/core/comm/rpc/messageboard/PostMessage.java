@@ -14,6 +14,7 @@ import java.io.IOException;
  * This is sent when a new message is posted in the message board.
  */
 public class PostMessage extends RPC {
+
     private Message message;
 
     public PostMessage(Message msg) {
@@ -22,7 +23,6 @@ public class PostMessage extends RPC {
     }
 
     public void execute(Packet in) throws IOException {
-
     }
 
     public Packet serializeTo(Packet out) {

@@ -14,7 +14,8 @@ import java.io.IOException;
  * To change this template use File | Settings | File Templates.
  */
 public class FriendConnection extends AuthenticatedConnection {
-    public static final int CONNECTION_ID=1;
+
+    public static final int CONNECTION_ID = 1;
     private int rpcsSent, rpcsReceived;
     private long lastPingSentAt;
     private long lastPongReceivedAt;
@@ -51,15 +52,18 @@ public class FriendConnection extends AuthenticatedConnection {
         int id = packet.readByte();
         RPC rpc = RPCFactory.newInstance(id);
         if (rpc == null) {
-            if(T.t)T.warn("Skipping unknown RPC ID: "+id+"!!!");
+            if (T.t) {
+                T.warn("Skipping unknown RPC ID: " + id + "!!!");
+            }
             packet.skip(packet.getAvailable()); //skip contents of packet
             return;
         } else {
-            if(T.t) {
-                if (outerRPC == null)
-                    T.debug("<-- Recived "+rpc+" ("+(packet.getAvailable()+1)+" bytes) from "+netMan.getFriendManager().getNode(fromGuid)+" (con: "+getRemoteFriend()+")"); //+1 because we read one byte above
-                else
-                    T.debug("<----- Recived "+rpc+" ("+(packet.getAvailable()+1)+" bytes) from "+netMan.getFriendManager().getNode(fromGuid)+" (con: "+getRemoteFriend()+", outer: "+outerRPC+")"); //+1 because we read one byte above
+            if (T.t) {
+                if (outerRPC == null) {
+                    T.debug("<-- Recived " + rpc + " (" + (packet.getAvailable() + 1) + " bytes) from " + netMan.getFriendManager().getNode(fromGuid) + " (con: " + getRemoteFriend() + ")"); //+1 because we read one byte above
+                } else {
+                    T.debug("<----- Recived " + rpc + " (" + (packet.getAvailable() + 1) + " bytes) from " + netMan.getFriendManager().getNode(fromGuid) + " (con: " + getRemoteFriend() + ", outer: " + outerRPC + ")"); //+1 because we read one byte above
+                }
             }
             rpc.init(this, fromGuid, hops);
             rpc.execute(packet);
@@ -69,14 +73,18 @@ public class FriendConnection extends AuthenticatedConnection {
 
     private void signalReceived(RPC rpc) {
         rpcsReceived++;
-        setStatusString("s:"+rpcsSent+" r: "+rpcsReceived+" (last: <-"+rpc+")");
-        if (rpcsReceived % 10 == 0) updateLastSeenOnline();
+        setStatusString("s:" + rpcsSent + " r: " + rpcsReceived + " (last: <-" + rpc + ")");
+        if (rpcsReceived % 10 == 0) {
+            updateLastSeenOnline();
+        }
     }
 
     private void signalSent(RPC rpc) {
         rpcsSent++;
-        setStatusString("s:"+rpcsSent+" r: "+rpcsReceived+" (last: ->"+rpc+")");
-        if (rpcsSent % 10 == 0) updateLastSeenOnline();
+        setStatusString("s:" + rpcsSent + " r: " + rpcsReceived + " (last: ->" + rpc + ")");
+        if (rpcsSent % 10 == 0) {
+            updateLastSeenOnline();
+        }
     }
 
     private void updateLastSeenOnline() {
@@ -96,12 +104,18 @@ public class FriendConnection extends AuthenticatedConnection {
 
     public void send(int dstGuid, RPC rpc) throws IOException {
         if (dstGuid != getRemoteUserGUID()) {
-            if(T.t)T.debug("Rerouting package "+rpc+" to "+dstGuid);
+            if (T.t) {
+                T.debug("Rerouting package " + rpc + " to " + dstGuid);
+            }
             route(dstGuid, rpc);
         } else {
-            if (!rpc.isInitialized()) rpc.init(this); //under certain conditions a rpc can be reused and sent a second time - then it's the first init call that counts. Don't make it twice.
+            if (!rpc.isInitialized()) {
+                rpc.init(this); //under certain conditions a rpc can be reused and sent a second time - then it's the first init call that counts. Don't make it twice.
+            }
             Packet p = createRPCPacket(rpc);
-            if(T.t)T.debug("--> Sending "+rpc+" ("+p.getPos()+" bytes) to "+getRemoteFriend());
+            if (T.t) {
+                T.debug("--> Sending " + rpc + " (" + p.getPos() + " bytes) to " + getRemoteFriend());
+            }
             send(p);
         }
     }
@@ -109,7 +123,9 @@ public class FriendConnection extends AuthenticatedConnection {
     public void route(int dstGuid, RPC rpc) throws IOException {
         Friend f = netMan.getFriendManager().getFriend(dstGuid);
         if (f != null && f.getFriendConnection() != null) {
-            if(T.t)T.info("Rerouting package to friend");
+            if (T.t) {
+                T.info("Rerouting package to friend");
+            }
             f.getFriendConnection().send(rpc);
         } else {
             //note that one of our friends COULD actually be a closer Route to the destination. But this way we send
@@ -131,7 +147,11 @@ public class FriendConnection extends AuthenticatedConnection {
     }
 
     public static Packet createRPCPacket(NetworkManager m, RPC rpc) throws IOException {
-        if (!rpc.isInitialized()) if(T.t)T.error("RPC not initialized!");
+        if (!rpc.isInitialized()) {
+            if (T.t) {
+                T.error("RPC not initialized!");
+            }
+        }
         Packet p = m.createPacketForSend();
         p.writeByte(RPCFactory.getPacketIdFor(rpc));
         p = rpc.serializeTo(p);
@@ -139,8 +159,10 @@ public class FriendConnection extends AuthenticatedConnection {
     }
 
     public String toString() {
-        if (getRemoteFriend() == null) return super.toString();
-        return getRemoteFriend().getNickname()+" (communication)";
+        if (getRemoteFriend() == null) {
+            return super.toString();
+        }
+        return getRemoteFriend().getNickname() + " (communication)";
     }
 
     public void pingSent() {
@@ -152,9 +174,12 @@ public class FriendConnection extends AuthenticatedConnection {
     }
 
     public int getNetworkLatency() {
-        if (lastPingSentAt == 0) return 0;
-        if (lastPingSentAt > lastPongReceivedAt) return (int)(System.currentTimeMillis()-lastPingSentAt);
-        return (int)(lastPongReceivedAt - lastPingSentAt);
+        if (lastPingSentAt == 0) {
+            return 0;
+        }
+        if (lastPingSentAt > lastPongReceivedAt) {
+            return (int) (System.currentTimeMillis() - lastPingSentAt);
+        }
+        return (int) (lastPongReceivedAt - lastPingSentAt);
     }
-
 }

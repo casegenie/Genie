@@ -15,10 +15,9 @@ import java.io.Serializable;
  * To change this template use File | Settings | File Templates.
  */
 public class Hash implements Serializable {
+
     private static final long serialVersionUID = 6722610126499235070L;
-
     protected transient static final int HASH_SIZE = 24;
-
     protected byte[] hash;
 
     public Hash() {
@@ -30,7 +29,11 @@ public class Hash implements Serializable {
     }
 
     public Hash(byte[] hash) {
-        if (hash.length != HASH_SIZE) if(T.t)T.error("Incorrect hash size!!!");
+        if (hash.length != HASH_SIZE) {
+            if (T.t) {
+                T.error("Incorrect hash size!!!");
+            }
+        }
         this.hash = hash;
     }
 
@@ -43,19 +46,29 @@ public class Hash implements Serializable {
     }
 
     public boolean equals(Object obj) {
-        if(this == obj) return true;
-        if((obj == null) || (obj.getClass() != this.getClass())) return false;
-        Hash h = (Hash)obj;
-        if (h.array().length != hash.length) return false;
-        for(int i=0;i<hash.length;i++) {
-            if (hash[i] != h.array()[i]) return false;
+        if (this == obj) {
+            return true;
+        }
+        if ((obj == null) || (obj.getClass() != this.getClass())) {
+            return false;
+        }
+        Hash h = (Hash) obj;
+        if (h.array().length != hash.length) {
+            return false;
+        }
+        for (int i = 0; i < hash.length; i++) {
+            if (hash[i] != h.array()[i]) {
+                return false;
+            }
         }
         return true;
     }
 
     public int hashCode() {
         int h = hash[0];
-        for(int i=1;i<hash.length;i++) h ^= hash[i];
+        for (int i = 1; i < hash.length; i++) {
+            h ^= hash[i];
+        }
         return h;
     }
 
@@ -70,9 +83,11 @@ public class Hash implements Serializable {
     public static Hash createFrom(DataInputStream in) throws IOException {
         Hash h = new Hash();
         int off = 0;
-        while(off < HASH_SIZE) {
-            int r = in.read(h.hash, off, HASH_SIZE-off);
-            if (r <= 0) throw new IOException("Corrupt serialized hash?");
+        while (off < HASH_SIZE) {
+            int r = in.read(h.hash, off, HASH_SIZE - off);
+            if (r <= 0) {
+                throw new IOException("Corrupt serialized hash?");
+            }
             off += r;
         }
         return h;

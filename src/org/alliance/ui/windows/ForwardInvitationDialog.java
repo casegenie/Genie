@@ -17,9 +17,9 @@ import java.awt.event.ActionEvent;
  * To change this template use File | Settings | File Templates.
  */
 public class ForwardInvitationDialog extends XUIDialog {
+
     private JCheckBox alwaysAllowInvite;
     private boolean pressedYes = false;
-
 
     public ForwardInvitationDialog(UISubsystem ui, PleaseForwardInvitationInteraction pmi) throws Exception {
         super(ui.getMainWindow());
@@ -30,16 +30,16 @@ public class ForwardInvitationDialog extends XUIDialog {
         String from = fm.nicknameWithContactPath(pmi.getFromGuid());
         String to = fm.nicknameWithContactPath(pmi.getToGuid());
 
-        ((JHtmlLabel)xui.getComponent("label")).setText(from+" wants to connect to "+to+". These two users are not connected right now. You are the connection between them.<p>Do you want to allow "+from+" to connect to "+to+"?");
+        ((JHtmlLabel) xui.getComponent("label")).setText(from + " wants to connect to " + to + ". These two users are not connected right now. You are the connection between them.<p>Do you want to allow " + from + " to connect to " + to + "?");
 
-        alwaysAllowInvite = (JCheckBox)xui.getComponent("alwaysAllowInvite");
+        alwaysAllowInvite = (JCheckBox) xui.getComponent("alwaysAllowInvite");
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         display();
     }
 
-   public boolean hasPressedYes() {
+    public boolean hasPressedYes() {
         return pressedYes;
     }
 

@@ -16,7 +16,8 @@ import java.io.Serializable;
  *
  */
 public abstract class PersistantRPC extends RPC implements Serializable {
-	private int destinationGuid;
+
+    private int destinationGuid;
     private long timestamp;
     protected boolean hasBeenQueuedForLaterSend;
 
@@ -36,7 +37,7 @@ public abstract class PersistantRPC extends RPC implements Serializable {
      * Return true if this PersistantRPC is older than a month.
      */
     public boolean hasExpired() {
-        return System.currentTimeMillis() - timestamp > ((long)1000)*60*60*24*31;
+        return System.currentTimeMillis() - timestamp > ((long) 1000) * 60 * 60 * 24 * 31;
     }
 
     public void notifyRPCQueuedForLaterSend() {

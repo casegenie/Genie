@@ -11,10 +11,10 @@ import java.util.Arrays;
 
 public class AddRuleWindow extends XUIDialog {
 
-	private UISubsystem ui;
+    private UISubsystem ui;
     private ArrayList<JRadioButton> radioButtons = new ArrayList<JRadioButton>();
-    private final static String[] OPTIONS = new String[] { "ip_addr1",
-            "ip_addr2", "ip_addr3", "ip_addr4", "ip_addr_mask" };
+    private final static String[] OPTIONS = new String[]{"ip_addr1",
+        "ip_addr2", "ip_addr3", "ip_addr4", "ip_addr_mask"};
     private ArrayList<JTextField> FIELDS = new ArrayList<JTextField>();
     private boolean allow = false;
     private JButton ok;
@@ -27,23 +27,23 @@ public class AddRuleWindow extends XUIDialog {
         this.ui = ui;
 
         //Code here to parse the human readable stuff
-        String human_copy = human.substring(human.lastIndexOf(' ')+1);
+        String human_copy = human.substring(human.lastIndexOf(' ') + 1);
         for (int i = 0; i < 4; i++) {
             int divider = human_copy.indexOf('.');
-            if(divider == -1){
+            if (divider == -1) {
                 divider = human_copy.indexOf('/');
             }
             humanParsed[i] = human_copy.substring(0, divider);
-            human_copy = human_copy.substring(divider+1);
+            human_copy = human_copy.substring(divider + 1);
         }
         humanParsed[4] = human_copy;
         init();
 
         // Remove if it's allow or deny
-        if(human.charAt(0) == 'A'){
+        if (human.charAt(0) == 'A') {
             //Allow should be checked
             JRadioButton temp = (JRadioButton) xui.getComponent("radioAllow");
-            allow=true;
+            allow = true;
             temp.setSelected(true);
         } else {
             //Deny should be checked
@@ -54,7 +54,7 @@ public class AddRuleWindow extends XUIDialog {
         ui.getMainWindow().setAddRuleWindowDialogShowing(false);
     }
 
-    private void init() throws Exception{
+    private void init() throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/rulewindow.xui.xml"));
         radioButtons.add((JRadioButton) xui.getComponent("radioAllow"));
         radioButtons.add((JRadioButton) xui.getComponent("radioDeny"));
@@ -91,26 +91,27 @@ public class AddRuleWindow extends XUIDialog {
         Integer temp;
         for (int i = 0; i < OPTIONS.length - 1; i++) {
             //If it's left blank, assume a 0
-            if(FIELDS.get(i).getText() == ""){
+            if (FIELDS.get(i).getText() == "") {
                 FIELDS.get(i).setText("0");
             }
-            try{
+            try {
                 temp = Integer.parseInt(FIELDS.get(i).getText().trim());
-                if(temp <0 || temp > 255){
+                if (temp < 0 || temp > 255) {
                     JOptionPane.showMessageDialog(null, "Invalid IP Bock entered - " + temp);
                     return;
                 }
                 human += temp + ".";
-            } catch(NumberFormatException e){
-                if (FIELDS.get(i).getText().trim().length() == 0)
+            } catch (NumberFormatException e) {
+                if (FIELDS.get(i).getText().trim().length() == 0) {
                     OptionDialog.showErrorDialog(this, "All IP number text boxes must be filled in.");
-                else
-                    OptionDialog.showErrorDialog(this, "The block " + FIELDS.get(i).getText().trim() +" contains a invalid character");
+                } else {
+                    OptionDialog.showErrorDialog(this, "The block " + FIELDS.get(i).getText().trim() + " contains a invalid character");
+                }
                 return;
             }
         }
         // Kinda a hack but meh :)
-        try{
+        try {
             Integer mask = new Integer(FIELDS.get(OPTIONS.length - 1).getText());
             if (mask < 0 || mask > 32) {
                 JOptionPane.showMessageDialog(null,
@@ -118,11 +119,12 @@ public class AddRuleWindow extends XUIDialog {
                 return;
             }
             human = human.subSequence(0, human.length() - 1) + "/" + mask;
-        } catch(NumberFormatException e){
-            if (FIELDS.get(OPTIONS.length - 1).getText().trim().length() == 0)
+        } catch (NumberFormatException e) {
+            if (FIELDS.get(OPTIONS.length - 1).getText().trim().length() == 0) {
                 OptionDialog.showErrorDialog(this, "You must enter a mask");
-            else
+            } else {
                 OptionDialog.showErrorDialog(this, "Mask is not a valid number");
+            }
             return;
         }
         dispose();

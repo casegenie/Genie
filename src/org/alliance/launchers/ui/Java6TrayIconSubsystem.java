@@ -23,6 +23,7 @@ import java.util.List;
  * New tray icon using java.awt.SystemTray (new stuff in Java 6).
  */
 public class Java6TrayIconSubsystem implements Subsystem, Runnable {
+
     private CoreSubsystem core;
     private Subsystem ui;
     private ResourceLoader rl;
@@ -32,42 +33,79 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
     public void init(ResourceLoader rl, Object... params) throws Exception {
         this.rl = rl;
-        core = (CoreSubsystem)params[0];
+        core = (CoreSubsystem) params[0];
         initTray();
         core.setUICallback(new UICallback() {
-            public void firstDownloadEverFinished() {}
-            public void callbackRemoved() {}
-            public void signalFileDatabaseFlushStarting() {}
-            public void signalFileDatabaseFlushComplete() {}
-            public void nodeOrSubnodesUpdated(Node node) {}
-            public void noRouteToHost(Node node) {}
-            public void pluginCommunicationReceived(Friend source, String data) {}
-            public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {}
-            public void trace(int level, String message, Exception stackTrace) {}
-            public void statusMessage(String s) {}
-            public void toFront() {}
-            public void signalFriendAdded(Friend friend) {}
-            public boolean isUIVisible() { return false; }
-            public void logNetworkEvent(String event) {}
-            public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {}
-            public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {}
+
+            public void firstDownloadEverFinished() {
+            }
+
+            public void callbackRemoved() {
+            }
+
+            public void signalFileDatabaseFlushStarting() {
+            }
+
+            public void signalFileDatabaseFlushComplete() {
+            }
+
+            public void nodeOrSubnodesUpdated(Node node) {
+            }
+
+            public void noRouteToHost(Node node) {
+            }
+
+            public void pluginCommunicationReceived(Friend source, String data) {
+            }
+
+            public void searchHits(int srcGuid, int hops, List<SearchHit> hits) {
+            }
+
+            public void trace(int level, String message, Exception stackTrace) {
+            }
+
+            public void statusMessage(String s) {
+            }
+
+            public void toFront() {
+            }
+
+            public void signalFriendAdded(Friend friend) {
+            }
+
+            public boolean isUIVisible() {
+                return false;
+            }
+
+            public void logNetworkEvent(String event) {
+            }
+
+            public void receivedShareBaseList(Friend friend, String[] shareBaseNames) {
+            }
+
+            public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
+            }
 
             public void newUserInteractionQueued(NeedsUserInteraction ui) {
                 if (ui instanceof PostMessageInteraction) {
-                    PostMessageInteraction pmi = (PostMessageInteraction)ui;
+                    PostMessageInteraction pmi = (PostMessageInteraction) ui;
                     String msg = pmi.getMessage().replaceAll("\\<.*?\\>", "");      // Strip html
                     if (pmi instanceof PostMessageToAllInteraction) {
-                        if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0)
-                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid())+": "+msg, TrayIcon.MessageType.INFO);
+                        if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0) {
+                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                        }
                     } else {
-                        if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0)
-                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid())+": "+msg, TrayIcon.MessageType.INFO);
+                        if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0) {
+                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                        }
                     }
                 } else {
-                    if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0)
+                    if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
                         ti.displayMessage("Alliance needs your attention.", "", TrayIcon.MessageType.INFO);
+                    }
                 }
                 balloonClickHandler = new Runnable() {
+
                     public void run() {
                         openUI();
                     }
@@ -75,9 +113,10 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             }
 
             public void handleError(final Throwable e, final Object source) {
-                ti.displayMessage(e.getClass().getName(), e+"\n"+source, TrayIcon.MessageType.ERROR);
+                ti.displayMessage(e.getClass().getName(), e + "\n" + source, TrayIcon.MessageType.ERROR);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
+
                     public void run() {
                         try {
                             e.printStackTrace();
@@ -86,7 +125,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                             Object errorDialog = Class.forName("com.stendahls.ui.ErrorDialog").newInstance();
                             Method m = errorDialog.getClass().getMethod("init", Throwable.class, boolean.class);
                             m.invoke(errorDialog, e, false);
-                        } catch(Throwable t) {
+                        } catch (Throwable t) {
                             t.printStackTrace();
                         }
                     }
@@ -105,6 +144,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 openUI();
             }
@@ -113,19 +153,19 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
         m.addSeparator();
 
-/*
+        /*
         disabled because there's a risk that port is still bound when starting up
         mi = new JMenuItem("Restart");
         mi.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    ti.displayMessage("", "Restarting Alliance...", TrayIcon.NONE_MESSAGE_TYPE);
-                    balloonClickHandler = null;
-                    core.restartProgram(false);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
+        public void actionPerformed(ActionEvent e) {
+        try {
+        ti.displayMessage("", "Restarting Alliance...", TrayIcon.NONE_MESSAGE_TYPE);
+        balloonClickHandler = null;
+        core.restartProgram(false);
+        } catch (IOException e1) {
+        e1.printStackTrace();
+        }
+        }
         });
         m.add(mi);*/
 
@@ -135,6 +175,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi = new MenuItem("Forever (not recommended)");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 shutdown();
             }
@@ -145,8 +186,9 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi = new MenuItem("for 6 hours");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                restart(60*6);
+                restart(60 * 6);
             }
         });
         shutdown.add(mi);
@@ -154,8 +196,9 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi = new MenuItem("for 3 hours");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
-                restart(60*3);
+                restart(60 * 3);
             }
         });
         shutdown.add(mi);
@@ -163,6 +206,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi = new MenuItem("for 1 hour");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 restart(60);
             }
@@ -172,6 +216,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         mi = new MenuItem("for 30 minutes");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 restart(30);
             }
@@ -179,13 +224,14 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         shutdown.add(mi);
 
         m.add(shutdown);
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push( new PopupFixQueue(m) );
+        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new PopupFixQueue(m));
 
         ti = new TrayIcon(Toolkit.getDefaultToolkit().getImage(rl.getResource("gfx/icons/alliance.png")),
                 "Alliance", m);
         ti.setImageAutoSize(false);
 
         ti.addActionListener(new ActionListener() {
+
             public void actionPerformed(ActionEvent e) {
                 openUI();
             }
@@ -201,34 +247,40 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         tray.add(ti);
 
         ti.addActionListener(new ActionListener() {
+
             private long lastClickAt;
+
             public void actionPerformed(ActionEvent e) {
-                if (System.currentTimeMillis()-lastClickAt < 1000) openUI();
+                if (System.currentTimeMillis() - lastClickAt < 1000) {
+                    openUI();
+                }
                 lastClickAt = System.currentTimeMillis();
             }
         });
 
-/*
+        /*
         if the code below is added the java process never quits. It just hangs after the call to System.exit() - probably a bug in java 6?
         this code isn't needed anyway since SystemTray guarantees to automatically remove the icons when exiting
         Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                if (tray != null) {
-                    tray.remove(ti);
-                    tray = null;
-                }
-            }
+        public void run() {
+        if (tray != null) {
+        tray.remove(ti);
+        tray = null;
+        }
+        }
         });*/
 
         // Update tooltip periodically with current transfer rates
         Thread t = new Thread(new Runnable() {
+
             public void run() {
                 try {
-                    while(true) {
-                        ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable()+"\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
+                    while (true) {
+                        ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
                         Thread.sleep(5000);
                     }
-                } catch(InterruptedException e) {}
+                } catch (InterruptedException e) {
+                }
             }
         });
         t.setDaemon(true);
@@ -273,17 +325,21 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
     private synchronized void openUI() {
         try {
             if (ui != null) {
-                if(T.t)T.info("Subsystem already started.");
+                if (T.t) {
+                    T.info("Subsystem already started.");
+                }
                 core.uiToFront();
                 return;
             }
-            Runnable r = (Runnable)Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+            Runnable r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
             SimpleTimer s = new SimpleTimer();
-            ui = (Subsystem)Class.forName("org.alliance.ui.UISubsystem").newInstance();
+            ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();
             ui.init(ResourceSingelton.getRl(), core, r);
-            if(T.t)T.trace("Subsystem UI started in "+s.getTime());
+            if (T.t) {
+                T.trace("Subsystem UI started in " + s.getTime());
+            }
             r.run();
-        } catch(Exception t) {
+        } catch (Exception t) {
             core.reportError(t, this);
         }
     }

@@ -9,7 +9,7 @@ package org.alliance.core.interactions;
  */
 public class PostMessageToAllInteraction extends PostMessageInteraction {
 
-	public PostMessageToAllInteraction(String message, int fromGuid) {
+    public PostMessageToAllInteraction(String message, int fromGuid) {
         super(message, fromGuid);
     }
 

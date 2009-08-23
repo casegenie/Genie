@@ -20,6 +20,7 @@ import java.io.IOException;
  * Time: 18:42:48
  */
 public class ConnectionInfo extends RPC {
+
     private Friend friend;
 
     public ConnectionInfo() {
@@ -34,7 +35,9 @@ public class ConnectionInfo extends RPC {
         if (guid == manager.getMyGUID()) {
             MyNode me = manager.getMe();
             me.setExternalIp(in.readUTF());
-            if(T.t)T.info("Updating external IP for myself: "+me.getExternalIp());
+            if (T.t) {
+                T.info("Updating external IP for myself: " + me.getExternalIp());
+            }
             in.readInt(); //ignore port
         } else {
             friend = manager.getFriend(guid);
@@ -43,10 +46,14 @@ public class ConnectionInfo extends RPC {
             int port = in.readInt();
 
             if (friend == null) {
-                if(T.t)T.error("Friend is null!");
+                if (T.t) {
+                    T.error("Friend is null!");
+                }
             } else {
                 if (friend.isConnected()) {
-                    if(T.t)T.info("Already connected to friend.");
+                    if (T.t) {
+                        T.info("Already connected to friend.");
+                    }
                 } else {
                     if (friend.updateLastKnownHostInfo(host, port)) {
                         manager.getFriendConnector().wakeUp();

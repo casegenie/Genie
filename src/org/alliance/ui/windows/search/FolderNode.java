@@ -17,15 +17,13 @@ import java.util.HashMap;
  * Date: 2006-apr-24
  * Time: 14:39:04
  */
-
 public class FolderNode extends SearchTreeNode {
+
     private ArrayList<FileNode> children = new ArrayList<FileNode>();
     private HashMap<Hash, FileNode> mapping = new HashMap<Hash, FileNode>();
-
     private long totalSize;
     private double totalHits;
     private int newestDaysAgo;
-
     private RootNode parent;
     private String name;
     private String originalName;
@@ -67,7 +65,7 @@ public class FolderNode extends SearchTreeNode {
 
     public boolean isLeaf() {
 //        if (shouldDelegate()) getDelegate().isLeaf();
-        return children.size()==0;
+        return children.size() == 0;
     }
 
     public Enumeration children() {
@@ -87,7 +85,9 @@ public class FolderNode extends SearchTreeNode {
             Collections.sort(children);
         } else {
             n.addHit(sourceGuid);
-            if (newestDaysAgo > h.getHashedDaysAgo()) newestDaysAgo = h.getHashedDaysAgo();
+            if (newestDaysAgo > h.getHashedDaysAgo()) {
+                newestDaysAgo = h.getHashedDaysAgo();
+            }
         }
         totalHits++;
     }
@@ -104,13 +104,15 @@ public class FolderNode extends SearchTreeNode {
 
     public double getSources() {
 //        if (shouldDelegate()) getDelegate().getSources();
-        return totalHits/children.size();
+        return totalHits / children.size();
     }
 
     public double getSpeed() {
         double s = 0;
-        for(FileNode n : children) s+=n.getSpeed();
-        return s/children.size();
+        for (FileNode n : children) {
+            s += n.getSpeed();
+        }
+        return s / children.size();
     }
 
     public long getSize() {
@@ -131,10 +133,11 @@ public class FolderNode extends SearchTreeNode {
 //    private boolean shouldDelegate() {
 //        return children.size() == 1;
 //    }
-
     public boolean containedInShare(CoreSubsystem core) {
-        for(Hash h : mapping.keySet()) {
-            if (!core.getFileManager().getFileDatabase().contains(h)) return false;
+        for (Hash h : mapping.keySet()) {
+            if (!core.getFileManager().getFileDatabase().contains(h)) {
+                return false;
+            }
         }
         return true;
     }

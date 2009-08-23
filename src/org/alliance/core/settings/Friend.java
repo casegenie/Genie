@@ -7,6 +7,7 @@ package org.alliance.core.settings;
  * Time: 14:01:19
  */
 public class Friend {
+
     private String nickname, host;
     private Integer guid, port;
     private Long lastseenonlineat;
@@ -24,7 +25,7 @@ public class Friend {
     }
 
     public Friend(String nickname, String lasthost, Integer guid, Integer lastport, Integer introducedBy) {
-        this(nickname, lasthost,  guid, lastport);
+        this(nickname, lasthost, guid, lastport);
         this.middlemanguid = introducedBy;
     }
 
@@ -61,7 +62,7 @@ public class Friend {
     }
 
     public String toString() {
-        return "Friend ["+nickname+"]";
+        return "Friend [" + nickname + "]";
     }
 
     public Long getLastseenonlineat() {

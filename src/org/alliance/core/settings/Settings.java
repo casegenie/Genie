@@ -9,6 +9,7 @@ import java.util.ArrayList;
  * Time: 14:01:02
  */
 public class Settings {
+
     private ArrayList<Friend> friendlist;
     private ArrayList<Share> sharelist;
     private IPBlacklist rulelist;
@@ -70,17 +71,27 @@ public class Settings {
     public Friend getFriend(int guid) {
         //this kind of alternative iteration is used to circumvent possible concurrent modification problems
         Object a[] = friendlist.toArray();
-        for(Object o : a) if (((Friend)o).getGuid() == guid) return (Friend)o;
+        for (Object o : a) {
+            if (((Friend) o).getGuid() == guid) {
+                return (Friend) o;
+            }
+        }
         return null;
     }
 
     public void addFriend(Friend f) {
-        if (friendlist == null) friendlist = new ArrayList<Friend>();
+        if (friendlist == null) {
+            friendlist = new ArrayList<Friend>();
+        }
         friendlist.add(f);
     }
 
     public boolean hasFriend(Friend f) {
-        for(Friend f2 : friendlist) if (f2 == f) return true;
+        for (Friend f2 : friendlist) {
+            if (f2 == f) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -91,19 +102,23 @@ public class Settings {
     public void setSharelist(ArrayList<Share> sharelist) {
         this.sharelist = sharelist;
     }
-    public IPBlacklist getRulelist(){
-    	return rulelist;
+
+    public IPBlacklist getRulelist() {
+        return rulelist;
     }
     //Method is dirty...I know, but no other way around it?  I need a IPBlacklist..not a ArrayList
-    public void setRulelist(ArrayList<Routerule> ruleList){
-    	this.rulelist = new IPBlacklist();
-    	for(int i=0; i<ruleList.size(); i++){
-    		this.rulelist.add(ruleList.get(i));
-    	}
+
+    public void setRulelist(ArrayList<Routerule> ruleList) {
+        this.rulelist = new IPBlacklist();
+        for (int i = 0; i < ruleList.size(); i++) {
+            this.rulelist.add(ruleList.get(i));
+        }
     }
-    
+
     public void addShare(Share share) {
-        if (sharelist == null) sharelist = new ArrayList<Share>();
+        if (sharelist == null) {
+            sharelist = new ArrayList<Share>();
+        }
         sharelist.add(share);
     }
 }

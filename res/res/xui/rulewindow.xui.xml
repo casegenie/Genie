@@ -1,3 +1,4 @@
+
 <xui>
     <title value="Add IP range rule" image="gfx/icons/alliance.png"/>
     <body>
@@ -27,7 +28,8 @@
             <strut height="10"/>
             <panel axis="x" border="0" expand="horiz">
                 <filler axis="x"/>
-                <button text="OK" eventid="accept" width="80"/><strut width="10"/>
+                <button text="OK" eventid="accept" width="80"/>
+                <strut width="10"/>
                 <button text="Cancel" eventid="cancel" width="80"/>
             </panel>
         </panel>

@@ -16,6 +16,7 @@ import java.util.Collection;
  * To change this template use File | Settings | File Templates.
  */
 public class GetHashesForPath extends RPC {
+
     private String path;
     private int shareBaseIndex;
 
@@ -32,10 +33,12 @@ public class GetHashesForPath extends RPC {
         path = data.readUTF();
 
         String basePath = core.getShareManager().getBaseByIndex(shareBaseIndex).getPath();
-        path = basePath += '/'+path;
+        path = basePath += '/' + path;
 
         Collection<FileDescriptor> c = core.getFileManager().getFileDatabase().getFDsByPath(path);
-        if(T.t)T.info("Found "+c.size()+" hashes for path "+path);
+        if (T.t) {
+            T.info("Found " + c.size() + " hashes for path " + path);
+        }
         send(new HashesForPath(path, c));
     }
 

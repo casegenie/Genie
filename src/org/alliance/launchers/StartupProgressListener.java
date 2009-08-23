@@ -7,5 +7,6 @@ package org.alliance.launchers;
  * Time: 13:58:58
  */
 public interface StartupProgressListener {
+
     void updateProgress(String message);
 }

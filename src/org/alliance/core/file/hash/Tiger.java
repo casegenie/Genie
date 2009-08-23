@@ -41,13 +41,11 @@ public final class Tiger extends MessageDigest implements Cloneable {
      */
     private byte[] pad;
     private int padding;
-
     /**
      * Private Contextual byte count, send in the next block,
      * after the ending padding block.
      */
     private long bytes;
-
     /**
      * Private context that contains the current digest key.
      */
@@ -66,8 +64,8 @@ public final class Tiger extends MessageDigest implements Cloneable {
      * Clones this object.
      */
     public Object clone() throws CloneNotSupportedException {
-        Tiger that = (Tiger)super.clone();
-        that.pad = (byte[])this.pad.clone();
+        Tiger that = (Tiger) super.clone();
+        that.pad = (byte[]) this.pad.clone();
         return that;
     }
 
@@ -94,10 +92,10 @@ public final class Tiger extends MessageDigest implements Cloneable {
     public void engineReset() {
         int i = 60;
         do {
-           pad[i    ] = (byte)0x00;
-           pad[i + 1] = (byte)0x00;
-           pad[i + 2] = (byte)0x00;
-           pad[i + 3] = (byte)0x00;
+            pad[i] = (byte) 0x00;
+            pad[i + 1] = (byte) 0x00;
+            pad[i + 2] = (byte) 0x00;
+            pad[i + 3] = (byte) 0x00;
         } while ((i -= 4) >= 0);
         padding = 0;
         bytes = 0;
@@ -237,93 +235,108 @@ public final class Tiger extends MessageDigest implements Cloneable {
                 int i;
                 /* Add padding null bytes but replace the last 8 padding bytes
                  * by the little-endian 64-bit digested message bit-length. */
-                pad[i = padding] = (byte)0x01; /* required 1st padding byte */
+                pad[i = padding] = (byte) 0x01; /* required 1st padding byte */
                 /* Check if 8 bytes available in pad to store the total
                  * message size */
                 switch (i) { /* INVARIANT: i must be in [0..63] */
-                case 52: pad[53] = (byte)0x00; /* no break; falls thru */
-                case 53: pad[54] = (byte)0x00; /* no break; falls thru */
-                case 54: pad[55] = (byte)0x00; /* no break; falls thru */
-                case 55: break;
-                case 56: pad[57] = (byte)0x00; /* no break; falls thru */
-                case 57: pad[58] = (byte)0x00; /* no break; falls thru */
-                case 58: pad[59] = (byte)0x00; /* no break; falls thru */
-                case 59: pad[60] = (byte)0x00; /* no break; falls thru */
-                case 60: pad[61] = (byte)0x00; /* no break; falls thru */
-                case 61: pad[62] = (byte)0x00; /* no break; falls thru */
-                case 62: pad[63] = (byte)0x00; /* no break; falls thru */
-                case 63:
-                    computeBlock(pad, 0);
-                    /* Clear the 56 first bytes of pad[]. */
-                    i = 52;
-                    do {
-                        pad[i    ] = (byte)0x00;
-                        pad[i + 1] = (byte)0x00;
-                        pad[i + 2] = (byte)0x00;
-                        pad[i + 3] = (byte)0x00;
-                    } while ((i -= 4) >= 0);
-                    break;
-                default:
-                    /* Clear the rest of 56 first bytes of pad[]. */
-                    switch (i & 3) {
-                    case 3: i++;
-                            break;
-                    case 2: pad[(i += 2) - 1] = (byte)0x00;
-                            break;
-                    case 1: pad[(i += 3) - 2] = (byte)0x00;
-                            pad[ i       - 1] = (byte)0x00;
-                            break;
-                    case 0: pad[(i += 4) - 3] = (byte)0x00;
-                            pad[ i       - 2] = (byte)0x00;
-                            pad[ i       - 1] = (byte)0x00;
-                    }
-                    do {
-                        pad[i    ] = (byte)0x00;
-                        pad[i + 1] = (byte)0x00;
-                        pad[i + 2] = (byte)0x00;
-                        pad[i + 3] = (byte)0x00;
-                    } while ((i += 4) < 56);
+                    case 52:
+                        pad[53] = (byte) 0x00; /* no break; falls thru */
+                    case 53:
+                        pad[54] = (byte) 0x00; /* no break; falls thru */
+                    case 54:
+                        pad[55] = (byte) 0x00; /* no break; falls thru */
+                    case 55:
+                        break;
+                    case 56:
+                        pad[57] = (byte) 0x00; /* no break; falls thru */
+                    case 57:
+                        pad[58] = (byte) 0x00; /* no break; falls thru */
+                    case 58:
+                        pad[59] = (byte) 0x00; /* no break; falls thru */
+                    case 59:
+                        pad[60] = (byte) 0x00; /* no break; falls thru */
+                    case 60:
+                        pad[61] = (byte) 0x00; /* no break; falls thru */
+                    case 61:
+                        pad[62] = (byte) 0x00; /* no break; falls thru */
+                    case 62:
+                        pad[63] = (byte) 0x00; /* no break; falls thru */
+                    case 63:
+                        computeBlock(pad, 0);
+                        /* Clear the 56 first bytes of pad[]. */
+                        i = 52;
+                        do {
+                            pad[i] = (byte) 0x00;
+                            pad[i + 1] = (byte) 0x00;
+                            pad[i + 2] = (byte) 0x00;
+                            pad[i + 3] = (byte) 0x00;
+                        } while ((i -= 4) >= 0);
+                        break;
+                    default:
+                        /* Clear the rest of 56 first bytes of pad[]. */
+                        switch (i & 3) {
+                            case 3:
+                                i++;
+                                break;
+                            case 2:
+                                pad[(i += 2) - 1] = (byte) 0x00;
+                                break;
+                            case 1:
+                                pad[(i += 3) - 2] = (byte) 0x00;
+                                pad[i - 1] = (byte) 0x00;
+                                break;
+                            case 0:
+                                pad[(i += 4) - 3] = (byte) 0x00;
+                                pad[i - 2] = (byte) 0x00;
+                                pad[i - 1] = (byte) 0x00;
+                        }
+                        do {
+                            pad[i] = (byte) 0x00;
+                            pad[i + 1] = (byte) 0x00;
+                            pad[i + 2] = (byte) 0x00;
+                            pad[i + 3] = (byte) 0x00;
+                        } while ((i += 4) < 56);
                 }
                 /* Convert the message size from bytes to little-endian bits. */
-                pad[56] = (byte)(i = (int)bytes << 3);
-                pad[57] = (byte)(i >>> 8);
-                pad[58] = (byte)(i >>> 16);
-                pad[59] = (byte)(i >>> 24);
-                pad[60] = (byte)(i = (int)(bytes >>> 29));
-                pad[61] = (byte)(i >>> 8);
-                pad[62] = (byte)(i >>> 16);
-                pad[63] = (byte)(i >>> 24);
+                pad[56] = (byte) (i = (int) bytes << 3);
+                pad[57] = (byte) (i >>> 8);
+                pad[58] = (byte) (i >>> 16);
+                pad[59] = (byte) (i >>> 24);
+                pad[60] = (byte) (i = (int) (bytes >>> 29));
+                pad[61] = (byte) (i >>> 8);
+                pad[62] = (byte) (i >>> 16);
+                pad[63] = (byte) (i >>> 24);
                 computeBlock(pad, 0);
                 /* Return the computed digest in little-endian byte order. */
-                hashvalue[offset     ] = (byte)(i = (int) hA);
-                hashvalue[offset +  1] = (byte)(i >>> 8);
-                hashvalue[offset +  2] = (byte)(i >>> 16);
-                hashvalue[offset +  3] = (byte)(i >>> 24);
-                hashvalue[offset +  4] = (byte)(i = (int)(hA >>> 32));
-                hashvalue[offset += 5] = (byte)(i >>> 8);
-                hashvalue[offset +  1] = (byte)(i >>> 16);
-                hashvalue[offset +  2] = (byte)(i >>> 24);
-                hashvalue[offset +  3] = (byte)(i = (int) hB);
-                hashvalue[offset +  4] = (byte)(i >>> 8);
-                hashvalue[offset += 5] = (byte)(i >>> 16);
-                hashvalue[offset +  1] = (byte)(i >>> 24);
-                hashvalue[offset +  2] = (byte)(i = (int)(hB >>> 32));
-                hashvalue[offset +  3] = (byte)(i >>> 8);
-                hashvalue[offset +  4] = (byte)(i >>> 16);
-                hashvalue[offset += 5] = (byte)(i >>> 24);
-                hashvalue[offset +  1] = (byte)(i = (int) hC);
-                hashvalue[offset +  2] = (byte)(i >>> 8);
-                hashvalue[offset +  3] = (byte)(i >>> 16);
-                hashvalue[offset +  4] = (byte)(i >>> 24);
-                hashvalue[offset += 5] = (byte)(i = (int)(hC >>> 32));
-                hashvalue[offset +  1] = (byte)(i >>> 8);
-                hashvalue[offset +  2] = (byte)(i >>> 16);
-                hashvalue[offset +  3] = (byte)(i >>> 24);
+                hashvalue[offset] = (byte) (i = (int) hA);
+                hashvalue[offset + 1] = (byte) (i >>> 8);
+                hashvalue[offset + 2] = (byte) (i >>> 16);
+                hashvalue[offset + 3] = (byte) (i >>> 24);
+                hashvalue[offset + 4] = (byte) (i = (int) (hA >>> 32));
+                hashvalue[offset += 5] = (byte) (i >>> 8);
+                hashvalue[offset + 1] = (byte) (i >>> 16);
+                hashvalue[offset + 2] = (byte) (i >>> 24);
+                hashvalue[offset + 3] = (byte) (i = (int) hB);
+                hashvalue[offset + 4] = (byte) (i >>> 8);
+                hashvalue[offset += 5] = (byte) (i >>> 16);
+                hashvalue[offset + 1] = (byte) (i >>> 24);
+                hashvalue[offset + 2] = (byte) (i = (int) (hB >>> 32));
+                hashvalue[offset + 3] = (byte) (i >>> 8);
+                hashvalue[offset + 4] = (byte) (i >>> 16);
+                hashvalue[offset += 5] = (byte) (i >>> 24);
+                hashvalue[offset + 1] = (byte) (i = (int) hC);
+                hashvalue[offset + 2] = (byte) (i >>> 8);
+                hashvalue[offset + 3] = (byte) (i >>> 16);
+                hashvalue[offset + 4] = (byte) (i >>> 24);
+                hashvalue[offset += 5] = (byte) (i = (int) (hC >>> 32));
+                hashvalue[offset + 1] = (byte) (i >>> 8);
+                hashvalue[offset + 2] = (byte) (i >>> 16);
+                hashvalue[offset + 3] = (byte) (i >>> 24);
                 engineReset(); /* clear the evidence */
                 return HASH_LENGTH;
             }
             throw new DigestException(
-                "insufficient space in output buffer to store the digest");
+                    "insufficient space in output buffer to store the digest");
         }
         throw new DigestException("partial digests not returned");
     }
@@ -348,208 +361,97 @@ public final class Tiger extends MessageDigest implements Cloneable {
          * widening bytes or integers due to sign extension! */
         long w0, w1, w2, w3, w4, w5, w6, w7;
         /* First pass on little endian input, with multiplier equal to 5. */
-        c = hC
-          ^ (w0 = ((long)(  (input[offset     ] & 0xff)
-                         | ((input[offset +  1] & 0xff) <<  8)
-                         | ((input[offset +  2] & 0xff) << 16)
-                         | ( input[offset +  3]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  4] & 0xff)
-                         | ((input[offset += 5] & 0xff) <<  8)
-                         | ((input[offset +  1] & 0xff) << 16)
-                         | ( input[offset +  2]         << 24)) << 32));
-        a = ( hA
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w1 = ((long)(  (input[offset +  3] & 0xff)
-                         | ((input[offset +  4] & 0xff) <<  8)
-                         | ((input[offset += 5] & 0xff) << 16)
-                         | ( input[offset +  1]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  2] & 0xff)
-                         | ((input[offset +  3] & 0xff) <<  8)
-                         | ((input[offset +  4] & 0xff) << 16)
-                         | ( input[offset += 5]         << 24)) << 32));
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + hB) * 5
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w2 = ((long)(  (input[offset +  1] & 0xff)
-                         | ((input[offset +  2] & 0xff) <<  8)
-                         | ((input[offset +  3] & 0xff) << 16)
-                         | ( input[offset +  4]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset += 5] & 0xff)
-                         | ((input[offset +  1] & 0xff) <<  8)
-                         | ((input[offset +  2] & 0xff) << 16)
-                         | ( input[offset +  3]         << 24)) << 32));
-        c = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 5
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w3 = ((long)(  (input[offset +  4] & 0xff)
-                         | ((input[offset += 5] & 0xff) <<  8)
-                         | ((input[offset +  1] & 0xff) << 16)
-                         | ( input[offset +  2]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  3] & 0xff)
-                         | ((input[offset +  4] & 0xff) <<  8)
-                         | ((input[offset += 5] & 0xff) << 16)
-                         | ( input[offset +  1]         << 24)) << 32));
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 5
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w4 = ((long)(  (input[offset +  2] & 0xff)
-                         | ((input[offset +  3] & 0xff) <<  8)
-                         | ((input[offset +  4] & 0xff) << 16)
-                         | ( input[offset += 5]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  1] & 0xff)
-                         | ((input[offset +  2] & 0xff) <<  8)
-                         | ((input[offset +  3] & 0xff) << 16)
-                         | ( input[offset +  4]         << 24)) << 32));
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 5
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w5 = ((long)(  (input[offset += 5] & 0xff)
-                         | ((input[offset +  1] & 0xff) <<  8)
-                         | ((input[offset +  2] & 0xff) << 16)
-                         | ( input[offset +  3]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  4] & 0xff)
-                         | ((input[offset += 5] & 0xff) <<  8)
-                         | ((input[offset +  1] & 0xff) << 16)
-                         | ( input[offset +  2]         << 24)) << 32));
-        c = (((S3[(lo>>> 8         ) & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8         ) & 0xff] ^ S0[ hi>>>24        ]) + c) * 5
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w6 = ((long)(  (input[offset +  3] & 0xff)
-                         | ((input[offset +  4] & 0xff) <<  8)
-                         | ((input[offset += 5] & 0xff) << 16)
-                         | ( input[offset +  1]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset +  2] & 0xff)
-                         | ((input[offset +  3] & 0xff) <<  8)
-                         | ((input[offset +  4] & 0xff) << 16)
-                         | ( input[offset += 5]         << 24)) << 32));
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 5
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w7 = ((long)(  (input[offset +  1] & 0xff)
-                         | ((input[offset +  2] & 0xff) <<  8)
-                         | ((input[offset +  3] & 0xff) << 16)
-                         | ( input[offset +  4]         << 24)) & 0xffffffffL)
-                | ((long)(  (input[offset += 5] & 0xff)
-                         | ((input[offset +  1] & 0xff) <<  8)
-                         | ((input[offset +  2] & 0xff) << 16)
-                         | ( input[offset +  3]         << 24)) << 32));
-        b =  ((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 5
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]);
-        c =  ((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 5;
+        c = hC ^ (w0 = ((long) ((input[offset] & 0xff) | ((input[offset + 1] & 0xff) << 8) | ((input[offset + 2] & 0xff) << 16) | (input[offset + 3] << 24)) & 0xffffffffL) | ((long) ((input[offset + 4] & 0xff) | ((input[offset += 5] & 0xff) << 8) | ((input[offset + 1] & 0xff) << 16) | (input[offset + 2] << 24)) << 32));
+        a = (hA - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w1 = ((long) ((input[offset + 3] & 0xff) | ((input[offset + 4] & 0xff) << 8) | ((input[offset += 5] & 0xff) << 16) | (input[offset + 1] << 24)) & 0xffffffffL) | ((long) ((input[offset + 2] & 0xff) | ((input[offset + 3] & 0xff) << 8) | ((input[offset + 4] & 0xff) << 16) | (input[offset += 5] << 24)) << 32));
+        b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + hB) * 5 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w2 = ((long) ((input[offset + 1] & 0xff) | ((input[offset + 2] & 0xff) << 8) | ((input[offset + 3] & 0xff) << 16) | (input[offset + 4] << 24)) & 0xffffffffL) | ((long) ((input[offset += 5] & 0xff) | ((input[offset + 1] & 0xff) << 8) | ((input[offset + 2] & 0xff) << 16) | (input[offset + 3] << 24)) << 32));
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 5 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w3 = ((long) ((input[offset + 4] & 0xff) | ((input[offset += 5] & 0xff) << 8) | ((input[offset + 1] & 0xff) << 16) | (input[offset + 2] << 24)) & 0xffffffffL) | ((long) ((input[offset + 3] & 0xff) | ((input[offset + 4] & 0xff) << 8) | ((input[offset += 5] & 0xff) << 16) | (input[offset + 1] << 24)) << 32));
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 5 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w4 = ((long) ((input[offset + 2] & 0xff) | ((input[offset + 3] & 0xff) << 8) | ((input[offset + 4] & 0xff) << 16) | (input[offset += 5] << 24)) & 0xffffffffL) | ((long) ((input[offset + 1] & 0xff) | ((input[offset + 2] & 0xff) << 8) | ((input[offset + 3] & 0xff) << 16) | (input[offset + 4] << 24)) << 32));
+        b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 5 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w5 = ((long) ((input[offset += 5] & 0xff) | ((input[offset + 1] & 0xff) << 8) | ((input[offset + 2] & 0xff) << 16) | (input[offset + 3] << 24)) & 0xffffffffL) | ((long) ((input[offset + 4] & 0xff) | ((input[offset += 5] & 0xff) << 8) | ((input[offset + 1] & 0xff) << 16) | (input[offset + 2] << 24)) << 32));
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 5 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w6 = ((long) ((input[offset + 3] & 0xff) | ((input[offset + 4] & 0xff) << 8) | ((input[offset += 5] & 0xff) << 16) | (input[offset + 1] << 24)) & 0xffffffffL) | ((long) ((input[offset + 2] & 0xff) | ((input[offset + 3] & 0xff) << 8) | ((input[offset + 4] & 0xff) << 16) | (input[offset += 5] << 24)) << 32));
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 5 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w7 = ((long) ((input[offset + 1] & 0xff) | ((input[offset + 2] & 0xff) << 8) | ((input[offset + 3] & 0xff) << 16) | (input[offset + 4] << 24)) & 0xffffffffL) | ((long) ((input[offset += 5] & 0xff) | ((input[offset + 1] & 0xff) << 8) | ((input[offset + 2] & 0xff) << 16) | (input[offset + 3] << 24)) << 32));
+        b = ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 5 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff]);
+        c = ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 5;
         /* Start scheduling the current input set before next pass. */
-        w7 ^= w6 -= (w5 += w4 ^= w3 -= (w2 += w1 ^= w0 -= w7
-                                                        ^ 0xa5a5a5a5a5a5a5a5L
-                                       ) ^ ((~w1) << 19)
-                    ) ^ ((~w4) >>> 23);
+        w7 ^= w6 -= (w5 += w4 ^= w3 -= (w2 += w1 ^= w0 -= w7 ^ 0xa5a5a5a5a5a5a5a5L) ^ ((~w1) << 19)) ^ ((~w4) >>> 23);
         /* Second pass on scheduled input, with multiplier equal to 7. */
-        c = ( c
-            - (S0[(lo=(int)(b ^= w0 += w7)) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)       ) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w1 -= (w0) ^ ((~w7) << 19));
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 7
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w2 ^= w1);
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 7
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-         ^ (w3 += w2);
-        c = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 7
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w4 -= w3 ^ ((~w2) >>> 23));
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 7
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w5 ^= w4);
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 7
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w6 += w5);
-        c = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 7
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w7 -= w6 ^ 0x0123456789abcdefL);
-        a =  ((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 7
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]);
-        b =  ((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 7;
+        c = (c - (S0[(lo = (int) (b ^= w0 += w7)) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w1 -= (w0) ^ ((~w7) << 19));
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 7 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w2 ^= w1);
+        b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 7 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w3 += w2);
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 7 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w4 -= w3 ^ ((~w2) >>> 23));
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 7 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w5 ^= w4);
+        b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 7 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w6 += w5);
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 7 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w7 -= w6 ^ 0x0123456789abcdefL);
+        a = ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 7 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff]);
+        b = ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 7;
         /* Start scheduling the current input set before next pass. */
-        w7 ^= w6 -= (w5 += w4 ^= w3 -= (w2 += w1 ^= w0 -= w7
-                                                        ^ 0xa5a5a5a5a5a5a5a5L
-                                       ) ^ ((~w1) << 19)
-                    ) ^ ((~w4) >>> 23);
+        w7 ^= w6 -= (w5 += w4 ^= w3 -= (w2 += w1 ^= w0 -= w7 ^ 0xa5a5a5a5a5a5a5a5L) ^ ((~w1) << 19)) ^ ((~w4) >>> 23);
         /* Third pass on scheduled input, with multiplier equal to 9.
          * The standard Tiger algorithm currently perform only
          * one pass of this type with this schedule. */
-        b = ( b
-            - (S0[(lo=(int)(a ^= w0 += w7)) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)       ) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w1 -= w0 ^ ((~w7) << 19));
-        c = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 9
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w2 ^= w1);
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 9
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w3 += w2);
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 9
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w4 -= w3 ^ ((~w2) >>> 23));
-        c = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 9
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w5 ^= w4);
-        a = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 9
-            - (S0[(lo=(int) c      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(c>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w6 += w5);
-        hB = (
-        b = (((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + b) * 9
-            - (S0[(lo=(int) a      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(a>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]))
-          ^ (w7 - (w6 ^ 0x0123456789abcdefL))
-        ) - hB;
-        hC +=((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + c) * 9
-            - (S0[(lo=(int) b      ) & 0xff] ^ S1[(lo>>>16) & 0xff] ^
-               S2[(hi=(int)(b>>>32)) & 0xff] ^ S3[(hi>>>16) & 0xff]);
-        hA ^=((S3[(lo>>> 8)          & 0xff] ^ S2[ lo>>>24        ] ^
-               S1[(hi>>> 8)          & 0xff] ^ S0[ hi>>>24        ]) + a) * 9;
+        b = (b - (S0[(lo = (int) (a ^= w0 += w7)) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w1 -= w0 ^ ((~w7) << 19));
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 9 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w2 ^= w1);
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 9 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w3 += w2);
+        b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 9 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w4 -= w3 ^ ((~w2) >>> 23));
+        c = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 9 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w5 ^= w4);
+        a = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 9 - (S0[(lo = (int) c) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (c >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w6 += w5);
+        hB = (b = (((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + b) * 9 - (S0[(lo = (int) a) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (a >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff])) ^ (w7 - (w6 ^ 0x0123456789abcdefL))) - hB;
+        hC += ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + c) * 9 - (S0[(lo = (int) b) & 0xff] ^ S1[(lo >>> 16) & 0xff] ^
+                S2[(hi = (int) (b >>> 32)) & 0xff] ^ S3[(hi >>> 16) & 0xff]);
+        hA ^= ((S3[(lo >>> 8) & 0xff] ^ S2[lo >>> 24] ^
+                S1[(hi >>> 8) & 0xff] ^ S0[hi >>> 24]) + a) * 9;
     }
-
     /**
      * Precomputed constant Tiger "S-Boxes" in 64-bit format.
      * Each of these four table have 256 elements.
      */
     private static final long[] S0 = {
-        /* 0 */ 0x02aab17cf7e90c5eL, /* 1 */ 0xac424b03e243a8ecL,
+        /* 0 */0x02aab17cf7e90c5eL, /* 1 */ 0xac424b03e243a8ecL,
         /* 2 */ 0x72cd5be30dd5fcd3L, /* 3 */ 0x6d019b93f6f97f3aL,
         /* 4 */ 0xcd9978ffd21f9193L, /* 5 */ 0x7573a1c9708029e2L,
         /* 6 */ 0xb164326b922a83c3L, /* 7 */ 0x46883eee04915870L,
@@ -678,7 +580,7 @@ public final class Tiger extends MessageDigest implements Cloneable {
         /* 252 */ 0xffed95d8f1ea02a2L, /* 253 */ 0xe72b3bd61464d43dL,
         /* 254 */ 0xa6300f170bdc4820L, /* 255 */ 0xebc18760ed78a77aL};
     private static final long[] S1 = {
-        /* 256 */ 0xe6a6be5a05a12138L, /* 257 */ 0xb5a122a5b4f87c98L,
+        /* 256 */0xe6a6be5a05a12138L, /* 257 */ 0xb5a122a5b4f87c98L,
         /* 258 */ 0x563c6089140b6990L, /* 259 */ 0x4c46cb2e391f5dd5L,
         /* 260 */ 0xd932addbc9b79434L, /* 261 */ 0x08ea70e42015aff5L,
         /* 262 */ 0xd765a6673e478cf1L, /* 263 */ 0xc4fb757eab278d99L,
@@ -807,7 +709,7 @@ public final class Tiger extends MessageDigest implements Cloneable {
         /* 508 */ 0x9010a91e84711ae9L, /* 509 */ 0x4df7f0b7b1498371L,
         /* 510 */ 0xd62a2eabc0977179L, /* 511 */ 0x22fac097aa8d5c0eL};
     private static final long[] S2 = {
-        /* 512 */ 0xf49fcc2ff1daf39bL, /* 513 */ 0x487fd5c66ff29281L,
+        /* 512 */0xf49fcc2ff1daf39bL, /* 513 */ 0x487fd5c66ff29281L,
         /* 514 */ 0xe8a30667fcdca83fL, /* 515 */ 0x2c9b4be3d2fcce63L,
         /* 516 */ 0xda3ff74b93fbbbc2L, /* 517 */ 0x2fa165d2fe70ba66L,
         /* 518 */ 0xa103e279970e93d4L, /* 519 */ 0xbecdec77b0e45e71L,
@@ -936,7 +838,7 @@ public final class Tiger extends MessageDigest implements Cloneable {
         /* 764 */ 0x454c6fe9f2c0c1cdL, /* 765 */ 0x419cf6496412691cL,
         /* 766 */ 0xd3dc3bef265b0f70L, /* 767 */ 0x6d0e60f5c3578a9eL};
     private static final long[] S3 = {
-        /* 768 */ 0x5b0e608526323c55L, /* 769 */ 0x1a46c1a9fa1b59f5L,
+        /* 768 */0x5b0e608526323c55L, /* 769 */ 0x1a46c1a9fa1b59f5L,
         /* 770 */ 0xa9e245a17c4c8ffaL, /* 771 */ 0x65ca5159db2955d7L,
         /* 772 */ 0x05db0a76ce35afc2L, /* 773 */ 0x81eac77ea9113d45L,
         /* 774 */ 0x528ef88ab6ac0a0dL, /* 775 */ 0xa09ea253597be3ffL,

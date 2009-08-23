@@ -1,3 +1,4 @@
+
 <xui>
     <title value=""/>
     <body>
@@ -14,7 +15,8 @@
             <button eventid="chat2" text="Send"/>
         </panel>
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">
-            <label id="status" text=" "/><filler expand="horiz"/>
+            <label id="status" text=" "/>
+            <filler expand="horiz"/>
         </panel>
     </body>
 </xui>

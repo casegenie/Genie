@@ -11,6 +11,7 @@ import java.util.Date;
  * Represents a message in the message board.
  */
 public abstract class Message {
+
     private VMID messageId;
     private String text;
     private Date created;

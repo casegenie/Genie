@@ -6,8 +6,8 @@ package org.alliance.ui.windows.viewshare;
  * Date: 2006-aug-10
  * Time: 18:16:51
  */
-
 public class ViewShareLoadingNode extends ViewShareFileNode {
+
     public ViewShareLoadingNode(ViewShareRootNode root, ViewShareTreeNode parent) {
         super("Loading...", root, parent);
     }
@@ -17,7 +17,7 @@ public class ViewShareLoadingNode extends ViewShareFileNode {
     }
 
     protected String getFileItemPath() {
-        return getParent().getFileItemPath()+getName();
+        return getParent().getFileItemPath() + getName();
     }
 
     public boolean isLeaf() {

@@ -15,12 +15,12 @@ import java.nio.ByteBuffer;
  * To change this template use File | Settings | File Templates.
  */
 public class BlockConsumer implements DataConsumer {
+
     private FileDescriptor fd;
     private int blockNumber;
     private BlockStorage storage;
     private DownloadConnection dc;
     private int sliceOffset = 0;
-
     private ByteBuffer saveBuffer;
 
     public BlockConsumer(DownloadConnection c, int blockNumber, BlockStorage storage) throws IOException {
@@ -34,20 +34,21 @@ public class BlockConsumer implements DataConsumer {
         //@todo: this is not optimal. We treat block downloads in consumerque the same way
         // as block downloads actually beeing downloaded. This is here to signal that this block is in
         //progress - although it's actually only in the consumerQue (probably)
-        storage.saveSlice(fd.getRootHash(), blockNumber,  sliceOffset, ByteBuffer.allocate(0), fd);
+        storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, ByteBuffer.allocate(0), fd);
     }
-
     private boolean firstConsume = true;
+
     public void consume(ByteBuffer buf) throws IOException {
         int saveBufferPos = saveBuffer == null ? 0 : saveBuffer.position();
-        if (sliceOffset+buf.remaining()+saveBufferPos >  BlockFile.getBlockSize(blockNumber, fd.getSize())) {
-            if(T.t)T.info("On the edge between two blocks. "+sliceOffset+", "+buf.remaining()+", "+saveBufferPos);
+        if (sliceOffset + buf.remaining() + saveBufferPos > BlockFile.getBlockSize(blockNumber, fd.getSize())) {
+            if (T.t) {
+                T.info("On the edge between two blocks. " + sliceOffset + ", " + buf.remaining() + ", " + saveBufferPos);
+            }
             //there's more then we need. This happens when the the chunk of data sent in crossing two blocks
             ByteBuffer buf2 = ByteBuffer.allocate(
-                    BlockFile.getBlockSize(blockNumber, fd.getSize()) - (sliceOffset+saveBufferPos)
-            );
+                    BlockFile.getBlockSize(blockNumber, fd.getSize()) - (sliceOffset + saveBufferPos));
             int oldLimit = buf.limit();
-            buf.limit(buf.position()+buf2.remaining());
+            buf.limit(buf.position() + buf2.remaining());
             buf2.put(buf);
             buf2.flip();
             buf.limit(oldLimit);
@@ -65,16 +66,20 @@ public class BlockConsumer implements DataConsumer {
             sliceOffset += buf.remaining();
             buf.position(buf.limit()); //make it look like we read the bytes
 
-            if (sliceOffset >= BlockFile.getBlockSize(blockNumber, fd.getSize())) blockComplete();
+            if (sliceOffset >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
+                blockComplete();
+            }
             return;
         }
 
         dc.getDownload().addBytesComplete(buf.remaining());
 
-        if (buf.remaining() > saveBuffer.remaining()) flush();
+        if (buf.remaining() > saveBuffer.remaining()) {
+            flush();
+        }
         saveBuffer.put(buf);
         if (firstConsume ||
-                saveBuffer.position()+sliceOffset >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
+                saveBuffer.position() + sliceOffset >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
             flush();
             firstConsume = false;
         }
@@ -82,7 +87,9 @@ public class BlockConsumer implements DataConsumer {
 
     private void flush() throws IOException {
         if (dc.getDownload().isInvalid()) {
-            if(T.t)T.info("Invalidated download. Flushing data from download. Waiting to gracefully close connection.");
+            if (T.t) {
+                T.info("Invalidated download. Flushing data from download. Waiting to gracefully close connection.");
+            }
             saveBuffer.clear();
         } else {
             saveBuffer.flip();
@@ -94,24 +101,34 @@ public class BlockConsumer implements DataConsumer {
             }
         }
     }
-
     private boolean performedBlockComplete;
+
     private void blockComplete() throws IOException {
-        if (performedBlockComplete) return;
+        if (performedBlockComplete) {
+            return;
+        }
         performedBlockComplete = true;
 
-        if(T.t)T.ass(sliceOffset <= BlockFile.getBlockSize(blockNumber, fd.getSize()), "Wrote outside of block!");
+        if (T.t) {
+            T.ass(sliceOffset <= BlockFile.getBlockSize(blockNumber, fd.getSize()), "Wrote outside of block!");
+        }
 
         if (dc.getDownload().checkIfDownloadIsComplete() || dc.getDownload().isInvalid()) {
             if (dc.getDownload().checkIfDownloadIsComplete()) {
-                if(T.t)T.info("Yay. File downloaded! Closing download connection.");
+                if (T.t) {
+                    T.info("Yay. File downloaded! Closing download connection.");
+                }
             } else if (dc.getDownload().isInvalid()) {
-                if(T.t)T.info("Download invalidated. Closing download connection.");
+                if (T.t) {
+                    T.info("Download invalidated. Closing download connection.");
+                }
             }
             dc.blockDownloadComplete(blockNumber);
             dc.sendGracefulClose();
         } else {
-            if(T.t)T.info("Block "+blockNumber+" from "+dc+" downloaded succesfully!");
+            if (T.t) {
+                T.info("Block " + blockNumber + " from " + dc + " downloaded succesfully!");
+            }
             dc.blockDownloadComplete(blockNumber);
             dc.startDownloadingBlock();
         }

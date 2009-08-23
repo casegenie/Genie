@@ -17,6 +17,7 @@ import com.stendahls.util.TextUtils;
  * Time: 14:55:58
  */
 public abstract class AuthenticatedConnection extends PacketConnection {
+
     protected int remoteUserGUID;
 
     protected AuthenticatedConnection(NetworkManager netMan, Direction direction) {
@@ -51,16 +52,18 @@ public abstract class AuthenticatedConnection extends PacketConnection {
     }
 
     public void sendConnectionIdentifier() throws IOException {
-        if(T.t)T.trace("Sending authentication and connection type "+getConnectionId());
+        if (T.t) {
+            T.trace("Sending authentication and connection type " + getConnectionId());
+        }
         Packet p = netMan.createPacketForSend();
         p.writeInt(Version.PROTOCOL_VERSION);
-        p.writeByte((byte)getConnectionIdForRemote());
+        p.writeByte((byte) getConnectionIdForRemote());
         p.writeInt(netMan.getFriendManager().getMyGUID());
         send(p);
     }
 
     public static AuthenticatedConnection newInstance(NetworkManager netMan, Object key, int connectiondId, int guid) throws IOException {
-        switch(connectiondId) {
+        switch (connectiondId) {
             case FriendConnection.CONNECTION_ID:
                 return new FriendConnection(netMan, key, Connection.Direction.IN, guid);
             case UploadConnection.CONNECTION_ID:
@@ -68,12 +71,12 @@ public abstract class AuthenticatedConnection extends PacketConnection {
             case ReverseConnection.CONNECTION_ID:
                 return new ReverseConnection(netMan, key, Connection.Direction.IN, guid);
             default:
-                throw new IOException("Unknown connection id "+connectiondId);
+                throw new IOException("Unknown connection id " + connectiondId);
         }
     }
 
     public String toString() {
-        return netMan.getFriendManager().getFriend(remoteUserGUID)+" ("+ TextUtils.simplifyClassName(this)+")";
+        return netMan.getFriendManager().getFriend(remoteUserGUID) + " (" + TextUtils.simplifyClassName(this) + ")";
     }
 
     public SocketAddress getSocketAddress() {

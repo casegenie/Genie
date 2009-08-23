@@ -23,7 +23,8 @@ import java.util.Enumeration;
  * To change this template use File | Settings | File Templates.
  */
 public class NodeTreeNode extends GenericNode {
-	private ArrayList<NodeTreeNode> children;
+
+    private ArrayList<NodeTreeNode> children;
     private NodeTreeNode parent;
     private Node node;
     private UISubsystem ui;
@@ -47,18 +48,24 @@ public class NodeTreeNode extends GenericNode {
     private void assureChildrenAreLoaded() {
         if (children == null) {
             children = new ArrayList<NodeTreeNode>();
-            if (dummyString != null) return;
+            if (dummyString != null) {
+                return;
+            }
             if (node == manager.getMe()) {
-                for(Friend f : manager.friends()) children.add(new NodeTreeNode(f, this, ui, model));
+                for (Friend f : manager.friends()) {
+                    children.add(new NodeTreeNode(f, this, ui, model));
+                }
             } else {
                 if (!node.friendsFriendsLoaded()) {
                     children.add(new NodeTreeNode("Loading ..."));
-                    manager.getCore().invokeLater( new Runnable() {
+                    manager.getCore().invokeLater(new Runnable() {
+
                         public void run() {
                             try {
                                 manager.loadSubnodesFor(node);
-                            } catch(final IOException e) {
+                            } catch (final IOException e) {
                                 SwingUtilities.invokeLater(new Runnable() {
+
                                     public void run() {
                                         reportError(e.toString());
                                     }
@@ -67,10 +74,12 @@ public class NodeTreeNode extends GenericNode {
                         }
                     });
                 } else {
-                    for(UntrustedNode n : node.friendsFriends()) {
-                        if (parent != null && parent.getNode() == n) continue;
+                    for (UntrustedNode n : node.friendsFriends()) {
+                        if (parent != null && parent.getNode() == n) {
+                            continue;
+                        }
                         if (model.get(n) != null) {
-                            children.add(new NodeTreeNode("Recursion to "+n.getNickname()));
+                            children.add(new NodeTreeNode("Recursion to " + n.getNickname()));
                         } else {
                             children.add(new NodeTreeNode(n, this, ui, model));
                         }
@@ -95,7 +104,7 @@ public class NodeTreeNode extends GenericNode {
     }
 
     public int getIndex(TreeNode node) {
-        return children.indexOf((NodeTreeNode)node);
+        return children.indexOf((NodeTreeNode) node);
     }
 
     public boolean getAllowsChildren() {
@@ -116,8 +125,10 @@ public class NodeTreeNode extends GenericNode {
     }
 
     public String toString() {
-        if (dummyString != null) return dummyString;
-        return node.getNickname() + (node.isConnected() ? " ("+ TextUtils.formatByteSize(node.getShareSize())+")" : "");
+        if (dummyString != null) {
+            return dummyString;
+        }
+        return node.getNickname() + (node.isConnected() ? " (" + TextUtils.formatByteSize(node.getShareSize()) + ")" : "");
     }
 
     public void reloadChildren() {
@@ -126,7 +137,9 @@ public class NodeTreeNode extends GenericNode {
     }
 
     public Object getIdentifier() {
-        if (node == null) return null;
+        if (node == null) {
+            return null;
+        }
         return node.getGuid();
     }
 
