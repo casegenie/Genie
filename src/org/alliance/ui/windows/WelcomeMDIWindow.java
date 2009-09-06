@@ -5,10 +5,13 @@ import com.stendahls.ui.JHtmlLabel;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.ui.UISubsystem;
 
-import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import java.io.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,9 +23,7 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
 
     public static final String IDENTIFIER = "welcome";
     private JHtmlLabel label;
-    private JLabel imageLabel;
     private UISubsystem ui;
-    private String html, image;
 
     public WelcomeMDIWindow() {
     }
@@ -41,13 +42,12 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
     }
 
     private void init(String html, String title) throws Exception {
-        this.html = html;
-
         label = (JHtmlLabel) xui.getComponent("label");
         label.setText(html);
 
         label.addHyperlinkListener(new HyperlinkListener() {
 
+            @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
                 String s = e.getURL().toString();
                 s = s.substring(s.length() - 1);
@@ -65,27 +65,28 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
                 }
             }
         });
-
-//            imageLabel = (JLabel) xui.getComponent("image");
-//            imageLabel.setIcon(new ImageIcon(ui.getRl().getResource(image)));
-
         setTitle(title);
         postInit();
     }
 
+    @Override
     public void save() throws Exception {
     }
 
+    @Override
     public String getIdentifier() {
         return IDENTIFIER;
     }
 
+    @Override
     public void revert() throws Exception {
     }
 
+    @Override
     public void serialize(ObjectOutputStream out) throws IOException {
     }
 
+    @Override
     public MDIWindow deserialize(ObjectInputStream in) throws IOException {
         return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
