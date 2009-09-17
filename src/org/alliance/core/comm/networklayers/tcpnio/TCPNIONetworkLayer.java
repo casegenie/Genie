@@ -15,6 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.CancelledKeyException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
@@ -230,6 +231,8 @@ public class TCPNIONetworkLayer implements Runnable {
                                 handleWrite(key);
                             }
                         }
+                    } catch (CancelledKeyException e) {
+                        //reportError(key, e);
                     } catch (Exception e) {
                         reportError(key, e);
                     }

@@ -398,10 +398,12 @@ public class OptionsWindow extends XUIDialog {
             shareList.revalidate();
 
             //Bastvera (Adding group name)
-            String groupname = JOptionPane.showInputDialog(null,
-                    "Enter new group name for folder.\nDivide multiple group names with commas.\nExample 1: music,games\nExample 2: music,games,private\nEmpty field set default group 'public'",
-                    "New group name",
-                    JOptionPane.QUESTION_MESSAGE);
+            String groupname = "Public";
+            try {
+                GroupDialogWindow dialogWindow = new GroupDialogWindow(ui, null);
+                groupname = dialogWindow.getGroupname();
+            } catch (Exception ex) {
+            }  
             if (groupname == null || groupname.trim().length() == 0) {
                 groupname = "Public";
             } else {
