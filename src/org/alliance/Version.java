@@ -21,7 +21,7 @@ public class Version {
         try {
             Properties p = new Properties();
             p.load(ResourceSingelton.getRl().getResourceStream("build.properties"));
-            n = Integer.parseInt(p.get("build.number").toString().replace("\u00A0", ""));
+            n = Integer.parseInt(p.get("build.number").toString().replaceAll("\\D", ""));
         } catch (Exception e) {
             System.err.println("Could not load buildnumber: " + e);
         } finally {

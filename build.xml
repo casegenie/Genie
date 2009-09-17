@@ -73,7 +73,7 @@
     -->
     <target name="-pre-jar" >
         <propertyfile file="${basedir}/res/res/build.properties">
-            <entry key="build.number" value="1" type="int" operation="+"/>
+            <entry key="build.number" default="1" type="int" operation="+"/>
         </propertyfile>
     </target>
     <target name="-post-jar">
@@ -81,7 +81,6 @@
             <zipfileset src="${dist.jar}" excludes="META-INF/*" />
             <zipfileset src="lib/clink.jar" excludes="META-INF/*" />
             <zipfileset src="lib/idw-gpl.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/jdic.jar" excludes="META-INF/*" />
             <zipfileset src="lib/jnotify-0.91.jar" excludes="META-INF/*" />
             <zipfileset src="lib/stendahls-commons.jar" excludes="META-INF/*" />
             <zipfileset src="lib/StendahlsTheme.jar" excludes="META-INF/*" />
