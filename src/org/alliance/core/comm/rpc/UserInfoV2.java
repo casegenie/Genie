@@ -10,6 +10,7 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.node.Friend;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 
 /**
  *
@@ -52,6 +53,13 @@ public class UserInfoV2 extends RPC {
         f.setHighestOutgoingCPS(in.readInt());
         f.setNumberOfFilesShared(in.readInt());
         f.setNumberOfInvitedFriends(in.readInt());
+        try {
+            String dnsName = in.readUTF();
+            if (!dnsName.trim().isEmpty()) {
+                f.updateLastKnownHostInfo(dnsName, port);
+            }
+        } catch (BufferUnderflowException ex) {
+        }
 
         if (CoreSubsystem.ALLOW_TO_SEND_UPGRADE_TO_FRIENDS) {
             if (buildNumber < Version.BUILD_NUMBER) {
@@ -103,6 +111,7 @@ public class UserInfoV2 extends RPC {
         p.writeInt((int) Math.round(core.getNetworkManager().getBandwidthOut().getHighestCPS()));
         p.writeInt(core.getFileManager().getFileDatabase().getNumberOfShares());
         p.writeInt(core.getSettings().getMy().getInvitations());
+        p.writeUTF(core.getSettings().getServer().getDnsname());
 
         return p;
     }

@@ -69,9 +69,8 @@ public class CompressedPathCollection implements Serializable {
                 }
                 if (!new File(path + s).exists()) {
                     if (T.t) {
-                        T.info("Ehm. Found file in path collection that does not exist. Recovering by ignoring it and removing it from path collection.");
+                        T.info("Ehm. Found file in path collection that does not exist. Ignore it, it will be removed later by ShareScanner");
                     }
-                    it.remove();
                 } else {
                     hs.add(s);
                 }

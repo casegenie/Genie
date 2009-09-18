@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
+import org.alliance.launchers.OSInfo;
 
 /**
  * Created by IntelliJ IDEA.
@@ -201,6 +202,14 @@ public class FileDatabase {
     private synchronized void remove(FileDescriptor fd) throws IOException {
         if (T.t) {
             T.info("Remoiving: " + fd);
+        }
+        if (OSInfo.isWindows()) {
+            //Don't remove files where mount point doesn't exist (external drives check) but ShareBase still exist
+            if (!(new File(fd.getCanonicalPath().substring(0, fd.getCanonicalPath().indexOf(":\\") + 1)).exists())) {
+                if ((core.getFileManager().getShareManager().getBaseByPath(fd.getBasePath())) != null) {
+                    return;
+                }
+            }
         }
         if (baseHashTable == null) {
             throw new IOException("Internal error 0 in filedatabase!");

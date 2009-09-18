@@ -78,13 +78,22 @@ public class Friend extends Node {
     public boolean updateLastKnownHostInfo(String host, int port) throws IOException {
         Settings s = manager.getSettings();
 
-        // Don't overwrite hostnames set by the user manually
-        if (TextUtils.isIpNumber(s.getFriend(guid).getHost())) {
+        if (TextUtils.isIpNumber(host) && TextUtils.isIpNumber(s.getFriend(guid).getHost())) {
             if (T.t) {
                 T.info("Updating host info for " + this + ": " + host + ":" + port);
             }
             boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
             lastKnownHost = rDNSConvert(host, s.getFriend(guid));
+            lastKnownPort = port;
+            s.getFriend(guid).setHost(lastKnownHost);
+            s.getFriend(guid).setPort(lastKnownPort);
+            return hostInfoChanged;
+        } else if (!TextUtils.isIpNumber(host) && !s.getFriend(guid).getHost().equals(host)) {
+            if (T.t) {
+                T.info("Updating host info for " + this + ": " + host + ":" + port);
+            }
+            boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
+            lastKnownHost = host;
             lastKnownPort = port;
             s.getFriend(guid).setHost(lastKnownHost);
             s.getFriend(guid).setPort(lastKnownPort);
