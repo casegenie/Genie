@@ -71,7 +71,7 @@ import javax.swing.JFrame;
  */
 public class CoreSubsystem implements Subsystem {
 
-    public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = false; //don't forget to turn off trace, run with registered synthetica
+    public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = true; //don't forget to turn off trace, run with registered synthetica
     private static final int STATE_FILE_VERSION = 5;
     public final static int KB = 1024;
     public final static int MB = 1024 * KB;
@@ -98,7 +98,7 @@ public class CoreSubsystem implements Subsystem {
     }
 
     @Override
-    public void init(ResourceLoader rl, Object... params) throws Exception {
+    public void init(ResourceLoader rl, Object... params) throws Exception {       
         StartupProgressListener progress = new StartupProgressListener() {
 
             @Override

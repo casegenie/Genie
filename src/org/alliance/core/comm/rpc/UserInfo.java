@@ -52,7 +52,7 @@ public class UserInfo extends RPC {
         f.setAllianceBuildNumber(buildNumber);
 
         if (CoreSubsystem.ALLOW_TO_SEND_UPGRADE_TO_FRIENDS) {
-            if (buildNumber < Version.BUILD_NUMBER) {
+            if (buildNumber < Version.BUILD_NUMBER && buildNumber > 1000) {
                 //remote has old version
                 Hash h = core.getFileManager().getAutomaticUpgrade().getMyJarHash();
                 if (h != null) {

@@ -50,7 +50,7 @@ public class FileManager extends Manager {
     public void init() throws IOException {
         cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
         downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
-//Temporary blocked autoupdate for Beta    // automaticUpgrade = new AutomaticUpgrade(core, cache);
+        automaticUpgrade = new AutomaticUpgrade(core, cache);
         shareManager = new ShareManager(core, settings);
     }
 

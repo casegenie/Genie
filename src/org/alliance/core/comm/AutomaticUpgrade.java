@@ -26,7 +26,7 @@ import java.util.jar.JarFile;
 public class AutomaticUpgrade {
 
     public static final String UPGRADE_FILENAME = "alliance.upgrade";
-    private static final File SOURCE_JAR = new File("alliance.dat");
+    public static final File SOURCE_JAR = new File("alliance.dat");
     private CacheStorage cache;
     private CoreSubsystem core;
     private boolean upgradeAttemtHasBeenMade = false;
@@ -106,8 +106,8 @@ public class AutomaticUpgrade {
             if (T.t) {
                 T.info("Verifying jar " + fd.getFullPath() + "...");
             }
-            JarVerifier jv = new JarVerifier(new X509Certificate[]{cert});
-            jv.verify(new JarFile(fd.getFullPath(), true));
+            //JarVerifier jv = new JarVerifier(new X509Certificate[]{cert});
+            //jv.verify(new JarFile(fd.getFullPath(), true));
 
             core.getUICallback().statusMessage("Upgrade verified! Restarting.");
 
@@ -115,7 +115,7 @@ public class AutomaticUpgrade {
                 T.info("Jar verified! Upgrading...");
             }
 
-            copyFile(new File(fd.getFullPath()), SOURCE_JAR);
+            copyFile(new File(fd.getFullPath()), new File("alliance.tmp"));
             if (T.t) {
                 T.info("Upgrade successful! Restarting.");
             }

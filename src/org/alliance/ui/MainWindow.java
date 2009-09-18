@@ -620,22 +620,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     }
                 });
             }
-
-//            NeedsUserInteraction nui;
-//            while((nui = ui.getCore().fetchUserInteraction()) != null) {
-//                final NeedsUserInteraction nui1 = nui;
-//                try {
-//                    SwingUtilities.invokeAndWait(new Runnable() {
-//                        public void run() {
-//                            handleNeedsUserInteraction(nui1);
-//                        }
-//                    });
-//                } catch (InterruptedException e) {
-//                } catch (InvocationTargetException e) {
-//                }
-//            }
-
-//            if(T.t)T.trace("userInteractionsInProgress: "+userInteractionsInProgress+", in que: "+ui.getCore().getAllUserInteractionsInQue().size());
             final boolean[] removedAUserInteraction = new boolean[]{false};
             for (NeedsUserInteraction nui : ui.getCore().getAllUserInteractionsInQue()) {
                 if (userInteractionsInProgress == 0 || nui.canRunInParallelWithOtherInteractions()) {
@@ -712,28 +696,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         ui.handleErrorInEventLoop(e);
                     }
                 }
-                /*
-                this old way of handling new versions was less user friendly - usability testing showed this
-                if (ui.getCore().getAwayManager().isAway() || OptionDialog.showQuestionDialog(this, "A new version of Alliance has been downloaded and installed in the background (the upgrade was verified using a 2048 bit RSA certificate).[p] You need to restart Alliance to use the new version. Note that it will take about two minutes before Alliance starts again. Would you like to do this now?[p]")) {
-                try {
-                ui.getCore().restartProgram(true);
-                } catch (IOException e) {
-                ui.handleErrorInEventLoop(e);
-                }
-                } else {
-                //wait for 5 minutes and then ask again.
-                Thread t = new Thread(new Runnable() {
-                public void run() {
-                try { Thread.sleep(1000*60*5); } catch(InterruptedException e) {}
-                ui.getCore().invokeLater(new Runnable() {
-                public void run() {
-                ui.getCore().queNeedsUserInteraction(new NeedsToRestartBecauseOfUpgradeInteraction());
-                }
-                });
-                }
-                });
-                t.start();
-                }*/
             } else if (nui instanceof ForwardedInvitationInteraction) {
                 ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) nui;
                 if (ui.getCore().getFriendManager().getFriend(fii.getFromGuid()) != null && ui.getCore().getFriendManager().getFriend(fii.getFromGuid()).isConnected()) {
@@ -894,11 +856,11 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_trace(ActionEvent e) throws Exception {
-         if (!org.alliance.T.t) {
-              OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
-          } else {
+        if (!org.alliance.T.t) {
+            OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
+        } else {
             createTraceWindow();
-          }
+        }
     }
 
     /*    public void EVENT_shutdown6(ActionEvent e) throws Exception{
