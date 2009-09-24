@@ -8,11 +8,8 @@ import java.io.InputStreamReader;
 import java.util.jar.JarFile;
 
 /**
- * Created by IntelliJ IDEA.
- * User: maciek
- * Date: 2008-jun-05
- * Time: 19:03:00
- * To change this template use File | Settings | File Templates.
+ * Created by IntelliJ IDEA. User: maciek Date: 2008-jun-05 Time: 19:03:00 To
+ * change this template use File | Settings | File Templates.
  */
 public class Plugin {
 
@@ -25,16 +22,14 @@ public class Plugin {
 
     public void setJar(String jar) throws IOException {
         File jarfile = new File(jar);
-        if (jarfile.exists()) {
-            init(jarfile);
-        } else {
+        if (!init(jarfile)) {
             this.jar = jar;
             pluginclass = "";
         }
     }
 
-    //TODO: This is not a "get" to ensure that it is not in the settings.xml file
-    //If there is a better way please fix
+    // TODO: This is not a "get" to ensure that it is not in the settings.xml file
+    // If there is a better way please fix
     public String retrievePluginClass() {
         return pluginclass;
     }
@@ -45,18 +40,29 @@ public class Plugin {
     }
 
     /**
-     * Code below gets a file in the root of the jar with a name of JARCLASSFILE
-     * this class needs to contain the alliance class
-     */
-    public void init(File file) throws IOException {
-        JarFile jarfile = new JarFile(file);
-        InputStream is = jarfile.getInputStream(jarfile.getEntry(JARCLASSFILE));
-        BufferedReader dis = new BufferedReader(new InputStreamReader(is));
-        String mainclass = dis.readLine();
-        jarfile.close();
-        dis.close();
-        is.close();
-        this.jar = file.getCanonicalPath();
-        this.pluginclass = mainclass;
+	 * Code below gets a file in the root of the jar with a name of JARCLASSFILE
+	 * this class needs to contain the alliance class
+	 */
+    public boolean init(File file) throws IOException {
+    	if(file.exists()){
+    		JarFile jarfile = new JarFile(file);
+    		if(jarfile.getEntry(JARCLASSFILE) != null) {
+	        	InputStream is = jarfile.getInputStream(jarfile.getEntry(JARCLASSFILE));
+	        	BufferedReader dis = new BufferedReader(new InputStreamReader(is));
+	        	String mainclass = dis.readLine();
+	        	jarfile.close();
+	        	dis.close();
+	        	is.close();
+	        	this.jar = file.getCanonicalPath();
+	        	this.pluginclass = mainclass;
+	        	return true;
+	        
+    		} else {
+    			// TODO: This error probably should be exposed in the UI
+    			// someway...not sure of the best way of doing so
+    			System.out.println("The Jar file is missing the " + JARCLASSFILE + " file, and was unable to be loaded correctly");
+    		}
+    	}
+		return false;
     }
 }

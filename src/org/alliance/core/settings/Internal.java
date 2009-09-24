@@ -603,4 +603,13 @@ public class Internal extends SettingClass {
     public void setAutomaticallydenyallinvitations(Integer automaticallydenyallinvitations) {
         this.automaticallydenyallinvitations = automaticallydenyallinvitations;
     }
+    
+    public String getCurrentDirectory(){
+    	return CURRENT_DIRECTORY;
+    }
+    
+    public String getUserDirectory(){
+    	return USER_DIRECTORY;
+    }
+    
 }

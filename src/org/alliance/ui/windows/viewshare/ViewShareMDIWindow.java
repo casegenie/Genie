@@ -186,6 +186,8 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
         } catch (IllegalArgumentException ex) {
             OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
+        } catch (UnsupportedOperationException ex) {
+        	OptionDialog.showErrorDialog(ui.getMainWindow(), "This operation is not supported on this architecture");
         }
     }
 
