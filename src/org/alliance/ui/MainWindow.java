@@ -328,30 +328,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     }
                     setVisible(false);
                 } else if (OSInfo.supportsTrayIcon()) {
-                    if (OSInfo.isWindows()) {
-                        if (T.t) {
-                            T.info("On windows Alliance can restart so we're triggering a restart here - in order to preserve memory");
-                        }
-                        Thread t = new Thread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                try {
-                                    Thread.sleep(100);
-                                    setVisible(false);
-                                    ui.getCore().restartProgram(false);
-                                } catch (Exception e1) {
-                                    ui.handleErrorInEventLoop(e1);
-                                }
-                            }
-                        });
-                        t.start();
-                    } else {
-                        if (T.t) {
-                            T.info("We have a tray icon but cannot restart Alliance so we just hide the window here");
-                        }
-                        setVisible(false);
+                    if (T.t) {
+                        T.info("We have a tray icon so we just hide the window here");
                     }
+                    setVisible(false);
                 } else {
                     if (T.t) {
                         T.info("No tray icon and not Mac - just shut down alliance");
@@ -838,13 +818,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_options(ActionEvent e) throws Exception {
         new OptionsWindow(ui);
-//        String s = JOptionPane.showInputDialog("Enter upload throttle, in kb/s (kilobyte per second).\n0 means no limit.\nIf you have 1mbit upstream a value of 70 is recommended.\nThis value will be saved in your configuration file.", ui.getCore().getSettings().getInternal().getUploadthrottle()/KB);
-//        if (s != null) {
-//            int limit = Integer.parseInt(s.trim());
-//            ui.getCore().getSettings().getInternal().setUploadthrottle(limit);
-//            ui.getCore().saveSettings();
-//            ui.getCore().getNetworkManager().getUploadThrottle().setRate(limit*KB);
-//        }
     }
 
     public void EVENT_addshare(ActionEvent e) throws Exception {
@@ -863,35 +836,20 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
     }
 
-    /*    public void EVENT_shutdown6(ActionEvent e) throws Exception{
-    ui.getCore().restartProgram(false, 6*60);
-    }
-    
-    public void EVENT_shutdown3(ActionEvent e) throws Exception{
-    ui.getCore().restartProgram(false, 3*60);
+    public void EVENT_exitApp(ActionEvent e) throws Exception {
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you wish to close Alliance?", "Are you sure?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            if (ui.getCore() != null) {
+                ui.getCore().shutdown();
+            }
+
+            if (ui != null) {
+                ui.shutdown();
+                ui = null;
+            }
+            System.exit(0);
+        }
     }
 
-    public void EVENT_shutdown1(ActionEvent e) throws Exception{
-    ui.getCore().restartProgram(false, 60);
-    }
-
-    public void EVENT_shutdown30(ActionEvent e) throws Exception{
-    ui.getCore().restartProgram(false, 30);
-    }
-
-    public void EVENT_shutdownForever(ActionEvent e) throws Exception{
-    if(JOptionPane.showConfirmDialog(null, "Are you sure you wish to close Alliance?", "Are you sure?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
-    if (ui.getCore() != null) {
-    ui.getCore().shutdown();
-    }
-
-    if (ui != null) {
-    ui.shutdown();
-    ui = null;
-    }
-    System.exit(0);
-    }
-    }*/
     public void EVENT_addally(ActionEvent e) throws IOException {
         String invitation = JOptionPane.showInputDialog(ui.getMainWindow(), "Enter the connection code you got from your friend: ");
         try {

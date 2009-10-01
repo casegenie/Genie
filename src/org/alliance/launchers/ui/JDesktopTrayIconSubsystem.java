@@ -3,6 +3,7 @@ package org.alliance.launchers.ui;
 import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.resourceloader.ResourceLoader;
 import com.stendahls.util.TextUtils;
+import java.awt.Font;
 import org.alliance.Subsystem;
 import org.alliance.Version;
 import org.alliance.core.CoreSubsystem;
@@ -10,28 +11,37 @@ import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.core.T;
 import org.alliance.core.UICallback;
+import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
+import org.jdesktop.jdic.tray.SystemTray;
+import org.jdesktop.jdic.tray.TrayIcon;
 
-import java.awt.Font;
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.SystemTray;
-import java.awt.Toolkit;
-import java.awt.TrayIcon;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
+import javax.swing.ImageIcon;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import org.alliance.launchers.OSInfo;
 
 /**
- * New tray icon using java.awt.SystemTray (new stuff in Java 6).
+ * Created by IntelliJ IDEA.
+ * User: maciek
+ * Date: 2006-feb-03
+ * Time: 14:10:37
  */
-public class Java6TrayIconSubsystem implements Subsystem, Runnable {
+public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
     private CoreSubsystem core;
     private Subsystem ui;
@@ -44,6 +54,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
     public void init(ResourceLoader rl, Object... params) throws Exception {
         this.rl = rl;
         core = (CoreSubsystem) params[0];
+        extractNativeLibs();
         initTray();
         core.setUICallback(new UICallback() {
 
@@ -117,16 +128,16 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                     String msg = pmi.getMessage().replaceAll("\\<.*?\\>", "");      // Strip html
                     if (pmi instanceof PostMessageToAllInteraction) {
                         if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0) {
-                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     } else {
                         if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0) {
-                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage("Alliance needs your attention.", "", TrayIcon.MessageType.INFO);
+                        ti.displayMessage("Alliance needs your attention.", "Click here to find out why.", TrayIcon.INFO_MESSAGE_TYPE);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -140,7 +151,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
             @Override
             public void handleError(final Throwable e, final Object source) {
-                ti.displayMessage(e.getClass().getName(), e + "\n" + source, TrayIcon.MessageType.ERROR);
+                ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\nClick here to view detailed error (and send error report)", TrayIcon.ERROR_MESSAGE_TYPE);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
 
@@ -162,14 +173,41 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         });
     }
 
-    private void initTray() throws Exception {
-        tray = SystemTray.getSystemTray();
+    private void extractNativeLibs() throws IOException {
+        String name = "tray.dll";
+        File f = new File(name);
+        if (!f.exists()) {
+            if (T.t) {
+                T.info("Extracting lib: " + name);
+            }
+            FileOutputStream out = new FileOutputStream(f);
+            InputStream in = rl.getResourceStream(name);
+            byte buf[] = new byte[10 * KB];
+            int read;
+            while ((read = in.read(buf)) != -1) {
+                out.write(buf, 0, read);
+            }
+            out.flush();
+            out.close();
+            if (T.t) {
+                T.info("Done.");
+            }
+        }
+    }
 
-        PopupMenu m = new PopupMenu();
+    private void initTray() throws Exception {
+        try {
+            tray = SystemTray.getDefaultSystemTray();
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("If you are running on linux you might want to go to the forum at sourceforge and read how to run Alliance on linux. You need to download native libraries to start it.");
+            throw new Exception("Native library for system tray missing. If you are running linux you need to download it manually. Look in the forum on sourceforge for more information.");
+        }
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        JPopupMenu m = new JPopupMenu();
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        MenuItem mi = new MenuItem("Open Alliance");
+        JMenuItem mi = new JMenuItem("Open Alliance");
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -184,7 +222,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         if (OSInfo.isWindows()) {
             m.addSeparator();
 
-            mi = new MenuItem("Unload UI");
+            mi = new JMenuItem("Unload UI");
             mi.setFont(f);
             mi.addActionListener(new ActionListener() {
 
@@ -195,10 +233,10 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             });
             m.add(mi);
         }
-        
+
         m.addSeparator();
 
-        mi = new MenuItem("Exit");
+        mi = new JMenuItem("Exit");
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
@@ -209,21 +247,21 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         });
         m.add(mi);
 
-        Toolkit.getDefaultToolkit().getSystemEventQueue().push(new PopupFixQueue(m));
-
-        ti = new TrayIcon(Toolkit.getDefaultToolkit().getImage(rl.getResource("gfx/icons/alliancetray.png")),
+        ti = new TrayIcon(new ImageIcon(rl.getResource("gfx/icons/alliancetray.png")),
                 "Alliance", m);
-        ti.setImageAutoSize(false);
 
-        ti.addActionListener(new ActionListener() {
+        ti.setIconAutoSize(false);
+        ti.addBalloonActionListener(new ActionListener() {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                openUI();
+                if (balloonClickHandler != null) {
+                    balloonClickHandler.run();
+                }
             }
         });
 
-        tray.add(ti);
+        tray.addTrayIcon(ti);
 
         ti.addActionListener(new ActionListener() {
 
@@ -238,6 +276,23 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             }
         });
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+
+            @Override
+            public void run() {
+                if (tray != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            tray.removeTrayIcon(ti);
+                        }
+                    });
+                    tray = null;
+                }
+            }
+        });
+
         // Update tooltip periodically with current transfer rates
         Thread t = new Thread(new Runnable() {
 
@@ -245,11 +300,17 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             public void run() {
                 try {
                     while (true) {
-                        ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
+                            }
+                        });
+
                         Thread.sleep(5000);
                     }
                 } catch (InterruptedException e) {
-                } catch (NullPointerException e) {
                 }
             }
         });
@@ -260,7 +321,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
     @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
-            ti.displayMessage("", "Shutting down...", TrayIcon.MessageType.NONE);
+            ti.displayMessage("", "Shutting down...", TrayIcon.NONE_MESSAGE_TYPE);
             balloonClickHandler = null;
         }
 
@@ -273,7 +334,8 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             core = null;
         }
         if (tray != null) {
-            tray.remove(ti);
+            tray.removeTrayIcon(ti);
+            tray = null;
         }
         System.exit(0);
     }
@@ -286,7 +348,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                 }
                 core.uiToFront();
                 return;
-            }
+            }           
             Runnable r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
             SimpleTimer s = new SimpleTimer();
             ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();
@@ -314,7 +376,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                 return;
             }
             if (tray != null && ti != null) {
-                ti.displayMessage("", "Unloading UI...", TrayIcon.MessageType.NONE);
+                ti.displayMessage("", "Unloading UI...", TrayIcon.NONE_MESSAGE_TYPE);
                 balloonClickHandler = null;
             }
             core.restartProgram(false);

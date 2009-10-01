@@ -4,13 +4,7 @@
     <menubar>
         <menu text="File" mnemonic="f">
             <menuitem eventid="hide" mnemonic="x" text="Hide window"/>
-            <!--<menu mnemonic="s" text="Shutdown Alliance">
-                <menuitem eventid="shutdown30"  text="for 30 minutes"/>
-                <menuitem eventid="shutdown1"  text="for 1 hour"/>
-                <menuitem eventid="shutdown3"  text="for 3 hours"/>
-                <menuitem eventid="shutdown6"  text="for 6 hours"/>
-                <menuitem eventid="shutdownForever"  text="Forever (not recommended)"/>
-            </menu>-->
+            <menuitem eventid="exitApp" text="Exit"/>
         </menu>
         <menu text="View" mnemonic="w">
             <menuitem eventid="uploads" accelerator="ctrl-u" mnemonic="u" text="Uploads"/>

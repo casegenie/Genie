@@ -224,10 +224,11 @@ public class Main {
             return tray;
         } catch (Throwable e) {
             if (T.t) {
-                T.warn("Not supported OS.");
+                T.warn("Java 6 tray icon not supported. Falling back to old code.");
             }
-            System.exit(0);
-            return null;
+            Subsystem tray = (Subsystem) Class.forName("org.alliance.launchers.ui.JDesktopTrayIconSubsystem").newInstance();
+            tray.init(ResourceSingelton.getRl(), core);
+            return tray;
         }
     }
 
