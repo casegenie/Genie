@@ -4,7 +4,6 @@ import org.alliance.core.T;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
 import org.alliance.core.node.Friend;
-import org.alliance.core.node.MyNode;
 
 import java.io.IOException;
 
@@ -33,15 +32,8 @@ public class ConnectionInfo extends RPC {
     @Override
     public void execute(Packet in) throws IOException {
         int guid = in.readInt();
-        if (guid == manager.getMyGUID()) {
-            MyNode me = manager.getMe();
-            me.setExternalIp(in.readUTF());
-            if (T.t) {
-                T.info("Updating external IP for myself: " + me.getExternalIp());
-            }
-            in.readInt(); //ignore port
-        } else {
-            friend = manager.getFriend(guid);
+        if (guid != manager.getMyGUID()) {
+        	friend = manager.getFriend(guid);
 
             String host = in.readUTF();
             int port = in.readInt();

@@ -58,9 +58,6 @@ public class MyNode extends Node {
         return externalIp;
     }
 
-    public void setExternalIp(String externalIp) {
-        this.externalIp = externalIp;
-    }
     private boolean alreadyTriedAutodetect = false;
 
     public void autodetectExternalIp(CoreSubsystem core) throws IOException {

@@ -261,11 +261,12 @@ public class OptionsWindow extends XUIDialog {
             settings.getRulelist().add(rule);
         }
 
-        ui.getCore().saveSettings();
         ui.getCore().getNetworkManager().getUploadThrottle().setRate(settings.getInternal().getUploadthrottle() * KB);
         if (uploadThrottleBefore != settings.getInternal().getUploadthrottle()) {
             ui.getCore().getNetworkManager().getBandwidthOut().resetHighestCPS();
         }
+        
+        ui.getCore().saveSettings();
         return true;
     }
 
