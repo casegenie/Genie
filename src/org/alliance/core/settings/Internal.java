@@ -23,7 +23,11 @@ public class Internal extends SettingClass {
 
     static {
         if (OSInfo.isLinux()) {
-            USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
+        	if (new File("standaloneVersion").exists()) {
+        		USER_DIRECTORY = "";
+        	} else {
+        		USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
+        	}
             CURRENT_DIRECTORY = USER_DIRECTORY;
         } else if (OSInfo.isWindows()) {
             if (new File("standaloneVersion").exists()) {

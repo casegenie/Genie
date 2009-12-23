@@ -1,5 +1,6 @@
 package org.alliance.ui.addfriendwizard;
 
+import org.alliance.core.CoreSubsystem;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.UntrustedNode;
 import org.alliance.core.node.Invitation;
@@ -32,7 +33,7 @@ public class ForwardInvitationNodesList extends JList {
     private AddFriendWizard addFriendWizard;
 
     public ForwardInvitationNodesList(UISubsystem ui, final AddFriendWizard addFriendWizard) {
-        super(new ForwardInvitationListModel(ui));
+        super(new ForwardInvitationListModel(ui.getCore()));
         this.ui = ui;
         this.addFriendWizard = addFriendWizard;
 
@@ -128,17 +129,17 @@ public class ForwardInvitationNodesList extends JList {
 
     public static class ForwardInvitationListModel extends DefaultListModel {
 
-        private UISubsystem ui;
+        private CoreSubsystem core;
 
-        public ForwardInvitationListModel(final UISubsystem ui) {
-            this.ui = ui;
+        public ForwardInvitationListModel(final CoreSubsystem core) {
+        	this.core = core;
 
-            TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
+        	TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
 
                 @Override
                 public int compare(Integer o1, Integer o2) {
-                    String n1 = ui.getCore().getFriendManager().nickname(o1);
-                    String n2 = ui.getCore().getFriendManager().nickname(o2);
+                    String n1 = core.getFriendManager().nickname(o1);
+                    String n2 = core.getFriendManager().nickname(o2);
                     if (n1.compareToIgnoreCase(n2) == 0) {
                         return o1.compareTo(o2);
                     } else {
@@ -146,13 +147,13 @@ public class ForwardInvitationNodesList extends JList {
                     }
                 }
             });
-            Collection<Friend> friends = ui.getCore().getFriendManager().friends();
+            Collection<Friend> friends = core.getFriendManager().friends();
             for (Friend f : friends.toArray(new Friend[friends.size()])) {
                 if (f.friendsFriends() != null) {
                     Collection<UntrustedNode> ff = f.friendsFriends();
                     for (UntrustedNode n : ff.toArray(new UntrustedNode[ff.size()])) {
-                        if (ui.getCore().getFriendManager().getFriend(n.getGuid()) == null &&
-                                ui.getCore().getFriendManager().getMyGUID() != n.getGuid()) {
+                        if (core.getFriendManager().getFriend(n.getGuid()) == null &&
+                                core.getFriendManager().getMyGUID() != n.getGuid()) {
                             secondaryNodeGuids.add(n.getGuid());
                         }
                     }
@@ -161,17 +162,17 @@ public class ForwardInvitationNodesList extends JList {
 
             removeDoubledInvitation(secondaryNodeGuids);
             for (int guid : secondaryNodeGuids) {
-                addElement(new ListRow(ui.getCore().getFriendManager().nickname(guid), createConnectedThroughList(guid, friends), guid, checkTrusted(guid, friends)));
+                addElement(new ListRow(core.getFriendManager().nickname(guid), createConnectedThroughList(guid, friends), guid, checkTrusted(guid, friends)));
             }
         }
 
         private void removeDoubledInvitation(TreeSet<Integer> secondaryNodeGuids) {
-            Collection<Invitation> invitations = ui.getCore().getInvitaitonManager().allInvitations();
+            Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
             for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
                 if (i.getDestinationGuid() == null) {
                     continue;
                 }
-                if (ui.getCore().getInvitaitonManager().hasBeenRecentlyInvited(i)) {
+                if (core.getInvitaitonManager().hasBeenRecentlyInvited(i)) {
                     secondaryNodeGuids.remove(i.getDestinationGuid()); //often the guid won't exist in the list - that's fine.
                 }
             }

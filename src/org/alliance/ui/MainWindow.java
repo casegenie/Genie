@@ -702,7 +702,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
 
                 if (ui.getCore().doesInterationQueContain(ForwardedInvitationInteraction.class) ||
-                        new ForwardInvitationNodesList.ForwardInvitationListModel(ui).getSize() == 0) {
+                        new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0) {
                     if (lastAddFriendWizard != null) {
                         lastAddFriendWizard.getOuterDialog().dispose();
                     }
@@ -710,24 +710,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     //after this method completes the next pending interaction will be processed.
                 } else {
                     if (ui.getCore().getSettings().getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
-                        ui.getCore().invokeLater(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                try {
-                                    final ArrayList<ForwardInvitationNodesList.ListRow> al = new ArrayList<ForwardInvitationNodesList.ListRow>();
-                                    ForwardInvitationNodesList.ForwardInvitationListModel m = new ForwardInvitationNodesList.ForwardInvitationListModel(ui);
-                                    for (int j = 0; j < m.getSize(); j++) {
-                                        al.add((ForwardInvitationNodesList.ListRow) m.getElementAt(j));
-                                    }
-                                    for (ForwardInvitationNodesList.ListRow r : al) {
-                                        ui.getCore().getFriendManager().forwardInvitationTo(r.guid);
-                                    }
-                                } catch (Exception e) {
-                                    ui.getCore().reportError(e, this);
-                                }
-                            }
-                        });
+                    	ui.getCore().getFriendManager().connectToAllFriendsOfFriends();
                     } else {
                         showSuccessfullyConnectedToNewFriendDialog(name);
                         try {

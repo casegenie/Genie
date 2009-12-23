@@ -109,7 +109,7 @@ public class AddFriendWizard extends JWizard {
 
         //disable looking for friends in secondary connections if we have no friends
         //or if we have no friends to forward invitations to  
-        if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui).getSize() == 0 ||
+        if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0 ||
                 ui.getCore().getFriendManager().friends().size() == 0) {
             innerXUI.getComponent("radio1_3").setEnabled(false);
         }

@@ -20,6 +20,7 @@ import org.alliance.core.comm.rpc.PleaseForwardInvitation;
 import org.alliance.core.comm.rpc.UserInfo;
 import org.alliance.core.comm.rpc.UserInfoV2;
 import org.alliance.core.comm.rpc.UserList;
+import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -167,12 +168,38 @@ public class FriendManager extends Manager {
         if (getFriend(c.getRemoteUserGUID()) != null) {
             getFriend(c.getRemoteUserGUID()).addConnection(c);
             getNetMan().getPackageRouter().updateRouteTable(getFriend(c.getRemoteUserGUID()), c.getRemoteUserGUID(), 0);
+            /*Code below automatically connects to all friends of friends, however it does not work on startup due to objects
+            not being sufficiantly initialized, which is ok because the next time any user connects it runs successfully*/
+            if(settings.getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
+            	 connectToAllFriendsOfFriends();
+            }
         } else {
             if (T.t) {
                 T.ass(c instanceof InvitationConnection, "Not an invitation connection!");
             }
         }
     }
+
+	public void connectToAllFriendsOfFriends() {
+		core.invokeLater(new Runnable() {
+
+		     @Override
+		     public void run() {
+		         try {
+		             final ArrayList<ForwardInvitationNodesList.ListRow> al = new ArrayList<ForwardInvitationNodesList.ListRow>();
+		             ForwardInvitationNodesList.ForwardInvitationListModel m = new ForwardInvitationNodesList.ForwardInvitationListModel(core);
+		             for (int j = 0; j < m.getSize(); j++) {
+		                 al.add((ForwardInvitationNodesList.ListRow) m.getElementAt(j));
+		             }
+		             for (ForwardInvitationNodesList.ListRow r : al) {
+		                 forwardInvitationTo(r.guid);
+		             }
+		         } catch (Exception e) {
+		             core.reportError(e, this);
+		         }
+		     }
+		 });
+	}
 
     public Friend getFriend(int guid) {
         return friends.get(guid);

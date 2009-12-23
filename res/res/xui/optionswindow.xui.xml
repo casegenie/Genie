@@ -215,7 +215,7 @@
                             <filler/>
                         </panel>
                         <panel axis="x" border="0" expand="horiz">
-                            <checkbox id="internal.alwaysautomaticallyconnecttoallfriendsoffriend" text="When a new friend connects to me automatically connect to all his friends"/>
+                            <checkbox id="internal.alwaysautomaticallyconnecttoallfriendsoffriend" text="When a friend connects to me automatically connect to all his friends"/>
                             <filler/>
                         </panel>
                     </panel>

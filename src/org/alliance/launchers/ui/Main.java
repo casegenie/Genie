@@ -117,7 +117,11 @@ public class Main {
     public static String localizeHomeDir() {
         String dir;
         if (OSInfo.isLinux()) {
-            dir = System.getProperty("user.home") + "/.alliance/";
+        	if (new File("standaloneVersion").exists()) {
+                dir = "";
+            } else {
+                dir = System.getProperty("user.home") + "/.alliance/";
+            }
         } else if (OSInfo.isWindows()) {
             if (new File("standaloneVersion").exists()) {
                 dir = "";
