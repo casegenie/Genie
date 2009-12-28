@@ -27,6 +27,7 @@ public class PluginManager extends Manager {
     private CoreSubsystem core;
     private URLClassLoader classLoader;
     private List<PlugIn> plugIns = new ArrayList<PlugIn>();
+    private List<ConsolePlugInExtension> plugInConsoleExtensions;
 
     public PluginManager(CoreSubsystem core) {
         this.core = core;
@@ -34,18 +35,24 @@ public class PluginManager extends Manager {
 
     @Override
     public void init() throws Exception {
+    	plugInConsoleExtensions = new ArrayList<ConsolePlugInExtension>();
         if (!core.getSettings().getPluginlist().isEmpty()) {
             setupClassLoader();
             for (org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
                 try {
                     PlugIn pi = (PlugIn) classLoader.loadClass(p.retrievePluginClass()).newInstance();
                     pi.init(core);
+                    plugInConsoleExtensions.add(pi.getConsoleExtensions());
                     plugIns.add(pi);
                 } catch (Exception e) {
                     JOptionPane.showMessageDialog(null, "There was an error loading the main class of  " + p.getJar() + " so this plugin will be disabled");
                 }
             }
         }
+    }
+    
+    public List<ConsolePlugInExtension> getPluginConsoleExtensions() {
+    	return plugInConsoleExtensions;
     }
 
     private void setupClassLoader() throws Exception {

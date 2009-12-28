@@ -20,6 +20,7 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
 import org.alliance.core.node.InvitaitonManager;
 import org.alliance.core.node.Invitation;
+import org.alliance.core.plugins.ConsolePlugInExtension;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -27,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.StringTokenizer;
 
 /**
@@ -58,13 +60,19 @@ public class Console {
     };
     private CoreSubsystem core;
     private FriendManager manager;
+    private List<ConsolePlugInExtension> extensions;
     private Subsystem ui;
     private Printer printer = PLAIN_PRINTER;
     private boolean netLog;
 
-    public Console(CoreSubsystem core) {
+    public Console(CoreSubsystem core, List<ConsolePlugInExtension> extensions) {
         this.core = core;
         manager = core.getFriendManager();
+        if(extensions == null) {
+        	extensions = new ArrayList<ConsolePlugInExtension>();//Create empty list
+        } else {
+        	this.extensions = extensions;
+        }
     }
 
     public void setPrinter(Printer printer) {
@@ -210,7 +218,16 @@ public class Console {
         } else if ("error".equals(command)) {
             throw new Exception("test error");
         } else {
-            printer.println("Unknown command " + command);
+        	boolean success = false;
+        	for (ConsolePlugInExtension ext : extensions) {
+				if (ext != null && ext.handleLine(command, printer)) {
+					success = true;
+					break;
+				}
+			}
+        	if (!success) {
+        		printer.println("Unknown command " + command);
+        	}
         }
     }
 

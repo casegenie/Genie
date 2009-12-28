@@ -28,7 +28,7 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
     public ConsoleMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "console", ui);
 
-        console = new Console(ui.getCore());
+        console = new Console(ui.getCore(), ui.getCore().getPluginManager().getPluginConsoleExtensions());
         console.setPrinter(this);
 
         textarea = (JTextArea) xui.getComponent("textarea");

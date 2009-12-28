@@ -54,6 +54,7 @@ public class AddPluginWindow extends XUIDialog {
         core.saveSettings();
         if (this.addedOrRemovedSomething) {
             //restart the plugin subsystem
+            core.getPluginManager().shutdown();
             core.getPluginManager().init();
         }
         dispose();

@@ -30,7 +30,7 @@ public class Main {
 
         System.out.println("Welcome to alliance " + manager.getSettings().getMy().getNickname() + "!\n");
 
-        Console c = new Console(core);
+        Console c = new Console(core, null);
 
         while (true) {
             System.out.print("> ");
