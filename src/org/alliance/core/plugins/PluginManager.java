@@ -5,12 +5,13 @@ import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.net.URLClassLoader;
 import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.ListIterator;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -45,7 +46,8 @@ public class PluginManager extends Manager {
                     plugInConsoleExtensions.add(pi.getConsoleExtensions());
                     plugIns.add(pi);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, "There was an error loading the main class of  " + p.getJar() + " so this plugin will be disabled");
+                    JOptionPane.showMessageDialog(null, 
+                            "There was an error loading the main class of  " + p.getJar() + " so this plugin will be disabled");
                 }
             }
         }
@@ -57,9 +59,8 @@ public class PluginManager extends Manager {
 
     private void setupClassLoader() throws Exception {
         List<URL> l = new ArrayList<URL>();
-        Iterator<Plugin> itr = core.getSettings().getPluginlist().iterator();
-        while (itr.hasNext()) {
-            org.alliance.core.settings.Plugin p = itr.next();
+        for(ListIterator<Plugin> itr = core.getSettings().getPluginlist().listIterator(); itr.hasNext(); ) {
+            org.alliance.core.settings.Plugin p = (Plugin) itr.next();
             File f = new File(p.getJar());
             if (f.exists()) {
                 l.add(f.toURI().toURL());
@@ -70,26 +71,21 @@ public class PluginManager extends Manager {
                     JFileChooser file = new JFileChooser();
                     FileNameExtensionFilter filter = new FileNameExtensionFilter("JAR files", "JAR", "jar", "Jar");
                     file.setFileFilter(filter);
-                    int returnVal = file.showOpenDialog(null);
-                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                    if (file.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
                         try {
+                            itr.remove(); //Remove old plugin that we are trying to replace
                             Plugin newPlugin = new Plugin();
                             newPlugin.init(file.getSelectedFile());
                             l.add(file.getSelectedFile().toURI().toURL());
-                            //I'm not sure if the order matters in the arraylist....don't think so
-                            core.getSettings().getPluginlist().remove(p);
-                            core.getSettings().getPluginlist().add(newPlugin);
-                        } catch (IOException e) {
-                            JOptionPane.showMessageDialog(null,
-                                    "Could not parse given jar file to find entry point");
+                            itr.add(newPlugin);
+                        } catch (FileNotFoundException e) {
+                            JOptionPane.showMessageDialog(null, 
+                                    "The Jar file " + file.getSelectedFile() + 
+                                        " is missing the launcher file, and was unable to be loaded correctly");
                         }
                     }
                 } else {
-                    core.getSettings().getPluginlist().remove(p);
-                    //This is a hack to prevent a java concurrent modification exception
-                    //might waste a few cycles, but it should work, if there's a better way...please update
-                    itr = core.getSettings().getPluginlist().iterator();
-                    l = new ArrayList<URL>();
+                    itr.remove();
                 }
             }
         }

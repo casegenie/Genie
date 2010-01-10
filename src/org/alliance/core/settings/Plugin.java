@@ -2,6 +2,7 @@ package org.alliance.core.settings;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -43,7 +44,7 @@ public class Plugin {
 	 * Code below gets a file in the root of the jar with a name of JARCLASSFILE
 	 * this class needs to contain the alliance class
 	 */
-    public boolean init(File file) throws IOException {
+    public boolean init(File file) throws IOException, FileNotFoundException{
     	if(file.exists()){
     		JarFile jarfile = new JarFile(file);
     		if(jarfile.getEntry(JARCLASSFILE) != null) {
@@ -58,9 +59,7 @@ public class Plugin {
 	        	return true;
 	        
     		} else {
-    			// TODO: This error probably should be exposed in the UI
-    			// someway...not sure of the best way of doing so
-    			System.out.println("The Jar file is missing the " + JARCLASSFILE + " file, and was unable to be loaded correctly");
+                throw new FileNotFoundException();
     		}
     	}
 		return false;
