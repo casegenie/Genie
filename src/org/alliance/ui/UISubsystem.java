@@ -8,6 +8,7 @@ import com.stendahls.nif.ui.toolbaractions.ToolbarActionManager;
 import com.stendahls.resourceloader.ResourceLoader;
 import com.stendahls.ui.ErrorDialog;
 import de.javasoft.plaf.synthetica.SyntheticaBlackStarLookAndFeel;
+import de.javasoft.plaf.synthetica.SyntheticaLookAndFeel;
 import java.awt.Font;
 import javax.swing.plaf.FontUIResource;
 import org.alliance.Subsystem;
@@ -107,6 +108,7 @@ public class UISubsystem implements UINexus, Subsystem {
                 if (core.getSettings().getInternal().getGuiskin().equals("Alliance")) {
                     //SubstanceLookAndFeel.setSkin(new MySkin(this));
                     UIManager.setLookAndFeel(new SyntheticaBlackStarLookAndFeel());
+                    SyntheticaLookAndFeel.setFont("Dialog", 12);
                 } else {
                     String theme = core.getSettings().getInternal().getGuiskin().replace(" ", "") + "Skin";
                     Class.forName("org.jvnet.substance.skin." + theme);
