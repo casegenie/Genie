@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
-import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
 
 /**
  * The FriendManager keeps track of all nodes. Contains a list of friends and a list of all nodes

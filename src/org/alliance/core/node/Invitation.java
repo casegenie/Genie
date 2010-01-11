@@ -8,11 +8,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.Random;
-import java.util.Enumeration;
 
 /**
  * Created by IntelliJ IDEA.
@@ -36,11 +32,7 @@ public class Invitation implements Serializable {
         this.middlemanGuid = middlemanGuid == null ? 0 : middlemanGuid;
 
         String myhost;
-        if (core.getSettings().getServer().getLansupport() != null && core.getSettings().getServer().getLansupport() == 1) {
-            myhost = getLocalIPNumber();
-        } else {
-            myhost = core.getFriendManager().getMe().getExternalIp(core);
-        }
+        myhost = core.getFriendManager().getMe().getExternalIp(core);
 
         if (T.t) {
             T.trace("Creating invitation for host: " + myhost);
@@ -75,21 +67,6 @@ public class Invitation implements Serializable {
         if (T.t) {
             T.info("Created invitation. String: " + completeInvitaitonString);
         }
-    }
-
-    private String getLocalIPNumber() throws SocketException, UnknownHostException {
-        //get the local ip number of machine
-        Enumeration netInterfaces = NetworkInterface.getNetworkInterfaces();
-        while (netInterfaces.hasMoreElements()) {
-            NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
-            if (ni.getInetAddresses().hasMoreElements()) {
-                InetAddress ip = (InetAddress) ni.getInetAddresses().nextElement();
-                if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":") == -1) {
-                    return ip.getHostAddress();
-                }
-            }
-        }
-        return InetAddress.getLocalHost().getHostAddress();
     }
 
     public int getInvitationPassKey() {

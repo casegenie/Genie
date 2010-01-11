@@ -12,7 +12,6 @@ import org.alliance.core.settings.Routerule;
 import org.alliance.core.settings.SettingClass;
 import org.alliance.core.settings.Settings;
 import org.alliance.core.settings.Share;
-import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.ui.Main;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
@@ -781,8 +780,10 @@ public class OptionsWindow extends XUIDialog {
                     Boolean confirm = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This option will try to convert all friend's IPs to DNS. Conversion will hang alliance for couple of seconds so use it only when you don't upload/download anything.\nIf DNS names can't be obtained alliance will use IP and try to convert later.");
                     if (confirm) {
                         try {
-                            setComponentValue(components.get("server.dnsname"), InetAddress.getByName(ui.getCore().getFriendManager().getMe().getExternalIp()).getHostName());
+                            setComponentValue(components.get("server.dnsname"), InetAddress.getByName(ui.getCore().getFriendManager().getMe().getExternalIp(ui.getCore())).getHostName());
                         } catch (UnknownHostException ex) {
+                            setComponentValue(components.get("server.dnsname"), "");
+                        } catch (IOException ex) {
                             setComponentValue(components.get("server.dnsname"), "");
                         }
                         ui.getCore().getSettings().getInternal().setRdnsname(1);
