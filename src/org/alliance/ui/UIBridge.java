@@ -10,6 +10,7 @@ import org.alliance.launchers.OSInfo;
 
 import java.io.File;
 import java.util.List;
+import java.util.TreeMap;
 import javax.swing.SwingUtilities;
 
 /**
@@ -88,12 +89,12 @@ public class UIBridge implements UICallback {
     }
 
     @Override
-    public void receivedDirectoryListing(final Friend friend, final int shareBaseIndex, final String path, final String[] files) {
+    public void receivedDirectoryListing(final Friend friend, final int shareBaseIndex, final String path, final TreeMap<String, Long> fileSize) {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
             public void run() {
-                ui.getMainWindow().directoryListingReceived(friend, shareBaseIndex, path, files);
+                ui.getMainWindow().directoryListingReceived(friend, shareBaseIndex, path, fileSize);
             }
         });
     }
@@ -213,6 +214,20 @@ public class UIBridge implements UICallback {
             @Override
             public void run() {
                 ui.getMainWindow().setStatusMessage(s);
+            }
+        });
+    }
+
+    @Override
+    public void statusMessage(final String s, final boolean b) {
+        if (T.t) {
+            T.info("status message: " + s);
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                ui.getMainWindow().setStatusMessage(s, b);
             }
         });
     }

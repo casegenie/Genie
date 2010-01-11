@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  */
 public class TestBlockStorage extends TestCase {
 
-    private CoreSubsystem core;
+   /* private CoreSubsystem core;
 
     @Override
     protected void setUp() throws Exception {
@@ -115,5 +115,5 @@ public class TestBlockStorage extends TestCase {
             }
         }
         System.out.println("all blocks should be done");
-    }
+    }*/
 }

@@ -5,6 +5,7 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -28,8 +29,8 @@ public class NonWindowUICallback implements UICallback {
     }
 
     public void messageRecieved(int srcGuid, String message) {
-    /*@todo: handle this in some good way. balloon should be shown. should add it to ui
-    and balloon click should open ui with chat window*/
+        /*@todo: handle this in some good way. balloon should be shown. should add it to ui
+        and balloon click should open ui with chat window*/
     }
 
     @Override
@@ -75,7 +76,7 @@ public class NonWindowUICallback implements UICallback {
     }
 
     @Override
-    public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
+    public void receivedDirectoryListing(Friend friend, int i, String s, TreeMap<String, Long> fileSize) {
     }
 
     @Override
@@ -94,5 +95,12 @@ public class NonWindowUICallback implements UICallback {
     }
 
     public void signalFileDatabaseFlushComplete() {
+    }
+
+    @Override
+    public void statusMessage(String s, boolean b) {
+        if (!CoreSubsystem.isRunningAsTestSuite()) {
+            System.out.println(s);
+        }
     }
 }

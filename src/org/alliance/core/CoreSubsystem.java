@@ -17,6 +17,7 @@ import org.alliance.core.comm.rpc.GetUserInfo;
 import org.alliance.core.comm.rpc.GetUserInfoV2;
 import org.alliance.core.comm.upnp.UPnPManager;
 import org.alliance.core.crypto.CryptoManager;
+import org.alliance.core.file.h2database.DatabaseCore;
 import org.alliance.core.file.FileManager;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.interactions.ForwardedInvitationInteraction;
@@ -71,13 +72,14 @@ import javax.swing.JFrame;
  */
 public class CoreSubsystem implements Subsystem {
 
-    public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = true; //don't forget to turn off trace, run with registered synthetica
+    public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = false; //don't forget to turn off trace, run with registered synthetica
     private static final int STATE_FILE_VERSION = 5;
     public final static int KB = 1024;
     public final static int MB = 1024 * KB;
     public final static long GB = 1024 * MB;
     public final static int BLOCK_SIZE = MB;
     public final static String ERROR_URL = "http://maciek.tv/alliance/errorreporter/";
+    private DatabaseCore dbCore;
     private ResourceLoader rl;
     private FriendManager friendManager;
     private FileManager fileManager;
@@ -98,7 +100,7 @@ public class CoreSubsystem implements Subsystem {
     }
 
     @Override
-    public void init(ResourceLoader rl, Object... params) throws Exception {       
+    public void init(ResourceLoader rl, Object... params) throws Exception {
         StartupProgressListener progress = new StartupProgressListener() {
 
             @Override
@@ -137,6 +139,7 @@ public class CoreSubsystem implements Subsystem {
 
         loadSettings();
 
+        dbCore = new DatabaseCore(this);
         fileManager = new FileManager(this, settings);
         friendManager = new FriendManager(this, settings);
         cryptoManager = new CryptoManager(this);
@@ -212,7 +215,7 @@ public class CoreSubsystem implements Subsystem {
             }
         });
 
-        System.setProperty("alliance.share.nfiles", "" + fileManager.getFileDatabase().getNumberOfFiles());
+        System.setProperty("alliance.share.nfiles", "" + fileManager.getFileDatabase().getNumberOfShares());
         System.setProperty("alliance.share.size", "" + fileManager.getFileDatabase().getTotalSize());
         System.setProperty("alliance.network.nfriends", "" + friendManager.getNFriends());
         System.setProperty("alliance.invites", "" + getSettings().getMy().getInvitations());
@@ -767,5 +770,9 @@ public class CoreSubsystem implements Subsystem {
 
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public DatabaseCore getDbCore() {
+        return dbCore;
     }
 }

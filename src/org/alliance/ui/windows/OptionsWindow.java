@@ -73,7 +73,8 @@ public class OptionsWindow extends XUIDialog {
         "internal.disablenewuserpopup",
         "internal.alwaysallowfriendsoftrustedfriendstoconnecttome",
         "internal.alwaysdenyuntrustedinvitations", "internal.rdnsname",
-        "internal.pmsound", "internal.downloadsound", "internal.publicsound"};
+        "internal.pmsound", "internal.downloadsound", "internal.publicsound",
+        "internal.guiskin"};
     private UISubsystem ui;
     private HashMap<String, JComponent> components = new HashMap<String, JComponent>();
     private JList shareList;
@@ -91,13 +92,11 @@ public class OptionsWindow extends XUIDialog {
         this(ui, false);
     }
 
-    public OptionsWindow(final UISubsystem ui, boolean startInShareTab)
-            throws Exception {
+    public OptionsWindow(final UISubsystem ui, boolean startInShareTab) throws Exception {
         super(ui.getMainWindow());
         this.ui = ui;
 
-        init(ui.getRl(), ui.getRl().getResourceStream(
-                "xui/optionswindow.xui.xml"));
+        init(ui.getRl(), ui.getRl().getResourceStream("xui/optionswindow.xui.xml"));
 
         xui.getComponent("server.port").setEnabled(false);
 
@@ -199,7 +198,11 @@ public class OptionsWindow extends XUIDialog {
 
         } else if (c instanceof JComboBox) {
             JComboBox b = (JComboBox) c;
-            b.setSelectedIndex(Integer.parseInt(settingValue));
+            try {
+                b.setSelectedIndex(Integer.parseInt(settingValue));
+            } catch (NumberFormatException e) {
+                b.setSelectedItem(settingValue);
+            }
         }
     }
 
@@ -265,7 +268,7 @@ public class OptionsWindow extends XUIDialog {
         if (uploadThrottleBefore != settings.getInternal().getUploadthrottle()) {
             ui.getCore().getNetworkManager().getBandwidthOut().resetHighestCPS();
         }
-        
+
         ui.getCore().saveSettings();
         return true;
     }
@@ -359,7 +362,11 @@ public class OptionsWindow extends XUIDialog {
             return ((JCheckBox) c).isSelected() ? 1 : 0;
         }
         if (c instanceof JComboBox) {
-            return "" + ((JComboBox) c).getSelectedIndex();
+            if (components.get("internal.guiskin").equals(c)) {
+                return ((JComboBox) c).getSelectedItem();
+            } else {
+                return "" + ((JComboBox) c).getSelectedIndex();
+            }
         }
         return null;
     }
@@ -403,7 +410,7 @@ public class OptionsWindow extends XUIDialog {
                 GroupDialogWindow dialogWindow = new GroupDialogWindow(ui, null);
                 groupname = dialogWindow.getGroupname();
             } catch (Exception ex) {
-            }  
+            }
             if (groupname == null || groupname.trim().length() == 0) {
                 groupname = "Public";
             } else {
@@ -705,18 +712,18 @@ public class OptionsWindow extends XUIDialog {
             components.get("internal.alwaysdenyuntrustedinvitations").setEnabled(false);
         }
 
-        if (!OSInfo.isWindows()) {
-            xui.getComponent("standalonedelete").setEnabled(false);
-            xui.getComponent("standalonecopy").setEnabled(false);
+        /* if (!OSInfo.isWindows()) {
+        xui.getComponent("standalonedelete").setEnabled(false);
+        xui.getComponent("standalonecopy").setEnabled(false);
         } else {
-            if (new File("standaloneVersion").exists()) {
-                xui.getComponent("standalonedelete").setEnabled(true);
-                xui.getComponent("standalonecopy").setEnabled(false);
-            } else {
-                xui.getComponent("standalonedelete").setEnabled(false);
-                xui.getComponent("standalonecopy").setEnabled(true);
-            }
+        if (new File("standaloneVersion").exists()) {
+        xui.getComponent("standalonedelete").setEnabled(true);
+        xui.getComponent("standalonecopy").setEnabled(false);
+        } else {
+        xui.getComponent("standalonedelete").setEnabled(false);
+        xui.getComponent("standalonecopy").setEnabled(true);
         }
+        }*/
     }
 
     private void configureCheckBoxListeners() {

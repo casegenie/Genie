@@ -32,7 +32,7 @@ public class ShareManager {
     public ShareManager(CoreSubsystem core, Settings settings) throws IOException {
         this.core = core;
         this.settings = settings;
-        fileDatabase = new FileDatabase(core, settings.getInternal().getFiledatabaseindexfile(), settings.getInternal().getFiledatabasefile());
+        fileDatabase = new FileDatabase(core);
         shareScanner = new ShareScanner(core, this);
         fileSystemMonitor = new FileSystemMonitor(this);
 
@@ -84,7 +84,6 @@ public class ShareManager {
     }
 
     public void shutdown() throws IOException {
-        fileDatabase.flush();
         shareScanner.kill();
     }
 

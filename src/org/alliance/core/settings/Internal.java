@@ -1,5 +1,6 @@
 package org.alliance.core.settings;
 
+import com.stendahls.util.TextUtils;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.launchers.OSInfo;
 
@@ -23,21 +24,21 @@ public class Internal extends SettingClass {
 
     static {
         if (OSInfo.isLinux()) {
-        	if (new File("standaloneVersion").exists()) {
-        		USER_DIRECTORY = "";
-        	} else {
-        		USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
-        	}
+            if (new File("portable").exists()) {
+                USER_DIRECTORY = "";
+            } else {
+                USER_DIRECTORY = System.getProperty("user.home") + "/.alliance/";
+            }
             CURRENT_DIRECTORY = USER_DIRECTORY;
         } else if (OSInfo.isWindows()) {
-            if (new File("standaloneVersion").exists()) {
+            if (new File("portable").exists()) {
                 USER_DIRECTORY = "";
             } else {
                 USER_DIRECTORY = System.getenv("APPDATA") + "/Alliance/";
             }
             JFileChooser fr = new JFileChooser();
             FileSystemView fw = fr.getFileSystemView();
-            CURRENT_DIRECTORY = fw.getDefaultDirectory() + "/Alliance/";
+            CURRENT_DIRECTORY = TextUtils.makeSurePathIsMultiplatform(fw.getDefaultDirectory() + "/Alliance/");
         } else {
             String s = new File(".").getAbsoluteFile().toString();
             if (s.endsWith(".")) {
@@ -47,9 +48,7 @@ public class Internal extends SettingClass {
             USER_DIRECTORY = "";
         }
     }
-    private Integer tempcleareddups = 0;
-    private String filedatabasefile = USER_DIRECTORY + "data/share.dat";
-    private String filedatabaseindexfile = USER_DIRECTORY + "data/share.idx";
+    private String databasefile = USER_DIRECTORY + "data/db/alliance";
     private String downloadquefile = USER_DIRECTORY + "data/downloads.dat";
     private String corestatefile = USER_DIRECTORY + "data/core.dat";
     private String windowstatefile = USER_DIRECTORY + "data/mainwindow.state";
@@ -109,6 +108,7 @@ public class Internal extends SettingClass {
     private Integer uploadthrottle = 0; //zero to disable
     private String serverlistenip = "";
     private Integer enableiprules = 0;
+    private String guiskin = "Alliance";
 
     public Internal() {
     }
@@ -133,12 +133,12 @@ public class Internal extends SettingClass {
         this.sharemanagercycle = sharemanagercycle;
     }
 
-    public String getFiledatabasefile() {
-        return filedatabasefile;
+    public String getDatabasefile() {
+        return databasefile;
     }
 
-    public void setFiledatabasefile(String filedatabasefile) {
-        this.filedatabasefile = filedatabasefile;
+    public void setDatabasefile(String databasefile) {
+        this.databasefile = databasefile;
     }
 
     public String getDownloadfolder() {
@@ -352,14 +352,6 @@ public class Internal extends SettingClass {
         this.minimumtimebetweeninvitations = minimumtimebetweeninvitations;
     }
 
-    public Integer getTempcleareddups() {
-        return tempcleareddups;
-    }
-
-    public void setTempcleareddups(Integer tempcleareddups) {
-        this.tempcleareddups = tempcleareddups;
-    }
-
     public Integer getAlwaysallowfriendstoconnect() {
         return alwaysallowfriendstoconnect;
     }
@@ -472,16 +464,8 @@ public class Internal extends SettingClass {
         this.totalmegabytesuploaded = totalmegabytesuploaded;
     }
 
-    public String getFiledatabaseindexfile() {
-        return filedatabaseindexfile;
-    }
-
     public String getDownloadquefile() {
         return downloadquefile;
-    }
-
-    public void setFiledatabaseindexfile(String filedatabaseindexfile) {
-        this.filedatabaseindexfile = filedatabaseindexfile;
     }
 
     public void setDownloadquefile(String downloadquefile) {
@@ -607,13 +591,20 @@ public class Internal extends SettingClass {
     public void setAutomaticallydenyallinvitations(Integer automaticallydenyallinvitations) {
         this.automaticallydenyallinvitations = automaticallydenyallinvitations;
     }
-    
-    public String getCurrentDirectory(){
-    	return CURRENT_DIRECTORY;
+
+    public String getCurrentDirectory() {
+        return CURRENT_DIRECTORY;
     }
-    
-    public String getUserDirectory(){
-    	return USER_DIRECTORY;
+
+    public String getUserDirectory() {
+        return USER_DIRECTORY;
     }
-    
+
+    public String getGuiskin() {
+        return guiskin;
+    }
+
+    public void setGuiskin(String guiskin) {
+        this.guiskin = guiskin;
+    }
 }

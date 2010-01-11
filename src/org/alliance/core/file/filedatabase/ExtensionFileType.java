@@ -15,6 +15,10 @@ public class ExtensionFileType extends FileTypeIdentifier {
         this.extensions = extensions;
     }
 
+    public String[] getExtensions() {
+        return extensions;
+    }
+
     @Override
     public boolean matches(String s) {
         for (String e : extensions) {

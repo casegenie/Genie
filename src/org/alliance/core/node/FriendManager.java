@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
+import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
 
 /**
  * The FriendManager keeps track of all nodes. Contains a list of friends and a list of all nodes
@@ -100,7 +101,6 @@ public class FriendManager extends Manager {
             T.info("Setting up friends...");
         }
         me = new MyNode(settings.getMy().getNickname(), settings.getMy().getGuid(), core);
-        me.setShareSize(core.getFileManager().getTotalBytesShared());
 
         for (Iterator<org.alliance.core.settings.Friend> it = settings.getFriendlist().iterator(); it.hasNext();) {
             org.alliance.core.settings.Friend f = it.next();
@@ -170,9 +170,10 @@ public class FriendManager extends Manager {
             getNetMan().getPackageRouter().updateRouteTable(getFriend(c.getRemoteUserGUID()), c.getRemoteUserGUID(), 0);
             /*Code below automatically connects to all friends of friends, however it does not work on startup due to objects
             not being sufficiantly initialized, which is ok because the next time any user connects it runs successfully*/
-            if(settings.getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
-            	 connectToAllFriendsOfFriends();
+            if (settings.getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
+                connectToAllFriendsOfFriends();
             }
+
         } else {
             if (T.t) {
                 T.ass(c instanceof InvitationConnection, "Not an invitation connection!");
@@ -180,26 +181,27 @@ public class FriendManager extends Manager {
         }
     }
 
-	public void connectToAllFriendsOfFriends() {
-		core.invokeLater(new Runnable() {
+    //TODO separate core/ui
+    public void connectToAllFriendsOfFriends() {
+        core.invokeLater(new Runnable() {
 
-		     @Override
-		     public void run() {
-		         try {
-		             final ArrayList<ForwardInvitationNodesList.ListRow> al = new ArrayList<ForwardInvitationNodesList.ListRow>();
-		             ForwardInvitationNodesList.ForwardInvitationListModel m = new ForwardInvitationNodesList.ForwardInvitationListModel(core);
-		             for (int j = 0; j < m.getSize(); j++) {
-		                 al.add((ForwardInvitationNodesList.ListRow) m.getElementAt(j));
-		             }
-		             for (ForwardInvitationNodesList.ListRow r : al) {
-		                 forwardInvitationTo(r.guid);
-		             }
-		         } catch (Exception e) {
-		             core.reportError(e, this);
-		         }
-		     }
-		 });
-	}
+            @Override
+            public void run() {
+                try {
+                    final ArrayList<ForwardInvitationNodesList.ListRow> al = new ArrayList<ForwardInvitationNodesList.ListRow>();
+                    ForwardInvitationNodesList.ForwardInvitationListModel m = new ForwardInvitationNodesList.ForwardInvitationListModel(core);
+                    for (int j = 0; j < m.getSize(); j++) {
+                        al.add((ForwardInvitationNodesList.ListRow) m.getElementAt(j));
+                    }
+                    for (ForwardInvitationNodesList.ListRow r : al) {
+                        forwardInvitationTo(r.guid);
+                    }
+                } catch (Exception e) {
+                    core.reportError(e, this);
+                }
+            }
+        });
+    }
 
     public Friend getFriend(int guid) {
         return friends.get(guid);
@@ -445,7 +447,7 @@ public class FriendManager extends Manager {
 
     public String nickname(int guid) {
         if (getFriend(guid) != null) {
-            return getFriend(guid).nickname();
+            return getFriend(guid).getNickname();
         }
         return nicknameWithoutLocalRename(guid);
     }

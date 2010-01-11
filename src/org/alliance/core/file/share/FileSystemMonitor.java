@@ -86,7 +86,7 @@ public class FileSystemMonitor {
                             if (!rootPath.endsWith("/")) {
                                 rootPath += '/';
                             }
-                            manager.getShareScanner().signalFileRenamed(rootPath + oldName, rootPath + newName);
+                            manager.getShareScanner().signalFileRenamed(sb.getPath(), rootPath + oldName, rootPath + newName);
                         }
 
                         @Override
@@ -112,7 +112,7 @@ public class FileSystemMonitor {
                             if (!rootPath.endsWith("/")) {
                                 rootPath += '/';
                             }
-                            manager.getShareScanner().signalFileDeleted(rootPath + name);
+                            manager.getShareScanner().signalFileDeleted(sb.getPath(), rootPath + name);
                         }
 
                         @Override

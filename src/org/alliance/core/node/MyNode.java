@@ -57,7 +57,6 @@ public class MyNode extends Node {
     public String getExternalIp() {
         return externalIp;
     }
-
     private boolean alreadyTriedAutodetect = false;
 
     public void autodetectExternalIp(CoreSubsystem core) throws IOException {
@@ -97,6 +96,11 @@ public class MyNode extends Node {
     @Override
     public int getNumberOfFilesShared() {
         return core.getFileManager().getFileDatabase().getNumberOfShares();
+    }
+
+    @Override
+    public long getShareSize() {
+        return core.getFileManager().getFileDatabase().getTotalSize();
     }
 
     @Override

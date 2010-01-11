@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.TreeMap;
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
@@ -97,6 +98,10 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
             }
 
             @Override
+            public void statusMessage(String s, boolean b) {
+            }
+
+            @Override
             public void toFront() {
             }
 
@@ -118,7 +123,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
             }
 
             @Override
-            public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
+            public void receivedDirectoryListing(Friend friend, int i, String s, TreeMap<String, Long> fileSize) {
             }
 
             @Override
@@ -348,7 +353,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                 }
                 core.uiToFront();
                 return;
-            }           
+            }
             Runnable r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
             SimpleTimer s = new SimpleTimer();
             ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();

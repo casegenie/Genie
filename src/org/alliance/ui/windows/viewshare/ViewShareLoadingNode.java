@@ -9,7 +9,7 @@ package org.alliance.ui.windows.viewshare;
 public class ViewShareLoadingNode extends ViewShareFileNode {
 
     public ViewShareLoadingNode(ViewShareRootNode root, ViewShareTreeNode parent) {
-        super("Loading...", root, parent);
+        super("Loading...", 0L, root, parent);
     }
 
     @Override

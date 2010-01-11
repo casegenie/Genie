@@ -11,6 +11,7 @@ import org.alliance.ui.T;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.TreeMap;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 
@@ -23,13 +24,15 @@ import javax.swing.tree.TreeNode;
 public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
 
     protected String name;
+    protected Long size;
     protected ViewShareRootNode root;
     protected ViewShareTreeNode parent;
     protected boolean hasSentQueryForChildren = false;
     protected ArrayList<ViewShareFileNode> children = new ArrayList<ViewShareFileNode>();
 
-    public ViewShareTreeNode(String name, ViewShareRootNode root, ViewShareTreeNode parent) {
+    public ViewShareTreeNode(String name, Long size, ViewShareRootNode root, ViewShareTreeNode parent) {
         this.name = name;
+        this.size = size;
         this.root = root;
         this.parent = parent;
     }
@@ -63,17 +66,17 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
                             if (T.t) {
                                 T.info("Getting files for my share. ShareBase: " + getShareBaseIndex() + ", path: " + path);
                             }
-                            final String files[] = root.getModel().getCore().getFileManager().getFileDatabase().getDirectoryListing(sb, path);
-                            for (String s : files) {
+                            final TreeMap<String, Long> fileSize = root.getModel().getCore().getFileManager().getFileDatabase().getDirectoryListing(sb, path);
+                            for (String s : fileSize.keySet()) {
                                 if (T.t) {
                                     T.info("File: " + s);
                                 }
-                            }
+                            }                            
                             SwingUtilities.invokeLater(new Runnable() {
 
                                 @Override
                                 public void run() {
-                                    root.getModel().getWin().directoryListingReceived(getShareBaseIndex(), getFileItemPath(), files);
+                                    root.getModel().getWin().directoryListingReceived(getShareBaseIndex(), getFileItemPath(), fileSize);
                                 }
                             });
                         }
@@ -145,7 +148,7 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
         return name;
     }
 
-    public void pathUpdated(String path, String[] files) {
+    public void pathUpdated(String path, TreeMap<String, Long> fileSize) {
         if (T.t) {
             T.info(this + ": Path updated: " + path);
         }
@@ -155,11 +158,11 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
                 T.info("It's our files - remove all our children and add the new ones.");
             }
             children.clear();
-            for (String s : files) {
+            for (String s : fileSize.keySet()) {
                 if (T.t) {
                     T.trace("Adding: " + s);
                 }
-                children.add(new ViewShareFileNode(s, root, this));
+                children.add(new ViewShareFileNode(s, fileSize.get(s), root, this));
             }
             root.getModel().nodeStructureChanged(this);
         } else {
@@ -172,11 +175,11 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
                 if (T.t) {
                     T.warn("Ehh. Did not find item. Creating it.");
                 }
-                node = new ViewShareFileNode(item, root, this);
+                node = new ViewShareFileNode(item, 0L, root, this);
                 children.add(node);
                 root.getModel().nodeStructureChanged(this);
             }
-            node.pathUpdated(path.substring(item.length()), files);
+            node.pathUpdated(path.substring(item.length()), fileSize);
         }
     }
 
@@ -206,6 +209,10 @@ public abstract class ViewShareTreeNode implements IdentifiableTreeNode {
 
     public String getName() {
         return name;
+    }
+
+    public Long getSize() {
+        return size;
     }
 
     @Override

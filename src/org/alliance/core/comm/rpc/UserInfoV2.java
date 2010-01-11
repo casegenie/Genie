@@ -62,7 +62,7 @@ public class UserInfoV2 extends RPC {
         }
 
         if (CoreSubsystem.ALLOW_TO_SEND_UPGRADE_TO_FRIENDS) {
-            if (buildNumber < Version.BUILD_NUMBER && buildNumber > 1000) {
+            if (buildNumber < Version.BUILD_NUMBER && buildNumber > 1120) {
                 //remote has old version
                 Hash h = core.getFileManager().getAutomaticUpgrade().getMyJarHash();
                 if (h != null) {
@@ -102,7 +102,7 @@ public class UserInfoV2 extends RPC {
     public Packet serializeTo(Packet p) {
         p.writeInt(manager.getMyGUID());
         p.writeInt(core.getSettings().getServer().getPort());
-        p.writeLong(core.getFileManager().getTotalBytesShared());
+        p.writeLong(core.getFileManager().getFileDatabase().getTotalSize());
         p.writeInt(Version.BUILD_NUMBER);
 
         p.writeLong(core.getNetworkManager().getBandwidthIn().getTotalBytes());

@@ -57,12 +57,12 @@ public class FriendListModel extends DefaultListModel {
                 if (o1 == null || o2 == null) {
                     return 0;
                 }
-                String s1 = o1.nickname();
-                String s2 = o2.nickname();
+                String s1 = o1.getNickname();
+                String s2 = o2.getNickname();
                 if (s1.equalsIgnoreCase(s2)) {
                     return o1.getGuid() - o2.getGuid();
                 }
-                return o1.nickname().compareToIgnoreCase(o2.nickname());
+                return o1.getNickname().compareToIgnoreCase(o2.getNickname());
             }
         });
 

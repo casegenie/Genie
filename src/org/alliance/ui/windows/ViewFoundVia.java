@@ -31,10 +31,10 @@ public class ViewFoundVia extends XUIDialog {
                 if (o1 == null || o2 == null) {
                     return 0;
                 }
-                if (o1.nickname().equalsIgnoreCase(o2.nickname())) {
+                if (o1.getNickname().equalsIgnoreCase(o2.getNickname())) {
                     return o1.getGuid() - o2.getGuid();
                 }
-                return o1.nickname().compareToIgnoreCase(o2.nickname());
+                return o1.getNickname().compareToIgnoreCase(o2.getNickname());
             }
         });
 

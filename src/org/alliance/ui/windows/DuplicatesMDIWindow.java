@@ -1,8 +1,6 @@
 package org.alliance.ui.windows;
 
 import org.alliance.ui.UISubsystem;
-import org.alliance.core.file.filedatabase.FileDescriptor;
-import org.alliance.core.file.hash.Hash;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.util.TextUtils;
@@ -10,11 +8,11 @@ import com.stendahls.util.TextUtils;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.TreeSet;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.File;
+import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -30,7 +28,6 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
-    private DuplicatesMDIWindow.TableModel model;
     private JTable table;
     private ArrayList<Dup> dups = new ArrayList<Dup>();
 
@@ -38,7 +35,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         super(ui.getMainWindow().getMDIManager(), "duplicates", ui);
 
         table = (JTable) xui.getComponent("table");
-        table.setModel(model = new DuplicatesMDIWindow.TableModel());
+        table.setModel(new DuplicatesMDIWindow.TableModel());
         table.setAutoCreateColumnsFromModel(false);
         table.getColumnModel().getColumn(0).setPreferredWidth(100);
         table.getColumnModel().getColumn(0).setCellRenderer(new MyCellRenderer());
@@ -48,25 +45,20 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         table.setColumnSelectionAllowed(true);
 
         setTitle("Duplicates in my share");
-
-        TreeSet<String> ts = new TreeSet<String>(ui.getCore().getFileManager().getFileDatabase().getDuplicates());
-        for (String s : ts) {
-            Hash h = ui.getCore().getFileManager().getFileDatabase().getHashForDuplicate(s);
-            if (h == null) {
-                dups.add(new Dup(s, "<lost>"));
-            } else {
-                FileDescriptor fd = ui.getCore().getFileManager().getFd(h);
-                if (fd != null) {
-                    dups.add(new Dup(fd.getFullPath(), s));
-                }
-            }
+        HashMap<String, String> duplicates = ui.getCore().getFileManager().getFileDatabase().getDuplicates(8196);
+        for (String path : duplicates.keySet()) {
+            dups.add(new Dup(path, duplicates.get(path)));
         }
-
+        duplicates.clear();
         ((JLabel) xui.getComponent("status")).setText("Number of duplicates: " + dups.size());
         postInit();
     }
 
     public void EVENT_delete(ActionEvent e) throws Exception {
+        if (e != null) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "This function is disabled in this version of Alliance.");
+            return;
+        }
         if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) {
             return;
         }

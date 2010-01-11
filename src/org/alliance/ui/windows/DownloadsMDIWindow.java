@@ -182,7 +182,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 text = "Downloading from ";
             }
             if (c.getRemoteFriend() != null) {
-                text += c.getRemoteFriend().nickname() + " (" + c.getBandwidthIn().getCPSHumanReadable() + "), ";
+                text += c.getRemoteFriend().getNickname() + " (" + c.getBandwidthIn().getCPSHumanReadable() + "), ";
             } else {
                 text += "<unknown>, ";
             }
@@ -208,7 +208,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                         text = "Uploading to ";
                     }
                     if (uc.getRemoteFriend() != null) {
-                        text += uc.getRemoteFriend().nickname() + " (" + c.getBandwidthOut().getCPSHumanReadable() + "), ";
+                        text += uc.getRemoteFriend().getNickname() + " (" + c.getBandwidthOut().getCPSHumanReadable() + "), ";
                     } else {
                         text += "<unknown>, ";
                     }
@@ -606,11 +606,6 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         } catch (IllegalArgumentException ex) {
         } catch (UnsupportedOperationException ex) {
         }
-    }
-
-    public void d() {
-        System.out.println("OMFG");
-
     }
 
     public void EVENT_openhddlink(ActionEvent e) {

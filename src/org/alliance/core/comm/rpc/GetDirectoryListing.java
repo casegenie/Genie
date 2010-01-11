@@ -6,6 +6,7 @@ import org.alliance.core.comm.T;
 import org.alliance.core.file.share.ShareBase;
 
 import java.io.IOException;
+import java.util.TreeMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,8 +39,9 @@ public class GetDirectoryListing extends RPC {
             path = path.substring(1);
         }
         ShareBase sb = manager.getCore().getShareManager().getBaseByIndex(shareBaseIndex);
-        String files[] = manager.getCore().getFileManager().getFileDatabase().getDirectoryListing(sb, path);
-        send(new DirectoryListing(shareBaseIndex, path, files));
+
+        TreeMap<String, Long> fileSize = manager.getCore().getFileManager().getFileDatabase().getDirectoryListing(sb, path);
+        send(new DirectoryListing(shareBaseIndex, path, fileSize));
     }
 
     @Override

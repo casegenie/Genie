@@ -11,7 +11,7 @@ import com.stendahls.util.TextUtils;
  */
 public class BandwidthAnalyzer {
 
-    public static final int INNER_INVERVAL = 1000, OUTER_INTERVAL = 10000;
+    public static final int INNER_INVERVAL = 1000, OUTER_INTERVAL = 3000;
     private long tick = -1;
     private int nBytes;
     private double highestCps;

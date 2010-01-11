@@ -48,6 +48,15 @@ public class FileDescriptor {
     public FileDescriptor() {
     }
 
+    public FileDescriptor(String basePath, String subpath, long size, Hash rootHash, Hash[] hashList, long modifiedAt) {
+        this.basePath = basePath;
+        this.subpath = subpath;
+        this.size = size;
+        this.rootHash = rootHash;
+        this.hashList = hashList;
+        this.modifiedAt = modifiedAt;
+    } 
+
     public FileDescriptor(String basePath, File file, int hashSpeedInMbPerSecond) throws IOException {
         this(basePath, file, hashSpeedInMbPerSecond, null);
     }
@@ -133,6 +142,7 @@ public class FileDescriptor {
             hashes.add(new Hash(tiger.digest()));
         }
 
+        //Get root hash from all hashes
         tiger.reset();
         for (Hash h : hashes) {
             tiger.update(h.array());
@@ -144,7 +154,7 @@ public class FileDescriptor {
         size = file.length();
         subpath = createSubpath(file.getPath());
         modifiedAt = file.lastModified();
-        in.close();
+        in.close();      
 
         if (T.t) {
             T.debug("Hashed " + TextUtils.formatNumber("" + totalRead) + " bytes in " + st.getTime() + ". Hash list contains " + hashes.size() + " hashes.");

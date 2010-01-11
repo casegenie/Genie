@@ -4,7 +4,10 @@ import org.alliance.core.comm.T;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.TreeMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -15,15 +18,15 @@ import java.io.IOException;
  */
 public class DirectoryListing extends CompressedRPC {
 
-    private String files[];
+    private TreeMap<String, Long> fileSize = new TreeMap<String, Long>();
     private int shareBaseIndex;
     private String path;
 
     public DirectoryListing() {
     }
 
-    public DirectoryListing(int shareBaseIndex, String path, String files[]) {
-        this.files = files;
+    public DirectoryListing(int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
+        this.fileSize = fileSize;
         this.shareBaseIndex = shareBaseIndex;
         this.path = path;
     }
@@ -37,21 +40,49 @@ public class DirectoryListing extends CompressedRPC {
             T.info("Decompressing " + nFiles + " files for share base " + shareBaseIndex + " and path " + path);
         }
 
-        files = new String[nFiles];
-        for (int i = 0; i < files.length; i++) {
-            files[i] = in.readUTF();
+        fileSize = new TreeMap<String, Long>(new Comparator<String>() {
+
+            @Override
+            public int compare(String s1, String s2) {
+                if (s1 == null || s2 == null) {
+                    return 0;
+                }
+                if (s1.equalsIgnoreCase(s2)) {
+                    return s1.compareTo(s2);
+                }
+                if (s1.endsWith("/") && !s2.endsWith("/")) {
+                    return -1;
+                }
+                if (!s1.endsWith("/") && s2.endsWith("/")) {
+                    return 1;
+                }
+                return s1.compareToIgnoreCase(s2);
+            }
+        });
+
+        for (int i = 0; i < nFiles; i++) {
+            fileSize.put(in.readUTF(), 0L);
+        }
+
+        try {
+            if (nFiles == in.readInt()) {
+                for (String s : fileSize.keySet()) {
+                    fileSize.put(s, in.readLong());
+                }
+            }
+        } catch (EOFException e) {
+            if (T.t) {
+                T.info("Old DirectoryListing!");
+            }
         }
 
         if (T.t) {
             T.info("Found the following files:");
-        }
-        for (String s : files) {
-            if (T.t) {
+            for (String s : fileSize.keySet()) {
                 T.info("  " + s);
             }
         }
-
-        core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, files);
+        core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, fileSize);
     }
 
     @Override
@@ -92,14 +123,19 @@ public class DirectoryListing extends CompressedRPC {
         if (positive == true) {
             out.writeInt(shareBaseIndex);
             out.writeUTF(path);
-            out.writeInt(files.length);
-            for (String s : files) {
+            out.writeInt(fileSize.size());
+            for (String s : fileSize.keySet()) {
                 out.writeUTF(s);
+            }
+            out.writeInt(fileSize.size());
+            for (Long l : fileSize.values()) {
+                out.writeLong(l);
             }
         } else {
             out.writeInt(shareBaseIndex);
             out.writeUTF(path);
             out.writeInt(0); //Do not list hidden folders
         }
+        fileSize.clear();
     }
 }

@@ -16,7 +16,6 @@ public abstract class Node {
     protected String nickname;
     protected int guid;
     protected HashMap<Integer, UntrustedNode> friendsFriends;
-    protected long shareSize;
 
     protected Node() {
     }
@@ -36,10 +35,6 @@ public abstract class Node {
 
     public boolean isAway() {
         return false;
-    }
-
-    public String getNickname() {
-        return nickname;
     }
 
     public void setNickname(String nickname) {
@@ -96,23 +91,19 @@ public abstract class Node {
 
     public void setFriendsFriends(HashMap<Integer, UntrustedNode> friendsFriends) {
         this.friendsFriends = friendsFriends;
-    }
+    }   
 
     public long getShareSize() {
-        return shareSize;
+        return 0;
     }
 
-    public void setShareSize(long shareSize) {
-        this.shareSize = shareSize;
-    }
-
-    public String nickname() {
+    public String getNickname() {
         return nickname;
     }
 
     public int getAllianceBuildNumber() {
         return 0;
-    }
+    }  
 
     public int getNumberOfFilesShared() {
         return 0;

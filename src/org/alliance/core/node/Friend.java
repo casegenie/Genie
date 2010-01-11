@@ -30,7 +30,7 @@ public class Friend extends Node {
     private long lastSeenOnlineAt;
     private int middlemanGuid;
     private int allianceBuildNumber;
-    private long totalBytesSent, totalBytesReceived;
+    private long totalBytesSent, totalBytesReceived, shareSize;
     private double highestIncomingCPS, highestOutgoingCPS;
     private int numberOfFilesShared, numberOfInvitedFriends;
     private boolean isAway;
@@ -292,7 +292,7 @@ public class Friend extends Node {
     }
 
     @Override
-    public String nickname() {
+    public String getNickname() {
         if (nicknameToShowInUI == null) {
             org.alliance.core.settings.Friend f = manager.getCore().getSettings().getFriend(guid);
             if (f != null && f.getRenamednickname() != null && f.getRenamednickname().trim().length() > 0) {
@@ -318,6 +318,11 @@ public class Friend extends Node {
     }
 
     @Override
+    public long getShareSize() {
+        return shareSize;
+    }
+
+    @Override
     public double getHighestOutgoingCPS() {
         return highestOutgoingCPS;
     }
@@ -335,6 +340,10 @@ public class Friend extends Node {
     @Override
     public long getTotalBytesSent() {
         return totalBytesSent;
+    }
+
+    public void setShareSize(long shareSize) {
+        this.shareSize = shareSize;
     }
 
     public void setTotalBytesSent(long totalBytesSent) {

@@ -43,7 +43,7 @@ public class UserList extends RPC {
             boolean connected = in.readBoolean();
             long share = in.readLong();
             UntrustedNode rf = UntrustedNode.loadOrCreate(manager, nickname, guid, connected);
-            rf.setShareSize(share);
+            //rf.setShareSize(share);
 
             n.addFriendsFriend(rf);
 

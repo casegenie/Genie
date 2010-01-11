@@ -1,6 +1,5 @@
 package org.alliance.core.comm;
 
-import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
 
 /**
@@ -28,16 +27,13 @@ public class SearchHit {
         this.size = size;
         this.hashedDaysAgo = hashedDaysAgo;
     }
-
-    public SearchHit(FileDescriptor fd) {
-        root = fd.getRootHash();
-        path = fd.getSubpath();
-        size = fd.getSize();
-        basepath = fd.getBasePath(); //Get base path
-        hashedDaysAgo = (int) ((System.currentTimeMillis() - fd.getModifiedAt()) / 1000 / 60 / 60 / 24);
-        if (hashedDaysAgo > 255) {
-            hashedDaysAgo = 255;
-        }
+    
+     public SearchHit(Hash root, String path, long size, String basepath, int hashedDaysAgo) {
+        this.root = root;
+        this.path = path;
+        this.size = size;
+        this.basepath = basepath;
+        this.hashedDaysAgo = hashedDaysAgo;
     }
 
     public Hash getRoot() {

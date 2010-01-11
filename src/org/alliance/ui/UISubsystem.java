@@ -8,7 +8,8 @@ import com.stendahls.nif.ui.toolbaractions.ToolbarActionManager;
 import com.stendahls.resourceloader.ResourceLoader;
 import com.stendahls.ui.ErrorDialog;
 import de.javasoft.plaf.synthetica.SyntheticaBlackStarLookAndFeel;
-import de.javasoft.plaf.synthetica.SyntheticaLookAndFeel;
+import java.awt.Font;
+import javax.swing.plaf.FontUIResource;
 import org.alliance.Subsystem;
 import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.ERROR_URL;
@@ -19,8 +20,12 @@ import org.alliance.ui.nodetreemodel.NodeTreeNode;
 
 import java.awt.Window;
 import java.lang.reflect.Method;
+import java.util.Enumeration;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.jvnet.substance.SubstanceLookAndFeel;
 
 /**
  * Created by IntelliJ IDEA.
@@ -93,17 +98,35 @@ public class UISubsystem implements UINexus, Subsystem {
             }
         });
 
-
         try {
-            //SyntheticaLookAndFeel.setAntiAliasEnabled(true);
-            SyntheticaBlackStarLookAndFeel lnf = new SyntheticaBlackStarLookAndFeel();
-            //SyntheticaWhiteVisionLookAndFeel lnf = new SyntheticaWhiteVisionLookAndFeel();
-            //SyntheticaSkyMetallicLookAndFeel lnf = new SyntheticaSkyMetallicLookAndFeel();
-            //SyntheticaOrangeMetallicLookAndFeel lnf = new SyntheticaOrangeMetallicLookAndFeel();
-            UIManager.setLookAndFeel(lnf);
-            if (core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() != null &&
-                    core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() == 1) {
-                SyntheticaLookAndFeel.setFont("Dialog", 12);
+            if (core.getSettings().getInternal().getGuiskin().equals("OS Native")) {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            } else {
+                JFrame.setDefaultLookAndFeelDecorated(true);
+                JDialog.setDefaultLookAndFeelDecorated(true);
+                if (core.getSettings().getInternal().getGuiskin().equals("Alliance")) {
+                    //SubstanceLookAndFeel.setSkin(new MySkin(this));
+                    UIManager.setLookAndFeel(new SyntheticaBlackStarLookAndFeel());
+                } else {
+                    String theme = core.getSettings().getInternal().getGuiskin().replace(" ", "") + "Skin";
+                    Class.forName("org.jvnet.substance.skin." + theme);
+                    SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin." + theme);
+                }
+            }
+
+            if (core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() != null
+                    && core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() == 1) {
+                Enumeration keys = UIManager.getDefaults().keys();
+                FontUIResource f = new FontUIResource(new javax.swing.plaf.FontUIResource("Dialog", Font.TRUETYPE_FONT, 12));
+                while (keys.hasMoreElements()) {
+                    Object key = keys.nextElement();
+                    Object value = UIManager.get(key);
+                    if (value instanceof FontUIResource) {
+                        FontUIResource orig = (FontUIResource) value;
+                        Font font = new Font(f.getFontName(), orig.getStyle(), f.getSize());
+                        UIManager.put(key, new FontUIResource(font));
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

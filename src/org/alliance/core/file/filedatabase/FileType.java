@@ -11,15 +11,15 @@ public enum FileType {
 
     EVERYTHING("All Files", 0, new FileTypeIdentifier() {
 
-        @Override
+@Override
 public boolean matches(String s) {
     return true;
 }
 }),
     AUDIO("Audio", 1, new ExtensionFileType(new String[]{"mp3", "mp4", "wav", "acc", "ogg", "asf", "wma", "aiff"})),
-    ARCHIVE("Archives", 4, new ExtensionFileType(new String[]{"rar", "zip", "tar", "gz"}) {
+    ARCHIVE("Archives", 4, new ExtensionFileType(new String[]{"rar", "zip", "tar", "gz", "7z"}) {
 
-        @Override
+@Override
 public boolean matches(String s) {
     if (!super.matches(s)) {
         if (s.length() > 3 && s.charAt(s.length() - 3) == 'r' && Character.isDigit(s.charAt(s.length() - 2)) && Character.isDigit(s.charAt(s.length() - 1))) {
@@ -30,11 +30,11 @@ public boolean matches(String s) {
     return true;
 }
 }),
-    CDDVD("CD/DVD Images", 3, new ExtensionFileType(new String[]{"iso", "img", "bin"})),
+    CDDVD("CD/DVD Images", 3, new ExtensionFileType(new String[]{"iso", "img", "bin", "cue", "mdf", "mds"})),
     DOCUMENT("Documents", 6, new ExtensionFileType(new String[]{"doc", "txt", "nfo"})),
     IMAGE("Pictures", 5, new ExtensionFileType(new String[]{"jpg", "jpeg", "gif", "png", "bmp", "tiff"})),
     PRESENTATION("Presentations", 7, new ExtensionFileType(new String[]{"key", "pps", "ppt"})),
-    VIDEO("Video", 2, new ExtensionFileType(new String[]{"avi", "mkv", "mpg", "mpeg", "mov", "asf", "wmv", "divx", "xvid", "rmvb", "rm"}));
+    VIDEO("Video", 2, new ExtensionFileType(new String[]{"avi", "mkv", "mpg", "mpeg", "mov", "asf", "wmv", "divx", "xvid", "rmvb", "rm", "ogm"}));
     private final String description;
     private final byte id;
     private final FileTypeIdentifier fileTypeIdentifier;

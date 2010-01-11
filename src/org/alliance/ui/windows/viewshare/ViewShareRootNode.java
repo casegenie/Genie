@@ -19,7 +19,7 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     private ViewShareTreeModel model;
 
     public ViewShareRootNode() {
-        super("root", null, null);
+        super("root", 0L, null, null);
     }
 
     void fill(String[] shareBaseNames) {

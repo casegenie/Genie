@@ -1,96 +1,156 @@
 package org.alliance.ui;
 
-import org.alliance.core.CoreSubsystem;
-
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
-import javax.swing.JComponent;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.util.ArrayList;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 /**
- * Created by IntelliJ IDEA.
- * User: maciek
- * Date: 2007-feb-15
- * Time: 16:49:43
+ *
+ * @author Bastvera
  */
-public class JSpeedDiagram extends JComponent {
+public class JSpeedDiagram extends JPanel implements Runnable {
 
-    private double scale = 400;
-    private double diagramr[] = new double[2048];
-    private double diagramw[] = new double[2048];
+    private int maxValue;
+    private int panelHeight;
+    private int panelWidth;
+    private ArrayList<Integer> valuesDownload = new ArrayList<Integer>();
+    private ArrayList<Integer> valuesUpload = new ArrayList<Integer>();
+    private ArrayList<Integer> yPositionDownload = new ArrayList<Integer>();
+    private ArrayList<Integer> yPositionUpload = new ArrayList<Integer>();
+    private ArrayList<Integer> xTimeScale = new ArrayList<Integer>();
+    private final UISubsystem ui;
+    private static final int HEIGTH_OFFSET = 3;
+    private static final int TIME_SCALE_DIVIDER = 20;
+    private static final Color TRANSPARENT_GREY = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
-    public JSpeedDiagram() {
-        setOpaque(false);
+    JSpeedDiagram(UISubsystem ui) {
+        this.ui = ui;
+        this.setBackground(Color.BLACK);
     }
 
     @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(400, 30);
+    public void run() {
+        boolean alive = true;
+        while (alive) {
+            try {
+                if (getSize().width != 0 && getSize().height != 0) {
+                    panelHeight = getSize().height;
+                    panelWidth = getSize().width;
+
+                    maxValue = 10;
+
+                    int valueDownload = (int) (ui.getCore().getNetworkManager().getBandwidthIn().getCPS() / 1024);
+                    int valueUpload = (int) (ui.getCore().getNetworkManager().getBandwidthOut().getCPS() / 1024);
+
+                    valuesDownload.add(valueDownload);
+                    valuesUpload.add(valueUpload);
+
+                    //Get max value
+                    int valueChecked;
+                    for (int i = 0; i < valuesDownload.size(); i++) {
+                        valueChecked = valuesDownload.get(i);
+                        if (maxValue < valueChecked) {
+                            maxValue = valueChecked;
+                        }
+                        valueChecked = valuesUpload.get(i);
+                        if (maxValue < valueChecked) {
+                            maxValue = valueChecked;
+                        }
+                    }
+
+                    //Rescale Height
+                    yPositionDownload.add(0);
+                    yPositionUpload.add(0);
+                    double percent;
+                    int position;
+                    for (int i = 0; i < yPositionDownload.size(); i++) {
+                        percent = (double) valuesDownload.get(i) / (double) maxValue;
+                        position = (int) ((double) panelHeight * percent);
+                        if (position < HEIGTH_OFFSET) {
+                            position = HEIGTH_OFFSET;
+                        }
+                        yPositionDownload.set(i, position);
+
+                        percent = (double) valuesUpload.get(i) / (double) maxValue;
+                        position = (int) ((double) panelHeight * percent);
+                        if (position < HEIGTH_OFFSET) {
+                            position = HEIGTH_OFFSET;
+                        }
+                        yPositionUpload.set(i, position);
+                    }
+
+                    //Rescale Width
+                    xTimeScale.add(0);
+                    int xDivided = panelWidth / TIME_SCALE_DIVIDER;
+                    for (int i = 0; i < xTimeScale.size(); i++) {
+                        xTimeScale.set(i, xDivided * i);
+                    }
+
+
+                    //Move Diagram
+                    if (xTimeScale.size() > TIME_SCALE_DIVIDER + 1) {
+                        xTimeScale.remove(TIME_SCALE_DIVIDER + 1);
+                        xTimeScale.set(xTimeScale.size() - 1, getSize().width);
+                        yPositionDownload.remove(0);
+                        yPositionUpload.remove(0);
+                        valuesDownload.remove(0);
+                        valuesUpload.remove(0);
+                    }
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            repaint();
+                        }
+                    });
+                }
+                Thread.sleep(3000);
+
+            } catch (InterruptedException ex) {
+            }
+        }
     }
 
     @Override
-    public synchronized void paint(Graphics g) {
-        int xlen = getSize().width;
-        int ylen = getSize().height;
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        g2d.setFont(new Font("Dialog", Font.TRUETYPE_FONT, 10));
 
-        scale = getNewScale();
+        g2d.setColor(TRANSPARENT_GREY);
+        int div = 0;
+        while (div * 10 < panelWidth) {
+            div++;
+            g2d.drawLine(div * 10, 0, div * 10, panelHeight);
+        }
+        div = 0;
+        while (div * 10 < panelHeight) {
+            div++;
+            g2d.drawLine(0, div * 10, panelWidth, div * 10);
+        }
 
-        /*   g.setColor(new Color(82/2,199/2,156/2));
-        g.fillRect(0,0,xlen,ylen);*/
-
-        for (int x = 0; x < xlen; x++) {
-            int l = (int) ((diagramr[x + (diagramr.length - xlen)] / scale) * ylen);
-            if (x <= 50) {
-                g.setColor(new Color(0, 0, 0, x));
+        if (xTimeScale.size() > 1) {
+            for (int i = 0; i < xTimeScale.size() - 1; i++) {
+                g2d.setColor(Color.GREEN);
+                g2d.drawLine(xTimeScale.get(i), panelHeight - yPositionDownload.get(i), xTimeScale.get(i + 1), panelHeight - yPositionDownload.get(i + 1));
+                g2d.setColor(Color.RED);
+                g2d.drawLine(xTimeScale.get(i), panelHeight - yPositionUpload.get(i), xTimeScale.get(i + 1), panelHeight - yPositionUpload.get(i + 1));
             }
-            g.drawLine(x, ylen - l, x, ylen);
+            g2d.setColor(Color.WHITE);
+            g2d.drawString(Integer.toString(maxValue) + " Kb/s", 2, 10);
+            g2d.drawString("0 Kb/s", 3, panelHeight - HEIGTH_OFFSET);
         }
-
-        for (int x = 0; x < xlen; x++) {
-            int l = (int) ((diagramw[x + (diagramw.length - xlen)] / scale) * ylen);
-            if (x <= 50) {
-                g.setColor(new Color(0, 0, 0, x));
-            }
-            g.drawLine(x, ylen - l, x, ylen);
-        }
-
-//        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-//        g.setColor(new Color(0,0,0,100));
-//        g.setFont(new Font("Arial Black, Arial", 0, 10));
-//        g.drawString((int)scale+"KiB/s",2,10);
-//        g.drawString("0KiB/s",2,ylen-3);
-//        ((Graphics2D)g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-    }
-
-    private double getNewScale() {
-        double max = 0;
-        for (int i = 0; i < diagramr.length; i++) {
-            if (max < diagramr[i]) {
-                max = diagramr[i];
-            }
-        }
-
-        for (int i = 0; i < diagramw.length; i++) {
-            if (max < diagramw[i]) {
-                max = diagramw[i];
-            }
-        }
-
-        int t = (int) (max / 100);
-        t = (t + 1) * 100;
-        return t;
-    }
-    private int counter = 0;
-
-    public synchronized void update(CoreSubsystem core) {
-        counter++;
-        if (counter % 10 == 0) {
-            System.arraycopy(diagramr, 1, diagramr, 0, diagramr.length - 1);
-            diagramr[diagramr.length - 1] = core.getNetworkManager().getBandwidthIn().getCPS() / 1024;
-
-            System.arraycopy(diagramw, 1, diagramw, 0, diagramw.length - 1);
-            diagramw[diagramw.length - 1] = core.getNetworkManager().getBandwidthOut().getCPS() / 1024;
-            repaint();
-        }
+        g2d.setColor(Color.GRAY);
+        g2d.drawLine(0, 0, panelWidth, 0);
+        g2d.drawLine(0, panelHeight, panelWidth, panelHeight);
+        g2d.drawLine(0, 0, 0, panelHeight);
+        g2d.drawLine(panelWidth, 0, panelWidth, panelHeight);
     }
 }

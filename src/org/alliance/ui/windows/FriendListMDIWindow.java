@@ -41,7 +41,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     private UISubsystem ui;
     private JList list;
     private ImageIcon iconFriendDimmed, iconFriendOld;
-    private JLabel statusleft, statusright;
+    private JLabel statusright;
     private String[] LEVEL_NAMES = {"Rookie", "True Member", "Experienced", "King"};
     private String[] LEVEL_ICONS = {"friend_lame", "friend", "friend_cool", "friend_king"};
     private ImageIcon[] friendIcons;
@@ -69,7 +69,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
         setWindowType(WINDOWTYPE_NAVIGATION);
 
-        statusleft = (JLabel) xui.getComponent("statusleft");
         statusright = (JLabel) xui.getComponent("statusright");
 
         createUI();
@@ -276,7 +275,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             //Groups painting
             if (value instanceof String) {
                 setIcon(groupIcon);
-                setFont(new Font("Tahoma", Font.BOLD, 12));
+                setFont(new Font(this.getFont().getFontName(), Font.BOLD, 12));
                 setText(value.toString());
                 setBackground(new Color(230, 230, 233));
                 return this;
@@ -431,9 +430,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 }
                 if (delete) {
                     for (Object friend : friends) {
-                        Node f = (Node) friend;
-                        if (f != null && f instanceof Friend) {
-                            ui.getCore().getFriendManager().permanentlyRemove((Friend) f);
+                        if (friend instanceof Friend) {
+                            Node f = (Node) friend;
+                            if (f != null && f instanceof Friend) {
+                                ui.getCore().getFriendManager().permanentlyRemove((Friend) f);
+                            }
                         }
                     }
                     revert();
@@ -581,6 +582,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     }
                 }
             }
-        }
+        }       
     }
 }

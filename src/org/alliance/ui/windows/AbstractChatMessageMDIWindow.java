@@ -9,6 +9,7 @@ import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -91,6 +92,8 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         new CutCopyPastePopup(chat);
 
         textarea.setEditable(false);
+        textarea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        textarea.setFont(new Font("Dialog", Font.TRUETYPE_FONT, 12));
         textarea.setBackground(Color.white);
         textarea.addHyperlinkListener(new HyperlinkListener() {
 
@@ -302,8 +305,8 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     private String creattHtmlChatLine(ChatLine cl) {
         String s;
         DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
-        if (previousChatLine != null &&
-                f.format(new Date(cl.tick)).equals(
+        if (previousChatLine != null
+                && f.format(new Date(cl.tick)).equals(
                 f.format(new Date(previousChatLine.tick)))) {
             s = "[" + SHORT_FORMAT.format(new Date(cl.tick)) + "]";
         } else {

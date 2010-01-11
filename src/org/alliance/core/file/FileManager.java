@@ -9,7 +9,6 @@ import org.alliance.core.file.blockstorage.CacheStorage;
 import org.alliance.core.file.blockstorage.DownloadStorage;
 import org.alliance.core.file.filedatabase.FileDatabase;
 import org.alliance.core.file.filedatabase.FileDescriptor;
-import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
@@ -58,10 +57,11 @@ public class FileManager extends Manager {
         return shareManager;
     }
 
-    public void shutdown() throws IOException {
+    public void shutdown() throws IOException {        
         shareManager.shutdown();
         cache.shutdown();
         downloads.shutdown();
+        core.getDbCore().shutdown();
     }
 
     public boolean contains(Hash root) {
@@ -75,14 +75,6 @@ public class FileManager extends Manager {
             return true;
         }
         return false;
-    }
-
-    public FileDescriptor[] search(String query, int maxHits, FileType ft) throws IOException {
-        return shareManager.getFileDatabase().search(query, maxHits, ft);
-    }
-
-    public long getTotalBytesShared() {
-        return shareManager.getFileDatabase().getTotalSize();
     }
 
     public boolean containsComplete(Hash root) {

@@ -1,33 +1,22 @@
 package org.alliance.core.file.filedatabase;
 
 import com.stendahls.nif.util.SimpleTimer;
-import com.stendahls.nif.util.WeakValueHashMap;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
-import org.alliance.core.file.ChunkStorage;
-import org.alliance.core.file.filedatabase.searchindex.KeywordIndex;
+import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
-import org.alliance.core.file.share.T;
+import org.alliance.core.file.FileManager;
 import org.alliance.launchers.console.Console;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.InflaterInputStream;
-import org.alliance.launchers.OSInfo;
+import java.util.TreeMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -38,415 +27,394 @@ import org.alliance.launchers.OSInfo;
  */
 public class FileDatabase {
 
-    public static final int MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS = 1000 * 60 * 10;
-    public static final int VERSION = 12;
-    private ChunkStorage chunkStorage;
-    private FileDescriptorAllocationTable allocationTable = new FileDescriptorAllocationTable();
-    private KeywordIndex keywordIndex;
-    private HashMap<Hash, Integer> baseHashTable = new HashMap<Hash, Integer>();
-    private HashMap<String, Hash> duplicates = new HashMap<String, Hash>();
-    private CompressedPathCollection indexedFilenames = new CompressedPathCollection();
-    //this cache does not seem to work very well - not 100% sure tho. It might be that there's nothing in this cache. BUT I'm afraid there might be new problems if this cache is implemented correctly: If there are cached items FDs that are no longer valid (removed on disk) might be returned anyway..  maybe. this is sketchy.
-    private WeakValueHashMap<Hash, FileDescriptor> fileDescriptorCache = new WeakValueHashMap<Hash, FileDescriptor>();
-    private String indexFilePath;
-    private long totalSize;
-    private long lastFlushedAt;
     private CoreSubsystem core;
+    private long shareSize = 0;
+    private int numberOfShares = 0;
+    private boolean priority = false;
 
-    public FileDatabase(CoreSubsystem core, String indexFilePath, String databaseFilePath) throws IOException {
+    public FileDatabase(CoreSubsystem core) throws IOException {
         this.core = core;
-        this.indexFilePath = indexFilePath;
+        updateCacheCounters(true, true);
+    }
 
-        keywordIndex = new KeywordIndex();
-        chunkStorage = new ChunkStorage(databaseFilePath);
+    public void addEntry(FileDescriptor fd) {
+        FileIndex fileIndex = new FileIndex(fd.getBasePath(), mergePathParts(fd.getBasePath(), fd.getSubpath(), null));
+        byte fileType = FileType.getByFileName(fileIndex.getFilename()).id();
+        if (core.getDbCore().getDbShares().addEntry(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename(), fileType, fd.getSize(), fd.getRootHash().array(), fd.getModifiedAt())) {
+            for (Hash h : fd.getHashList()) {
+                core.getDbCore().getDbHashes().addEntry(fd.getRootHash().array(), h.array());
+            }
+        } else {
+            core.getDbCore().getDbDuplicates().addEntry(mergePathParts(fd.getBasePath(), fd.getSubpath(), null), fd.getRootHash().array(), fd.getModifiedAt());
+        }
+    }
 
+    public void removeEntry(byte[] rootHash) {
+        core.getDbCore().getDbShares().deleteEntryByRootHash(rootHash);
+    }
+
+    private void removeObsoleteShare(String basePath, int removedFiles) {
+        ResultSet results = core.getDbCore().getDbShares().getEntriesByBasePath(basePath, 1024, 0);
         try {
-            loadIndices();
-        } catch (Exception e) {
-            if (T.t) {
-                T.error("Could not load indices: " + e);
+            boolean recurse = false;
+            while (results.next()) {
+                removeEntry(results.getBytes("root_hash"));
+                removedFiles++;
+                core.getUICallback().statusMessage("Removed " + removedFiles + " files from removed share - " + basePath);
+                recurse = true;
             }
-            e.printStackTrace();
-        }
-    }
-
-    public synchronized boolean isEmpty() throws IOException {
-        return getNumberOfFiles() == 0;
-    }
-
-    /**
-     *
-     * @param fd
-     * @return null if everything is ok. If the hash root is aldready in database the older FD is returned (the one in database, not the one sent to this method)
-     * @throws IOException
-     */
-    public synchronized FileDescriptor add(FileDescriptor fd) throws IOException {
-        if (contains(fd.getRootHash())) {
-            if (T.t) {
-                T.info("Maybe found duplicate: " + fd);
+            if (recurse) {
+                removeObsoleteShare(basePath, removedFiles);
             }
-            FileDescriptor old = getFd(fd.getRootHash());
-            if (old != null && old.existsAndSeemsEqual()) {
-                if (TextUtils.makeSurePathIsMultiplatform(old.getCanonicalPath()).equals(
-                        TextUtils.makeSurePathIsMultiplatform(fd.getCanonicalPath()))) {
-                    if (T.t) {
-                        T.warn("Problem in file database! Tried to add identical file as duplicate! " + fd);
-                    }
-                    if (contains(fd.getCanonicalPath())) {
-                        if (T.t) {
-                            T.info("File is contained in filename index! wtf?");
-                        }
-                    } else {
-                        if (contains(fd.getFullPath())) {
-                            if (T.t) {
-                                T.info("AHA! Cannonical file not in filename index - but regular filename is.");
-                            }
-                        } else {
-                            if (T.t) {
-                                T.info("Neither cannonical or regular filename is in filename index.");
-                            }
-                        }
-                        if (T.t) {
-                            T.info("Adding connocinal filename to filename index.");
-                        }
-                        indexedFilenames.addPath(fd.getCanonicalPath());
-                    }
-                    return old;
-                }
-                if (old.getCanonicalPath().toLowerCase().indexOf("sample") != -1 ||
-                        old.getCanonicalPath().toLowerCase().indexOf("copy") != -1 ||
-                        TextUtils.makeSurePathIsMultiplatform(old.getCanonicalPath().toLowerCase()).indexOf("/old/") != -1) {
-                    if (T.t) {
-                        T.trace("Found duplicate with less significant path name");
-                    }
-                    remove(old);
-                    addDuplicate(old.getCanonicalPath(), old.getRootHash());
-                    //continue adding fd
-                } else {
-                    addDuplicate(fd.getCanonicalPath(), fd.getRootHash());
-                    return old;
-                }
-            } else {
-                if (T.t) {
-                    T.info("Nope. Original did not exist.");
-                }
-                if (old != null) {
-                    remove(old);
-                }
-            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        if (T.t) {
-            T.info("Adding new fd to db: " + fd);
-        }
-
-        //save to file descriptor
-        ByteArrayOutputStream out = new ByteArrayOutputStream(512);
-        fd.serializeTo(out);
-        out.flush();
-        out.close();
-        int off = chunkStorage.appendChunk(out.toByteArray());
-
-        //add to allocation table
-        int index = allocationTable.addOffset(off);
-
-        //add to baseHashTable
-        baseHashTable.put(fd.getRootHash(), index);
-
-        //index keywords
-        keywordIndex.add(index, fd);
-
-        indexedFilenames.addPath(fd.getCanonicalPath());
-
-        totalSize += fd.getSize();
-
-        //save and flush database and indices
-        if (System.currentTimeMillis() - lastFlushedAt > MINIMUM_TIME_BETWEEN_FLUSHES_IN_MS) {
-            flush();
-        }
-
-        return null; //null means everything went ok.
     }
 
-    private void addDuplicate(String fullPath, Hash rootHash) {
-        fullPath = TextUtils.makeSurePathIsMultiplatform(fullPath);
-        if (T.t) {
-            T.info("Adding duplicate: " + fullPath);
-        }
-        duplicates.put(fullPath, rootHash);
-    }
-
-    public synchronized FileDescriptor getFd(int index) throws IOException {
-        return getFd(index, true);
-    }
-
-    public synchronized FileDescriptor getFd(int index, boolean addToCache) throws IOException {
-        int offset = allocationTable.getOffset(index);
-        FileDescriptor fd = null;
+    private int removeObsoleteFiles(String subPath, int offset, int scannedFiles) {
+        ResultSet results = core.getDbCore().getDbShares().getEntriesBySubPath(subPath, 1024, offset);
         try {
-            InputStream is = chunkStorage.getChunk(offset);
-            if (is == null) {
-                //chunk has been removed from storage
-                return null;
+            boolean recurse = false;
+            while (results.next()) {
+                core.getUICallback().statusMessage("Searching for removed files: (" + scannedFiles * 100 / numberOfShares + "%)");
+                scannedFiles++;
+                if (!(new File(mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename"))).exists())) {
+                    removeEntry(results.getBytes("root_hash"));
+                }
+                recurse = true;
             }
-            fd = FileDescriptor.createFrom(is, true, core);
-        } catch (FileHasBeenRemovedOrChanged fileHasBeenRemoved) {
-            remove(fileHasBeenRemoved.getFd());
-            return null;
+            if (recurse) {
+                scannedFiles = removeObsoleteFiles(subPath, offset + 1024, scannedFiles);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        if (addToCache) {
-            fileDescriptorCache.put(fd.getRootHash(), fd);
-        }
-        return fd;
+        return scannedFiles;
     }
 
-    private synchronized void remove(FileDescriptor fd) throws IOException {
-        if (T.t) {
-            T.info("Remoiving: " + fd);
-        }
-        if (OSInfo.isWindows()) {
-            //Don't remove files where mount point doesn't exist (external drives check) but ShareBase still exist
-            if (!(new File(fd.getCanonicalPath().substring(0, fd.getCanonicalPath().indexOf(":\\") + 1)).exists())) {
-                if ((core.getFileManager().getShareManager().getBaseByPath(fd.getBasePath())) != null) {
-                    return;
+    public void removeObsoleteEntries(ArrayList<ShareBase> shareBase) {
+       // long time = System.currentTimeMillis();
+        ResultSet results = core.getDbCore().getDbShares().getBasePaths();
+        try {
+            //Clean by removed sharabases
+            ArrayList<String> shares = new ArrayList<String>();
+            for (ShareBase sharebase : core.getFileManager().getShareManager().shareBases()) {
+                shares.add(sharebase.getPath());
+            }
+            while (results.next()) {
+                if (!shares.contains(results.getString("base_path"))) {
+                    removeObsoleteShare(results.getString("base_path"), 0);
                 }
             }
+            //Clean by removed files
+            int scannedFiles = 0;
+            results = core.getDbCore().getDbShares().getSubPaths();
+            while (results.next()) {
+                scannedFiles = removeObsoleteFiles(results.getString("sub_path"), 0, scannedFiles);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        if (baseHashTable == null) {
-            throw new IOException("Internal error 0 in filedatabase!");
-        }
-        Integer index = baseHashTable.get(fd.getRootHash());
-        if (index == null) {
-            throw new IOException("Internal error in remove in filedatabase!");
-        }
-        int off = allocationTable.getOffset(index);
-        keywordIndex.remove(index);
-        chunkStorage.markAsRemoved(off);
-        baseHashTable.remove(fd.getRootHash());
-        fileDescriptorCache.remove(fd.getRootHash());
-        indexedFilenames.removePath(fd.getCanonicalPath());
-        totalSize -= fd.getSize();
+        //System.out.println("removeObsoleteShares - " + (System.currentTimeMillis() - time));
     }
 
-    public synchronized FileDescriptor getFd(Hash hash) throws IOException {
-        if (contains(hash)) {
-            FileDescriptor fd = fileDescriptorCache.get(hash);
-            if (fd != null) {
+    public FileDescriptor getFd(Hash rootHash) throws IOException {
+       // long time = System.currentTimeMillis();
+        ResultSet result = core.getDbCore().getDbShares().getEntryByRootHash(rootHash.array());
+        try {
+            while (result.next()) {
+                String basePath = result.getString("base_path");
+                String subPath = mergePathParts(null, result.getString("sub_path"), result.getString("filename"));
+                long size = result.getLong("size");
+                long modifiedAt = result.getLong("modified");
+
+                result = core.getDbCore().getDbHashes().getEntryByRootHash(rootHash.array());
+                ArrayList<Hash> hashArray = new ArrayList<Hash>();
+                while (result.next()) {
+                    hashArray.add(new Hash(result.getBytes("hash")));
+                }
+                Hash[] hashList = hashArray.toArray(new Hash[hashArray.size()]);
+                // System.out.println("getFD - " + (System.currentTimeMillis() - time));
+                FileDescriptor fd = new FileDescriptor(basePath, subPath, size, rootHash, hashList, modifiedAt);
                 return fd;
             }
-        }
-        Integer i = baseHashTable.get(hash);
-        if (i == null) {
+        } catch (SQLException ex) {
+            ex.printStackTrace();
             return null;
         }
-        return getFd(i);
+        return null;
     }
 
-    public synchronized int getNumberOfFiles() {
-        return allocationTable.getNumberOfFiles();
+    public byte[] getRootHash(String basePath, String path) throws IOException {
+        FileIndex fileIndex = new FileIndex(basePath, path);
+        ResultSet result = core.getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+        try {
+            while (result.next()) {
+                return result.getBytes("root_hash");
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            return null;
+        }
+        return null;
     }
 
-    public synchronized void printToSout() throws IOException {
-        System.out.println(TextUtils.formatByteSize(totalSize) + " in " + TextUtils.formatNumber(getNumberOfFiles()) + " files.");
+    public HashMap<Hash, String> getRootHashWithPath(String path, String basePath) {
+        HashMap<Hash, String> hashPath = new HashMap<Hash, String>();
+        try {
+            FileIndex fileIndex = new FileIndex(basePath, mergePathParts(basePath, path, null));
+            if (!path.endsWith("/")) {
+                ResultSet results = core.getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+                while (results.next()) {
+                    hashPath.put(new Hash(results.getBytes("root_hash")), mergePathParts(null, null, results.getString("filename")));
+                }
+            } else {
+                ResultSet results = core.getDbCore().getDbShares().getEntriesByBasePathAndSubPath(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
+                path = path.substring(0, path.length() - 1);
+                path = path.substring(0, path.lastIndexOf("/") + 1);
+                path = basePath + "/" + path;
+                while (results.next()) {
+                    hashPath.put(new Hash(results.getBytes("root_hash")), mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")).replace(path, ""));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return hashPath;
+    }
+
+    public HashMap<Hash, Long> getRootHashWithSize(String basePath, String path) {
+        HashMap<Hash, Long> hashSize = new HashMap<Hash, Long>();
+        try {
+            FileIndex fileIndex = new FileIndex(basePath, mergePathParts(basePath, path, null));
+            if (!path.endsWith("/")) {
+                ResultSet results = core.getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+                while (results.next()) {
+                    hashSize.put(new Hash(results.getBytes("root_hash")), results.getLong("size"));
+                }
+            } else {
+                ResultSet results = core.getDbCore().getDbShares().getEntriesByBasePathAndSubPath(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
+                while (results.next()) {
+                    hashSize.put(new Hash(results.getBytes("root_hash")), results.getLong("size"));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return hashSize;
+    }
+
+    public synchronized ArrayList<SearchHit> getSearchHits(String query, byte type, int limit) {
+        //long time = System.currentTimeMillis();
+        priority = true;
+        ResultSet results = core.getDbCore().getDbShares().getEntriesBySearchQuery(query, type, limit);
+        ArrayList<SearchHit> hitList = new ArrayList<SearchHit>();
+        try {
+            Hash root;
+            String path;
+            long size;
+            int hashedDaysAgo;
+            String basepath;
+            while (results.next()) {
+                root = new Hash(results.getBytes("root_hash"));
+                basepath = results.getString("base_path");
+                path = mergePathParts(null, results.getString("sub_path"), results.getString("filename"));
+                size = results.getLong("size");
+                hashedDaysAgo = (int) ((System.currentTimeMillis() - results.getLong("modified")) / 1000 / 60 / 60 / 24);
+                if (hashedDaysAgo > 255) {
+                    hashedDaysAgo = 255;
+                }
+                hitList.add(new SearchHit(root, path, size, basepath, hashedDaysAgo));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        //System.out.println("getsearchhit - " + (System.currentTimeMillis() - time));
+        priority = false;
+        return hitList;
+    }
+
+    public HashMap<String, String> getDuplicates(int limit) {
+        ResultSet results = core.getDbCore().getDbDuplicates().getAllEntries(limit);
+        HashMap<String, String> duplicates = new HashMap<String, String>();
+        try {
+            while (results.next()) {
+                duplicates.put(results.getString("path"), mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return duplicates;
     }
 
     public synchronized void flush() throws IOException {
-        core.getUICallback().statusMessage("<html><b><font color=blue>Please wait while flushing file database and search index to disk...</font></b></html>");
+        core.getUICallback().statusMessage("<html><b><font color=blue>Saving settings...</font></b></html>");
         SimpleTimer st = new SimpleTimer();
-        chunkStorage.flush();
-        saveIndices();
-        lastFlushedAt = System.currentTimeMillis();
-        core.getUICallback().statusMessage("Flushed file database and search index in " + st.getTime());
+        core.getUICallback().statusMessage("Saved settings in " + st.getTime());
     }
 
-    private void saveIndices() throws IOException {
-        String fn = indexFilePath;
-        File file = new File(fn);
-        if (file.getParentFile() != null) {
-            file.getParentFile().mkdirs();
-        }
-        File bak = new File(fn + ".bak");
-        bak.delete();
-        file.renameTo(bak);
-        file = new File(fn);
-
-        FileOutputStream fout = new FileOutputStream(file);
-        ObjectOutputStream out = new ObjectOutputStream(new DeflaterOutputStream(fout, new Deflater(9)));
-
-        out.writeInt(VERSION);
-        out.writeLong(totalSize);
-        out.writeObject(baseHashTable);
-        allocationTable.save(out);
-        keywordIndex.save(out);
-        out.writeObject(indexedFilenames);
-        out.writeObject(duplicates);
-
-        out.flush();
-        out.close();
-    }
-
-    private void loadIndices() throws IOException {
-        loadIndices(indexFilePath);
-    }
-
-    private void loadIndices(String path) throws IOException {
-        File file = new File(path);
-        if (!file.exists()) {
-            if (T.t) {
-                T.warn("Assuming we're starting for the first time with no index.");
-            }
-            return;
-        }
-
+    public boolean contains(String basePath, String path, boolean checkDuplicates) {
+        FileIndex fileIndex = new FileIndex(basePath, path);
+        ResultSet result = core.getDbCore().getDbShares().contains(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
         try {
-            ObjectInputStream in = new ObjectInputStream(new InflaterInputStream(new FileInputStream(file)));
-            try {
-                if (in.readInt() != VERSION) {
-                    if (T.t) {
-                        T.warn("Incorrect database version! Starting from scratch!");
-                    }
-                    return;
-                }
-                totalSize = in.readLong();
-                baseHashTable = (HashMap<Hash, Integer>) in.readObject();
-                allocationTable.load(in);
-                keywordIndex.load(in);
-                indexedFilenames = (CompressedPathCollection) in.readObject();
-                duplicates = (HashMap<String, Hash>) in.readObject();
-
-                //make sure all duplicates are stored as multiplatform paths - remove this once this version has been out for a while - this is here only for backward compatibility
-                HashMap<String, Hash> hm = new HashMap<String, Hash>();
-                for (String d : duplicates.keySet()) {
-                    hm.put(TextUtils.makeSurePathIsMultiplatform(d), duplicates.get(d));
-                }
-                duplicates = hm;
-
-            } catch (ClassNotFoundException e) {
-                throw new IOException("Could not load indices: " + e);
-            }
-            in.close();
-        } catch (IOException e) {
-            if (path.endsWith(".bak")) {
-                throw e;
-            } else {
-                if (T.t) {
-                    T.error("Error when loading index. Trying with backup index. " + e);
-                }
-                loadIndices(indexFilePath + ".bak");
-            }
-        }
-    }
-
-    public synchronized void cleanupDuplicates() {
-        for (Iterator<String> i = duplicates.keySet().iterator(); i.hasNext();) {
-            if (!new File(i.next()).exists()) {
-                i.remove();
-            }
-        }
-    }
-
-    public synchronized boolean contains(String path) throws IOException {
-        return indexedFilenames.contains(path);
-    }
-
-    public synchronized boolean contains(Hash rootHash) {
-        return baseHashTable.containsKey(rootHash);
-    }
-
-    public KeywordIndex getKeywordIndex() {
-        return keywordIndex;
-    }
-
-    public long getTotalSize() {
-        return totalSize;
-    }
-
-    public int getNumberOfShares() {
-        return baseHashTable.size();
-    }
-
-    public synchronized Set<Hash> getAllHashes() {
-        return baseHashTable.keySet();
-    }
-
-    /**
-     * Returns up to 1000 FDs that are withing the supplied path. Subdirectories included.
-     * @param path
-     * @return
-     * @throws IOException
-     */
-    public Collection<FileDescriptor> getFDsByPath(String path) throws IOException {
-        FileDescriptor fd[] = search(path, 1000, FileType.EVERYTHING);
-        ArrayList<FileDescriptor> al = new ArrayList<FileDescriptor>();
-        for (FileDescriptor f : fd) {
-            if (f != null) {
-                if (T.t) {
-                    T.trace(f.getFullPath() + " - " + path);
-                }
-                if (f.getFullPath().startsWith(path)) {
-                    al.add(f);
-                }
-            }
-        }
-        return al;
-    }
-
-    public synchronized FileDescriptor[] search(String query, int maxHits, FileType ft) throws IOException {
-        int indices[] = keywordIndex.search(query, maxHits, ft);
-        FileDescriptor fd[] = new FileDescriptor[indices.length];
-        for (int i = 0; i < indices.length; i++) {
-            fd[i] = getFd(indices[i]);
-        }
-        return fd;
-    }
-
-    public boolean isDuplicate(String fullPath) throws IOException {
-        fullPath = TextUtils.makeSurePathIsMultiplatform(new File(fullPath).getCanonicalPath());
-        if (duplicates.containsKey(fullPath)) {
-            FileDescriptor fd = getFd(duplicates.get(fullPath));
-            if (fd != null) {
-                if (fd.existsAndSeemsEqual()) {
+            while (result.next()) {
+                if (result.getBoolean("contains")) {
                     return true;
+                } else if (checkDuplicates) {
+                    result = core.getDbCore().getDbDuplicates().getEntryByPath(mergePathParts(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename()));
+                    return result.next();
                 } else {
-                    remove(fd);
+                    return false;
                 }
             }
-            duplicates.remove(fullPath);
+            return false;
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return false;
     }
 
-    public String[] getDirectoryListing(ShareBase base, String path) {
-        return indexedFilenames.getDirectoryListing(base.getPath() + "/" + path);
-    }
-
-    public Collection<String> getDuplicates() {
-        return duplicates.keySet();
-    }
-
-    public Hash getHashForDuplicate(String path) {
-        return duplicates.get(TextUtils.makeSurePathIsMultiplatform(path));
-    }
-
-    public void clearDuplicates() {
-        if (T.t) {
-            T.info("Removing all duplicate entries.");
+    public boolean contains(Hash rootHash) {
+        ResultSet result = core.getDbCore().getDbShares().getEntryByRootHash(rootHash.array());
+        try {
+            return result.next();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
-        duplicates.clear();
+        return false;
+    }
+
+    public synchronized void updateCacheCounters(boolean updateNumber, boolean updateSize) {
+        try {
+            if (updateNumber) {
+                ResultSet results = core.getDbCore().getDbShares().getNumberOfShares();
+                while (results.next()) {
+                    numberOfShares = results.getInt(1);
+                }
+            }
+            if (updateSize) {
+                ResultSet results = core.getDbCore().getDbShares().getTotalSizeOfFiles();
+                while (results.next()) {
+                    shareSize = results.getLong(1);
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public long getTotalSize() {
+        return shareSize;
+    }
+
+    public int getNumberOfShares() {
+        return numberOfShares;
+    }
+
+    public synchronized TreeMap<String, Long> getDirectoryListing(ShareBase base, String subPath) {
+        priority = true;
+        //long time = System.currentTimeMillis();
+
+        ArrayList<String> entries = new ArrayList<String>();
+        ResultSet results = core.getDbCore().getDbShares().getEntriesByBasePathAndSubPath(base.getPath(), subPath, false, 8196);
+        try {
+            while (results.next()) {
+                entries.add(mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        TreeMap<String, Long> fileSize = new TreeMap<String, Long>(new Comparator<String>() {
+
+            @Override
+            public int compare(String s1, String s2) {
+                if (s1 == null || s2 == null) {
+                    return 0;
+                }
+                if (s1.equalsIgnoreCase(s2)) {
+                    return s1.compareTo(s2);
+                }
+                if (s1.endsWith("/") && !s2.endsWith("/")) {
+                    return -1;
+                }
+                if (!s1.endsWith("/") && s2.endsWith("/")) {
+                    return 1;
+                }
+                return s1.compareToIgnoreCase(s2);
+            }
+        });
+
+        File dirPath = new File(mergePathParts(base.getPath(), subPath, null));
+        File[] list = dirPath.listFiles();
+        int politeCounter = 0;
+        for (File f : list) {
+            if (f.isDirectory() && !f.getName().contains(FileManager.INCOMPLETE_FOLDER_NAME) && f.listFiles().length != 0) {
+                fileSize.put(f.getName() + "/", 0L);
+            } else if (entries.contains(TextUtils.makeSurePathIsMultiplatform(f.getPath()))) {
+                fileSize.put(f.getName(), f.length());
+            }
+            politeCounter++;
+            if (politeCounter == 500) {
+                politeCounter = 0;
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException ex) {
+                }
+            }
+        }
+
+        //System.out.println("directory listing - " + (System.currentTimeMillis() - time));
+        priority = false;
+        return fileSize;
+    }
+
+    private String mergePathParts(String basePath, String subPath, String filename) {
+        StringBuilder path = new StringBuilder();
+        if (basePath != null) {
+            path.append(basePath);
+            path.append("/");
+        }
+        if (subPath != null) {
+            path.append(subPath);
+        }
+        if (filename != null) {
+            path.append(filename);
+        }
+        return path.toString();
+    }
+
+    public boolean isPriority() {
+        return priority;
     }
 
     public void printStats(Console.Printer printer) throws IOException {
         printer.println("Filedatabse stats:");
-        printer.println("  FileDescriptor Allocation Table size: " + allocationTable.getNumberOfFiles());
-        printer.println("  keywords in index: " + keywordIndex.getNumbefOfKeywords());
-        printer.println("  keys in base hashtable: " + baseHashTable.size());
-        printer.println("  duplicates: " + duplicates.size());
-        printer.println("  filename list: " + indexedFilenames.getNmberOfPaths());
-        printer.println("  filedescriptors cahced: " + fileDescriptorCache.size());
-        printer.println("  % of filedescriptor databse marked for deletion: " + chunkStorage.getPercetMarkedForDeletion());
-
     }
 
-    public void removeFromDuplicates(String file) {
-        duplicates.remove(TextUtils.makeSurePathIsMultiplatform(file));
+    private class FileIndex {
+
+        private String basePath;
+        private String subPath;
+        private String filename;
+
+        public FileIndex(String basePath, String path) {
+            this.basePath = TextUtils.makeSurePathIsMultiplatform(basePath);
+            subPath = TextUtils.makeSurePathIsMultiplatform(path).substring(this.basePath.length() + 1);
+            filename = subPath.substring(subPath.lastIndexOf("/") + 1, subPath.length());
+            subPath = subPath.substring(0, subPath.length() - filename.length());
+        }
+
+        public String getBasePath() {
+            return basePath;
+        }
+
+        public String getFilename() {
+            return filename;
+        }
+
+        public String getSubPath() {
+            return subPath;
+        }
     }
 }

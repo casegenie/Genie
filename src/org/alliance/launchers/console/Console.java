@@ -12,7 +12,6 @@ import org.alliance.core.comm.rpc.GetShareBaseList;
 import org.alliance.core.comm.rpc.Ping;
 import org.alliance.core.crypto.cryptolayers.SSLCryptoLayer;
 import org.alliance.core.file.blockstorage.BlockFile;
-import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
@@ -20,7 +19,6 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
 import org.alliance.core.node.InvitaitonManager;
 import org.alliance.core.node.Invitation;
-import org.alliance.core.plugins.ConsolePlugInExtension;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -30,6 +28,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
+import org.alliance.core.plugins.ConsolePlugInExtension;
 
 /**
  * Created by IntelliJ IDEA.
@@ -68,10 +67,10 @@ public class Console {
     public Console(CoreSubsystem core, List<ConsolePlugInExtension> extensions) {
         this.core = core;
         manager = core.getFriendManager();
-        if(extensions == null) {
-        	extensions = new ArrayList<ConsolePlugInExtension>();//Create empty list
+        if (extensions == null) {
+            extensions = new ArrayList<ConsolePlugInExtension>();//Create empty list
         } else {
-        	this.extensions = extensions;
+            this.extensions = extensions;
         }
     }
 
@@ -119,8 +118,6 @@ public class Console {
             startnetlog();
         } else if ("contains".equals(command)) {
             contains(params);
-        } else if ("dups".equals(command)) {
-            dups();
         } else if ("ui".equals(command)) {
             ui();
         } else if ("killui".equals(command)) {
@@ -191,8 +188,6 @@ public class Console {
             remotedir(sharebaseIndex, user, p);
         } else if ("remotesharebases".equals(command)) {
             remotesharebases(params.get(0));
-        } else if ("cleardups".equals(command)) {
-            cleardups();
         } else if ("threads".equals(command)) {
             threads();
         } else if ("filedatabase".equals(command)) {
@@ -218,16 +213,16 @@ public class Console {
         } else if ("error".equals(command)) {
             throw new Exception("test error");
         } else {
-        	boolean success = false;
-        	for (ConsolePlugInExtension ext : extensions) {
-				if (ext != null && ext.handleLine(command, printer)) {
-					success = true;
-					break;
-				}
-			}
-        	if (!success) {
-        		printer.println("Unknown command " + command);
-        	}
+            boolean success = false;
+            for (ConsolePlugInExtension ext : extensions) {
+                if (ext != null && ext.handleLine(command, printer)) {
+                    success = true;
+                    break;
+                }
+            }
+            if (!success) {
+                printer.println("Unknown command " + command);
+            }
         }
     }
 
@@ -325,13 +320,9 @@ public class Console {
             return;
         }
         printer.println("Found share base: " + b);
-        for (String s : core.getFileManager().getFileDatabase().getDirectoryListing(b, path)) {
-            printer.println(s);
-        }
-    }
-
-    private void cleardups() {
-        core.getFileManager().getFileDatabase().clearDuplicates();
+        /*  for (String s : core.getFileManager().getFileDatabase().getDirectoryListing(b, path)) {
+        printer.println(s);
+        }*/
     }
 
     private void startnetlog() {
@@ -344,17 +335,6 @@ public class Console {
         if (netLog) {
             printer.println(FORMAT.format(new Date()) + " " + event);
         }
-    }
-
-    private void dups() throws IOException {
-        Collection<String> dups = new ArrayList<String>(core.getFileManager().getFileDatabase().getDuplicates());
-        printer.println("Duplicates: ");
-        for (String s : dups) {
-            Hash h = core.getFileManager().getFileDatabase().getHashForDuplicate(s);
-            FileDescriptor fd = core.getFileManager().getFileDatabase().getFd(h);
-            printer.println("  " + s + " -> " + fd.getSubpath());
-        }
-        printer.println(dups.size() + " duplicates in share.");
     }
 
     private void search(ArrayList<String> params) throws IOException {
@@ -413,11 +393,12 @@ public class Console {
 
         printer.println("Searching in " + ft.description() + "...");
         SimpleTimer st = new SimpleTimer();
-        int indices[] = core.getShareManager().getFileDatabase().getKeywordIndex().search(query, 100, ft);
+        //int indices[] = core.getShareManager().getFileDatabase().getKeywordIndex().search(query, 100, ft);
         printer.println("...completed in " + st.getTime() + ".");
-        for (int i : indices) {
-            printer.println("  " + core.getShareManager().getFileDatabase().getFd(i));
-        }
+        // for (int i : indices) {
+        //TODO
+        //printer.println("  " + core.getShareManager().getFileDatabase().getFd(i));
+        // }
     }
 
     private void gc() {
@@ -433,11 +414,11 @@ public class Console {
 
     private void share(ArrayList<String> params) throws IOException {
         printer.println("All complete files: ");
-        ArrayList<Hash> al = new ArrayList<Hash>(core.getFileManager().getFileDatabase().getAllHashes());
-        for (Hash h : al) {
-            FileDescriptor fd = core.getFileManager().getFileDatabase().getFd(h);
-            printer.println("  " + fd);
-        }
+        //ArrayList<Hash> al = new ArrayList<Hash>(core.getFileManager().getFileDatabase().getAllHashes());
+        // for (Hash h : al) {
+        //    FileDescriptor fd = core.getFileManager().getFileDatabase().getFd(h);
+        // //    printer.println("  " + fd);
+        //   }
         printer.println("");
 
         printer.println("Incomplete files in cache: ");
@@ -454,8 +435,8 @@ public class Console {
         }
         printer.println("");
 
-        printer.println("Sharing " +
-                TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getTotalSize()) + " in " + core.getShareManager().getFileDatabase().getNumberOfFiles() + " files.");
+        printer.println("Sharing "
+                + TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getTotalSize()) + " in " + core.getShareManager().getFileDatabase().getNumberOfShares() + " files.");
         printer.println("");
     }
 
@@ -494,8 +475,8 @@ public class Console {
     private void list() {
         printer.println("Friends: ");
         for (Friend f : manager.friends()) {
-            printer.println("  " + f.getNickname() + " " +
-                    (f.getFriendConnection() == null ? "disconnected" : f.getFriendConnection().getSocketAddress()));
+            printer.println("  " + f.getNickname() + " "
+                    + (f.getFriendConnection() == null ? "disconnected" : f.getFriendConnection().getSocketAddress()));
         }
     }
 }

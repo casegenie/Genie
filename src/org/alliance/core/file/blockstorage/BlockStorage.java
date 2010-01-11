@@ -82,23 +82,19 @@ public abstract class BlockStorage extends Thread {
                     if (T.t) {
                         T.info("Took from BlockStorage finishing que: " + bf);
                     }
-                    core.getUICallback().statusMessage("Verifying ard defragmenting " + bf.getFd().getSubpath() + "...");
+                    core.getUICallback().statusMessage("Verifying and defragmenting " + bf.getFd().getSubpath() + "...");
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
 
                         @Override
                         public void run() {
-                            try {
-                                if (T.t) {
-                                    T.ass(!bf.isOpen(), "Open!");
-                                }
-                                remove(bf.getFd().getRootHash());
-                                bf.getFd().updateModifiedAt();
-                                core.getFileManager().getFileDatabase().add(bf.getFd());
-                                signalFileComplete(bf);
-                            } catch (IOException e) {
-                                core.reportError(e, bf.getFd().getSubpath());
+                            if (T.t) {
+                                T.ass(!bf.isOpen(), "Open!");
                             }
+                            remove(bf.getFd().getRootHash());
+                            bf.getFd().updateModifiedAt();
+                            core.getFileManager().getFileDatabase().addEntry(bf.getFd());
+                            signalFileComplete(bf);
                         }
                     });
                     core.getUICallback().statusMessage("File complete: " + bf.getFd().getSubpath());

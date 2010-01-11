@@ -2,11 +2,8 @@ package org.alliance.core.comm.rpc;
 
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
-import org.alliance.core.comm.T;
-import org.alliance.core.file.filedatabase.FileDescriptor;
 
 import java.io.IOException;
-import java.util.Collection;
 
 /**
  * Created by IntelliJ IDEA.
@@ -34,13 +31,7 @@ public class GetHashesForPath extends RPC {
         path = data.readUTF();
 
         String basePath = core.getShareManager().getBaseByIndex(shareBaseIndex).getPath();
-        path = basePath += '/' + path;
-
-        Collection<FileDescriptor> c = core.getFileManager().getFileDatabase().getFDsByPath(path);
-        if (T.t) {
-            T.info("Found " + c.size() + " hashes for path " + path);
-        }
-        send(new HashesForPath(path, c));
+        send(new HashesForPath(path, basePath, core));
     }
 
     @Override

@@ -2,7 +2,7 @@
 <xui>
     <title value="Options" image="gfx/icons/alliance.png"/>
     <body>
-        <tabbedpanel height="550" id="tab">
+        <tabbedpanel height="600" id="tab">
             <tab text="General" tooltip="General options">
                 <panel axis="y" bordertype="etched" bordertitle="Personal information">
                     <form expand="horiz" border="5">
@@ -25,6 +25,62 @@
                     <panel axis="x">
                         <mlabel html="true">
                             Note that your nickname can be seen by second degree friends in the network.
+                        </mlabel>
+                    </panel>
+                </panel>
+
+                <panel axis="y" bordertype="etched" bordertitle="GUI Skin Theme">
+                    <form expand="horiz" border="5">
+                        <row>
+                            <cell>
+                                <panel border="0" axis="y">
+                                    <filler/>
+                                    <label text="Choose Skin Theme: "/>
+                                </panel>
+                            </cell>
+                            <cell>
+                                <panel border="0" axis="x">
+                                    <filler axis="x"/>
+                                    <dropdown width="250" minwidth="250" maxwidth="250" id="internal.guiskin">
+                                        <option text="Alliance"/>
+                                        <option text="OS Native"/>
+                                        <!--<option text="Autumn"/>-->
+                                        <!--<option text="Business"/>-->
+                                        <!--<option text="Business Black Steel"/>-->
+                                        <!--<option text="Business Blue Steel"/>-->
+                                        <!--<option text="Challenger Deep"/>-->
+                                        <!--<option text="Creme"/>-->
+                                        <!--<option text="Creme Coffee"/>-->
+                                        <!--<option text="Dust"/>-->
+                                        <!--<option text="Dust Coffee"/>-->
+                                        <!--<option text="Emerald Dusk"/>-->
+                                        <!--<option text="Field Of Wheat"/>-->
+                                        <!--<option text="Finding Nemo"/>-->
+                                        <!--<option text="Green Magic"/>-->
+                                        <!--<option text="Magma"/>-->
+                                        <!--<option text="Mango"/>-->
+                                        <!--<option text="Mist Aqua"/>-->
+                                        <!--<option text="Mist Silver"/>-->
+                                        <!--<option text="Moderate"/>-->
+                                        <!--<option text="Nebula"/>-->
+                                        <!--<option text="Nebula Brick Wall"/>-->
+                                        <!--<option text="Office Blue 2007"/>-->
+                                        <!--<option text="Office Silver 2007"/>-->
+                                        <!--<option text="Raven"/>-->
+                                        <!--<option text="Raven Graphite"/>-->
+                                        <!--<option text="Raven Graphite Glass"/>-->
+                                        <!--<option text="Sahara"/>-->
+                                        <!--<option text="Streetlights"/>-->
+                                        <!--<option text="Twilight"/>-->
+                                    </dropdown>
+                                </panel>
+                            </cell>
+                        </row>
+                    </form>
+
+                    <panel axis="x">
+                        <mlabel html="true">
+                            Some skins need more computer resources than others. Restart needed.
                         </mlabel>
                     </panel>
                 </panel>
@@ -180,7 +236,7 @@
                         <button width="85" eventid="sounddefault" text="Default"/>
                     </panel>
                 </panel>
-                 
+
             </tab>
 
             <tab text="Security &amp; System tray" tooltip="Encryption and network expansion details">
@@ -349,7 +405,7 @@
                 </panel>
 
                 <panel axis="y" bordertype="etched" bordertitle="Server - Experimental settings">
-                 <!-- <panel axis="x" expand="horiz" border="0">
+                    <!-- <panel axis="x" expand="horiz" border="0">
                         <label text="IP number to listen on: "/>
                         <textfield width="100" minwidth="100" maxwidth="100" id="internal.serverlistenip"/>
                         <filler/>
@@ -368,8 +424,8 @@
                     </panel>
                     <label text=""/>
                     <mlabel html="true">Here you can input your DNS address if you own one or use DDNS provider.
-                                        [b]Be sure that you provided correct address[/b] before your start connecting to new friends.[br]
-                                        [i]Leave blank to use your IP number.[/i]
+                        [b]Be sure that you provided correct address[/b] before your start connecting to new friends.[br]
+                        [i]Leave blank to use your IP number.[/i]
                     </mlabel>
                     <panel border="0" axis="x" expand="horiz">
                         <checkbox id="internal.rdnsname" text="Enable rDNS support. (Don't change if you don't know what it is) " tooltip="Will autodetect your DNS. Due to converting will hang Alliance for couple of seconds. Restart recommended."/>
@@ -383,14 +439,14 @@
                         <filler/>
                     </panel>
                 </panel>
-                <panel axis="y" bordertype="etched" bordertitle="Alliance datafiles storing place (Windows ONLY)">
+                <!--<panel axis="y" bordertype="etched" bordertitle="Alliance datafiles storing place (Windows ONLY)">
                     <panel border="0" axis="x" expand="horiz">
                         <button width="200" eventid="standalonecopy" text="Use Alliance Folder"/>
                         <strut width="5"/>
                         <button width="200" eventid="standalonedelete" text="Use UserProfile Folder"/>
                         <filler/>
                     </panel>
-                </panel>
+                </panel>-->
 
             </tab>
         </tabbedpanel>

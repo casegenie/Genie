@@ -117,13 +117,13 @@ public class Main {
     public static String localizeHomeDir() {
         String dir;
         if (OSInfo.isLinux()) {
-        	if (new File("standaloneVersion").exists()) {
+            if (new File("portable").exists()) {
                 dir = "";
             } else {
                 dir = System.getProperty("user.home") + "/.alliance/";
             }
         } else if (OSInfo.isWindows()) {
-            if (new File("standaloneVersion").exists()) {
+            if (new File("portable").exists()) {
                 dir = "";
             } else {
                 dir = System.getenv("APPDATA") + "/Alliance/";
@@ -242,8 +242,8 @@ public class Main {
             Subsystem core = (Subsystem) Class.forName("org.alliance.core.CoreSubsystem").newInstance();
             core.init(ResourceSingelton.getRl(), settings, l);
             if (T.t) {
-                T.info("" +
-                        "Subsystem CORE started in " + s.getTime());
+                T.info(""
+                        + "Subsystem CORE started in " + s.getTime());
             }
             return core;
         } catch (Throwable t) {

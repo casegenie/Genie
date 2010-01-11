@@ -7,6 +7,7 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * Used by PlugIns to hook onto the UICallback of core.  
@@ -68,6 +69,12 @@ public class DoubleUICallback implements UICallback {
     }
 
     @Override
+    public void statusMessage(String s, boolean b) {
+        first.statusMessage(s, b);
+        second.statusMessage(s, b);
+    }
+
+    @Override
     public void toFront() {
         first.toFront();
         second.toFront();
@@ -97,9 +104,9 @@ public class DoubleUICallback implements UICallback {
     }
 
     @Override
-    public void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, String[] files) {
-        first.receivedDirectoryListing(friend, shareBaseIndex, path, files);
-        second.receivedDirectoryListing(friend, shareBaseIndex, path, files);
+    public void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
+        first.receivedDirectoryListing(friend, shareBaseIndex, path, fileSize);
+        second.receivedDirectoryListing(friend, shareBaseIndex, path, fileSize);
     }
 
     @Override

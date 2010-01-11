@@ -26,6 +26,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.TreeMap;
 import org.alliance.launchers.OSInfo;
 
 /**
@@ -86,6 +87,10 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             }
 
             @Override
+            public void statusMessage(String s, boolean b) {
+            }
+
+            @Override
             public void toFront() {
             }
 
@@ -107,7 +112,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             }
 
             @Override
-            public void receivedDirectoryListing(Friend friend, int i, String s, String[] files) {
+            public void receivedDirectoryListing(Friend friend, int i, String s, TreeMap<String, Long> fileSize) {
             }
 
             @Override
@@ -195,7 +200,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             });
             m.add(mi);
         }
-        
+
         m.addSeparator();
 
         mi = new MenuItem("Exit");

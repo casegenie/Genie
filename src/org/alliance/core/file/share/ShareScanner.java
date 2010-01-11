@@ -6,7 +6,6 @@ import org.alliance.core.AwayManager;
 import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.GB;
 import org.alliance.core.file.FileManager;
-import org.alliance.core.file.filedatabase.FileDatabase;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.launchers.OSInfo;
 
@@ -27,6 +26,7 @@ public class ShareScanner extends Thread {
     private boolean alive = true;
     private ShareManager manager;
     private long bytesScanned;
+    private int filesScanned;
     private CoreSubsystem core;
     private boolean shouldBeFastScan = false;
     private boolean scanInProgress = false;
@@ -56,7 +56,6 @@ public class ShareScanner extends Thread {
                     if (T.t) {
                         T.trace("Flushing database because user is away and it was a while since we did it.");
                     }
-                    manager.getFileDatabase().flush();
                     core.saveState();
                 }
             }
@@ -68,18 +67,18 @@ public class ShareScanner extends Thread {
         }
         while (alive) {
             scanInProgress = true;
-            filesScannedCounter = 0;
             if (filesQueuedForHashing.size() > 0) {
                 ArrayList<String> al = new ArrayList<String>(filesQueuedForHashing);
                 filesQueuedForHashing.clear();
                 for (String file : al) {
                     try {
-                        if (manager.getFileDatabase().getFDsByPath(file).size() > 0) {
-                            if (T.t) {
-                                T.trace("File already is hashed: " + file);
-                            }
-                            continue;
+                        //TODO hash check
+                        /* if (manager.getFileDatabase().contains(file.toString())) {
+                        if (T.t) {
+                        T.trace("File already is hashed: " + file);
                         }
+                        continue;
+                        }*/
                         File f = new File(file);
                         if (!f.isDirectory() && f.canRead()) {
                             hash(file);
@@ -98,16 +97,21 @@ public class ShareScanner extends Thread {
             }
 
             if (System.currentTimeMillis() - lastFullScanCompletedAt > getShareManagerCycle() || shouldBeFastScan) {
-                manager.getFileDatabase().cleanupDuplicates();
-
-                cleanup();
 
                 ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
+
+                //Scan shares for removed files
+                manager.getCore().getUICallback().statusMessage("Checking share for removed files.", true);
+                manager.getFileDatabase().removeObsoleteEntries(al);
+
+                long time = System.currentTimeMillis();
+                filesScanned = 0;
                 for (ShareBase base : al) {
                     if (!alive) {
                         break;
                     }
                     try {
+                        manager.getCore().getUICallback().statusMessage("Scanning: " + base + "...", true);
                         scanPath(base);
                     } catch (Exception e) {
                         if (T.t) {
@@ -115,16 +119,15 @@ public class ShareScanner extends Thread {
                         }
                     }
                 }
-
-                manager.getCore().getUICallback().statusMessage("Share scan complete.");
+                System.out.println("Scanned time - " + (System.currentTimeMillis() - time));
+                manager.getCore().getUICallback().statusMessage("Share scan complete.", true);
                 lastFullScanCompletedAt = System.currentTimeMillis();
             }
 
             try {
                 //flush fairly often when user is away - the UI locks when you flush so we want to avoid doing that while the user is by the computer
-                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20) ||
-                        System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
-                    manager.getFileDatabase().flush();
+                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20)
+                        || System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
                     core.saveState();
                     lastFlushCompletedAt = System.currentTimeMillis();
                 }
@@ -137,7 +140,7 @@ public class ShareScanner extends Thread {
             if (!alive) {
                 break;
             }
-            core.getFriendManager().getMe().setShareSize(core.getShareManager().getFileDatabase().getTotalSize());
+            core.getShareManager().getFileDatabase().updateCacheCounters(true, true);
             waitForNextScan();
         }
     }
@@ -167,85 +170,60 @@ public class ShareScanner extends Thread {
         }
     }
 
-    private void cleanup() {
-        if (T.t) {
-            T.info("Cleaning up index...");
-        }
-        FileDatabase fd = manager.getFileDatabase();
-
-        int n = fd.getNumberOfFiles();
-        for (int i = 0; i < n; i++) {
-            if (!alive) {
-                return;
-            }
-            try {
-                // If file is missing the descriptor will automatically be removed from the index
-                fd.getFd(i, false);
-
-                int sleepEveryXFiles = shouldBeFastScan ? 500 : 100;
-                if (i % sleepEveryXFiles == 0) {
-                    manager.getCore().getUICallback().statusMessage("Checking share for removed files (" + (i * 100 / n) + "%)...");
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                }
-            } catch (IOException e) {
-                if (T.t) {
-                    T.warn("Unable to retrieve file descriptor: " + e);
-                }
-            }
-        }
-    }
-
-    private void scanPath(ShareBase base) throws IOException {
-        if (T.t) {
-            T.info("Scanning " + base.getPath() + "...");
-        }
-        scanPathRecursive(base.getPath(), base, 1);
-    }
-    private int filesScannedCounter = 0;
-
-    private void scanPathRecursive(String dir, ShareBase base, int level) throws IOException {
+    public void visitAllFiles(File file, String basePath) {
         if (!alive) {
             return;
         }
 
-        if (shouldSkip(dir)) {
+        if (file.isDirectory()) {
+            if (shouldSkip(file.getName())) {
+                return;
+            }
+            File[] children = file.listFiles();
+            if (children != null) {
+                for (int i = 0; i < children.length; i++) {
+                    visitAllFiles(children[i], basePath);
+                }
+            }
+        } else {
+            if (!file.isHidden() && file.length() != 0) {
+                scanFiles(basePath, file.getPath());
+            }
+        }
+    }
+
+    private void scanPath(ShareBase base) {
+        String basePath = base.getPath();
+        if (T.t) {
+            T.info("Scanning " + basePath + "...");
+        }
+        visitAllFiles(new File(basePath), basePath);
+    }
+
+    private void scanFiles(String basePath, String path) {
+        if (!alive) {
             return;
         }
-
-        File top = new File(dir);
-
-        File files[] = top.listFiles();
-        if (files != null) {
-            for (int i = 0; i < files.length; i++) {
-                File file = files[i];
-                file = file.getCanonicalFile();
-                if (!shouldBeFastScan && (filesScannedCounter % 100) == 0) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                    }
-                }
-                filesScannedCounter++;
-                if (file.isDirectory()) {
-                    if (T.t) {
-                        T.trace("Scanning " + file.getPath() + "...");
-                    }
-                    manager.getCore().getUICallback().statusMessage("Scanning " + file.getPath() + "...");
-                    scanPathRecursive(file.getPath(), base, level + 1);
-                } else {
-                    try {
-                        if (!manager.getFileDatabase().contains(file.toString())) {
-                            hash(base, file);
-                        }
-                    } catch (IOException e) {
-                        if (T.t) {
-                            T.warn("Could not hash file " + file + ": " + e);
-                        }
-                    }
-                }
+        try {
+            if (!shouldBeFastScan && filesScanned == 100) {
+                filesScanned = 0;
+                Thread.sleep(250);
+            }
+            while (core.getShareManager().getFileDatabase().isPriority()) {
+                Thread.sleep(100);
+            }
+        } catch (InterruptedException e) {
+        }
+        try {
+            filesScanned++;
+            manager.getCore().getUICallback().statusMessage("Searching for new files - Last scanned file: " + path);
+            if (!manager.getFileDatabase().contains(basePath, path, true)) {
+                hash(basePath, new File(path));
+                core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
+            }
+        } catch (IOException e) {
+            if (T.t) {
+                T.warn("Could not hash file " + path + ": " + e);
             }
         }
     }
@@ -264,40 +242,30 @@ public class ShareScanner extends Thread {
             }
             return;
         }
-        hash(manager.getShareBaseByFile(file), f);
+        hash(manager.getShareBaseByFile(file).getPath(), f);
     }
 
-    private void hash(ShareBase base, File file) throws IOException {
-        if (file.isHidden() || file.length() == 0) {
-            if (T.t) {
-                T.debug("Skipping hidden or empty file " + file);
-            }
-            return;
-        }
-        if (manager.getFileDatabase().isDuplicate(file.getCanonicalPath())) {
-            return;
-        }
-
+    private void hash(String basePath, File file) throws IOException {
         SimpleTimer st = new SimpleTimer();
         FileDescriptor fd;
         try {
-            fd = new FileDescriptor(base.getPath(), file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
+            fd = new FileDescriptor(basePath, file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
         } catch (FileDescriptor.FileModifiedWhileHashingException e) {
             manager.getCore().getUICallback().statusMessage("File modified while hashing: " + file);
             queFileForHashing(file.toString(), true);
             return;
         }
-        manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime() +
-                " (" + TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.))) + "/s)");
-        manager.getFileDatabase().add(fd);
+        manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime()
+                + " (" + TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.))) + "/s)");
+        manager.getFileDatabase().addEntry(fd);
 
         bytesScanned += fd.getSize();
         if (bytesScanned > manager.getCore().getSettings().getInternal().getPolitehashingintervalingigabytes() * GB) {
             bytesScanned = 0;
             try {
                 if (T.t) {
-                    T.info("Polite scanning in progress. Sleeping for " + manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() +
-                            " minutes for harddrive to cool down.");
+                    T.info("Polite scanning in progress. Sleeping for " + manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes()
+                            + " minutes for harddrive to cool down.");
                 }
                 Thread.sleep(manager.getCore().getSettings().getInternal().getPolitehashingwaittimeinminutes() * 60 * 1000);
             } catch (InterruptedException e) {
@@ -307,12 +275,13 @@ public class ShareScanner extends Thread {
 
     private void queFileForHashing(String file, boolean lowPriority) {
         try {
-            if (manager.getFileDatabase().getFDsByPath(file).size() > 0) {
-                if (T.t) {
-                    T.trace("File already is hashed: " + file);
-                }
-                return;
+            //TODO hash check
+            /*  if (manager.getFileDatabase().contains(file.toString())) {
+            if (T.t) {
+            T.trace("File already is hashed: " + file);
             }
+            return;
+            }*/
         } catch (Exception e) {
             if (T.t) {
                 T.warn("Problem while cheking if file already is hashed: " + e);
@@ -351,7 +320,7 @@ public class ShareScanner extends Thread {
         return manager;
     }
 
-    public void signalFileRenamed(final String oldFile, final String newFile) {
+    public void signalFileRenamed(final String basePath, final String oldFile, final String newFile) {
         if (!scannerHasBeenStarted || newFile.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
             return;
         }
@@ -360,8 +329,13 @@ public class ShareScanner extends Thread {
             @Override
             public void run() {
                 try {
-                    manager.getFileDatabase().getFDsByPath(oldFile);
-                    queFileForHashing(newFile, false);
+                    if (manager.getFileDatabase().contains(basePath, oldFile, false)) {
+                        byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, oldFile);
+                        manager.getFileDatabase().removeEntry(rootHash);
+                        manager.getCore().getUICallback().statusMessage("Removed file " + oldFile + " from share.", true);
+                        core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
+                        queFileForHashing(newFile, false);
+                    }
                 } catch (IOException e) {
                     core.reportError(e, this);
                 }
@@ -369,7 +343,7 @@ public class ShareScanner extends Thread {
         });
     }
 
-    public void signalFileDeleted(final String file) {
+    public void signalFileDeleted(final String basePath, final String file) {
         if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
             return;
         }
@@ -378,9 +352,12 @@ public class ShareScanner extends Thread {
             @Override
             public void run() {
                 try {
-                    manager.getFileDatabase().removeFromDuplicates(file); //in case the file exists in duplicates it will be removed
-                    manager.getFileDatabase().getFDsByPath(file); //will notice that the file is no longer avail and remove it from index
-                    manager.getCore().getUICallback().statusMessage("Removed file " + file + " from share.");
+                    if (manager.getFileDatabase().contains(basePath, file, false)) {
+                        byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, file);
+                        manager.getFileDatabase().removeEntry(rootHash);
+                        manager.getCore().getUICallback().statusMessage("Removed file " + file + " from share.", true);
+                        core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
+                    }
                 } catch (IOException e) {
                     core.reportError(e, this);
                 }

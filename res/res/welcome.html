@@ -1,14 +1,38 @@
 <b>Changelog</b>
 <br><br>
 <p>
-    <b>1.0.8a Beta</b> - 2009-10-01
+    <b>1.1.0</b> - 2010-01-11
+<dl>
+    <dd>+ Added: Portable mode to linux. (thanks Kratos)
+    <dd>+ Changed: "Always automatically connect to new friends of friends" to "Always automatically connect to all friends of friends". (thanks Kratos)
+    <dd>+ Added: Ability for plugins to insert a callback to the debug console. This allows plugins to add their own commands to the console. (thanks Kratos)
+    <dd>+ Fixed bug: Removing files when scanning is in progress no longer break communication.
+    <dd>+ Changed: View duplicates works again.
+    <dd>+ Changed: Display of filesizes in ShareView moved to tooltip.
+    <dd>+ Changed: DB memory usage reduced for big shares (100k files).
+    <dd>+ Changed: Improved scanning of removed files.
+    <dd>+ Changed: Improved database speed.
+    <dd>+ Fixed bug: BufferOverload when using "send as link to chat" on folder with more than 512 files.
+    <dd>+ Fixed bug: Several other minor bugs.
+</dl>
+<p>
+    <b>1.0.9</b> - 2009-12-20
+<dl>
+    <dd>+ Added: Display of filesizes in ShareView.
+    <dd>+ Changed: Database changed to H2.
+    <dd>+ Fixed bug: BufferOverload when you add folder with more than 512 files at once to download que.
+    <dd>+ Changed: Some UI elements.
+    <dd>+ Added: Native OS theme.
+    <dd>+ Fixed bug: Several other minor bugs.
+</dl>
+<p>
+    <b>1.0.8a</b> - 2009-10-01
 <dl>
     <dd>+ Removed: Old tray options.
     <dd>+ Changed: UI Unloading behavior for Win.
-    <dd>+ Changed: Tray support for Non-Win OSes.
 </dl>
 <p>
-    <b>1.0.8 Beta</b> - 2009-09-18
+    <b>1.0.8</b> - 2009-09-18
 <dl>
     <dd>+ Changed: AutoUpgrade turned on between Betas.
     <dd>+ Fixed bug: Rare DNS names reset to IP.
@@ -18,7 +42,7 @@
     <dd>+ Added: External hash links.
 </dl>
 <p>
-    <b>1.0.7 Beta</b> - 2009-06-17
+    <b>1.0.7</b> - 2009-06-17
 <dl>
     <dd>+ Added: Search friend. (thanks Bastvera)
     <dd>+ Fixed bug: DNS names sometimes resets to IP. (thanks Bastvera)
@@ -219,7 +243,7 @@
     <dd>+ Fixed bug: Files that have a zero file size are not shared
     <dd>+ Fixed bug: Several network connection problems
     <dd>+ Fixed bug: "ConcurrentModificationError" when deleting downloads for que
-    <dd>+ Fixed sveral other minor bugs
+    <dd>+ Fixed several other minor bugs
 </dl>
 <br>
 <p>

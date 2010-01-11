@@ -121,7 +121,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
                 if (upload == null || upload.getRemoteFriend() == null) {
                     return;
                 }
-                nickname = upload.getRemoteFriend().nickname();
+                nickname = upload.getRemoteFriend().getNickname();
                 FileDescriptor fd = ui.getCore().getFileManager().getFd(upload.getRoot());
                 if (fd != null) {
                     filename = fd.getSubpath();

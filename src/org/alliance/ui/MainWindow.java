@@ -12,8 +12,6 @@ import com.stendahls.nif.util.SXML;
 import com.stendahls.ui.util.RecursiveBackgroundSetter;
 import com.stendahls.util.TextUtils;
 import de.javasoft.plaf.synthetica.SyntheticaRootPaneUI;
-import de.javasoft.synthetica.addons.SystemMonitor;
-import de.javasoft.synthetica.addons.systemmonitor.Collector;
 import static org.alliance.core.CoreSubsystem.MB;
 import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.PublicChatHistory;
@@ -65,6 +63,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.TreeMap;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -173,43 +172,11 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     private void setupSpeedDiagram() {
-        SystemMonitor monitor = new SystemMonitor();
-        String id = "" + Math.random();
-        monitor.addCollector(id, 3000, 1000, new Collector() {
-
-            @Override
-            public double getValue() {
-                return ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getCPS();
-            }
-
-            @Override
-            public double getMaxValue() {
-                //double d = Math.max(ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS(), ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS());
-                double d = ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS();
-                return d;
-            }
-        });
-        monitor.setColor(id, new Color(0xf68a08));
-
-        id = "" + Math.random();
-        monitor.addCollector(id, 3000, 1000, new Collector() {
-
-            @Override
-            public double getValue() {
-                return ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getCPS();
-            }
-
-            @Override
-            public double getMaxValue() {
-                //return Math.max(ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS(), ui.getCore().getNetworkManager().getBandwidthOutHighRefresh().getHighestCPS());
-                return ui.getCore().getNetworkManager().getBandwidthInHighRefresh().getHighestCPS();
-            }
-        });
-        monitor.setColor(id, Color.green);
-
-        monitor.setPopupEnabled(true);
-        monitor.setSpotlightEnabled(true);
-        ((JPanel) xui.getComponent("diagrampanel")).add(monitor);
+        JSpeedDiagram diagram = new JSpeedDiagram(ui);
+        Thread diagramThread = new Thread(diagram);
+        diagramThread.setName("SpeedDiagram");
+        diagramThread.start();
+        ((JPanel) xui.getComponent("diagrampanel")).add(diagram);
     }
 
     private void setupMDIManager() {
@@ -223,8 +190,13 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         toolbarActionManager = new ToolbarActionManager(SXML.loadXML(xui.getResourceLoader().getResourceStream("toolbaractions.xml")));
         toolbarActionManager.bindToFrame(this);
     }
+    private long lastUpdateTime = System.currentTimeMillis();
 
-    public synchronized void setStatusMessage(final String s) {
+    public void setStatusMessage(final String s) {
+        if (System.currentTimeMillis() - lastUpdateTime < 50) {
+            return;
+        }
+        lastUpdateTime = System.currentTimeMillis();
         setStatusMessage(s, false);
     }
     private Thread messageFadeThread;
@@ -395,7 +367,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             // TODO user.home isn't the right place to put this file into, should be appdata/alliance or something similar
             FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile() + System.getProperty("tracewindow.id"));
             ObjectInputStream obj = new ObjectInputStream(in);
-
             setLocation((Point) obj.readObject());
             setSize((Dimension) obj.readObject());
             if (getRootPane().getUI() instanceof SyntheticaRootPaneUI) {
@@ -539,14 +510,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                             getUploadsWindow().update();
                         }
                         // if (mdiManager != null && getFriendListMDIWindow() != null) getFriendListMDIWindow().update(); //updated by paced runner in friendlistmodel
-
                         shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getTotalSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfShares() + " files");
-//                        uploadMessage.setText("Up: "+TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes()));
-//                        downloadMessage.setText("Down: "+TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes()));
-
                         updateBandwidth("Downloading", "downloaded", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
                         updateBandwidth("Uploading", "uploaded", bandwidthOut, ui.getCore().getNetworkManager().getBandwidthOut());
-
                         displayNagAboutInvitingFriendsIfNeeded();
                     }
 
@@ -568,10 +534,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                                             //downloading at fairly high speed - let's show the infomration dialog
                                             ui.getCore().getSettings().getInternal().setLastnaggedaboutinvitingafriend(System.currentTimeMillis());
                                             if (OptionDialog.showQuestionDialog(MainWindow.this,
-                                                    "You have not invited any friends to your Alliance network.[p]" +
-                                                    "If you invite friends you will be able to download more files faster and the network will become more reliable.[p]" +
-                                                    "[b]It is important for all Alliance users to invite at least once friend.[/b][p]" +
-                                                    "Would you like to invite a friend to your Alliance network now?[p]")) {
+                                                    "You have not invited any friends to your Alliance network.[p]"
+                                                    + "If you invite friends you will be able to download more files faster and the network will become more reliable.[p]"
+                                                    + "[b]It is important for all Alliance users to invite at least once friend.[/b][p]"
+                                                    + "Would you like to invite a friend to your Alliance network now?[p]")) {
                                                 ui.getCore().getSettings().getInternal().setHastriedtoinviteafriend(1);
                                                 openWizardAt(AddFriendWizard.STEP_PORT_OPEN_TEST);
                                             }
@@ -701,8 +667,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     lastAddFriendWizard.connectionWasSuccessful();
                 }
 
-                if (ui.getCore().doesInterationQueContain(ForwardedInvitationInteraction.class) ||
-                        new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0) {
+                if (ui.getCore().doesInterationQueContain(ForwardedInvitationInteraction.class)
+                        || new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0) {
                     if (lastAddFriendWizard != null) {
                         lastAddFriendWizard.getOuterDialog().dispose();
                     }
@@ -710,7 +676,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     //after this method completes the next pending interaction will be processed.
                 } else {
                     if (ui.getCore().getSettings().getInternal().getAlwaysautomaticallyconnecttoallfriendsoffriend() == 1) {
-                    	ui.getCore().getFriendManager().connectToAllFriendsOfFriends();
+                        ui.getCore().getFriendManager().connectToAllFriendsOfFriends();
                     } else {
                         showSuccessfullyConnectedToNewFriendDialog(name);
                         try {
@@ -931,7 +897,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
     }
 
-    public void directoryListingReceived(Friend friend, int shareBaseIndex, String path, String[] files) {
+    public void directoryListingReceived(Friend friend, int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
         if (friend == null) {
             return;
         }
@@ -941,8 +907,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 T.error("Could not find view share window for " + friend);
             }
         } else {
-            w.directoryListingReceived(shareBaseIndex, path, files);
+            w.directoryListingReceived(shareBaseIndex, path, fileSize);
         }
+        fileSize.clear();
     }
 
     public PublicChatMessageMDIWindow getPublicChat() {

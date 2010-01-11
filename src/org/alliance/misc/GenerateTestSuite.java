@@ -193,8 +193,7 @@ public class GenerateTestSuite {
         s.setMy(new My(user.getGuid(), user.getNickname()));
         s.setServer(new Server(user.getPort()));
         String path = "testsuite/data/" + user.getNickname() + "/";
-        s.getInternal().setFiledatabasefile(path + "share.dat");
-        s.getInternal().setFiledatabaseindexfile(path + "share.idx");
+        s.getInternal().setDatabasefile(path + "alliancedb");
         s.getInternal().setDownloadquefile(path + "downloads.dat");
         s.getInternal().setCorestatefile(path + "core.dat");
 

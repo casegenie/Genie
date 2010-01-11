@@ -5,7 +5,6 @@ import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.comm.rpc.GetHashesForPath;
-import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.MyNode;
@@ -36,8 +35,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.TreeMap;
 import javax.swing.JFileChooser;
+import javax.swing.ToolTipManager;
+import org.alliance.core.file.hash.Hash;
 
 /**
  * Created by IntelliJ IDEA.
@@ -59,7 +61,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
     public ViewShareMDIWindow(final UISubsystem ui, Node remote) throws Exception {
         super(ui.getMainWindow().getMDIManager(), (remote instanceof MyNode) ? "viewmyshare" : "viewshare", ui);
         this.remote = remote;
-        setTitle(remote.nickname());
+        setTitle(remote.getNickname());
 
         iconLoading = new ImageIcon(ui.getRl().getResource("gfx/icons/loadingsharenode.png"));
         //@todo: this is done in other places too. AND it's a waste of reasources to load these every time
@@ -75,6 +77,8 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new ViewShareTreeRenderer());
+        ToolTipManager.sharedInstance().registerComponent(tree);
+
 
         tree.addMouseListener(new MouseAdapter() {
 
@@ -115,8 +119,6 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         popup = (JPopupMenu) xui.getComponent(remote instanceof MyNode ? "popupme" : "popup");
 
-        //Bastvera For preventing XUI warning
-        // if (xui.getComponent("chatmessage") != null) {
         if (!(remote instanceof MyNode)) {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
             l.addHyperlinkListener(new HyperlinkListener() {
@@ -153,13 +155,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         model.shareBaseNamesRevieved(shareBaseNames);
     }
 
-    public void directoryListingReceived(int shareBaseIndex, String path, String[] files) {
+    public void directoryListingReceived(int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
         ViewShareShareBaseNode n = model.getRoot().getByShareBase(shareBaseIndex);
         if (n != null) {
             if (T.t) {
                 T.info("Updating path for share base at index " + shareBaseIndex + ": " + n);
             }
-            n.pathUpdated(path, files);
+            n.pathUpdated(path, fileSize);
         } else {
             if (T.t) {
                 T.error("Could not find share with sharebase " + shareBaseIndex);
@@ -187,7 +189,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         } catch (IllegalArgumentException ex) {
             OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
         } catch (UnsupportedOperationException ex) {
-        	OptionDialog.showErrorDialog(ui.getMainWindow(), "This operation is not supported on this architecture");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "This operation is not supported on this architecture");
         }
     }
 
@@ -209,32 +211,39 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
 
-        String path = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath() + "/" + node.getFileItemPath();
+        String basePath = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath();
+        String path = node.getFileItemPath();
+        String name = node.getName();
+
         if (T.t) {
             T.info("Sending " + path + " to chat");
         }
 
-        Collection<FileDescriptor> files = ui.getCore().getFileManager().getFileDatabase().getFDsByPath(path);
-
         String link = "<a href=\"" + ui.getCore().getFriendManager().getMyGUID() + "|";
         long totalSize = 0;
-        for (FileDescriptor f : files) {
-            link += f.getRootHash().getRepresentation() + "|";
-            totalSize += f.getSize();
+        int numberOfFiles = 0;
+
+        HashMap<Hash, Long> hashSize = ui.getCore().getFileManager().getFileDatabase().getRootHashWithSize(basePath, path);
+        for (Hash hash : hashSize.keySet()) {
+            link += hash.getRepresentation() + "|";
+            totalSize += hashSize.get(hash);
             if (T.t) {
-                T.debug("found: " + f);
+                T.debug("found: " + hash.getRepresentation());
             }
+            numberOfFiles++;
         }
+        hashSize.clear();
+
         link = link.substring(0, link.length() - 1);
 
-        String name = node.getName();
         if (name.endsWith("/")) {
             name = name.substring(0, name.length() - 1);
         }
-        link += "\">" + name + "</a> (" + TextUtils.formatByteSize(totalSize) + " in " + files.size() + " files)";
+        link += "\">" + name + "</a> (" + TextUtils.formatByteSize(totalSize) + " in " + numberOfFiles + " files)";
         if (T.t) {
             T.info("Sending link: " + link);
         }
+        System.out.println(link);
 
         ui.getMainWindow().getPublicChat().send(link);
         ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getPublicChat());
@@ -258,15 +267,18 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
 
-        String path = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath() + "/" + node.getFileItemPath();
+        String basePath = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath();
+        String path = node.getFileItemPath();
         String name = node.getName();
-        Collection<FileDescriptor> files = ui.getCore().getFileManager().getFileDatabase().getFDsByPath(path);
 
         String link = ui.getCore().getFriendManager().getMyGUID() + "|";
 
-        for (FileDescriptor f : files) {
-            link += f.getRootHash().getRepresentation() + "|";
+        HashMap<Hash, Long> hashSize = ui.getCore().getFileManager().getFileDatabase().getRootHashWithSize(basePath, path);
+        for (Hash hash : hashSize.keySet()) {
+            link += hash.getRepresentation() + "|";
         }
+        hashSize.clear();
+
         link = link.substring(0, link.length() - 1);
         if (name.endsWith("/")) {
             name = name.substring(0, name.length() - 1);
@@ -377,23 +389,28 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                 int row,
                 boolean hasFocus) {
 
-            super.getTreeCellRendererComponent(
-                    tree, value, sel,
-                    expanded, leaf, row,
-                    hasFocus);
+            super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 
             if (value instanceof ViewShareLoadingNode) {
                 setIcon(iconLoading);
+                setToolTipText(null);
             } else if (value instanceof ViewShareFileNode) {
                 ViewShareFileNode n = (ViewShareFileNode) value;
                 if (!n.isFolder()) {
                     setIcon(fileTypeIcons[FileType.getByFileName(n.getName()).id()]);
+                    long size = n.getSize();
+                    if (size > 0) {
+                        setToolTipText("Size: " + TextUtils.formatByteSize(n.getSize()));
+                    } else {
+                        setToolTipText("Size: N/A");
+                    }
                 } else {
                     if (expanded) {
                         setIcon(folderIconExpanded);
                     } else {
                         setIcon(folderIconCollapsed);
                     }
+                    setToolTipText(null);
                 }
             } else if (value instanceof ViewShareShareBaseNode) {
                 if (expanded) {
@@ -401,8 +418,8 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                 } else {
                     setIcon(folderIconCollapsed);
                 }
+                setToolTipText(null);
             }
-
             return this;
         }
     }

@@ -8,8 +8,8 @@ package org.alliance.ui.windows.viewshare;
  */
 public class ViewShareFileNode extends ViewShareTreeNode {
 
-    public ViewShareFileNode(String name, ViewShareRootNode root, ViewShareTreeNode parent) {
-        super(name, root, parent);
+    public ViewShareFileNode(String name, Long size, ViewShareRootNode root, ViewShareTreeNode parent) {
+        super(name, size, root, parent);
     }
 
     @Override

@@ -5,6 +5,7 @@ import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  * The interface CoreSubsystem uses to inform a UI and Plug-ins about changes in the state of this Alliance
@@ -40,7 +41,7 @@ public interface UICallback {
      * @param path
      * @param files
      */
-    void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, String[] files);
+    void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, TreeMap<String, Long> fileSize);
 
     /**
      * Called when a node has been updated in some way. Examples are:
@@ -64,6 +65,13 @@ public interface UICallback {
      * @param s The new status message to be displayed
      */
     void statusMessage(String s);
+
+    /**
+     * Called when the status message in the bottom of the Alliance main window is to be updated and its important.
+     * @param s The new status message to be displayed
+     * @param b important indicator
+     */
+    void statusMessage(String s, boolean b);
 
     /**
      * Is the UI visible or is Alliance running in background mode?

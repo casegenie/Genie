@@ -41,27 +41,27 @@ public class Plugin {
     }
 
     /**
-	 * Code below gets a file in the root of the jar with a name of JARCLASSFILE
-	 * this class needs to contain the alliance class
-	 */
-    public boolean init(File file) throws IOException, FileNotFoundException{
-    	if(file.exists()){
-    		JarFile jarfile = new JarFile(file);
-    		if(jarfile.getEntry(JARCLASSFILE) != null) {
-	        	InputStream is = jarfile.getInputStream(jarfile.getEntry(JARCLASSFILE));
-	        	BufferedReader dis = new BufferedReader(new InputStreamReader(is));
-	        	String mainclass = dis.readLine();
-	        	jarfile.close();
-	        	dis.close();
-	        	is.close();
-	        	this.jar = file.getCanonicalPath();
-	        	this.pluginclass = mainclass;
-	        	return true;
-	        
-    		} else {
+     * Code below gets a file in the root of the jar with a name of JARCLASSFILE
+     * this class needs to contain the alliance class
+     */
+    public boolean init(File file) throws IOException, FileNotFoundException {
+        if (file.exists()) {
+            JarFile jarfile = new JarFile(file);
+            if (jarfile.getEntry(JARCLASSFILE) != null) {
+                InputStream is = jarfile.getInputStream(jarfile.getEntry(JARCLASSFILE));
+                BufferedReader dis = new BufferedReader(new InputStreamReader(is));
+                String mainclass = dis.readLine();
+                jarfile.close();
+                dis.close();
+                is.close();
+                this.jar = file.getCanonicalPath();
+                this.pluginclass = mainclass;
+                return true;
+
+            } else {
                 throw new FileNotFoundException();
-    		}
-    	}
-		return false;
+            }
+        }
+        return false;
     }
 }

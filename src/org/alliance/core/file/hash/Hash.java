@@ -41,10 +41,9 @@ public class Hash implements Serializable {
         return hash;
     }
 
-    public void setHash(byte[] hash) {
-        this.hash = hash;
-    }
-
+    /*   public void setHash(byte[] hash) {
+    this.hash = hash;
+    }*/
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

@@ -11,7 +11,7 @@ public class ViewShareShareBaseNode extends ViewShareTreeNode {
     private int shareBaseIndex;
 
     public ViewShareShareBaseNode(String name, ViewShareRootNode root, int shareBaseIndex) {
-        super(name, root, root);
+        super(name, 0L, root, root);
         this.shareBaseIndex = shareBaseIndex;
     }
 

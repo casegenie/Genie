@@ -2,7 +2,6 @@ package org.alliance.core.comm.rpc;
 
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.comm.T;
-import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
 
@@ -25,14 +24,14 @@ import java.util.Collection;
  */
 public class SearchHitsV2 extends CompressedRPC {
 
-    public static final int MAX_SEARCH_HITS = 200;
+    public static final int MAX_SEARCH_HITS = 100;
     private ArrayList<SearchHit> hits = new ArrayList<SearchHit>();
 
     public SearchHitsV2() {
     }
 
-    public void addHit(FileDescriptor fd) {
-        hits.add(new SearchHit(fd));
+    public void addHit(SearchHit hit) {
+        hits.add(hit);
     }
 
     @Override
