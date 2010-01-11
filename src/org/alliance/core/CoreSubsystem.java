@@ -175,34 +175,6 @@ public class CoreSubsystem implements Subsystem {
                 }
             });
             t.start();
-
-            if (OSInfo.isWindows() && settings.getInternal().getRestartEveryXHours() != 0) {
-                t = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        try {
-                            //on windows, where Alliance can be restarted, it will restart every X hours by default
-                            Thread.sleep(1000 * 60 * 60 * settings.getInternal().getRestartEveryXHours());
-                            if (!getUICallback().isUIVisible()) {
-                                invokeLater(new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        try {
-                                            restartProgram(false);
-                                        } catch (IOException e) {
-                                            reportError(e, "automatic restart");
-                                        }
-                                    }
-                                });
-                            }
-                        } catch (InterruptedException e) {
-                        }
-                    }
-                });
-                t.start();
-            }
         }
 
         Thread.currentThread().setName(friendManager.getMe() + " main");
