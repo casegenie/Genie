@@ -255,7 +255,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         ti = new TrayIcon(new ImageIcon(rl.getResource("gfx/icons/alliancetray.png")),
                 "Alliance", m);
 
-        ti.setIconAutoSize(false);
+        ti.setIconAutoSize(true);
         ti.addBalloonActionListener(new ActionListener() {
 
             @Override

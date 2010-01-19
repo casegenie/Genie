@@ -41,8 +41,10 @@ public class FileDatabase {
         FileIndex fileIndex = new FileIndex(fd.getBasePath(), mergePathParts(fd.getBasePath(), fd.getSubpath(), null));
         byte fileType = FileType.getByFileName(fileIndex.getFilename()).id();
         if (core.getDbCore().getDbShares().addEntry(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename(), fileType, fd.getSize(), fd.getRootHash().array(), fd.getModifiedAt())) {
+            int blockNumber = 0;
             for (Hash h : fd.getHashList()) {
-                core.getDbCore().getDbHashes().addEntry(fd.getRootHash().array(), h.array());
+                core.getDbCore().getDbHashes().addEntry(fd.getRootHash().array(), h.array(), blockNumber);
+                blockNumber++;
             }
         } else {
             core.getDbCore().getDbDuplicates().addEntry(mergePathParts(fd.getBasePath(), fd.getSubpath(), null), fd.getRootHash().array(), fd.getModifiedAt());

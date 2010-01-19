@@ -216,7 +216,7 @@ public class ShareScanner extends Thread {
         }
         try {
             filesScanned++;
-            manager.getCore().getUICallback().statusMessage("Searching for new files - Last scanned file: " + path);
+            manager.getCore().getUICallback().statusMessage("Searching for new files: " + path);
             if (!manager.getFileDatabase().contains(basePath, path, true)) {
                 hash(basePath, new File(path));
                 core.getShareManager().getFileDatabase().updateCacheCounters(true, false);

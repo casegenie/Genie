@@ -72,6 +72,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.plaf.metal.MetalButtonUI;
+import org.alliance.ui.windows.SharesWindow;
 
 /**
  * Created by IntelliJ IDEA.
@@ -767,6 +768,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_options(ActionEvent e) throws Exception {
         new OptionsWindow(ui);
+    }
+    
+      public void EVENT_shares(ActionEvent e) throws Exception {
+        new SharesWindow(ui);
     }
 
     public void EVENT_addshare(ActionEvent e) throws Exception {

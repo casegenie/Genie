@@ -32,10 +32,10 @@ public class MySkin extends SubstanceSkin {
         SubstanceColorScheme disabledScheme = new LightGrayColorScheme().tint(0.05);
 
         SubstanceColorSchemeBundle defaultSchemeBundle = new SubstanceColorSchemeBundle(
-                activeScheme, defaultScheme, disabledScheme);      
+                activeScheme, defaultScheme, disabledScheme);
         this.registerDecorationAreaSchemeBundle(defaultSchemeBundle,
                 DecorationAreaType.NONE);
-                
+
         SubstanceColorScheme activeHeaderScheme = shemes.get("Alliance");
         SubstanceColorScheme defaultHeaderScheme = shemes.get("Alliance");
         SubstanceColorSchemeBundle headerSchemeBundle = new SubstanceColorSchemeBundle(
@@ -46,19 +46,17 @@ public class MySkin extends SubstanceSkin {
                 DecorationAreaType.SECONDARY_TITLE_PANE,
                 DecorationAreaType.HEADER, DecorationAreaType.TOOLBAR);
 
-     defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
-        new OrangeColorScheme(), new SunGlareColorScheme()
-            .saturate(-0.1), 0.4),
-        ComponentState.DEFAULT);
-    defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
-        new OrangeColorScheme(), new SunsetColorScheme(), 0.3),
-        ComponentState.ROLLOVER_SELECTED);
-    defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
-        new RaspberryColorScheme(), new SunsetColorScheme(), 0.6)
-        .saturate(0.2), ComponentState.PRESSED_SELECTED);
-    defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
-        new RaspberryColorScheme(), new SunsetColorScheme(), 0.2),
-        ComponentState.PRESSED_UNSELECTED);
+        defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
+                new OrangeColorScheme(), new SunGlareColorScheme().saturate(-0.1), 0.4),
+                ComponentState.DEFAULT);
+        defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
+                new OrangeColorScheme(), new SunsetColorScheme(), 0.3),
+                ComponentState.ROLLOVER_SELECTED);
+        defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
+                new RaspberryColorScheme(), new SunsetColorScheme(), 0.6).saturate(0.2), ComponentState.PRESSED_SELECTED);
+        defaultSchemeBundle.registerColorScheme(new BlendBiColorScheme(
+                new RaspberryColorScheme(), new SunsetColorScheme(), 0.2),
+                ComponentState.PRESSED_UNSELECTED);
 
         this.buttonShaper = new ClassicButtonShaper();
         this.gradientPainter = new ClassicGradientPainter();

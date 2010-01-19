@@ -25,19 +25,21 @@ public class DatabaseHashes {
         sql.append("CREATE TABLE IF NOT EXISTS hashes(");
         sql.append("root_hash binary NOT NULL, ");
         sql.append("hash binary NOT NULL, ");
+        sql.append("block_number SMALLINT NOT NULL, ");
         sql.append("CONSTRAINT fk_hashes_root_hash FOREIGN KEY (root_hash) REFERENCES shares(root_hash) ON DELETE CASCADE, ");
-        sql.append("CONSTRAINT pk_hashes PRIMARY KEY (root_hash, hash));");
+        sql.append("CONSTRAINT pk_hashes PRIMARY KEY (root_hash, hash, block_number));");
         statement.executeUpdate(sql.toString());
     }
 
-    public void addEntry(byte[] rootHash, byte[] hash) {
+    public void addEntry(byte[] rootHash, byte[] hash, int blockNumber) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("INSERT INTO hashes(root_hash, hash) ");
-            statement.append("VALUES(?, ?);");
+            statement.append("INSERT INTO hashes(root_hash, hash, block_number) ");
+            statement.append("VALUES(?, ?, ?);");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
             ps.setBytes(1, rootHash);
             ps.setBytes(2, hash);
+            ps.setInt(3, blockNumber);
             ps.executeUpdate();
         } catch (SQLException ex) {
         }
@@ -46,7 +48,7 @@ public class DatabaseHashes {
     public ResultSet getEntryByRootHash(byte[] rootHash) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("SELECT * FROM hashes WHERE root_hash=?;");
+            statement.append("SELECT * FROM hashes WHERE root_hash=? ORDER BY block_number;");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
             ps.setBytes(1, rootHash);
             return ps.executeQuery();
