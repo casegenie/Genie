@@ -95,7 +95,7 @@ public class FileDatabase {
     }
 
     public void removeObsoleteEntries(ArrayList<ShareBase> shareBase) {
-       // long time = System.currentTimeMillis();
+        // long time = System.currentTimeMillis();
         ResultSet results = core.getDbCore().getDbShares().getBasePaths();
         try {
             //Clean by removed sharabases
@@ -121,7 +121,7 @@ public class FileDatabase {
     }
 
     public FileDescriptor getFd(Hash rootHash) throws IOException {
-       // long time = System.currentTimeMillis();
+        // long time = System.currentTimeMillis();
         ResultSet result = core.getDbCore().getDbShares().getEntryByRootHash(rootHash.array());
         try {
             while (result.next()) {
@@ -350,22 +350,24 @@ public class FileDatabase {
         File dirPath = new File(mergePathParts(base.getPath(), subPath, null));
         File[] list = dirPath.listFiles();
         int politeCounter = 0;
-        for (File f : list) {
-            if (f.isDirectory() && !f.getName().contains(FileManager.INCOMPLETE_FOLDER_NAME) && f.listFiles().length != 0) {
-                fileSize.put(f.getName() + "/", 0L);
-            } else if (entries.contains(TextUtils.makeSurePathIsMultiplatform(f.getPath()))) {
-                fileSize.put(f.getName(), f.length());
-            }
-            politeCounter++;
-            if (politeCounter == 500) {
-                politeCounter = 0;
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
+        if (list != null) {
+            for (File f : list) {
+                if (f.isDirectory() && !f.getName().contains(FileManager.INCOMPLETE_FOLDER_NAME) && f.listFiles().length != 0) {
+                    fileSize.put(f.getName() + "/", 0L);
+                } else if (entries.contains(TextUtils.makeSurePathIsMultiplatform(f.getPath()))) {
+                    fileSize.put(f.getName(), f.length());
+                }
+                politeCounter++;
+                if (politeCounter == 500) {
+                    politeCounter = 0;
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                    }
                 }
             }
         }
-
+        
         //System.out.println("directory listing - " + (System.currentTimeMillis() - time));
         priority = false;
         return fileSize;
