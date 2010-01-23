@@ -49,8 +49,8 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
             T.ass(dst.hasArray(), "No array!");
         }
         byte arr[] = dst.array();
-        for (int i = start; i < end; i++) {
-            arr[i] = arr[i] -= 33;
+        for (int i = start; i < end; i++) { 
+        	arr[i] -= 33;
         }
     }
 }

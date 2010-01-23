@@ -29,8 +29,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
     private SSLContext sslContext;
     private HashMap<Object, Context> contexts = new HashMap<Object, Context>();
 //    private static final String INTERESTING_CHIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_256_CBC_SHA", "TLS_DH_anon_WITH_AES_128_CBC_SHA"};
-    private static final String INTERESTING_CHIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_128_CBC_SHA"};
-    private String ALLOWED_CHIPHER_SUITES[]; //generated at runtime
+    private static final String INTERESTING_CIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_128_CBC_SHA"};
+    private String allowedCipherSuites[]; //generated at runtime
     private static final int START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER = 17 * KB; //should calculate this from getPacketBufferSize in SSLEngine API
 
     private class Context {
@@ -73,7 +73,7 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
             }
         }
 
-        for (String s : INTERESTING_CHIPHER_SUITES) {
+        for (String s : INTERESTING_CIPHER_SUITES) {
             if (supportedChipherSuites.contains(s)) {
                 if (T.t) {
                     T.debug("Supported chipher suite: " + s);
@@ -81,8 +81,8 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
                 allowedChipherSuites.add(s);
             }
         }
-        ALLOWED_CHIPHER_SUITES = new String[allowedChipherSuites.size()];
-        allowedChipherSuites.toArray(ALLOWED_CHIPHER_SUITES);
+        allowedCipherSuites = new String[allowedChipherSuites.size()];
+        allowedChipherSuites.toArray(allowedCipherSuites);
     }
 
     @Override
@@ -293,7 +293,7 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         }
         SSLEngine e = sslContext.createSSLEngine();
 
-        e.setEnabledCipherSuites(ALLOWED_CHIPHER_SUITES);
+        e.setEnabledCipherSuites(allowedCipherSuites);
         e.setUseClientMode(c.getDirection() == Connection.Direction.OUT);
         e.beginHandshake();
         return e;
