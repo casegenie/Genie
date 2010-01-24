@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res/res"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/clink.jar"/>
+	<classpathentry kind="lib" path="lib/h2-1.1.118.jar"/>
+	<classpathentry kind="lib" path="lib/idw-gpl.jar"/>
+	<classpathentry kind="lib" path="lib/jdic.jar"/>
+	<classpathentry kind="lib" path="lib/jnotify-0.91.jar"/>
+	<classpathentry kind="lib" path="lib/junit-4.6.jar"/>
+	<classpathentry kind="lib" path="lib/stendahls-commons.jar"/>
+	<classpathentry kind="lib" path="lib/StendahlsTheme.jar"/>
+	<classpathentry kind="lib" path="lib/substance-lite-feel.jar"/>
+	<classpathentry kind="lib" path="lib/swingx-0.8.0.jar"/>
+	<classpathentry kind="lib" path="lib/synthetica.jar"/>
+	<classpathentry kind="lib" path="lib/syntheticaBlackStar.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

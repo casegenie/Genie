@@ -12,7 +12,7 @@ public class Server extends SettingClass {
 
     private Integer port;
     private String hostname;
-    private Integer lansupport = 0;
+    private Integer lansupport = 1;
     private String dnsname = "";
 
     public Server() {

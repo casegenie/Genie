@@ -102,11 +102,9 @@ public class OptionsWindow extends XUIDialog {
         nickname = (JTextField) xui.getComponent("my.nickname");
         downloadFolder = (JTextField) xui.getComponent("internal.downloadfolder");
         shareList = (JList) xui.getComponent("shareList");
-        ruleList = (JList) xui.getComponent("ruleList");
         shareListModel = new DefaultListModel();
         viewModel = new DefaultListModel(); //Model for view: groupname name + path
         groupNamesModel = new DefaultListModel(); //Bastvera (Model for groupname names synchronized with folder path names)
-        ruleListModel = new DefaultListModel();
         for (Share share : ui.getCore().getSettings().getSharelist()) {
             shareListModel.addElement(share.getPath());
             groupNamesModel.addElement(share.getSgroupname());
@@ -115,10 +113,6 @@ public class OptionsWindow extends XUIDialog {
 
         shareList.setModel(viewModel);
 
-        for (Routerule rule : ui.getCore().getSettings().getRulelist()) {
-            ruleListModel.addElement(rule);
-        }
-        ruleList.setModel(ruleListModel);
 
         openedWithUndefiniedNickname = ui.getCore().getSettings().getMy().getNickname().equals(My.UNDEFINED_NICKNAME);
 

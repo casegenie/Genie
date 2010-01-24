@@ -2,6 +2,8 @@ package org.alliance.core.settings;
 
 import java.util.ArrayList;
 
+import org.alliance.core.T;
+
 /**
  * Created by IntelliJ IDEA.
  * User: maciek
@@ -22,6 +24,13 @@ public class Settings {
         friendlist = new ArrayList<Friend>();
         sharelist = new ArrayList<Share>();
         rulelist = new IPBlacklist();
+        try {
+        	rulelist.add("ALLOW   129.22.0.0/16");
+        }
+        catch(Exception e) {
+        	System.err.println("Failed to add Case IP to firewall");
+        	System.exit(1);
+        }
         pluginlist = new ArrayList<Plugin>();
         server = new Server();
         internal = new Internal();

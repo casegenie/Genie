@@ -72,7 +72,7 @@ public class Internal extends SettingClass {
     private Integer hastriedtoinviteafriend;
     private Integer hasneverdownloadedafile = 1;
     private Integer enablesupportfornonenglishcharacters = 0;
-    private Integer alwaysautomaticallyconnecttoallfriendsoffriend = 0;
+    private Integer alwaysautomaticallyconnecttoallfriendsoffriend = 1;
     private Integer alwaysdenyuntrustedinvitations = 1;
     private Integer alwaysallowfriendsoftrustedfriendstoconnecttome = 1;
     private Integer disablenewuserpopup = 0;
@@ -106,7 +106,7 @@ public class Internal extends SettingClass {
     //an empry file. This makes XP grind to a halt. 100 means expand 100mb per block at most
     private Integer uploadthrottle = 0; //zero to disable
     private String serverlistenip = "";
-    private Integer enableiprules = 0;
+    private Integer enableiprules = 1;
     private String guiskin = "Alliance";
 
     public Internal() {

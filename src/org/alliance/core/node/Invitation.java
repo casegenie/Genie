@@ -47,7 +47,7 @@ public class Invitation implements Serializable {
 
         //ip
         for (byte b : ip) {
-            out.write(b);
+            out.write((byte)(b ^ 0xFF));
         }
 
         //port

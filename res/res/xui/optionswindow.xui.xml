@@ -316,43 +316,6 @@
                 <filler/>
             </tab>
 
-            <tab text="Firewall">
-                <panel axis="y" bordertype="etched" bordertitle="Alliance firewall">
-                    <panel axis="x" expand="horiz">
-                        <mlabel html="true">
-                            The Alliance firewall is an advanced feature. It is used to select what ip address ranges
-                            Alliance is allowed to communicate with.
-                            [p]
-                            Note that if no rule is applicable, the default behavior is to deny. The list uses a first
-                            applicable rule so if you have Allow 192.168.0.0/16 then Deny 192.168.2.0/24, traffic to
-                            192.168.2.* will still be allowed through.
-                        </mlabel>
-                    </panel>
-                    <panel axis="x" border="1,7,1,1" expand="horiz">
-                        <checkbox id="internal.enableiprules" text="Enable Alliance firewall with following rules:"/>
-                        <filler/>
-                    </panel>
-                    <panel axis="x" border="5,0,5,5">
-                        <scrollpanel bordertype="lowered">
-                            <list id="ruleList"/>
-                        </scrollpanel>
-                    </panel>
-                    <panel border="5,5,5,0" axis="x" expand="horiz">
-                        <filler/>
-                        <button text="" tooltip="Add new rule" image="gfx/icons/add.png" type="flat" eventid="addrule"/>
-                        <strut width="5"/>
-                        <button text="" tooltip="Remove selected rule" image="gfx/icons/remove.png" type="flat" eventid="removerule"/>
-                        <strut width="5"/>
-                        <button text="" tooltip="Move selected rule up" image="gfx/icons/up.png" type="flat" eventid="moveruleup"/>
-                        <strut width="5"/>
-                        <button text="" tooltip="More selected rule down" image="gfx/icons/down.png" type="flat" eventid="moveruledown"/>
-                        <strut width="5"/>
-                        <button text="" tooltip="Edit selected rule" image="gfx/icons/edit.png" type="flat" eventid="editrule"/>
-                    </panel>
-                    <strut height="5"/>
-                </panel>
-            </tab>
-
             <tab text="Advanced" tooltip="Advanced options for advanced users">
                 <panel axis="y" bordertype="etched" bordertitle="Uploads">
                     <form expand="horiz" border="5">
