@@ -55,7 +55,7 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
             @Override
             public void run() {
                 try {
-                    ui.getCore().getFriendManager().getNetMan().sendPersistantly(new ChatMessageV3(text, false), ui.getCore().getFriendManager().getFriend(guid));
+                    ui.getCore().getFriendManager().getNetMan().sendPersistently(new ChatMessageV3(text, false), ui.getCore().getFriendManager().getFriend(guid));
                 } catch (IOException e) {
                     ui.getCore().reportError(e, this);
                 }

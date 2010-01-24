@@ -15,7 +15,7 @@ import java.io.IOException;
  * Time: 16:34:22
  * To change this template use File | Settings | File Templates.
  */
-public class PleaseForwardInvitation extends PersistantRPC {
+public class PleaseForwardInvitation extends PersistentRPC {
 
     private String invitationCode;
     private int toGuid;

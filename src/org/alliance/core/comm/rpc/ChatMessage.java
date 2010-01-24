@@ -13,7 +13,7 @@ import java.io.IOException;
  * Date: 2005-dec-28
  * Time: 18:42:48
  */
-public class ChatMessage extends PersistantRPC {
+public class ChatMessage extends PersistentRPC {
 
     private String message;
     private boolean messageToAll;

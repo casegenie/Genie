@@ -8,7 +8,7 @@ import org.alliance.core.comm.filetransfers.DownloadManager;
 import org.alliance.core.comm.networklayers.tcpnio.NIOPacket;
 import org.alliance.core.comm.networklayers.tcpnio.TCPNIONetworkLayer;
 import org.alliance.core.comm.rpc.ConnectToMe;
-import org.alliance.core.comm.rpc.PersistantRPC;
+import org.alliance.core.comm.rpc.PersistentRPC;
 import org.alliance.core.comm.rpc.Ping;
 import org.alliance.core.comm.rpc.Search;
 import org.alliance.core.comm.throttling.BandwidthThrottle;
@@ -58,7 +58,7 @@ public class NetworkManager extends Manager {
     private HashSet<InetAddress> bannedHosts = new HashSet<InetAddress>();
     private long lastClearOfBannedHostsTick = System.currentTimeMillis();
     protected BandwidthAnalyzer bandwidthIn, bandwidthOut, bandwidthInHighRefresh, bandwidthOutHighRefresh;
-    private ArrayList<PersistantRPC> queuedPersistantRPCs = new ArrayList<PersistantRPC>();
+    private ArrayList<PersistentRPC> queuedPersistentRPCs = new ArrayList<PersistentRPC>();
     private HashMap<Integer, AuthenticatedConnection> connectionsWaitingForReverseConnect = new HashMap<Integer, AuthenticatedConnection>();
 
     public NetworkManager(CoreSubsystem core, Settings settings) throws IOException {
@@ -462,7 +462,7 @@ public class NetworkManager extends Manager {
      * @param destination
      * @throws IOException
      */
-    public void sendPersistantly(PersistantRPC rpc, Friend destination) throws IOException {
+    public void sendPersistently(PersistentRPC rpc, Friend destination) throws IOException {
         if (rpc == null || destination == null) {
             return;
         }
@@ -470,30 +470,30 @@ public class NetworkManager extends Manager {
         rpc.resetTimestamp();
         if (destination.getFriendConnection() != null) {
             if (T.t) {
-                T.trace("Sending persistant RPC immidiatly.");
+                T.trace("Sending PersistentRPC immidiatly.");
             }
             destination.getFriendConnection().send(rpc);
         } else {
             if (T.t) {
-                T.trace("Queueing persistant RPC: " + rpc + ", destination " + destination);
+                T.trace("Queueing PersistentRPC: " + rpc + ", destination " + destination);
             }
             rpc.notifyRPCQueuedForLaterSend();
-            queuedPersistantRPCs.add(rpc);
+            queuedPersistentRPCs.add(rpc);
         }
     }
 
     public void save(ObjectOutputStream out) throws IOException {
-        out.writeObject(queuedPersistantRPCs);
+        out.writeObject(queuedPersistentRPCs);
     }
 
     public void load(ObjectInputStream in) throws IOException {
         try {
-            queuedPersistantRPCs = (ArrayList<PersistantRPC>) in.readObject();
-            for (Iterator i = queuedPersistantRPCs.iterator(); i.hasNext();) {
-                PersistantRPC r = (PersistantRPC) i.next();
+            queuedPersistentRPCs = (ArrayList<PersistentRPC>) in.readObject();
+            for (Iterator i = queuedPersistentRPCs.iterator(); i.hasNext();) {
+                PersistentRPC r = (PersistentRPC) i.next();
                 if (r.hasExpired()) {
                     if (T.t) {
-                        T.trace("Removing expired PersistantRPC " + r);
+                        T.trace("Removing expired PersistentRPC " + r);
                     }
                     i.remove();
                 }
@@ -507,12 +507,12 @@ public class NetworkManager extends Manager {
         if (T.t) {
             T.debug("SignalFriendConnected: " + friend);
         }
-        for (Iterator i = queuedPersistantRPCs.iterator(); i.hasNext();) {
-            PersistantRPC r = (PersistantRPC) i.next();
+        for (Iterator i = queuedPersistentRPCs.iterator(); i.hasNext();) {
+            PersistentRPC r = (PersistentRPC) i.next();
             if (r.getDestinationGuid() == friend.getGuid()) {
                 try {
                     if (T.t) {
-                        T.debug("Found persistant RPC that needs to be sent. Sending. " + r);
+                        T.debug("Found PersistentRPC that needs to be sent. Sending. " + r);
                     }
                     friend.getFriendConnection().send(r);
                     i.remove();
