@@ -68,7 +68,7 @@ public class OptionsWindow extends XUIDialog {
         "internal.enablesupportfornonenglishcharacters",
         "internal.alwaysautomaticallyconnecttoallfriendsoffriend",
         "server.lansupport", "internal.automaticallydenyallinvitations",
-        "internal.enableiprules", "server.dnsname",
+        "server.dnsname",
         "internal.disablenewuserpopup",
         "internal.alwaysallowfriendsoftrustedfriendstoconnecttome",
         "internal.alwaysdenyuntrustedinvitations", "internal.rdnsname",
@@ -249,12 +249,6 @@ public class OptionsWindow extends XUIDialog {
         if (ui.getNodeTreeModel(false) != null) {
             ui.getNodeTreeModel(false).signalNodeChanged(
                     ui.getCore().getFriendManager().getMe());
-        }
-        // update rulelist
-        settings.getRulelist().clear();
-        for (Routerule rule : EnumerationIteratorConverter.iterable(
-                ruleListModel.elements(), Routerule.class)) {
-            settings.getRulelist().add(rule);
         }
 
         ui.getCore().getNetworkManager().getUploadThrottle().setRate(settings.getInternal().getUploadthrottle() * KB);
