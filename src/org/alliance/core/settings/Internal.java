@@ -391,7 +391,7 @@ public class Internal extends SettingClass {
         this.encryption = encryption;
     }
 
-    public String getChiphersuite() {
+    public String getCipherSuite() {
         return chipersuite;
     }
 

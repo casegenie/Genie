@@ -28,7 +28,7 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
 
     private SSLContext sslContext;
     private HashMap<Object, Context> contexts = new HashMap<Object, Context>();
-//    private static final String INTERESTING_CHIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_256_CBC_SHA", "TLS_DH_anon_WITH_AES_128_CBC_SHA"};
+//    private static final String INTERESTING_CIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_256_CBC_SHA", "TLS_DH_anon_WITH_AES_128_CBC_SHA"};
     private static final String INTERESTING_CIPHER_SUITES[] = {"TLS_DH_anon_WITH_AES_128_CBC_SHA"};
     private String allowedCipherSuites[]; //generated at runtime
     private static final int START_SIZE_OF_INCOMING_ENCRYPTED_DATA_BUFFER = 17 * KB; //should calculate this from getPacketBufferSize in SSLEngine API
@@ -58,31 +58,31 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         sslContext = SSLContext.getInstance("TLSv1");
         sslContext.init(null, null, null);
 
-        List<String> supportedChipherSuites = Arrays.asList(sslContext.createSSLEngine().getSupportedCipherSuites());
-        ArrayList<String> allowedChipherSuites = new ArrayList<String>();
-        if (core.getSettings().getInternal().getChiphersuite() != null && core.getSettings().getInternal().getChiphersuite().trim().length() > 0) {
-            if (supportedChipherSuites.contains(core.getSettings().getInternal().getChiphersuite())) {
+        List<String> supportedCipherSuites = Arrays.asList(sslContext.createSSLEngine().getSupportedCipherSuites());
+        ArrayList<String> allowedCipherSuitesList = new ArrayList<String>();
+        if (core.getSettings().getInternal().getCipherSuite() != null && core.getSettings().getInternal().getCipherSuite().trim().length() > 0) {
+            if (supportedCipherSuites.contains(core.getSettings().getInternal().getCipherSuite())) {
                 if (T.t) {
-                    T.debug("Supported user defined chipher suite: " + core.getSettings().getInternal().getChiphersuite());
+                    T.debug("Supported user defined cipher suite: " + core.getSettings().getInternal().getCipherSuite());
                 }
-                allowedChipherSuites.add(core.getSettings().getInternal().getChiphersuite());
+                allowedCipherSuitesList.add(core.getSettings().getInternal().getCipherSuite());
             } else {
                 if (T.t) {
-                    T.debug("User defined chipher suite not supported by java runtime: " + core.getSettings().getInternal().getChiphersuite());
+                    T.debug("User defined cipher suite not supported by java runtime: " + core.getSettings().getInternal().getCipherSuite());
                 }
             }
         }
 
         for (String s : INTERESTING_CIPHER_SUITES) {
-            if (supportedChipherSuites.contains(s)) {
+            if (supportedCipherSuites.contains(s)) {
                 if (T.t) {
-                    T.debug("Supported chipher suite: " + s);
+                    T.debug("Supported cipher suite: " + s);
                 }
-                allowedChipherSuites.add(s);
+                allowedCipherSuitesList.add(s);
             }
         }
-        allowedCipherSuites = new String[allowedChipherSuites.size()];
-        allowedChipherSuites.toArray(allowedCipherSuites);
+        allowedCipherSuites = new String[allowedCipherSuitesList.size()];
+        allowedCipherSuitesList.toArray(allowedCipherSuites);
     }
 
     @Override
@@ -281,13 +281,13 @@ public class SSLCryptoLayer extends BufferedCryptoLayer {
         Context cx = contexts.get(c.getKey());
         if (cx == null) {
             cx = new Context();
-            cx.engine = setupSLLEngine(c);
+            cx.engine = setupSSLEngine(c);
             contexts.put(c.getKey(), cx);
         }
         return cx;
     }
 
-    private SSLEngine setupSLLEngine(Connection c) throws SSLException {
+    private SSLEngine setupSSLEngine(Connection c) throws SSLException {
         if (T.t) {
             T.info("Creating new SSLEngine");
         }

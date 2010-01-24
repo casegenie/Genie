@@ -356,7 +356,7 @@ public class TCPNIONetworkLayer implements Runnable {
         try {
             sc.finishConnect();
         } catch (ConnectException e) {
-            connection.signalConnectionAttemtError();
+            connection.signalConnectionAttemptError();
             throw e;
         }
         SelectionKey newKey = sc.register(selector, SelectionKey.OP_READ);

@@ -160,8 +160,8 @@ public class InvitationConnection extends AuthenticatedConnection {
     }
 
     @Override
-    public void signalConnectionAttemtError() {
-        super.signalConnectionAttemtError();
+    public void signalConnectionAttemptError() {
+        super.signalConnectionAttemptError();
         if (connectionFailedEvent != null) {
             connectionFailedEvent.run();
             connectionFailedEvent = null;
