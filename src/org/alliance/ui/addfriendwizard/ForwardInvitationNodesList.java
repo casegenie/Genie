@@ -167,12 +167,12 @@ public class ForwardInvitationNodesList extends JList {
         }
 
         private void removeDoubledInvitation(TreeSet<Integer> secondaryNodeGuids) {
-            Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+            Collection<Invitation> invitations = core.getInvitationManager().allInvitations();
             for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
                 if (i.getDestinationGuid() == null) {
                     continue;
                 }
-                if (core.getInvitaitonManager().hasBeenRecentlyInvited(i)) {
+                if (core.getInvitationManager().hasBeenRecentlyInvited(i)) {
                     secondaryNodeGuids.remove(i.getDestinationGuid()); //often the guid won't exist in the list - that's fine.
                 }
             }

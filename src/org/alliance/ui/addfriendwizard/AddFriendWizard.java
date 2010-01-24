@@ -152,7 +152,7 @@ public class AddFriendWizard extends JWizard {
                     "\r\n" +
                     "2. After installation Alliance will ask you for a code. Enter this code:\r\n" +
                     "\r\n" +
-                    ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString() + "\r\n" +
+                    ui.getCore().getInvitationManager().createInvitation().getCompleteInvitationString() + "\r\n" +
                     "\r\n" +
                     "Using this code you will connect to our private Alliance network.\r\n";
 
@@ -414,7 +414,7 @@ public class AddFriendWizard extends JWizard {
             OptionDialog.showErrorDialog(ui.getMainWindow(), "You must enter a connection code!");
         } else {
             try {
-                ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(invitation.trim(), null);
+                ui.getCore().getInvitationManager().attemptToBecomeFriendWith(invitation.trim(), null);
                 goToAttemptConnect();
             } catch (EOFException ex) {
                 OptionDialog.showErrorDialog(ui.getMainWindow(), "Your connection code is corrupt. It seems to be too short. Maybe you did not enter all characters? Please try again. If that doesn't help try with a new code.");
@@ -510,7 +510,7 @@ public class AddFriendWizard extends JWizard {
             @Override
             public void run() {
                 try {
-                    final Invitation i = ui.getCore().getInvitaitonManager().createInvitation();
+                    final Invitation i = ui.getCore().getInvitationManager().createInvitation();
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override
@@ -520,7 +520,7 @@ public class AddFriendWizard extends JWizard {
                             invitationCode.append("1. Download and run Alliance here:\n");
                             invitationCode.append("http://www.alliancep2p.com/download\n\n");
                             invitationCode.append("2. When Alliance starts it will ask you for a code. Enter this:\n");
-                            invitationCode.append(i.getCompleteInvitaitonString());
+                            invitationCode.append(i.getCompleteInvitationString());
                             invitationCode.requestFocus();
                             SwingUtilities.invokeLater(new Runnable() {
 

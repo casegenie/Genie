@@ -17,7 +17,7 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
-import org.alliance.core.node.InvitaitonManager;
+import org.alliance.core.node.InvitationManager;
 import org.alliance.core.node.Invitation;
 
 import java.io.IOException;
@@ -195,7 +195,7 @@ public class Console {
         } else if ("sl".equals(command) || "searchLocal".equals(command)) {
             searchLocal(params);
         } else if ("ci".equals(command)) {
-            clearInvitaitons(params.get(0));
+            clearInvitations(params.get(0));
         } else if ("Search".equals(command)) {
             search(params);
         } else if ("scan".equals(command)) {
@@ -229,14 +229,14 @@ public class Console {
     private void invitations() {
         int count = 0;
         printer.println("Stored Invitation codes:");
-        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        Collection<Invitation> invitations = core.getInvitationManager().allInvitations();
         for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
             count++;
-            printer.print(i.getCompleteInvitaitonString());
-            if (core.getInvitaitonManager().getInvitation(i.getInvitationPassKey()).isForwardedInvitation()) {
-                printer.println(" (Forwarded)  -  Valid next: " + Long.toString((InvitaitonManager.INVITATION_TIMEOUT_FORWARDED - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60)) + " minutes.");
+            printer.print(i.getCompleteInvitationString());
+            if (core.getInvitationManager().getInvitation(i.getInvitationPassKey()).isForwardedInvitation()) {
+                printer.println(" (Forwarded)  -  Valid next: " + Long.toString((InvitationManager.INVITATION_TIMEOUT_FORWARDED - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60)) + " minutes.");
             } else {
-                printer.println(" (Manual)  -  Valid next: " + Long.toString((InvitaitonManager.INVITATION_TIMEOUT - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60 * 60)) + " hours.");
+                printer.println(" (Manual)  -  Valid next: " + Long.toString((InvitationManager.INVITATION_TIMEOUT - (System.currentTimeMillis() - i.getCreatedAt())) / (1000 * 60 * 60)) + " hours.");
             }
         }
         printer.println("Found " + count + " Invitations.");
@@ -244,10 +244,10 @@ public class Console {
 
     private void invitationsScan() {
         int count = 0;
-        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        Collection<Invitation> invitations = core.getInvitationManager().allInvitations();
         for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
-            if (!core.getInvitaitonManager().isValid(i.getInvitationPassKey())) {
-                core.getInvitaitonManager().consume(i.getInvitationPassKey());
+            if (!core.getInvitationManager().isValid(i.getInvitationPassKey())) {
+                core.getInvitationManager().consume(i.getInvitationPassKey());
                 count++;
             }
         }
@@ -256,9 +256,9 @@ public class Console {
 
     private void invitationsRemove() {
         int count = 0;
-        Collection<Invitation> invitations = core.getInvitaitonManager().allInvitations();
+        Collection<Invitation> invitations = core.getInvitationManager().allInvitations();
         for (Invitation i : invitations.toArray(new Invitation[invitations.size()])) {
-            core.getInvitaitonManager().consume(i.getInvitationPassKey());
+            core.getInvitationManager().consume(i.getInvitationPassKey());
             count++;
         }
         printer.println("Removed " + count + " Invitations.");
@@ -274,10 +274,10 @@ public class Console {
         core.getFileManager().getFileDatabase().printStats(printer);
     }
 
-    private void clearInvitaitons(String s) throws Exception {
+    private void clearInvitations(String s) throws Exception {
         int i = Integer.parseInt(s);
         if (i >= core.getSettings().getMy().getInvitations()) {
-            printer.println("Can't raise number of invitaitons");
+            printer.println("Can't raise number of invitations");
             return;
         }
         core.getSettings().getMy().createChecksumAndSetInvitations(i);

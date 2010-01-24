@@ -55,27 +55,27 @@ public class HandshakeConnection extends PacketConnection {
         int guid = p.readInt();
 
         if (netMan.getFriendManager().getFriend(guid) == null) {
-            if (core.getInvitaitonManager().containsKey(guid)) {
+            if (core.getInvitationManager().containsKey(guid)) {
                 if (T.t) {
                     T.info("Aha! Some I invited is trying to connect!");
                 }
-                if (core.getInvitaitonManager().isValid(guid)) {
+                if (core.getInvitationManager().isValid(guid)) {
                     if (T.t) {
                         T.info("And the key is valid! Let's go!");
                     }
                     InvitationConnection c = new InvitationConnection(netMan, Connection.Direction.IN, key, guid,
-                            core.getInvitaitonManager().getInvitation(guid).getMiddlemanGuid());
+                            core.getInvitationManager().getInvitation(guid).getMiddlemanGuid());
                     netMan.replaceConnection(key, c);
                     c.init();
 
-                    if (core.getSettings().getInternal().getInvitationmayonlybeusedonce() != 0 || core.getInvitaitonManager().getInvitation(guid).isForwardedInvitation()) {
-                        core.getInvitaitonManager().consume(guid);
+                    if (core.getSettings().getInternal().getInvitationmayonlybeusedonce() != 0 || core.getInvitationManager().getInvitation(guid).isForwardedInvitation()) {
+                        core.getInvitationManager().consume(guid);
                     }
 
                     return;
                 } else {
                     core.getUICallback().statusMessage("Invitation code time expired! Connection ignored.");
-                    core.getInvitaitonManager().consume(guid);
+                    core.getInvitationManager().consume(guid);
                 }
             } else {
                 if (T.t) {

@@ -25,7 +25,7 @@ import org.alliance.core.interactions.NeedsToRestartBecauseOfUpgradeInteraction;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
-import org.alliance.core.node.InvitaitonManager;
+import org.alliance.core.node.InvitationManager;
 import org.alliance.core.plugins.DoubleUICallback;
 import org.alliance.core.plugins.PluginManager;
 import org.alliance.core.settings.Settings;
@@ -84,7 +84,7 @@ public class CoreSubsystem implements Subsystem {
     private FriendManager friendManager;
     private FileManager fileManager;
     private NetworkManager networkManager;
-    private InvitaitonManager invitaitonManager;
+    private InvitationManager invitationManager;
     private UPnPManager upnpManager;
     private CryptoManager cryptoManager;
     private AwayManager awayManager;
@@ -144,7 +144,7 @@ public class CoreSubsystem implements Subsystem {
         friendManager = new FriendManager(this, settings);
         cryptoManager = new CryptoManager(this);
         networkManager = new NetworkManager(this, settings);
-        invitaitonManager = new InvitaitonManager(this, settings);
+        invitationManager = new InvitationManager(this, settings);
         upnpManager = new UPnPManager(this);
         awayManager = new AwayManager(this);
         pluginManager = new PluginManager(this);
@@ -296,7 +296,7 @@ public class CoreSubsystem implements Subsystem {
         }
         ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file));
         out.writeInt(STATE_FILE_VERSION);
-        invitaitonManager.save(out);
+        invitationManager.save(out);
         networkManager.save(out);
         out.writeObject(userInternactionQue);
         out.writeObject(publicChatHistory);
@@ -322,7 +322,7 @@ public class CoreSubsystem implements Subsystem {
                 in.close();
                 return;
             }
-            invitaitonManager.load(in);
+            invitationManager.load(in);
             networkManager.load(in);
             userInternactionQue = (ArrayList<NeedsUserInteraction>) in.readObject();
             publicChatHistory = (PublicChatHistory) in.readObject();
@@ -565,8 +565,8 @@ public class CoreSubsystem implements Subsystem {
         uiCallback.toFront();
     }
 
-    public InvitaitonManager getInvitaitonManager() {
-        return invitaitonManager;
+    public InvitationManager getInvitationManager() {
+        return invitationManager;
     }
 
     public void queNeedsUserInteraction(NeedsUserInteraction ui) {
@@ -586,7 +586,7 @@ public class CoreSubsystem implements Subsystem {
             if (getSettings().getInternal().getAlwaysallowfriendsoffriendstoconnecttome() > 0) {
                 try {
                     ForwardedInvitationInteraction fii = (ForwardedInvitationInteraction) ui;
-                    getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
+                    getInvitationManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
                     return;
                 } catch (Exception e) {
                     reportError(e, ui);
@@ -597,7 +597,7 @@ public class CoreSubsystem implements Subsystem {
                     Collection<Friend> friends = friendManager.friends();
                     for (Friend f : friends.toArray(new Friend[friends.size()])) {
                         if (f.getFriendsFriend(fii.getFromGuid()) != null && f.getTrusted() == 1) {
-                            getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
+                            getInvitationManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(this), fii.getFromGuid());
                             return;
                         }
                     }

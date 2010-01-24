@@ -19,7 +19,7 @@ import java.util.Random;
 public class Invitation implements Serializable {
 
     private int invitationPassKey;
-    private String completeInvitaitonString;
+    private String completeInvitationString;
     private long createdAt;
     private Integer destinationGuid;
     private int middlemanGuid;
@@ -61,11 +61,11 @@ public class Invitation implements Serializable {
         }
 
         out.flush();
-        completeInvitaitonString = HumanReadableEncoder.toBase64SHumanReadableString(o.toByteArray()).trim();
+        completeInvitationString = HumanReadableEncoder.toBase64SHumanReadableString(o.toByteArray()).trim();
 
         createdAt = System.currentTimeMillis();
         if (T.t) {
-            T.info("Created invitation. String: " + completeInvitaitonString);
+            T.info("Created invitation. String: " + completeInvitationString);
         }
     }
 
@@ -77,12 +77,12 @@ public class Invitation implements Serializable {
         this.invitationPassKey = invitationPassKey;
     }
 
-    public String getCompleteInvitaitonString() {
-        return completeInvitaitonString;
+    public String getCompleteInvitationString() {
+        return completeInvitationString;
     }
 
-    public void setCompleteInvitaitonString(String completeInvitaitonString) {
-        this.completeInvitaitonString = completeInvitaitonString;
+    public void setCompleteInvitationString(String completeInvitationString) {
+        this.completeInvitationString = completeInvitationString;
     }
 
     public long getCreatedAt() {

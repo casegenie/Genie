@@ -385,7 +385,7 @@ public class FriendManager extends Manager {
         }
 
         if (T.t) {
-            T.trace("Forwarding invitaiton to " + nickname(guid));
+            T.trace("Forwarding invitation to " + nickname(guid));
         }
         Friend route = null;
         for (Friend f : friends.values()) {

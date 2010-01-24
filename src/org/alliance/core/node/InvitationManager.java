@@ -23,7 +23,7 @@ import java.io.ObjectOutputStream;
  * Date: 2006-mar-16
  * Time: 14:20:39
  */
-public class InvitaitonManager {
+public class InvitationManager {
 
     public static final long INVITATION_TIMEOUT_IN_MINUTES = 60 * 24 * 31;
     public static final long INVITATION_TIMEOUT = 1000 * 60 * INVITATION_TIMEOUT_IN_MINUTES;
@@ -31,7 +31,7 @@ public class InvitaitonManager {
     private CoreSubsystem core;
     private HashMap<Integer, Invitation> invitations = new HashMap<Integer, Invitation>();
 
-    public InvitaitonManager(CoreSubsystem core, Settings settings) {
+    public InvitationManager(CoreSubsystem core, Settings settings) {
         this.core = core;
     }
 
