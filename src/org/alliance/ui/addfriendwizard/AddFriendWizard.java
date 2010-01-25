@@ -4,6 +4,8 @@ import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.ui.JWizard;
+
+import org.alliance.Version;
 import org.alliance.core.node.Invitation;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
@@ -144,18 +146,19 @@ public class AddFriendWizard extends JWizard {
             String subject = "";
             String body = "\r\n\r\n\r\n" +
                     "\r\n" +
-                    "You have been invited to my Alliance network! This is a private and secure network\r\n" +
+                    "You have been invited to my " + Version.NAME + 
+                    " network! This is a private and secure network\r\n" +
                     "where we can share files and chat.\r\n" +
                     "\r\n" +
-                    "1. Download and run Alliance here:\r\n" +
-                    "http://www.alliancep2p.com/download\r\n" +
+                    "1. Download and run " + Version.NAME + " Alliance here:\r\n" +
+                    Version.DOWNLOAD_URL + "\r\n" +
                     "\r\n" +
-                    "2. After installation Alliance will ask you for a code. Enter this code:\r\n" +
+                    "2. After installation " + Version.NAME + " will ask you for a code. Enter this code:\r\n" +
                     "\r\n" +
                     ui.getCore().getInvitationManager().createInvitation().getCompleteInvitationString() + "\r\n" +
                     "\r\n" +
-                    "Using this code you will connect to our private Alliance network.\r\n";
-
+                    "Using this code you will connect to our private " + Version.NAME + " network.\r\n";
+            		//TODO: Make this message better.
             body = body.replace("\n", "%0A");
             body = body.replace("\r", "%0D");
 

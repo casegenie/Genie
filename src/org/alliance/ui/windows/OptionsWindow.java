@@ -6,6 +6,8 @@ import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
 import static org.alliance.core.CoreSubsystem.KB;
+
+import org.alliance.Version;
 import org.alliance.core.node.Friend;
 import org.alliance.core.settings.My;
 import org.alliance.core.settings.Routerule;
@@ -529,7 +531,7 @@ public class OptionsWindow extends XUIDialog {
     }
 
     public void EVENT_standalonecopy(ActionEvent e) {
-        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in your userprofile folder.\nAlliance will copy all data then close. Restart manually.");
+        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in your userprofile folder.\n" + Version.NAME + " will copy all data then close. Restart manually.");
         if (delete) {
             try {
                 apply();
@@ -551,7 +553,7 @@ public class OptionsWindow extends XUIDialog {
     }
 
     public void EVENT_standalonedelete(ActionEvent e) {
-        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in alliance folder.\nAlliance will copy all data then close. Restart manually.");
+        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in alliance folder.\n" + Version.NAME + " will copy all data then close. Restart manually.");
         if (delete) {
             try {
                 apply();

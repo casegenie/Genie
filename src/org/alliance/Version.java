@@ -12,10 +12,12 @@ import org.alliance.core.ResourceSingelton;
  */
 public class Version {
 
+	public static final String NAME = "Alliance";
     public static final String VERSION = "1.1.0a";
     public static final int BUILD_NUMBER;
     public static final int PROTOCOL_VERSION = 3;
-
+    public static final String DOWNLOAD_URL = "http://www.alliancep2p.com/download";
+ 
     static {
         int n = 0;
         try {

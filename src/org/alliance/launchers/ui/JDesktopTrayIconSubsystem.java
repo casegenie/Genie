@@ -142,7 +142,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage("Alliance needs your attention.", "Click here to find out why.", TrayIcon.INFO_MESSAGE_TYPE);
+                        ti.displayMessage(Version.NAME + " needs your attention.", "Click here to find out why.", TrayIcon.INFO_MESSAGE_TYPE);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -212,7 +212,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        JMenuItem mi = new JMenuItem("Open Alliance");
+        JMenuItem mi = new JMenuItem("Open " + Version.NAME);
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -253,7 +253,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         m.add(mi);
 
         ti = new TrayIcon(new ImageIcon(rl.getResource("gfx/icons/alliancetray.png")),
-                "Alliance", m);
+                Version.NAME, m);
 
         ti.setIconAutoSize(true);
         ti.addBalloonActionListener(new ActionListener() {
@@ -309,7 +309,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
                             @Override
                             public void run() {
-                                ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
+                                ti.setToolTip(Version.NAME + " v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
                             }
                         });
 

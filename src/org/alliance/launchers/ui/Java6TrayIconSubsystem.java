@@ -131,7 +131,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage("Alliance needs your attention.", "", TrayIcon.MessageType.INFO);
+                        ti.displayMessage(Version.NAME + " needs your attention.", "", TrayIcon.MessageType.INFO);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -174,7 +174,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        MenuItem mi = new MenuItem("Open Alliance");
+        MenuItem mi = new MenuItem("Open " + Version.NAME);
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -217,7 +217,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new PopupFixQueue(m));
 
         ti = new TrayIcon(Toolkit.getDefaultToolkit().getImage(rl.getResource("gfx/icons/alliancetray.png")),
-                "Alliance", m);
+                Version.NAME, m);
         ti.setImageAutoSize(true);
 
         ti.addActionListener(new ActionListener() {
@@ -250,7 +250,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
             public void run() {
                 try {
                     while (true) {
-                        ti.setToolTip("Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
+                        ti.setToolTip(Version.NAME + " v" + Version.VERSION + " build " + Version.BUILD_NUMBER + "\nDownload: " + core.getNetworkManager().getBandwidthIn().getCPSHumanReadable() + "\nUpload: " + core.getNetworkManager().getBandwidthOut().getCPSHumanReadable() + "\nOnline: " + core.getFriendManager().getNFriendsConnected() + "/" + core.getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(core.getFriendManager().getTotalBytesShared()) + ")");
                         Thread.sleep(5000);
                     }
                 } catch (InterruptedException e) {

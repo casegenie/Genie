@@ -4,6 +4,9 @@ import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.T;
 
 import javax.swing.tree.TreeNode;
+
+import org.alliance.Version;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 
@@ -25,7 +28,7 @@ public class ViewShareRootNode extends ViewShareTreeNode {
     void fill(String[] shareBaseNames) {
         shareBases.clear();
         for (int i = 0; i < shareBaseNames.length; i++) {
-            if (!shareBaseNames[i].equals("cache") && !shareBaseNames[i].equals("You are using old version of Alliance")) { //For hiding unique empty folders
+            if (!shareBaseNames[i].equals("cache") && !shareBaseNames[i].equals("You are using old version of " + Version.NAME)) { //For hiding unique empty folders
                 shareBases.add(new ViewShareShareBaseNode(shareBaseNames[i], this, i));
             }
         }

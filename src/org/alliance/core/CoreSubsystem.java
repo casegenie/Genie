@@ -10,6 +10,7 @@ import com.stendahls.trace.Trace;
 import com.stendahls.trace.TraceHandler;
 import com.stendahls.ui.ErrorDialog;
 import org.alliance.Subsystem;
+import org.alliance.Version;
 import org.alliance.core.comm.AutomaticUpgrade;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.rpc.AwayStatus;
@@ -205,10 +206,10 @@ public class CoreSubsystem implements Subsystem {
             traceLog = new Log(logpath + "logs/trace.log");
         } catch (FileNotFoundException e) {
             if (OSInfo.isMac()) {
-                OptionDialog.showErrorDialog(new JFrame(), "It seems that you are trying to run Alliance from a mounted image on Mac.[p]You need to drag'n'drop the Alliance icon you clicked on to your Applications folder and then start Alliance from there.[p]Alliance will now shut down.");
+                OptionDialog.showErrorDialog(new JFrame(), "It seems that you are trying to run " + Version.NAME + " from a mounted image on Mac.[p]You need to drag'n'drop the " + Version.NAME + " icon you clicked on to your Applications folder and then start " + Version.NAME + " from there.[p]" + Version.NAME + " will now shut down.");
                 System.exit(1);
             } else {
-                throw new Exception("Permission problem. Can't write to files in Alliance application folder.");
+                throw new Exception("Permission problem. Can't write to files in " + Version.NAME + " application folder.");
             }
         }
     }
@@ -675,7 +676,7 @@ public class CoreSubsystem implements Subsystem {
             }
             if (GULCounter > 300) {
                 try {
-                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
+                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart " + Version.NAME +".</b> Please send this error report by pressing 'send error'."), true);
                 } catch (XUIException e) {
                     e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
