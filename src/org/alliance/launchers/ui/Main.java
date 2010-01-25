@@ -48,7 +48,7 @@ public class Main {
         }
 
         try {
-            System.out.println("Launching Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
+            System.out.println("Launching " + Version.NAME + " v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
             System.setProperty("alliance.build", "" + Version.BUILD_NUMBER);
 
             passArgumentLink(args);

@@ -93,10 +93,10 @@ public class HandshakeConnection extends PacketConnection {
             Friend friend = netMan.getFriendManager().getFriend(guid);
 
             if (protocolVersion > Version.PROTOCOL_VERSION) {
-                throw new RuntimeException("User " + netMan.getFriendManager().getFriend(guid).getNickname() + " has a newer version of Alliance then you. It cannot be updated automatically. Talk to him about it.");
+                throw new RuntimeException("User " + netMan.getFriendManager().getFriend(guid).getNickname() + " has a newer version of " + Version.NAME + " then you. It cannot be updated automatically. Talk to him about it.");
             }
             if (protocolVersion < Version.PROTOCOL_VERSION) {
-                throw new RuntimeException("User " + netMan.getFriendManager().getFriend(guid).getNickname() + " has an old (incompatible) version of Alliance. Talk to him about it.");
+                throw new RuntimeException("User " + netMan.getFriendManager().getFriend(guid).getNickname() + " has an old (incompatible) version of " + Version.NAME + ". Talk to him about it.");
             }
 
             //successfully connected to friend

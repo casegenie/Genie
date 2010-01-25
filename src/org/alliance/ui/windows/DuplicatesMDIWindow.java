@@ -1,5 +1,6 @@
 package org.alliance.ui.windows;
 
+import org.alliance.Version;
 import org.alliance.ui.UISubsystem;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.nif.ui.OptionDialog;
@@ -56,7 +57,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
     public void EVENT_delete(ActionEvent e) throws Exception {
         if (e != null) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "This function is disabled in this version of Alliance.");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), "This function is disabled in this version of " + Version.NAME);
             return;
         }
         if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) {

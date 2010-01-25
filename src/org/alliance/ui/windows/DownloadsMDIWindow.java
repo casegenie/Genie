@@ -3,6 +3,8 @@ package org.alliance.ui.windows;
 import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
+
+import org.alliance.Version;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.filetransfers.Download;
 import org.alliance.core.comm.filetransfers.DownloadConnection;
@@ -625,7 +627,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
             @Override
             public String getDescription() {
-                return ("Alliance files");
+                return Version.NAME + " files";
             }
         });
         int returnVal = fc.showOpenDialog(this);

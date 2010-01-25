@@ -1,6 +1,8 @@
 package org.alliance.ui;
 
 import com.stendahls.nif.ui.OptionDialog;
+
+import org.alliance.Version;
 import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.UICallback;
 import org.alliance.core.comm.SearchHit;
@@ -113,7 +115,7 @@ public class UIBridge implements UICallback {
                     @Override
                     public void run() {
                         OptionDialog.showInformationDialog(ui.getMainWindow(),
-                                "Congratulations! You have downloaded your first file using Alliance.[p]To find your Alliance downloads use the shortcut on the Desktop called 'My Alliance Downloads'.");
+                                "Congratulations! You have downloaded your first file using " + Version.NAME + ".[p]To find your " + Version.NAME+ " downloads use the shortcut on the Desktop called 'My Alliance Downloads'.");
                     }
                 });
             }

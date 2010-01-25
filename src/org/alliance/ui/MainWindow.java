@@ -13,6 +13,8 @@ import com.stendahls.ui.util.RecursiveBackgroundSetter;
 import com.stendahls.util.TextUtils;
 import de.javasoft.plaf.synthetica.SyntheticaRootPaneUI;
 import static org.alliance.core.CoreSubsystem.MB;
+
+import org.alliance.Version;
 import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.PublicChatHistory;
 import org.alliance.core.CoreSubsystem;
@@ -140,7 +142,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         RecursiveBackgroundSetter.setBackground(xui.getComponent("bottompanel"), new Color(0xE3E2E6), false);
 
-        setTitle("Alliance");
+        setTitle(Version.NAME);
 
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
@@ -157,7 +159,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
                 @Override
                 public void run() {
-                    OptionDialog.showInformationDialog(MainWindow.this, "Welcome to Alliance![p]Before starting you need to enter your nickname.[p]The options window will now open.[p]");
+                    OptionDialog.showInformationDialog(MainWindow.this, "Welcome to " + Version.NAME + "![p]Before starting you need to enter your nickname.[p]The options window will now open.[p]");
                     try {
                         EVENT_options(null);
                     } catch (Exception e) {
@@ -281,7 +283,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (OSInfo.supportsTrayIcon() || OSInfo.isMac()) {
             setVisible(false);
         } else {
-            OptionDialog.showInformationDialog(this, "You cant hide the Alliance window on your system. Simply close the window to shutdown Alliance.");
+            OptionDialog.showInformationDialog(this, "You cant hide the " + Version.NAME + " window on your system. Simply close the window to shut down " + Version.NAME + ".");
         }
     }
 
@@ -535,10 +537,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                                             //downloading at fairly high speed - let's show the infomration dialog
                                             ui.getCore().getSettings().getInternal().setLastnaggedaboutinvitingafriend(System.currentTimeMillis());
                                             if (OptionDialog.showQuestionDialog(MainWindow.this,
-                                                    "You have not invited any friends to your Alliance network.[p]"
+                                                    "You have not invited any friends to your " + Version.NAME + " network.[p]"
                                                     + "If you invite friends you will be able to download more files faster and the network will become more reliable.[p]"
-                                                    + "[b]It is important for all Alliance users to invite at least once friend.[/b][p]"
-                                                    + "Would you like to invite a friend to your Alliance network now?[p]")) {
+                                                    + "[b]It is important for all " + Version.NAME + " users to invite at least once friend.[/b][p]"
+                                                    + "Would you like to invite a friend to your " + Version.NAME + " network now?[p]")) {
                                                 ui.getCore().getSettings().getInternal().setHastriedtoinviteafriend(1);
                                                 openWizardAt(AddFriendWizard.STEP_PORT_OPEN_TEST);
                                             }
@@ -635,7 +637,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
             } else if (nui instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
-                    OptionDialog.showInformationDialog(this, "A new version of Alliance has been downloaded and installed in the background.[p]Next time you start Alliance the new version will start.");
+                    OptionDialog.showInformationDialog(this, "A new version of " + Version.NAME + " has been downloaded and installed in the background.[p]Next time you start " + Version.NAME + " the new version will start.");
                 } else {
                     try {
                         ui.getCore().restartProgram(true);
@@ -784,14 +786,14 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_trace(ActionEvent e) throws Exception {
         if (!org.alliance.T.t) {
-            OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
+            OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of " + Version.NAME + ".");
         } else {
             createTraceWindow();
         }
     }
 
     public void EVENT_exitApp(ActionEvent e) throws Exception {
-        if (JOptionPane.showConfirmDialog(null, "Are you sure you wish to close Alliance?", "Are you sure?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        if (JOptionPane.showConfirmDialog(null, "Are you sure you wish to close " + Version.NAME + "?", "Are you sure?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
             if (ui.getCore() != null) {
                 ui.getCore().shutdown();
             }
