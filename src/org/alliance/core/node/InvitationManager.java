@@ -67,7 +67,7 @@ public class InvitationManager {
 
         byte iparray[] = new byte[4];
         for (int i = 0; i < iparray.length; i++) {
-            iparray[i] = (byte)(in.readByte() ^ 0xFF);
+            iparray[i] = in.readByte();
         }
 
         InetAddress ip = InetAddress.getByAddress(iparray);
