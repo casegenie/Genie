@@ -29,7 +29,7 @@ public class AutomaticUpgrade {
     public static final File SOURCE_JAR = new File("alliance.dat");
     private CacheStorage cache;
     private CoreSubsystem core;
-    private boolean upgradeAttemtHasBeenMade = false;
+    private boolean upgradeAttemptHasBeenMade = false;
     private Hash newVersionHash, myJarHash;
 
     public AutomaticUpgrade(CoreSubsystem core, CacheStorage cache) throws IOException {
@@ -73,12 +73,12 @@ public class AutomaticUpgrade {
     }
 
     public void performUpgrade() throws Exception {
-        if (upgradeAttemtHasBeenMade) {
+        if (upgradeAttemptHasBeenMade) {
             if (T.t) {
                 T.info("No need to try to upgrade to new version several times.");
             }
         }
-        upgradeAttemtHasBeenMade = true;
+        upgradeAttemptHasBeenMade = true;
         if (T.t) {
             T.info("Upgrade received! Automatically upgrading to new version with hash " + newVersionHash);
         }
