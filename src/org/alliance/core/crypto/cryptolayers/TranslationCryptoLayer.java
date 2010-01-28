@@ -34,7 +34,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         }
         byte arr[] = dst.array();
         for (int i = start; i < end; i++) {
-            arr[i] = arr[i] += 33;
+            arr[i] ^= 0xAA;
         }
         return end - start;
 
@@ -42,7 +42,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
 
     @Override
     public void decrypt(Connection c, ByteBuffer src, ByteBuffer dst) {
-        int start = dst.position();
+    	int start = dst.position();
         dst.put(src);
         int end = dst.position();
         if (T.t) {
@@ -50,7 +50,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         }
         byte arr[] = dst.array();
         for (int i = start; i < end; i++) { 
-        	arr[i] -= 33;
+        	arr[i] ^= 0xAA;
         }
     }
 }
