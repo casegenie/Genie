@@ -47,7 +47,7 @@ public class PleaseForwardInvitation extends PersistentRPC {
     public void execute(Packet data) throws IOException {
         toGuid = data.readInt();
         invitationCode = data.readUTF();
-        core.queNeedsUserInteraction(new PleaseForwardInvitationInteraction(con.getRemoteUserGUID(), toGuid, invitationCode));
+        core.queueNeedsUserInteraction(new PleaseForwardInvitationInteraction(con.getRemoteUserGUID(), toGuid, invitationCode));
     }
 
     @Override

@@ -127,7 +127,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                 ArrayList<Integer> al = new ArrayList<Integer>();
                                 al.add(guid);
                                 for (int i = 1; i < hashes.length; i++) {
-                                    ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);
+                                    ui.getCore().getNetworkManager().getDownloadManager().queueDownload(new Hash(hashes[i]), "Link from chat", al);
                                 }
                                 ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                             }

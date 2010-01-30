@@ -131,10 +131,10 @@ public class InvitationConnection extends AuthenticatedConnection {
                     org.alliance.core.node.Friend friend = core.getFriendManager().getFriend(f.getGuid());
                     if (friend != null && !friend.isConnected()) {
                         if (friend.updateLastKnownHostInfo(host, port)) {
-                            core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
+                            core.getFriendManager().getFriendConnector().queueHighPriorityConnectTo(friend);
                         }
                     }
-                    core.queNeedsUserInteraction(new FriendAlreadyInListUserInteraction(newFriend.getGuid()));
+                    core.queueNeedsUserInteraction(new FriendAlreadyInListUserInteraction(newFriend.getGuid()));
                     return;
                 }
             }
@@ -144,7 +144,7 @@ public class InvitationConnection extends AuthenticatedConnection {
             try {
                 core.saveSettings();
                 Friend f = core.getFriendManager().addFriend(newFriend, true, middleman != null);
-                core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(f, (int) (Math.random() * 1000 + 1000));
+                core.getFriendManager().getFriendConnector().queueHighPriorityConnectTo(f, (int) (Math.random() * 1000 + 1000));
 
             } catch (Exception e) {
                 core.reportError(e, this);

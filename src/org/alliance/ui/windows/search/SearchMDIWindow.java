@@ -281,7 +281,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                                     if (path.trim().length() > 0) {
                                         name = path + "/" + name;
                                     }
-                                    ui.getCore().getNetworkManager().getDownloadManager().queDownload(n.getSh().getRoot(), name, n.getUserGuids());
+                                    ui.getCore().getNetworkManager().getDownloadManager().queueDownload(n.getSh().getRoot(), name, n.getUserGuids());
                                 } catch (IOException e1) {
                                     ui.handleErrorInEventLoop(e1);
                                 }

@@ -279,7 +279,7 @@ public class Friend extends Node {
                             Thread.sleep(500);
                         } catch (InterruptedException e1) {
                         }
-                        manager.getCore().getFriendManager().getFriendConnector().queHighPriorityConnectTo(Friend.this);
+                        manager.getCore().getFriendManager().getFriendConnector().queueHighPriorityConnectTo(Friend.this);
                     }
                 });
             }
@@ -288,7 +288,7 @@ public class Friend extends Node {
     }
 
     public void connect() throws IOException {
-        manager.getCore().getFriendManager().getFriendConnector().queHighPriorityConnectTo(this, 500);
+        manager.getCore().getFriendManager().getFriendConnector().queueHighPriorityConnectTo(this, 500);
     }
 
     @Override

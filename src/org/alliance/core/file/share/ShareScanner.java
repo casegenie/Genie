@@ -87,7 +87,7 @@ public class ShareScanner extends Thread {
                         if (T.t) {
                             T.error("Problem while hashing file " + file + ": " + e + ", trying again later");
                         }
-                        queFileForHashing(file, true);
+                        queueFileForHashing(file, true);
                     } catch (IOException e) {
                         if (T.t) {
                             T.error("Could not hash file " + file + ": " + e);
@@ -152,7 +152,7 @@ public class ShareScanner extends Thread {
             }
             if (filesQueuedForHashing.size() > 0) {
                 if (T.t) {
-                    T.info("Files are in hash que so don't wait for too long");
+                    T.info("Files are in hash queue so don't wait for too long");
                 }
                 Thread.sleep(1000 * 5);
             } else {
@@ -252,7 +252,7 @@ public class ShareScanner extends Thread {
             fd = new FileDescriptor(basePath, file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
         } catch (FileDescriptor.FileModifiedWhileHashingException e) {
             manager.getCore().getUICallback().statusMessage("File modified while hashing: " + file);
-            queFileForHashing(file.toString(), true);
+            queueFileForHashing(file.toString(), true);
             return;
         }
         manager.getCore().getUICallback().statusMessage("Hashed " + fd.getFilename() + " in " + st.getTime()
@@ -273,7 +273,7 @@ public class ShareScanner extends Thread {
         }
     }
 
-    private void queFileForHashing(String file, boolean lowPriority) {
+    private void queueFileForHashing(String file, boolean lowPriority) {
         try {
             //TODO hash check
             /*  if (manager.getFileDatabase().contains(file.toString())) {
@@ -334,7 +334,7 @@ public class ShareScanner extends Thread {
                         manager.getFileDatabase().removeEntry(rootHash);
                         manager.getCore().getUICallback().statusMessage("Removed file " + oldFile + " from share.", true);
                         core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
-                        queFileForHashing(newFile, false);
+                        queueFileForHashing(newFile, false);
                     }
                 } catch (IOException e) {
                     core.reportError(e, this);
@@ -369,6 +369,6 @@ public class ShareScanner extends Thread {
         if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
             return;
         }
-        queFileForHashing(file, false);
+        queueFileForHashing(file, false);
     }
 }

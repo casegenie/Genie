@@ -194,7 +194,7 @@ public class GenerateTestSuite {
         s.setServer(new Server(user.getPort()));
         String path = "testsuite/data/" + user.getNickname() + "/";
         s.getInternal().setDatabasefile(path + "alliancedb");
-        s.getInternal().setDownloadquefile(path + "downloads.dat");
+        s.getInternal().setDownloadqueueFile(path + "downloads.dat");
         s.getInternal().setCorestatefile(path + "core.dat");
 
         s.getInternal().setDownloadfolder(path + "downloads");

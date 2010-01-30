@@ -80,7 +80,7 @@ public abstract class BlockStorage extends Thread {
                 currentlyDefragmentingFile = true;
                 try {
                     if (T.t) {
-                        T.info("Took from BlockStorage finishing que: " + bf);
+                        T.info("Took from BlockStorage finishing queue: " + bf);
                     }
                     core.getUICallback().statusMessage("Verifying and defragmenting " + bf.getFd().getSubpath() + "...");
                     bf.moveToComplete(bf.getFd().getBasePath());
@@ -209,14 +209,14 @@ public abstract class BlockStorage extends Thread {
                     String dir = completeFilePath.toString();
                     bf.getFd().setBasePath(dir);
                     recentlyDownloaded.add(root);
-                    queForCompletion(bf);
+                    queueForCompletion(bf);
                 }
             }
         }
         return r;
     }
 
-    private void queForCompletion(BlockFile bf) {
+    private void queueForCompletion(BlockFile bf) {
         if (queue.contains(bf)) {
             return;
         }

@@ -37,9 +37,9 @@ public class ChatMessageV2 extends PersistentRPC {
         messageToAll = in.readBoolean();
         sentAtTick = in.readLong();
         if (messageToAll) {
-            manager.getCore().queNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid, sentAtTick));
+            manager.getCore().queueNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid, sentAtTick));
         } else {
-            manager.getCore().queNeedsUserInteraction(new PostMessageInteraction(message, fromGuid, sentAtTick));
+            manager.getCore().queueNeedsUserInteraction(new PostMessageInteraction(message, fromGuid, sentAtTick));
         }
     }
 

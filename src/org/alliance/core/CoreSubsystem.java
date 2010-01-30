@@ -95,7 +95,7 @@ public class CoreSubsystem implements Subsystem {
     private Settings settings;
     private String settingsFile;
     private Log errorLog, traceLog;
-    ArrayList<NeedsUserInteraction> userInternactionQue = new ArrayList<NeedsUserInteraction>();
+    ArrayList<NeedsUserInteraction> userInteractionQueue = new ArrayList<NeedsUserInteraction>();
 
     public CoreSubsystem() {
     }
@@ -299,7 +299,7 @@ public class CoreSubsystem implements Subsystem {
         out.writeInt(STATE_FILE_VERSION);
         invitationManager.save(out);
         networkManager.save(out);
-        out.writeObject(userInternactionQue);
+        out.writeObject(userInteractionQueue);
         out.writeObject(publicChatHistory);
         out.flush();
         out.close();
@@ -325,9 +325,9 @@ public class CoreSubsystem implements Subsystem {
             }
             invitationManager.load(in);
             networkManager.load(in);
-            userInternactionQue = (ArrayList<NeedsUserInteraction>) in.readObject();
+            userInteractionQueue = (ArrayList<NeedsUserInteraction>) in.readObject();
             publicChatHistory = (PublicChatHistory) in.readObject();
-            for (Iterator i = userInternactionQue.iterator(); i.hasNext();) {
+            for (Iterator i = userInteractionQueue.iterator(); i.hasNext();) {
                 if (i.next() instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
                     i.remove(); //we don't need to restart if it's a interaction from the last time we ran alliance
                 }
@@ -570,7 +570,7 @@ public class CoreSubsystem implements Subsystem {
         return invitationManager;
     }
 
-    public void queNeedsUserInteraction(NeedsUserInteraction ui) {
+    public void queueNeedsUserInteraction(NeedsUserInteraction ui) {
         if (ui instanceof PleaseForwardInvitationInteraction &&
                 getSettings().getInternal().getAlwaysallowfriendstoconnect() > 0) {
             try {
@@ -610,14 +610,14 @@ public class CoreSubsystem implements Subsystem {
                 }
             }
         }
-        userInternactionQue.add(ui);
+        userInteractionQueue.add(ui);
         uiCallback.newUserInteractionQueued(ui);
     }
 
     public NeedsUserInteraction fetchUserInteraction() {
-        if (userInternactionQue.size() > 0) {
-            NeedsUserInteraction ui = userInternactionQue.get(0);
-            userInternactionQue.remove(ui);
+        if (userInteractionQueue.size() > 0) {
+            NeedsUserInteraction ui = userInteractionQueue.get(0);
+            userInteractionQueue.remove(ui);
             try {
                 saveState();
             } catch (IOException e) {
@@ -629,18 +629,18 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public NeedsUserInteraction peekUserInteraction() {
-        if (userInternactionQue.size() > 0) {
-            return userInternactionQue.get(0);
+        if (userInteractionQueue.size() > 0) {
+            return userInteractionQueue.get(0);
         }
         return null;
     }
 
     public void removeUserInteraction(NeedsUserInteraction nui) {
-        userInternactionQue.remove(nui);
+        userInteractionQueue.remove(nui);
     }
 
-    public boolean doesInterationQueContain(Class<? extends NeedsUserInteraction> c) {
-        for (NeedsUserInteraction u : userInternactionQue) {
+    public boolean doesInterationQueueContain(Class<? extends NeedsUserInteraction> c) {
+        for (NeedsUserInteraction u : userInteractionQueue) {
             if (u.getClass().equals(c)) {
                 return true;
             }
@@ -655,8 +655,8 @@ public class CoreSubsystem implements Subsystem {
 
     public void softRestart() throws IOException {
         if (uiCallback.isUIVisible()) {
-            if (!doesInterationQueContain(NeedsToRestartBecauseOfUpgradeInteraction.class)) {
-                queNeedsUserInteraction(new NeedsToRestartBecauseOfUpgradeInteraction());
+            if (!doesInterationQueueContain(NeedsToRestartBecauseOfUpgradeInteraction.class)) {
+                queueNeedsUserInteraction(new NeedsToRestartBecauseOfUpgradeInteraction());
             }
         } else {
             restartProgram(false);
@@ -698,8 +698,8 @@ public class CoreSubsystem implements Subsystem {
     }
 
     @SuppressWarnings("unchecked")
-    public List<NeedsUserInteraction> getAllUserInteractionsInQue() {
-        return (List<NeedsUserInteraction>) userInternactionQue.clone();
+    public List<NeedsUserInteraction> getAllUserInteractionsInQueue() {
+        return (List<NeedsUserInteraction>) userInteractionQueue.clone();
     }
 
     public CryptoManager getCryptoManager() {
