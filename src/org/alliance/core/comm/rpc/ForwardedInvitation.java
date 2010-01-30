@@ -33,7 +33,7 @@ public class ForwardedInvitation extends PersistentRPC {
         fromGuid = data.readInt();
         invitationCode = data.readUTF();
         fromNickname = data.readUTF();
-        core.queNeedsUserInteraction(new ForwardedInvitationInteraction(con.getRemoteFriend(), fromNickname, fromGuid, invitationCode));
+        core.queueNeedsUserInteraction(new ForwardedInvitationInteraction(con.getRemoteFriend(), fromNickname, fromGuid, invitationCode));
     }
 
     @Override

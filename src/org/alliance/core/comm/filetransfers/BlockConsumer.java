@@ -31,9 +31,9 @@ public class BlockConsumer implements DataConsumer {
 
         saveBuffer = ByteBuffer.allocate(storage.getCore().getSettings().getInternal().getDiscwritebuffer());
 
-        //@todo: this is not optimal. We treat block downloads in consumerque the same way
+        //@todo: this is not optimal. We treat block downloads in ConsumerQueue the same way
         // as block downloads actually beeing downloaded. This is here to signal that this block is in
-        //progress - although it's actually only in the consumerQue (probably)
+        //progress - although it's actually only in the ConsumerQueue (probably)
         storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, ByteBuffer.allocate(0), fd);
     }
     private boolean firstConsume = true;

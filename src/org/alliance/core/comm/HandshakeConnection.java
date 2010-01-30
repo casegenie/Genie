@@ -101,7 +101,7 @@ public class HandshakeConnection extends PacketConnection {
 
             //successfully connected to friend
             if (friend.isNewlyDiscoveredFriend()) {
-                core.queNeedsUserInteraction(new NewFriendConnectedUserInteraction(friend.getGuid()));
+                core.queueNeedsUserInteraction(new NewFriendConnectedUserInteraction(friend.getGuid()));
                 friend.setNewlyDiscoveredFriend(false);
             }
 

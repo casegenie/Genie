@@ -570,7 +570,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 });
             }
             final boolean[] removedAUserInteraction = new boolean[]{false};
-            for (NeedsUserInteraction nui : ui.getCore().getAllUserInteractionsInQue()) {
+            for (NeedsUserInteraction nui : ui.getCore().getAllUserInteractionsInQueue()) {
                 if (userInteractionsInProgress == 0 || nui.canRunInParallelWithOtherInteractions()) {
                     if (nui instanceof NewFriendConnectedUserInteraction && isConnectedToNewFriendDialogShowing) {
                         continue; //wait til the dialog is no longer displayed
@@ -670,7 +670,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     lastAddFriendWizard.connectionWasSuccessful();
                 }
 
-                if (ui.getCore().doesInterationQueContain(ForwardedInvitationInteraction.class)
+                if (ui.getCore().doesInterationQueueContain(ForwardedInvitationInteraction.class)
                         || new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0) {
                     if (lastAddFriendWizard != null) {
                         lastAddFriendWizard.getOuterDialog().dispose();

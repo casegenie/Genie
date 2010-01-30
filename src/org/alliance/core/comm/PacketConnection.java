@@ -40,10 +40,10 @@ public abstract class PacketConnection extends Connection {
         }
         p.prepareForSend();
         if (!packetsToSend.offer(p)) {
-            throw new IOException("Send packet que overflow!");
+            throw new IOException("Send packet queue overflow!");
         }
         if (T.netTrace) {
-            T.trace("Queing packet for later send");
+            T.trace("Queuing packet for later send");
         }
 
         if (NetworkManager.DIRECTLY_CALL_READYTOSEND) {
@@ -60,7 +60,7 @@ public abstract class PacketConnection extends Connection {
 //          looks like alliance can hang in an infitite loop here sometimes
 //        if(T.t)T.traceNoDup("OS send buffer space is available - try to send sometihing");
         if (T.netTrace) {
-            T.trace("OS send buffer space is available - try to send sometihing. Packets in que: " +
+            T.trace("OS send buffer space is available - try to send something. Packets in queue: " +
                     packetsToSend.size() + "packetCurrentlySending: " + packetCurrentlyInSending);
         }
 

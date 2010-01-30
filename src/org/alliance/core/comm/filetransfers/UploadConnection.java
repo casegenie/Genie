@@ -20,7 +20,7 @@ public class UploadConnection extends TransferConnection {
     public static final int CONNECTION_ID = 3;
     private Hash root;
     private ByteBuffer buffer;
-    private ArrayList<DataProvider> providerQue = new ArrayList<DataProvider>();
+    private ArrayList<DataProvider> providerQueue = new ArrayList<DataProvider>();
 
     public UploadConnection(NetworkManager netMan, Object key, Direction direction, int userGUID) {
         super(netMan, key, direction, userGUID);
@@ -75,7 +75,7 @@ public class UploadConnection extends TransferConnection {
         if (T.t) {
             T.debug("Got command: GETFD");
         }
-        providerQue.add(new FileDescriptorProvider(core.getFileManager().getFd(root)));
+        providerQueue.add(new FileDescriptorProvider(core.getFileManager().getFd(root)));
         switchMode(Mode.RAW);
 
         if (NetworkManager.DIRECTLY_CALL_READYTOSEND) {
@@ -94,9 +94,9 @@ public class UploadConnection extends TransferConnection {
         }
         int blockNumber = p.readInt();
         if (core.getFileManager().containsComplete(root)) {
-            providerQue.add(new CompleteFileBlockProvider(blockNumber, root, core));
+            providerQueue.add(new CompleteFileBlockProvider(blockNumber, root, core));
         } else {
-            providerQue.add(new BlockStorageBlockProvider(blockNumber, root, core));
+            providerQueue.add(new BlockStorageBlockProvider(blockNumber, root, core));
         }
         switchMode(Mode.RAW);
 
@@ -113,13 +113,13 @@ public class UploadConnection extends TransferConnection {
             super.readyToSend();
         } else if (mode == Mode.RAW) {
             for (;;) {
-                if (providerQue.get(0).fill(buffer) < 0 && buffer.position() == 0) {
+                if (providerQueue.get(0).fill(buffer) < 0 && buffer.position() == 0) {
                     if (T.t) {
                         T.info("Done with sending from provider");
                     }
                     buffer.clear();
-                    providerQue.remove(0);
-                    if (providerQue.size() == 0) {
+                    providerQueue.remove(0);
+                    if (providerQueue.size() == 0) {
                         netMan.noInterestToSend(this);
                         switchMode(Mode.PACKET);
                         break;
@@ -177,9 +177,9 @@ public class UploadConnection extends TransferConnection {
         if (m == Mode.RAW) {
         } else if (m == Mode.PACKET) {
             if (T.t) {
-                T.ass(providerQue.size() <= 1, "Theres something in the que!");
+                T.ass(providerQueue.size() <= 1, "There's something in the queue!");
             }
-            providerQue.clear();
+            providerQueue.clear();
         }
     }
 

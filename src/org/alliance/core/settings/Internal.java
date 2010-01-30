@@ -49,7 +49,7 @@ public class Internal extends SettingClass {
         }
     }
     private String databasefile = USER_DIRECTORY + "data/db/alliance";
-    private String downloadquefile = USER_DIRECTORY + "data/downloads.dat";
+    private String downloadqueuefile = USER_DIRECTORY + "data/downloads.dat";
     private String corestatefile = USER_DIRECTORY + "data/core.dat";
     private String windowstatefile = USER_DIRECTORY + "data/mainwindow.state";
     private String pmsound = "sounds/chatpm.wav";
@@ -463,12 +463,12 @@ public class Internal extends SettingClass {
         this.totalmegabytesuploaded = totalmegabytesuploaded;
     }
 
-    public String getDownloadquefile() {
-        return downloadquefile;
+    public String getDownloadqueueFile() {
+        return downloadqueuefile;
     }
 
-    public void setDownloadquefile(String downloadquefile) {
-        this.downloadquefile = downloadquefile;
+    public void setDownloadqueueFile(String downloadqueuefile) {
+        this.downloadqueuefile = downloadqueuefile;
     }
 
     public Integer getShowpublicchatmessagesintray() {

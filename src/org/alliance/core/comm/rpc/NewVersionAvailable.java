@@ -31,7 +31,7 @@ public class NewVersionAvailable extends RPC {
         hash = new Hash();
         p.readArray(hash.array());
         if (T.t) {
-            T.info("Received new version info. Queing for download.");
+            T.info("Received new version info. Queuing for download.");
         }
         core.getFileManager().getAutomaticUpgrade().setNewVersionHash(hash);
         if (core.getFileManager().getFileDatabase().contains(hash)) {
@@ -46,7 +46,7 @@ public class NewVersionAvailable extends RPC {
         } else {
             ArrayList<Integer> al = new ArrayList<Integer>();
             al.add(con.getRemoteUserGUID());
-            core.getNetworkManager().getDownloadManager().queDownload(hash, core.getFileManager().getCache(), "Alliance Upgrade", al, true);
+            core.getNetworkManager().getDownloadManager().queueDownload(hash, core.getFileManager().getCache(), "Alliance Upgrade", al, true);
         }
     }
 

@@ -19,7 +19,7 @@ public class DownloadConnection extends TransferConnection {
 
     public static final int CONNECTION_ID = 2;
     private Download download;
-    private ArrayList<DataConsumer> consumerQue = new ArrayList<DataConsumer>();
+    private ArrayList<DataConsumer> consumerQueue = new ArrayList<DataConsumer>();
     private boolean inHandshake = true;
 
     public DownloadConnection(NetworkManager netMan, Direction direction, int userGUID, Download download) {
@@ -58,9 +58,9 @@ public class DownloadConnection extends TransferConnection {
     public void sendGetFD() throws IOException {
         sendCommand(Command.GET_FD);
         switchMode(Mode.RAW);
-        consumerQue.add(new FileDescriptorConsumer(download, this));
+        consumerQueue.add(new FileDescriptorConsumer(download, this));
         if (T.t) {
-            T.ass(consumerQue.size() == 1, "Somethings strange with que " + consumerQue.size());
+            T.ass(consumerQueue.size() == 1, "Something's strange with queue " + consumerQueue.size());
         }
     }
 
@@ -83,7 +83,7 @@ public class DownloadConnection extends TransferConnection {
             while (buf.remaining() > 0) {
                 //this might seem weird, but when a consumer is done, it will compact the buffer,
                 // remove itself from the queue and return. This way we continue with the next consumer.
-                consumerQue.get(0).consume(buf);
+                consumerQueue.get(0).consume(buf);
 //                if(T.t)T.trace("Bytes left in buf: "+buf.remaining());
             }
         }
@@ -112,10 +112,10 @@ public class DownloadConnection extends TransferConnection {
         }
         switchMode(Mode.PACKET);
 
-        while (consumerQue.size() < core.getSettings().getInternal().getNumberofblockstopipeline()) {
+        while (consumerQueue.size() < core.getSettings().getInternal().getNumberofblockstopipeline()) {
             if (blockNumber == -1) {
                 if (T.t) {
-                    T.info("Trying to que another get block");
+                    T.info("Trying to queue another get block");
                 }
                 blockNumber = download.selectBestBlockForDownload(getRemoteFriend());
                 if (blockNumber == -1) {
@@ -132,7 +132,7 @@ public class DownloadConnection extends TransferConnection {
             p.writeByte(Command.GETBLOCK.value());
             p.writeInt(blockNumber);
             send(p);
-            consumerQue.add(new BlockConsumer(this, blockNumber, download.getStorage()));
+            consumerQueue.add(new BlockConsumer(this, blockNumber, download.getStorage()));
             blockNumber = -1;
         }
 
@@ -150,25 +150,25 @@ public class DownloadConnection extends TransferConnection {
     }
 
     public boolean isDownloadingFd() {
-        return consumerQue.size() > 0 && consumerQue.get(0) instanceof FileDescriptorConsumer;
+        return consumerQueue.size() > 0 && consumerQueue.get(0) instanceof FileDescriptorConsumer;
     }
 
     public boolean isDownloadingBlock() {
-        return consumerQue.size() > 0 && consumerQue.get(0) instanceof BlockConsumer;
+        return consumerQueue.size() > 0 && consumerQueue.get(0) instanceof BlockConsumer;
     }
 
     public void blockDownloadComplete(int blockNumber) throws IOException {
         if (T.t) {
             T.info("Block " + blockNumber + " download complete.");
         }
-        consumerQue.remove(0);
+        consumerQueue.remove(0);
         download.signalBlockComplete(blockNumber);
     }
 
     public void startDownloadingBlock() throws IOException {
         int blockNumber = download.selectBestBlockForDownload(getRemoteFriend());
         if (blockNumber == -1) {
-            if (consumerQue.size() == 0) {
+            if (consumerQueue.size() == 0) {
                 if (T.t) {
                     T.info("Did not find anything to download. Closing connection.");
                 }
@@ -201,9 +201,9 @@ public class DownloadConnection extends TransferConnection {
     }
 
     public void fileDescriptorReceived() {
-        consumerQue.remove(0);
+        consumerQueue.remove(0);
         if (T.t) {
-            T.ass(consumerQue.size() == 0, "Somethings in queue when it shouldn't");
+            T.ass(consumerQueue.size() == 0, "Somethings in queue when it shouldn't");
         }
     }
 

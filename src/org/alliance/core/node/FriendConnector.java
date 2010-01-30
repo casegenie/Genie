@@ -28,7 +28,7 @@ public class FriendConnector extends Thread {
     }
     private FriendManager manager;
     private boolean alive = true;
-    private List<Action> actionQue = Collections.synchronizedList(new ArrayList<Action>());
+    private List<Action> actionQueue = Collections.synchronizedList(new ArrayList<Action>());
 
     public FriendConnector(FriendManager manager) {
         this.manager = manager;
@@ -69,12 +69,12 @@ public class FriendConnector extends Thread {
                     T.trace("Attempting to connect to another friend...");
                 }
                 //first take care of any queued actions
-                while (actionQue.size() > 0) {
+                while (actionQueue.size() > 0) {
                     if (T.t) {
                         T.trace("Found something in action que!");
                     }
-                    Action a = actionQue.get(0);
-                    actionQue.remove(0);
+                    Action a = actionQueue.get(0);
+                    actionQueue.remove(0);
                     if (a.sleepDelay != null && a.sleepDelay > 0) {
                         if (T.t) {
                             T.trace("Sleeping " + a.sleepDelay + "ms...");
@@ -125,7 +125,7 @@ public class FriendConnector extends Thread {
         alive = false;
     }
 
-    public void queHighPriorityConnectTo(Friend f, int dealyInMs) {
+    public void queueHighPriorityConnectTo(Friend f, int dealyInMs) {
         if (f.isConnected()) {
             if (T.t) {
                 T.info("Already connected to " + f + ", not connecting again.");
@@ -135,12 +135,12 @@ public class FriendConnector extends Thread {
         if (T.t) {
             T.info("Queuing action: connect to " + f + " in " + dealyInMs + " ms.");
         }
-        actionQue.add(new Action(f, dealyInMs));
+        actionQueue.add(new Action(f, dealyInMs));
         wakeUp();
     }
 
-    public void queHighPriorityConnectTo(Friend f) {
-        queHighPriorityConnectTo(f, 0);
+    public void queueHighPriorityConnectTo(Friend f) {
+        queueHighPriorityConnectTo(f, 0);
     }
 
     public void wakeUp() {

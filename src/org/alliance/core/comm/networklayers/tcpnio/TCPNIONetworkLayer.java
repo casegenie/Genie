@@ -40,7 +40,7 @@ public class TCPNIONetworkLayer implements Runnable {
 
     private NetworkManager netMan;
     private Selector selector;
-    private LinkedBlockingQueue<Runnable> taskQue = new LinkedBlockingQueue<Runnable>(500000);
+    private LinkedBlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<Runnable>(500000);
     private ByteBuffer buffer;
     private byte byteArray[];
     private static int MAXIMUM_PACKET_SIZE;
@@ -240,7 +240,7 @@ public class TCPNIONetworkLayer implements Runnable {
 
                 //process all tasks
                 Runnable r;
-                while ((r = taskQue.poll()) != null) {
+                while ((r = taskQueue.poll()) != null) {
                     r.run();
                 }
 
@@ -307,7 +307,7 @@ public class TCPNIONetworkLayer implements Runnable {
     }
 
     public void invokeLater(Runnable r) {
-        taskQue.add(r);
+        taskQueue.add(r);
         selector.wakeup();
     }
 

@@ -32,9 +32,9 @@ public class ChatMessage extends PersistentRPC {
         message = in.readUTF();
         messageToAll = in.readBoolean();
         if (messageToAll) {
-            manager.getCore().queNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid));
+            manager.getCore().queueNeedsUserInteraction(new PostMessageToAllInteraction(message, fromGuid));
         } else {
-            manager.getCore().queNeedsUserInteraction(new PostMessageInteraction(message, fromGuid));
+            manager.getCore().queueNeedsUserInteraction(new PostMessageInteraction(message, fromGuid));
         }
     }
 

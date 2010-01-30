@@ -85,7 +85,7 @@ public class HashesForPath extends CompressedRPC {
             } else if (core.getNetworkManager().getDownloadManager().getDownload(hash) != null) {
                 core.getUICallback().statusMessage("You are already downloading " + commonPath + "!");
             } else {
-                core.getNetworkManager().getDownloadManager().queDownload(hash, commonPath, guid);
+                core.getNetworkManager().getDownloadManager().queueDownload(hash, commonPath, guid);
             }
         }
         hashPath.clear();
