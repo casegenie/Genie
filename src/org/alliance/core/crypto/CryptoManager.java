@@ -2,6 +2,7 @@ package org.alliance.core.crypto;
 
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.comm.networklayers.tcpnio.TCPNIONetworkLayer;
+import org.alliance.core.crypto.cryptolayers.NoEncryptionCryptoLayer;
 import org.alliance.core.crypto.cryptolayers.SSLCryptoLayer;
 import org.alliance.core.crypto.cryptolayers.TranslationCryptoLayer;
 
@@ -31,7 +32,7 @@ public class CryptoManager {
                 if (T.t) {
                     T.info("Launching translation cryptolayer");
                 }
-                this.cryptoLayer = new TranslationCryptoLayer(core);
+                this.cryptoLayer = new NoEncryptionCryptoLayer(core);
                 break;
         }
 
