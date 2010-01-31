@@ -49,7 +49,10 @@ public class Routerule implements Serializable {
     }
 
     private void parseInput() throws Exception {
-        byte address[] = new byte[4];
+        //Changed from byte to short, a byte only has 8 bits = 4 bytes
+    	//so if we want any IPs with octets over 4bits (i.e. >128)
+    	//we need a short, which has 16 bits
+    	short address[] = new short[4];
 
         if (humanreadable.charAt(0) == 'A') {
             ruletype = Routerule.ALLOW;
@@ -68,7 +71,7 @@ public class Routerule implements Serializable {
                 if (temp < 0 || temp > 255) {
                     throw new Exception("Invalid IP entered");
                 } else {
-                    address[i] = temp.byteValue();
+                    address[i] = temp.shortValue();
                 }
                 human_copy = human_copy.substring(divider + 1);
             } catch (NumberFormatException e) {
@@ -80,10 +83,9 @@ public class Routerule implements Serializable {
             throw new Exception("Invalid Subnet Mask");
         }
         makeArrayInt(address);
-
     }
 
-    private void makeArrayInt(byte[] addr) {
+    private void makeArrayInt(short[] addr) {
         int value = 0;
         int shiftval = 0;
         for (int i = addr.length - 1; i >= 0; i--) {

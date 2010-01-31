@@ -51,6 +51,8 @@ public class Internal extends SettingClass {
     private String databasefile = USER_DIRECTORY + "data/db/alliance";
     private String downloadqueuefile = USER_DIRECTORY + "data/downloads.dat";
     private String corestatefile = USER_DIRECTORY + "data/core.dat";
+    private String privatekeyfile = USER_DIRECTORY + "data/private.key";
+    private String publickeyfile = USER_DIRECTORY + "data/public.key";
     private String windowstatefile = USER_DIRECTORY + "data/mainwindow.state";
     private String pmsound = "sounds/chatpm.wav";
     private String publicsound = "sounds/chatpublic.wav";
@@ -302,7 +304,22 @@ public class Internal extends SettingClass {
     public void setCorestatefile(String corestatefile) {
         this.corestatefile = corestatefile;
     }
-
+    
+    public String getPrivatekeyfile(){
+    	return privatekeyfile;
+    }
+    
+    public void setPrivatekeyfile(String privatekeyfile){
+    	this.privatekeyfile = privatekeyfile;
+    }
+    public String getPublickeyfile(){
+    	return publickeyfile;
+    }
+    
+    public void setPublickeyfile(String publickeyfile){
+    	this.publickeyfile = privatekeyfile;
+    }
+        
     public String getWindowstatefile() {
         return windowstatefile;
     }
