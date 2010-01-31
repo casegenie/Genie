@@ -73,6 +73,7 @@ public class FileDatabase {
         }
     }
 
+    //Should there be a call to updateCacheCounters here? So asks 362ef0
     private int removeObsoleteFiles(String subPath, int offset, int scannedFiles) {
         ResultSet results = core.getDbCore().getDbShares().getEntriesBySubPath(subPath, 1024, offset);
         try {
@@ -95,6 +96,8 @@ public class FileDatabase {
     }
 
     public void removeObsoleteEntries(ArrayList<ShareBase> shareBase) {
+    	if(numberOfShares==0) return;
+    	
         // long time = System.currentTimeMillis();
         ResultSet results = core.getDbCore().getDbShares().getBasePaths();
         try {
