@@ -1,0 +1,11 @@
+Alliance {
+    kind=Light
+    colorUltraLight=#414855
+    colorExtraLight=#323947
+    colorLight=#272E3D
+    colorMid=#222A39
+    colorDark=#1C2333
+    colorUltraDark=#171F2F
+    colorForeground=#FFE2E4
+}
+
