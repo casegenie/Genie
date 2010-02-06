@@ -2,8 +2,6 @@ package org.alliance.core.settings;
 
 import java.util.ArrayList;
 
-import org.alliance.core.T;
-
 /**
  * Created by IntelliJ IDEA.
  * User: maciek

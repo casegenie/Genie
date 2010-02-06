@@ -133,7 +133,13 @@ public class FileDatabase {
                 long size = result.getLong("size");
                 long modifiedAt = result.getLong("modified");
 
-                result = core.getDbCore().getDbHashes().getEntryByRootHash(rootHash.array());
+                File f = new File(mergePathParts(basePath, subPath, null));
+                if (f.lastModified() != modifiedAt) {
+                    removeEntry(rootHash.array());
+                    return null;
+                }
+
+                result = core.getDbCore().getDbHashes().getEntriesRootHash(rootHash.array());
                 ArrayList<Hash> hashArray = new ArrayList<Hash>();
                 while (result.next()) {
                     hashArray.add(new Hash(result.getBytes("hash")));
@@ -169,9 +175,14 @@ public class FileDatabase {
         try {
             FileIndex fileIndex = new FileIndex(basePath, mergePathParts(basePath, path, null));
             if (!path.endsWith("/")) {
-                ResultSet results = core.getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
-                while (results.next()) {
-                    hashPath.put(new Hash(results.getBytes("root_hash")), mergePathParts(null, null, results.getString("filename")));
+                ResultSet result = core.getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+                while (result.next()) {
+                    File f = new File(mergePathParts(result.getString("base_path"), result.getString("sub_path"), result.getString("filename")));
+                    if (f.lastModified() != result.getLong("modified")) {
+                        removeEntry(result.getBytes("root_hash"));
+                    } else {
+                        hashPath.put(new Hash(result.getBytes("root_hash")), mergePathParts(null, null, result.getString("filename")));
+                    }
                 }
             } else {
                 ResultSet results = core.getDbCore().getDbShares().getEntriesByBasePathAndSubPath(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
@@ -179,7 +190,12 @@ public class FileDatabase {
                 path = path.substring(0, path.lastIndexOf("/") + 1);
                 path = basePath + "/" + path;
                 while (results.next()) {
-                    hashPath.put(new Hash(results.getBytes("root_hash")), mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")).replace(path, ""));
+                    File f = new File(mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")));
+                    if (f.lastModified() != results.getLong("modified")) {
+                        removeEntry(results.getBytes("root_hash"));
+                    } else {
+                        hashPath.put(new Hash(results.getBytes("root_hash")), mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename")).replace(path, ""));
+                    }
                 }
             }
         } catch (SQLException ex) {
@@ -370,7 +386,7 @@ public class FileDatabase {
                 }
             }
         }
-        
+
         //System.out.println("directory listing - " + (System.currentTimeMillis() - time));
         priority = false;
         return fileSize;
