@@ -140,7 +140,7 @@ public class ShareScanner extends Thread {
             if (!alive) {
                 break;
             }
-            core.getShareManager().getFileDatabase().updateCacheCounters(true, true);
+            core.getShareManager().getFileDatabase().updateCacheCounters();
             waitForNextScan();
         }
     }
@@ -219,7 +219,6 @@ public class ShareScanner extends Thread {
             manager.getCore().getUICallback().statusMessage("Searching for new files: " + path);
             if (!manager.getFileDatabase().contains(basePath, path, true)) {
                 hash(basePath, new File(path));
-                core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
             }
         } catch (IOException e) {
             if (T.t) {
@@ -333,7 +332,6 @@ public class ShareScanner extends Thread {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, oldFile);
                         manager.getFileDatabase().removeEntry(rootHash);
                         manager.getCore().getUICallback().statusMessage("Removed file " + oldFile + " from share.", true);
-                        core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
                         queFileForHashing(newFile, false);
                     }
                 } catch (IOException e) {
@@ -356,7 +354,6 @@ public class ShareScanner extends Thread {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, file);
                         manager.getFileDatabase().removeEntry(rootHash);
                         manager.getCore().getUICallback().statusMessage("Removed file " + file + " from share.", true);
-                        core.getShareManager().getFileDatabase().updateCacheCounters(true, false);
                     }
                 } catch (IOException e) {
                     core.reportError(e, this);

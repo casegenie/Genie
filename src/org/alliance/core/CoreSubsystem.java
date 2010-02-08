@@ -17,7 +17,6 @@ import org.alliance.core.comm.rpc.GetUserInfo;
 import org.alliance.core.comm.rpc.GetUserInfoV2;
 import org.alliance.core.comm.upnp.UPnPManager;
 import org.alliance.core.crypto.CryptoManager;
-import org.alliance.core.file.h2database.DatabaseCore;
 import org.alliance.core.file.FileManager;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.interactions.ForwardedInvitationInteraction;
@@ -79,7 +78,6 @@ public class CoreSubsystem implements Subsystem {
     public final static long GB = 1024 * MB;
     public final static int BLOCK_SIZE = MB;
     public final static String ERROR_URL = "http://maciek.tv/alliance/errorreporter/";
-    private DatabaseCore dbCore;
     private ResourceLoader rl;
     private FriendManager friendManager;
     private FileManager fileManager;
@@ -139,7 +137,6 @@ public class CoreSubsystem implements Subsystem {
 
         loadSettings();
 
-        dbCore = new DatabaseCore(this);
         fileManager = new FileManager(this, settings);
         friendManager = new FriendManager(this, settings);
         cryptoManager = new CryptoManager(this);
@@ -152,14 +149,14 @@ public class CoreSubsystem implements Subsystem {
         publicChatHistory = new PublicChatHistory();
 
         loadState();
-
         cryptoManager.init();
-        progress.updateProgress("Loading core (file database)");
+        progress.updateProgress("Loading core (database manager)");
         fileManager.init();
-        progress.updateProgress("Loading core");
         friendManager.init();
+        progress.updateProgress("Loading core (network manager)");
         networkManager.init();
         awayManager.init();
+        progress.updateProgress("Loading core (plugin manager)");
         pluginManager.init();
 
         if (!isRunningAsTestSuite()) {
@@ -554,8 +551,8 @@ public class CoreSubsystem implements Subsystem {
 
         Main.stopStartSignalThread(); //such a fucking hack. When we run using the normal UI we need to signal the launcher that he needs to stop this startsignalthread
         String s = "." + System.getProperty("file.separator") + "alliance" + //must have exe/script/batch in current directory to start program
-                (openWithUI ? "" : " /min") +
-                (restartDelay == 0 ? "" : " /w" + restartDelay);
+                (openWithUI ? "" : " /min")
+                + (restartDelay == 0 ? "" : " /w" + restartDelay);
 
         Runtime.getRuntime().exec(s);
         System.exit(0);
@@ -570,8 +567,8 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public void queNeedsUserInteraction(NeedsUserInteraction ui) {
-        if (ui instanceof PleaseForwardInvitationInteraction &&
-                getSettings().getInternal().getAlwaysallowfriendstoconnect() > 0) {
+        if (ui instanceof PleaseForwardInvitationInteraction
+                && getSettings().getInternal().getAlwaysallowfriendstoconnect() > 0) {
             try {
                 //automatically forward this user invitation - the settings are set to do this.
                 if (T.t) {
@@ -743,8 +740,4 @@ public class CoreSubsystem implements Subsystem {
     public PluginManager getPluginManager() {
         return pluginManager;
     }
-
-    public DatabaseCore getDbCore() {
-        return dbCore;
     }
-}

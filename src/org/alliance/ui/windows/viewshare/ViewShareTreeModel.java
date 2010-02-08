@@ -66,7 +66,7 @@ public class ViewShareTreeModel extends DefaultTreeModel {
         return win;
     }
 
-    public void shareBaseNamesRevieved(String[] shareBaseNames) {
+    public void shareBaseNamesReceived(String[] shareBaseNames) {
         getRoot().fill(shareBaseNames);
         nodeStructureChanged(getRoot());
     }

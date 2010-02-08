@@ -18,7 +18,6 @@ public class ViewShareShareBaseNode extends ViewShareTreeNode {
     @Override
     protected int getShareBaseIndex() {
         return shareBaseIndex;
-//        return root.getIndex(this);
     }
 
     @Override
@@ -28,7 +27,6 @@ public class ViewShareShareBaseNode extends ViewShareTreeNode {
 
     @Override
     public boolean isLeaf() {
-        assureChildrenAreLoaded();
-        return children.size() == 0;
+        return false;
     }
 }

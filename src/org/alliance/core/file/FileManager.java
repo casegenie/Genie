@@ -10,6 +10,7 @@ import org.alliance.core.file.blockstorage.DownloadStorage;
 import org.alliance.core.file.filedatabase.FileDatabase;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
+import org.alliance.core.file.h2database.DatabaseCore;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
 
@@ -32,6 +33,7 @@ import java.io.IOException;
  */
 public class FileManager extends Manager {
 
+    private DatabaseCore dbCore;
     private CacheStorage cache;
     private DownloadStorage downloads;
     private ShareManager shareManager;
@@ -47,6 +49,7 @@ public class FileManager extends Manager {
 
     @Override
     public void init() throws IOException {
+        dbCore = new DatabaseCore(core);
         cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
         downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
         automaticUpgrade = new AutomaticUpgrade(core, cache);
@@ -57,11 +60,15 @@ public class FileManager extends Manager {
         return shareManager;
     }
 
+    public DatabaseCore getDbCore() {
+        return dbCore;
+    }
+
     public void shutdown() throws IOException {        
         shareManager.shutdown();
         cache.shutdown();
         downloads.shutdown();
-        core.getDbCore().shutdown();
+        dbCore.shutdown();
     }
 
     public boolean contains(Hash root) {

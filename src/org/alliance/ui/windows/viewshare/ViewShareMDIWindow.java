@@ -152,7 +152,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         if (T.t) {
             T.info("Callback got back - filling with " + shareBaseNames.length + " share bases.");
         }
-        model.shareBaseNamesRevieved(shareBaseNames);
+        model.shareBaseNamesReceived(shareBaseNames);
     }
 
     public void directoryListingReceived(int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
@@ -390,10 +390,9 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                 boolean hasFocus) {
 
             super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-
+            setToolTipText(null);
             if (value instanceof ViewShareLoadingNode) {
                 setIcon(iconLoading);
-                setToolTipText(null);
             } else if (value instanceof ViewShareFileNode) {
                 ViewShareFileNode n = (ViewShareFileNode) value;
                 if (!n.isFolder()) {
@@ -410,7 +409,6 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                     } else {
                         setIcon(folderIconCollapsed);
                     }
-                    setToolTipText(null);
                 }
             } else if (value instanceof ViewShareShareBaseNode) {
                 if (expanded) {
@@ -418,7 +416,6 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                 } else {
                     setIcon(folderIconCollapsed);
                 }
-                setToolTipText(null);
             }
             return this;
         }

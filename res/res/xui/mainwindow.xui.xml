@@ -22,7 +22,7 @@
             <separator/>
             <menuitem eventid="plugins" text="Plugins"/>
             <menuitem eventid="options" accelerator="ctrl-o" mnemonic="o" text="Options"/>
-            <!--<menuitem eventid="shares" accelerator="ctrl-o" mnemonic="o" text="Shares"/>-->
+            <menuitem eventid="shares" accelerator="ctrl-o" mnemonic="o" text="Shares"/>
         </menu>
     </menubar>
     <body>

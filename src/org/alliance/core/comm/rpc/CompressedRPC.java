@@ -49,10 +49,10 @@ public abstract class CompressedRPC extends RPC {
         out.close();
         byte arr[] = buf.toByteArray();
         p.writeInt(arr.length);
-        p.writeArray(arr);
         if (T.t) {
-            T.debug("Compressed RPC: from " + out.size() + " bytes to " + arr.length + " bytes.");
+            System.out.println("Compressed RPC: from " + out.size() + " bytes to " + arr.length + " bytes.");
         }
+        p.writeArray(arr);
         return p;
     }
 }

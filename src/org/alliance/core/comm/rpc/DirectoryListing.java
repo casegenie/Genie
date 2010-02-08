@@ -18,15 +18,15 @@ import java.util.TreeMap;
  */
 public class DirectoryListing extends CompressedRPC {
 
-    private TreeMap<String, Long> fileSize = new TreeMap<String, Long>();
+    private TreeMap<String, Long> dirListMap = new TreeMap<String, Long>();
     private int shareBaseIndex;
     private String path;
 
     public DirectoryListing() {
     }
 
-    public DirectoryListing(int shareBaseIndex, String path, TreeMap<String, Long> fileSize) {
-        this.fileSize = fileSize;
+    public DirectoryListing(int shareBaseIndex, String path, TreeMap<String, Long> dirListMap) {
+        this.dirListMap = dirListMap;
         this.shareBaseIndex = shareBaseIndex;
         this.path = path;
     }
@@ -40,7 +40,7 @@ public class DirectoryListing extends CompressedRPC {
             T.info("Decompressing " + nFiles + " files for share base " + shareBaseIndex + " and path " + path);
         }
 
-        fileSize = new TreeMap<String, Long>(new Comparator<String>() {
+        dirListMap = new TreeMap<String, Long>(new Comparator<String>() {
 
             @Override
             public int compare(String s1, String s2) {
@@ -61,13 +61,13 @@ public class DirectoryListing extends CompressedRPC {
         });
 
         for (int i = 0; i < nFiles; i++) {
-            fileSize.put(in.readUTF(), 0L);
+            dirListMap.put(in.readUTF(), 0L);
         }
 
         try {
             if (nFiles == in.readInt()) {
-                for (String s : fileSize.keySet()) {
-                    fileSize.put(s, in.readLong());
+                for (String s : dirListMap.keySet()) {
+                    dirListMap.put(s, in.readLong());
                 }
             }
         } catch (EOFException e) {
@@ -78,11 +78,11 @@ public class DirectoryListing extends CompressedRPC {
 
         if (T.t) {
             T.info("Found the following files:");
-            for (String s : fileSize.keySet()) {
+            for (String s : dirListMap.keySet()) {
                 T.info("  " + s);
             }
         }
-        core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, fileSize);
+        core.getUICallback().receivedDirectoryListing(con.getRemoteFriend(), shareBaseIndex, path, dirListMap);
     }
 
     @Override
@@ -123,12 +123,12 @@ public class DirectoryListing extends CompressedRPC {
         if (positive == true) {
             out.writeInt(shareBaseIndex);
             out.writeUTF(path);
-            out.writeInt(fileSize.size());
-            for (String s : fileSize.keySet()) {
+            out.writeInt(dirListMap.size());
+            for (String s : dirListMap.keySet()) {
                 out.writeUTF(s);
             }
-            out.writeInt(fileSize.size());
-            for (Long l : fileSize.values()) {
+            out.writeInt(dirListMap.size());
+            for (Long l : dirListMap.values()) {
                 out.writeLong(l);
             }
         } else {
@@ -136,6 +136,6 @@ public class DirectoryListing extends CompressedRPC {
             out.writeUTF(path);
             out.writeInt(0); //Do not list hidden folders
         }
-        fileSize.clear();
+        dirListMap.clear();
     }
 }

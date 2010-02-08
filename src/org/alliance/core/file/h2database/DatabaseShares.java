@@ -35,8 +35,7 @@ public class DatabaseShares {
         statement.executeUpdate(sql.toString());
     }
 
-    private void createIndexes() {
-        try {
+    private void createIndexes() throws SQLException {
             Statement statement = conn.createStatement();
             StringBuilder sql = new StringBuilder();
             sql.append("CREATE INDEX IF NOT EXISTS idx_shares_base_path ON shares(base_path);");
@@ -44,9 +43,7 @@ public class DatabaseShares {
             sql.append("CREATE INDEX IF NOT EXISTS idx_shares_filename ON shares(filename);");
             sql.append("CREATE INDEX IF NOT EXISTS idx_shares_type ON shares(type);");
             statement.executeUpdate(sql.toString());
-        } catch (SQLException ex) {
         }
-    }
 
     public boolean addEntry(String basePath, String subPath, String filename, byte type, long size, byte[] rootHash, long modifiedAt) {
         try {
