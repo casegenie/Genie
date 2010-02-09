@@ -443,6 +443,7 @@ public class Console {
     private void ui() throws Exception {
         Runnable r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
         ui = (Subsystem) Class.forName("org.alliance.ui.UISubsystem").newInstance();
+        //TODO: Rename this to ResourceSingleton
         ui.init(ResourceSingelton.getRl(), core);
         r.run(); //closes splashwindow
     }

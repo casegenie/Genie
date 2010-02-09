@@ -26,6 +26,13 @@ import java.util.ArrayList;
  * Time: 16:13:57
  * To change this template use File | Settings | File Templates.
  */
+
+/*
+ * TODO:
+ * From what I can see, FileDescriptor is handling way too much
+ * There should be a RemoteFile class and a LocalFile class, both of which extend from FileDescriptor.
+ * and let's make heavy use of the File object, as assuming that the path separator is a / give me a bad feeling 
+ */
 public class FileDescriptor {
 
     public static class FileModifiedWhileHashingException extends IOException {
