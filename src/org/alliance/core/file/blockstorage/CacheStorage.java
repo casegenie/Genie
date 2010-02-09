@@ -2,6 +2,7 @@ package org.alliance.core.file.blockstorage;
 
 import org.alliance.core.CoreSubsystem;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -10,6 +11,14 @@ import java.io.IOException;
  * Date: 2006-feb-06
  * Time: 22:57:21
  * To change this template use File | Settings | File Templates.
+ */
+
+/*
+ * Acts as a blockstorage object for items being downloaded to the cache
+ * IMHO:
+ * 	this class shouldn't exist
+ * 	each download should have a helper class to manage its own block storage
+ * 
  */
 public class CacheStorage extends BlockStorage {
 
@@ -27,12 +36,10 @@ public class CacheStorage extends BlockStorage {
             T.info("File in cache complete: " + path);
         }
 
-        if (bf.getFd().getRootHash().equals(core.getFileManager().getAutomaticUpgrade().getNewVersionHash())) {
-            try {
-                core.getFileManager().getAutomaticUpgrade().performUpgrade();
-            } catch (Exception e) {
-                core.reportError(new Exception("Automatic upgrade failed!", e), null);
-            }
+        try {
+            core.getFileManager().getAutomaticUpgrade().beginUpgrade();
+        } catch (Exception e) {
+            core.reportError(new Exception("Automatic upgrade failed!", e), null);
         }
     }
 

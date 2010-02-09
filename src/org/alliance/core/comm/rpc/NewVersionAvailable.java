@@ -4,6 +4,7 @@ import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
 import org.alliance.core.comm.T;
 import org.alliance.core.file.hash.Hash;
+import org.alliance.core.node.Friend;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ import java.util.ArrayList;
  */
 public class NewVersionAvailable extends RPC {
 
-    private Hash hash;
+	private int buildNumber;
+    private Hash binaryHash;
+    private Hash signatureHash;
 
     public NewVersionAvailable(Hash hash) {
-        this.hash = hash;
+        this.binaryHash = hash;
     }
 
     public NewVersionAvailable() {
@@ -28,31 +31,26 @@ public class NewVersionAvailable extends RPC {
 
     @Override
     public void execute(Packet p) throws IOException {
-        hash = new Hash();
-        p.readArray(hash.array());
+    	buildNumber = p.readInt();
+        binaryHash = new Hash();
+        p.readArray(binaryHash.array());
+        signatureHash = new Hash();
+        p.readArray(signatureHash.array());
+        
         if (T.t) {
             T.info("Received new version info. Queuing for download.");
         }
-        core.getFileManager().getAutomaticUpgrade().setNewVersionHash(hash);
-        if (core.getFileManager().getFileDatabase().contains(hash)) {
-            if (T.t) {
-                T.info("Upgrade already in my share. Start upgrade.");
-            }
-            try {
-                core.getFileManager().getAutomaticUpgrade().performUpgrade();
-            } catch (Exception e) {
-                core.reportError(e, "Automatic Upgrade");
-            }
-        } else {
-            ArrayList<Integer> al = new ArrayList<Integer>();
-            al.add(con.getRemoteUserGUID());
-            core.getNetworkManager().getDownloadManager().queueDownload(hash, core.getFileManager().getCache(), "Alliance Upgrade", al, true);
-        }
+        
+        Friend remote = core.getFriendManager().getFriend(fromGuid);
+        
+        core.getFileManager().getAutomaticUpgrade().beginDownloadAndUpgrade(buildNumber, remote, binaryHash, signatureHash);
     }
 
     @Override
     public Packet serializeTo(Packet p) {
-        p.writeArray(hash.array());
+    	p.writeInt(buildNumber);
+        p.writeArray(binaryHash.array());
+        p.writeArray(signatureHash.array());
         return p;
     }
 }
