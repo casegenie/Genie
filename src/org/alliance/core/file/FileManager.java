@@ -1,5 +1,6 @@
 package org.alliance.core.file;
 
+import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.Manager;
 import org.alliance.core.comm.AutomaticUpgrade;
@@ -15,6 +16,11 @@ import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 /**
  * Keeps track of all files used in Alliance. Contains the ShareManager, DownloadStorage and AutomaticUpgrade. Should
@@ -41,6 +47,8 @@ public class FileManager extends Manager {
     private Settings settings;
     private AutomaticUpgrade automaticUpgrade;
     public static final String INCOMPLETE_FOLDER_NAME = "_incomplete_";
+    public static final int MAKE_BACKUP = 0;
+    public static final int RESTORE_BACKUP = 1;
 
     public FileManager(CoreSubsystem core, Settings settings) throws IOException {
         this.core = core;
@@ -48,8 +56,16 @@ public class FileManager extends Manager {
     }
 
     @Override
-    public void init() throws IOException {
+    public void init() throws IOException, Exception {
+        try {
         dbCore = new DatabaseCore(core);
+            dbCore.connect();
+            core.getFileManager().manageBackup(MAKE_BACKUP);
+        } catch (Exception ex) {
+            core.getFileManager().manageBackup(RESTORE_BACKUP);
+            dbCore.connect();
+        }
+
         cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
         downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
         automaticUpgrade = new AutomaticUpgrade(core, cache);
@@ -153,5 +169,53 @@ public class FileManager extends Manager {
 
     public AutomaticUpgrade getAutomaticUpgrade() {
         return automaticUpgrade;
+    }
+
+    public void manageBackup(int mode) throws Exception {
+        String firstDirectory = core.getSettings().getInternal().getDatabasefile();
+        firstDirectory = TextUtils.makeSurePathIsMultiplatform(firstDirectory.substring(0, firstDirectory.lastIndexOf("/") + 1));
+        String secondDirectory = TextUtils.makeSurePathIsMultiplatform(firstDirectory + "backup/");
+        if (mode == MAKE_BACKUP) {
+            try {
+                copyBackup(firstDirectory, secondDirectory);
+            } catch (IOException ex) {
+                ex.printStackTrace();
+}
+        } else if (mode == RESTORE_BACKUP) {
+            try {
+                copyBackup(secondDirectory, firstDirectory);
+            } catch (IOException ex) {
+                throw new Exception("Failed to restore database from backup.", ex);
+            }
+        }
+    }
+
+    public void copyBackup(String source, String target) throws IOException {
+        File sourceDirectory = new File(source);
+        File targetDirectory = new File(target);
+        if (!targetDirectory.exists()) {
+            targetDirectory.mkdir();
+        } else {
+            File[] files = targetDirectory.listFiles();
+            for (File file : files) {
+                file.delete();
+            }
+        }
+        File[] files = sourceDirectory.listFiles();
+        for (File sourceFile : files) {
+            if (sourceFile.isFile() && !sourceFile.getName().contains(".lock") && !sourceFile.getName().contains(".trace")) {
+                InputStream in = new FileInputStream(sourceFile);
+                File targetFile = new File(target, sourceFile.getName());
+                OutputStream out = new FileOutputStream(targetFile);
+
+                byte[] buf = new byte[1024];
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                in.close();
+                out.close();
+            }
+        }
     }
 }

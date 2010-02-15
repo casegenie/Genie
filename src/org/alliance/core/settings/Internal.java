@@ -20,9 +20,6 @@ public class Internal extends SettingClass {
     private static final String USER_DIRECTORY;
 
     static {
-    }
-
-    static {
         if (OSInfo.isLinux()) {
             if (new File("portable").exists()) {
                 USER_DIRECTORY = "";

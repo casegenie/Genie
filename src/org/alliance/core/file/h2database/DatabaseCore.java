@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.alliance.core.CoreSubsystem;
-import org.h2.jdbc.JdbcSQLException;
 
 /**
  *
@@ -15,23 +14,23 @@ public class DatabaseCore {
 
     private final CoreSubsystem core;
     private Connection conn;
+    private boolean connected;
     private DatabaseShares dbShares;
     private DatabaseHashes dbHashes;
     private DatabaseDuplicates dbDuplicates;
     private static final String DRIVERURL = "jdbc:h2:";
     private static final String TYPE = "file:";
     //private static final String PATH = "./data/alliancedb";
-    private static final String OPTIONS = ";";
+    private static final String OPTIONS = ";DB_CLOSE_ON_EXIT=FALSE";
     private static final String USER = "sa";
     private static final String PASSWORD = "";
     private static final String DRIVER = "org.h2.Driver";
 
     public DatabaseCore(CoreSubsystem core) {
         this.core = core;
-        connect();
     }
 
-    public void connect() {
+    public void connect() throws Exception {
         try {
             Class.forName(DRIVER);
             String path = core.getSettings().getInternal().getDatabasefile();
@@ -40,16 +39,24 @@ public class DatabaseCore {
             dbShares = new DatabaseShares(conn);
             dbHashes = new DatabaseHashes(conn);
             dbDuplicates = new DatabaseDuplicates(conn);
-        } catch (JdbcSQLException ex) {
-            ex.printStackTrace();
+            connected = true;
+        } catch (ClassNotFoundException ex) {
+            throw new Exception("Failed to initalize database.", ex);
         } catch (SQLException ex) {
-            ex.printStackTrace();
-        } catch (Exception ex) {
-            ex.printStackTrace();
+            throw new Exception("Failed to load database from backup.", ex);
         }
     }
 
     public void shutdown() {
+        connected = false;
+        long time = System.currentTimeMillis();
+        //Wait max 10 seconds
+        while (core.getFileManager().getFileDatabase().isDbInUse() && System.currentTimeMillis() - time < 1000 * 10) {
+        try {
+                Thread.sleep(250);
+            } catch (InterruptedException ex) {
+            }
+        }
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SHUTDOWN COMPACT;");
@@ -83,4 +90,8 @@ public class DatabaseCore {
     public DatabaseDuplicates getDbDuplicates() {
         return dbDuplicates;
     }
+
+    public boolean isConnected() {
+        return connected;
+}
 }

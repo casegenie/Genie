@@ -511,7 +511,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                             getUploadsWindow().update();
                         }
                         // if (mdiManager != null && getFriendListMDIWindow() != null) getFriendListMDIWindow().update(); //updated by paced runner in friendlistmodel
-                        shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getTotalSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfShares() + " files");
+                        shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getShareSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfShares() + " files");
                         updateBandwidth("Downloading", "downloaded", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
                         updateBandwidth("Uploading", "uploaded", bandwidthOut, ui.getCore().getNetworkManager().getBandwidthOut());
                         displayNagAboutInvitingFriendsIfNeeded();

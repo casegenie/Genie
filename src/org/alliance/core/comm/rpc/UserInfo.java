@@ -91,7 +91,7 @@ public class UserInfo extends RPC {
     public Packet serializeTo(Packet p) {
         p.writeInt(manager.getMyGUID());
         p.writeInt(core.getSettings().getServer().getPort());
-        p.writeLong(core.getFileManager().getFileDatabase().getTotalSize());
+        p.writeLong(core.getFileManager().getFileDatabase().getShareSize());
         p.writeInt(Version.BUILD_NUMBER);
         return p;
     }

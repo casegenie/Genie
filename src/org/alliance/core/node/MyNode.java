@@ -127,7 +127,7 @@ public class MyNode extends Node {
 
     @Override
     public long getShareSize() {
-        return core.getFileManager().getFileDatabase().getTotalSize();
+        return core.getFileManager().getFileDatabase().getShareSize();
     }
 
     @Override

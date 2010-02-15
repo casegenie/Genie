@@ -436,7 +436,7 @@ public class Console {
         printer.println("");
 
         printer.println("Sharing "
-                + TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getTotalSize()) + " in " + core.getShareManager().getFileDatabase().getNumberOfShares() + " files.");
+                + TextUtils.formatByteSize(core.getShareManager().getFileDatabase().getShareSize()) + " in " + core.getShareManager().getFileDatabase().getNumberOfShares() + " files.");
         printer.println("");
     }
 
