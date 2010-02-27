@@ -17,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import org.alliance.core.comm.AutomaticUpgrade;
 
 /**
  * Created by IntelliJ IDEA.
@@ -32,21 +31,6 @@ public class Main {
     private static String link = "";
 
     public static void main(String[] args) {
-        //AutoUpgrade
-        if (new File("alliance.tmp").exists()) {
-            if (new File("alliance.tmp").length() == AutomaticUpgrade.SOURCE_JAR.length()) {
-                new File("alliance.tmp").delete();
-            } else {
-                try {
-                    AutomaticUpgrade.copyFile(new File("alliance.tmp"), AutomaticUpgrade.SOURCE_JAR);
-                    Runtime.getRuntime().exec("." + System.getProperty("file.separator") + "alliance");
-                    System.exit(0);
-                } catch (IOException ex) {
-                    System.exit(0);
-                }
-            }
-        }
-
         try {
             System.out.println("Launching Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
             System.setProperty("alliance.build", "" + Version.BUILD_NUMBER);
