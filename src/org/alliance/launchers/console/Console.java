@@ -92,24 +92,6 @@ public class Console {
 
         if ("list".equals(command)) {
             list();
-        } else if ("test".equals(command)) {
-            Thread t = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                    try {
-                        core.softRestart();
-                    } catch (IOException e) {
-                        e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                    }
-                }
-            });
-            t.start();
         } else if ("connect".equals(command)) {
             connect(params.get(0));
         } else if ("Ping".equals(command)) {
