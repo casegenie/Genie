@@ -4,7 +4,7 @@ import org.alliance.core.T;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
 import org.alliance.core.file.filedatabase.FileType;
-import static org.alliance.core.comm.rpc.SearchHitsV2.MAX_SEARCH_HITS;
+import static org.alliance.core.comm.rpc.SearchHits.MAX_SEARCH_HITS;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,7 +52,7 @@ public class Search extends RPC {
         }*/
 
         //TODO FileTYPE searching
-        SearchHitsV2 sh = new SearchHitsV2();
+        SearchHits sh = new SearchHits();
         ArrayList<SearchHit> hitList = core.getShareManager().getFileDatabase().getSearchHits(query, type, MAX_SEARCH_HITS);
         for (SearchHit hit : hitList) {
             sh.addHit(hit);

@@ -25,15 +25,7 @@ public class CacheStorage extends BlockStorage {
         String path = bf.getFd().getFullPath();
         if (T.t) {
             T.info("File in cache complete: " + path);
-        }
-
-        if (bf.getFd().getRootHash().equals(core.getFileManager().getAutomaticUpgrade().getNewVersionHash())) {
-            try {
-                core.getFileManager().getAutomaticUpgrade().performUpgrade();
-            } catch (Exception e) {
-                core.reportError(new Exception("Automatic upgrade failed!", e), null);
-            }
-        }
+        }       
     }
 
     @Override

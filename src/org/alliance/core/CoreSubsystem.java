@@ -10,7 +10,6 @@ import com.stendahls.trace.Trace;
 import com.stendahls.trace.TraceHandler;
 import com.stendahls.ui.ErrorDialog;
 import org.alliance.Subsystem;
-import org.alliance.core.comm.AutomaticUpgrade;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.rpc.AwayStatus;
 import org.alliance.core.comm.rpc.GetUserInfo;
@@ -22,6 +21,7 @@ import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.interactions.ForwardedInvitationInteraction;
 import org.alliance.core.interactions.NeedsToRestartBecauseOfUpgradeInteraction;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
+import org.alliance.core.interactions.NewVersionAvailableInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.FriendManager;
 import org.alliance.core.node.InvitaitonManager;
@@ -71,7 +71,6 @@ import javax.swing.JFrame;
  */
 public class CoreSubsystem implements Subsystem {
 
-    public final static boolean ALLOW_TO_SEND_UPGRADE_TO_FRIENDS = false; //don't forget to turn off trace, run with registered synthetica
     private static final int STATE_FILE_VERSION = 5;
     public final static int KB = 1024;
     public final static int MB = 1024 * KB;
@@ -324,7 +323,11 @@ public class CoreSubsystem implements Subsystem {
             userInternactionQue = (ArrayList<NeedsUserInteraction>) in.readObject();
             publicChatHistory = (PublicChatHistory) in.readObject();
             for (Iterator i = userInternactionQue.iterator(); i.hasNext();) {
-                if (i.next() instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
+                Object o = i.next();
+                if (o instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
+                    i.remove(); //we don't need to restart if it's a interaction from the last time we ran alliance
+                }
+                if (o instanceof NewVersionAvailableInteraction) {
                     i.remove(); //we don't need to restart if it's a interaction from the last time we ran alliance
                 }
             }
@@ -345,7 +348,7 @@ public class CoreSubsystem implements Subsystem {
             T.info("Saving settings");
         }
         if (new File(settingsFile).exists()) {
-            AutomaticUpgrade.copyFile(new File(settingsFile), new File(settingsFile + ".bak"));
+            FileManager.copyFile(new File(settingsFile), new File(settingsFile + ".bak"));
         }
 
         XMLSerializer s = new XMLSerializer();
@@ -558,6 +561,20 @@ public class CoreSubsystem implements Subsystem {
         System.exit(0);
     }
 
+    public void runUpdater(String srcDir, String targetDir, String version, int build) throws Exception {
+        if (OSInfo.isWindows()) {
+            shutdown();
+            String s = "cmd /c ." + System.getProperty("file.separator") + "updater.exe \""
+                    + srcDir + "\" \"" + targetDir + "\" \"" + version + "\" \"" + build + "\"";
+            Runtime.getRuntime().exec(s);
+            System.exit(0);
+        } else {
+            shutdown();
+            LauncherJava.execJar("updater.jar", new String[0]);
+            System.exit(0);
+        }
+    }
+
     public void uiToFront() {
         uiCallback.toFront();
     }
@@ -610,27 +627,6 @@ public class CoreSubsystem implements Subsystem {
         uiCallback.newUserInteractionQueued(ui);
     }
 
-    public NeedsUserInteraction fetchUserInteraction() {
-        if (userInternactionQue.size() > 0) {
-            NeedsUserInteraction ui = userInternactionQue.get(0);
-            userInternactionQue.remove(ui);
-            try {
-                saveState();
-            } catch (IOException e) {
-                reportError(e, this);
-            }
-            return ui;
-        }
-        return null;
-    }
-
-    public NeedsUserInteraction peekUserInteraction() {
-        if (userInternactionQue.size() > 0) {
-            return userInternactionQue.get(0);
-        }
-        return null;
-    }
-
     public void removeUserInteraction(NeedsUserInteraction nui) {
         userInternactionQue.remove(nui);
     }
@@ -649,13 +645,21 @@ public class CoreSubsystem implements Subsystem {
         networkManager.sendToAllFriends(new GetUserInfoV2());
     }
 
-    public void softRestart() throws IOException {
+    public void updateDownloaded() {
         if (uiCallback.isUIVisible()) {
             if (!doesInterationQueContain(NeedsToRestartBecauseOfUpgradeInteraction.class)) {
                 queNeedsUserInteraction(new NeedsToRestartBecauseOfUpgradeInteraction());
             }
-        } else {
-            restartProgram(false);
+        }
+    }
+
+    public void siteUpdateAvailable() {
+        if (OSInfo.isWindows()) {
+            if (uiCallback.isUIVisible()) {
+                if (!doesInterationQueContain(NewVersionAvailableInteraction.class)) {
+                    queNeedsUserInteraction(new NewVersionAvailableInteraction());
+                }
+            }
         }
     }
     private int GULCounter;
@@ -740,4 +744,4 @@ public class CoreSubsystem implements Subsystem {
     public PluginManager getPluginManager() {
         return pluginManager;
     }
-    }
+}

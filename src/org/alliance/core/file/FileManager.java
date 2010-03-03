@@ -2,8 +2,9 @@ package org.alliance.core.file;
 
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
+import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.Manager;
-import org.alliance.core.comm.AutomaticUpgrade;
+import org.alliance.core.comm.SiteUpdate;
 import org.alliance.core.file.blockstorage.BlockMask;
 import org.alliance.core.file.blockstorage.BlockStorage;
 import org.alliance.core.file.blockstorage.CacheStorage;
@@ -16,8 +17,6 @@ import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -45,8 +44,9 @@ public class FileManager extends Manager {
     private ShareManager shareManager;
     private CoreSubsystem core;
     private Settings settings;
-    private AutomaticUpgrade automaticUpgrade;
+    private SiteUpdate siteUpdater;
     public static final String INCOMPLETE_FOLDER_NAME = "_incomplete_";
+    public static final String UPDATE_FILE_NAME = "alliance.update";
     public static final int MAKE_BACKUP = 0;
     public static final int RESTORE_BACKUP = 1;
 
@@ -58,7 +58,7 @@ public class FileManager extends Manager {
     @Override
     public void init() throws IOException, Exception {
         try {
-        dbCore = new DatabaseCore(core);
+            dbCore = new DatabaseCore(core);
             dbCore.connect();
             core.getFileManager().manageBackup(MAKE_BACKUP);
         } catch (Exception ex) {
@@ -68,8 +68,11 @@ public class FileManager extends Manager {
 
         cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
         downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
-        automaticUpgrade = new AutomaticUpgrade(core, cache);
         shareManager = new ShareManager(core, settings);
+        siteUpdater = new SiteUpdate(core);
+        Thread siteUpdaterT = new Thread(siteUpdater);
+        siteUpdaterT.setName("Site Updater");
+        siteUpdaterT.start();
     }
 
     public ShareManager getShareManager() {
@@ -80,7 +83,19 @@ public class FileManager extends Manager {
         return dbCore;
     }
 
-    public void shutdown() throws IOException {        
+    public SiteUpdate getSiteUpdater() {
+        return siteUpdater;
+    }
+
+    public CacheStorage getCache() {
+        return cache;
+    }
+
+    public DownloadStorage getDownloadStorage() {
+        return downloads;
+    }
+
+    public void shutdown() throws IOException {
         shareManager.shutdown();
         cache.shutdown();
         downloads.shutdown();
@@ -135,14 +150,6 @@ public class FileManager extends Manager {
         return null;
     }
 
-    public CacheStorage getCache() {
-        return cache;
-    }
-
-    public DownloadStorage getDownloadStorage() {
-        return downloads;
-    }
-
     public boolean hasBlock(Hash rootHash, int blockNumber) throws IOException {
         if (shareManager.getFileDatabase().contains(rootHash)) {
             return true;
@@ -167,10 +174,6 @@ public class FileManager extends Manager {
         return cache.isRecentlyDownloaded(rootHash);
     }
 
-    public AutomaticUpgrade getAutomaticUpgrade() {
-        return automaticUpgrade;
-    }
-
     public void manageBackup(int mode) throws Exception {
         String firstDirectory = core.getSettings().getInternal().getDatabasefile();
         firstDirectory = TextUtils.makeSurePathIsMultiplatform(firstDirectory.substring(0, firstDirectory.lastIndexOf("/") + 1));
@@ -180,7 +183,7 @@ public class FileManager extends Manager {
                 copyBackup(firstDirectory, secondDirectory);
             } catch (IOException ex) {
                 ex.printStackTrace();
-}
+            }
         } else if (mode == RESTORE_BACKUP) {
             try {
                 copyBackup(secondDirectory, firstDirectory);
@@ -204,18 +207,22 @@ public class FileManager extends Manager {
         File[] files = sourceDirectory.listFiles();
         for (File sourceFile : files) {
             if (sourceFile.isFile() && !sourceFile.getName().contains(".lock") && !sourceFile.getName().contains(".trace")) {
-                InputStream in = new FileInputStream(sourceFile);
                 File targetFile = new File(target, sourceFile.getName());
-                OutputStream out = new FileOutputStream(targetFile);
-
-                byte[] buf = new byte[1024];
-                int len;
-                while ((len = in.read(buf)) > 0) {
-                    out.write(buf, 0, len);
-                }
-                in.close();
-                out.close();
+                copyFile(sourceFile, targetFile);
             }
         }
+    }
+
+    public static void copyFile(File src, File dst) throws IOException {
+        FileInputStream in = new FileInputStream(src);
+        FileOutputStream out = new FileOutputStream(dst);
+        byte buf[] = new byte[128 * KB];
+        int read;
+        while ((read = in.read(buf)) != -1) {
+            out.write(buf, 0, read);
+        }
+        out.flush();
+        out.close();
+        in.close();
     }
 }

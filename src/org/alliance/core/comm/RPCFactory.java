@@ -22,7 +22,6 @@ import org.alliance.core.comm.rpc.GetUserList;
 import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.comm.rpc.HashesForPath;
 import org.alliance.core.comm.rpc.IsFriend;
-import org.alliance.core.comm.rpc.NewVersionAvailable;
 import org.alliance.core.comm.rpc.NoRouteToHost;
 import org.alliance.core.comm.rpc.Ping;
 import org.alliance.core.comm.rpc.PleaseForwardInvitation;
@@ -31,7 +30,6 @@ import org.alliance.core.comm.rpc.Pong;
 import org.alliance.core.comm.rpc.Route;
 import org.alliance.core.comm.rpc.Search;
 import org.alliance.core.comm.rpc.SearchHits;
-import org.alliance.core.comm.rpc.SearchHitsV2;
 import org.alliance.core.comm.rpc.ShareBaseList;
 import org.alliance.core.comm.rpc.UserInfo;
 import org.alliance.core.comm.rpc.UserInfoV2;
@@ -70,7 +68,7 @@ public class RPCFactory {
                 rpc = new IsFriend();
                 break;
             case 10:
-                rpc = new NewVersionAvailable();
+                //Old RPC NewVersionAvailable;
                 break;
             case 11:
                 rpc = new NoRouteToHost();
@@ -88,7 +86,7 @@ public class RPCFactory {
                 rpc = new Search();
                 break;
             case 17:
-                rpc = new SearchHits();
+                //Old RPC SearchHits;
                 break;
             case 18:
                 rpc = new UserInfo();
@@ -136,7 +134,7 @@ public class RPCFactory {
                 rpc = new UserInfoV2();
                 break;
             case 33:
-                rpc = new SearchHitsV2();
+                rpc = new SearchHits();
                 break;
             case 34:
                 rpc = new AwayStatus();
@@ -153,7 +151,7 @@ public class RPCFactory {
         }
         if (rpc == null) {
             if (T.t) {
-                T.error("UNRECOGNIZED rpc id: " + packetId);
+                T.error("UNRECOGNIZED or OLD rpc id: " + packetId);
             }
         }
         return rpc;
@@ -187,9 +185,7 @@ public class RPCFactory {
         if (rpc instanceof IsFriend) {
             return 9;
         }
-        if (rpc instanceof NewVersionAvailable) {
-            return 10;
-        }
+        //Old RPC NewVersionAvailable return 10;
         if (rpc instanceof NoRouteToHost) {
             return 11;
         }
@@ -205,9 +201,7 @@ public class RPCFactory {
         if (rpc instanceof Search) {
             return 16;
         }
-        if (rpc instanceof SearchHits) {
-            return 17;
-        }
+        //Old RPC SearchHits return 17;
         if (rpc instanceof UserInfo) {
             return 18;
         }
@@ -253,7 +247,7 @@ public class RPCFactory {
         if (rpc instanceof UserInfoV2) {
             return 32;
         }
-        if (rpc instanceof SearchHitsV2) {
+        if (rpc instanceof SearchHits) {
             return 33;
         }
         if (rpc instanceof AwayStatus) {
@@ -269,7 +263,7 @@ public class RPCFactory {
             return 37;
         }
         if (T.t) {
-            T.error("Could not identify RPC: " + rpc);
+            T.error("Could not identify or old RPC: " + rpc);
         }
         return -1;
     }

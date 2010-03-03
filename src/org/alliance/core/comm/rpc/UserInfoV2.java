@@ -1,12 +1,10 @@
 package org.alliance.core.comm.rpc;
 
 import org.alliance.Version;
-import org.alliance.core.CoreSubsystem;
 import org.alliance.core.T;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
-import org.alliance.core.file.hash.Hash;
 import org.alliance.core.node.Friend;
 
 import java.io.IOException;
@@ -59,17 +57,7 @@ public class UserInfoV2 extends RPC {
                 f.updateLastKnownHostInfo(dnsName, port);
             }
         } catch (BufferUnderflowException ex) {
-        }
-
-        if (CoreSubsystem.ALLOW_TO_SEND_UPGRADE_TO_FRIENDS) {
-            if (buildNumber < Version.BUILD_NUMBER && buildNumber > 1120) {
-                //remote has old version
-                Hash h = core.getFileManager().getAutomaticUpgrade().getMyJarHash();
-                if (h != null) {
-                    send(new NewVersionAvailable(h));
-                }
-            }
-        }
+        }     
 
         //now that we have a good connection to friend: verify that we only have ONE connection
         if (con.getRemoteFriend().hasMultipleFriendConnections()) {

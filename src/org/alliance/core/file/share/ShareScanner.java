@@ -174,11 +174,11 @@ public class ShareScanner extends Thread {
         if (!alive) {
             return;
         }
+        if (shouldSkip(file.getName())) {
+            return;
+        }
 
         if (file.isDirectory()) {
-            if (shouldSkip(file.getName())) {
-                return;
-            }
             File[] children = file.listFiles();
             if (children != null) {
                 for (int i = 0; i < children.length; i++) {
@@ -297,12 +297,18 @@ public class ShareScanner extends Thread {
         }
     }
 
-    private boolean shouldSkip(String dir) {
-        String s = TextUtils.makeSurePathIsMultiplatform(dir);
+    private boolean shouldSkip(String name) {
+        String s = TextUtils.makeSurePathIsMultiplatform(name);
         if (s.endsWith("/")) {
             s = s.substring(0, s.length() - 1);
         }
-        return s.endsWith(FileManager.INCOMPLETE_FOLDER_NAME);
+        if (s.endsWith(FileManager.UPDATE_FILE_NAME)) {
+            return true;
+        }
+        if (s.endsWith(FileManager.INCOMPLETE_FOLDER_NAME)) {
+            return true;
+        }
+        return false;
     }
 
     public void kill() {
@@ -320,7 +326,7 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileRenamed(final String basePath, final String oldFile, final String newFile) {
-        if (!scannerHasBeenStarted || newFile.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+        if (!scannerHasBeenStarted || newFile.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1 || newFile.indexOf(FileManager.UPDATE_FILE_NAME) != -1) {
             return;
         }
         core.invokeLater(new Runnable() {
@@ -342,7 +348,7 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileDeleted(final String basePath, final String file) {
-        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1 || file.indexOf(FileManager.UPDATE_FILE_NAME) != -1) {
             return;
         }
         core.invokeLater(new Runnable() {
@@ -363,7 +369,7 @@ public class ShareScanner extends Thread {
     }
 
     public void signalFileCreated(final String file) {
-        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1) {
+        if (!scannerHasBeenStarted || file.indexOf(FileManager.INCOMPLETE_FOLDER_NAME) != -1 || file.indexOf(FileManager.UPDATE_FILE_NAME) != -1) {
             return;
         }
         queFileForHashing(file, false);
