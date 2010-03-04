@@ -59,7 +59,7 @@ public class SiteUpdate implements Runnable {
     public void run() {
         //Delayed start
         try {
-            Thread.sleep(1 * 15 * 1000);
+            Thread.sleep(15 * 1000);
         } catch (InterruptedException ex) {
         }
         while (alive) {

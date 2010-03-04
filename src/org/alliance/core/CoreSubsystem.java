@@ -654,11 +654,9 @@ public class CoreSubsystem implements Subsystem {
     }
 
     public void siteUpdateAvailable() {
-        if (OSInfo.isWindows()) {
-            if (uiCallback.isUIVisible()) {
-                if (!doesInterationQueContain(NewVersionAvailableInteraction.class)) {
-                    queNeedsUserInteraction(new NewVersionAvailableInteraction());
-                }
+        if (uiCallback.isUIVisible()) {
+            if (!doesInterationQueContain(NewVersionAvailableInteraction.class)) {
+                queNeedsUserInteraction(new NewVersionAvailableInteraction());
             }
         }
     }
