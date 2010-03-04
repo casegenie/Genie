@@ -9,6 +9,7 @@ import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.nif.ui.mdi.infonodemdi.InfoNodeMDIManager;
 import com.stendahls.nif.ui.toolbaractions.ToolbarActionManager;
 import com.stendahls.nif.util.SXML;
+import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.ui.util.RecursiveBackgroundSetter;
 import com.stendahls.util.TextUtils;
 import de.javasoft.plaf.synthetica.SyntheticaRootPaneUI;
@@ -26,6 +27,7 @@ import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
+import org.alliance.core.interactions.NewVersionAvailableInteraction;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
@@ -47,8 +49,10 @@ import org.alliance.ui.windows.UploadsMDIWindow;
 import org.alliance.ui.windows.WelcomeMDIWindow;
 import org.alliance.ui.windows.search.SearchMDIWindow;
 import org.alliance.ui.windows.viewshare.ViewShareMDIWindow;
+import org.alliance.ui.windows.SharesWindow;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -66,13 +70,15 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.plaf.metal.MetalButtonUI;
-import org.alliance.ui.windows.SharesWindow;
 
 /**
  * Created by IntelliJ IDEA.
@@ -109,8 +115,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         xui.setMenuItemDescriptionListener(this);
         statusMessage = (JLabel) xui.getComponent("statusbar");
         shareMessage = (JLabel) xui.getComponent("sharing");
-//        uploadMessage = (JLabel)xui.getComponent("totalup");
-//        downloadMessage = (JLabel)xui.getComponent("totaldown");
 
         setupToolbar();
 
@@ -635,12 +639,37 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
             } else if (nui instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
-                    OptionDialog.showInformationDialog(this, "A new version of Alliance has been downloaded and installed in the background.[p]Next time you start Alliance the new version will start.");
-                } else {
+                    OptionDialog.showInformationDialog(this, "A new version of Alliance has been downloaded.[p]Alliance will now run updater to install new version.");
+                    ui.getCore().getFileManager().getSiteUpdater().prepareUpdate();
+                }
+            } else if (nui instanceof NewVersionAvailableInteraction) {
+                if (!ui.getCore().getAwayManager().isAway()) {
                     try {
-                        ui.getCore().restartProgram(true);
-                    } catch (IOException e) {
-                        ui.handleErrorInEventLoop(e);
+                        OptionDialog updateDialog = new OptionDialog(this, "Update Available", "A new update for Alliance is available:[p][b]Alliance Version "
+                                + ui.getCore().getFileManager().getSiteUpdater().getSiteVersion()
+                                + " build (" + ui.getCore().getFileManager().getSiteUpdater().getSiteBuild()
+                                + ")[/b][p]Do you want to update now?[p][a href='.']View more information about this update[/a]", 1, 1);
+                        JLayeredPane lp = (JLayeredPane) updateDialog.getRootPane().getComponent(1);
+                        JPanel p = (JPanel) ((JPanel) lp.getComponent(0)).getComponent(0);
+                        for (Component c : p.getComponents()) {
+                            if (c instanceof JHtmlLabel) {
+
+                                ((JHtmlLabel) c).addHyperlinkListener(new HyperlinkListener() {
+
+                                    @Override
+                                    public void hyperlinkUpdate(HyperlinkEvent e) {
+                                        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+                                            ui.openURL("http://code.google.com/p/alliancep2pbeta/wiki/Info");
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                        if (updateDialog.showAndGetResult()) {
+                            ui.getCore().getFileManager().getSiteUpdater().beginDownload();
+                        }
+                    } catch (Exception ex) {
+                        ui.getCore().getUICallback().statusMessage("Update check failed", true);
                     }
                 }
             } else if (nui instanceof ForwardedInvitationInteraction) {
@@ -769,8 +798,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     public void EVENT_options(ActionEvent e) throws Exception {
         new OptionsWindow(ui);
     }
-    
-      public void EVENT_shares(ActionEvent e) throws Exception {
+
+    public void EVENT_shares(ActionEvent e) throws Exception {
         new SharesWindow(ui);
     }
 
