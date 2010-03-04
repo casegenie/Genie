@@ -35,7 +35,7 @@ public class SiteUpdate implements Runnable {
     private String orginalFilePath;
     private String siteVersion = Version.VERSION;
     private int siteBuild = Version.BUILD_NUMBER;
-    private boolean upgradeAttemtHasBeenMade = false;
+    private boolean updateAttemtHasBeenMade = false;
 
     public SiteUpdate(CoreSubsystem core) throws IOException {
         this.core = core;
@@ -157,18 +157,18 @@ public class SiteUpdate implements Runnable {
         core.getUICallback().statusMessage("Update verified! Restarting.");
 
         if (T.t) {
-            T.info("Jar verified! Upgrading...");
+            T.info("Jar verified! Updating...");
         }
     }
 
     public void prepareUpdate() {
         try {
-            if (upgradeAttemtHasBeenMade) {
+            if (updateAttemtHasBeenMade) {
                 if (T.t) {
                     T.info("No need to try to upgrade to new version several times.");
                 }
             }
-            upgradeAttemtHasBeenMade = true;
+            updateAttemtHasBeenMade = true;
             core.runUpdater(updateFilePath, orginalFilePath, siteVersion, siteBuild);
         } catch (Exception e) {
             core.getUICallback().statusMessage("Update failed.", true);

@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.alliance.launchers.OSInfo;
 
 /**
  * JavaLauncher Provides an easy way to launch java appliations. The <code>ClasspathBuilder</code> class
@@ -166,7 +167,11 @@ public class LauncherJava {
         }
 
         //add binary folder
-        jvm = jvm + File.separator + "bin" + File.separator + "javaw";
+         if (OSInfo.isWindows()) {
+            jvm = jvm + File.separator + "bin" + File.separator + "javaw";
+        } else {
+            jvm = jvm + File.separator + "bin" + File.separator + "java";
+        }
         return jvm;
     }
 }
