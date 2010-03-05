@@ -570,7 +570,7 @@ public class CoreSubsystem implements Subsystem {
             System.exit(0);
         } else {
             shutdown();
-            LauncherJava.execJar("updater.jar", new String[0]);
+            LauncherJava.execJar("updater.jar", new String[0], "");
             System.exit(0);
         }
     }

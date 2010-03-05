@@ -35,7 +35,7 @@ public class SiteUpdate implements Runnable {
     private String orginalFilePath;
     private String siteVersion = Version.VERSION;
     private int siteBuild = Version.BUILD_NUMBER;
-    private boolean updateAttemtHasBeenMade = false;
+    private boolean updateAttemptHasBeenMade = false;
 
     public SiteUpdate(CoreSubsystem core) throws IOException {
         this.core = core;
@@ -163,12 +163,12 @@ public class SiteUpdate implements Runnable {
 
     public void prepareUpdate() {
         try {
-            if (updateAttemtHasBeenMade) {
+            if (updateAttemptHasBeenMade) {
                 if (T.t) {
                     T.info("No need to try to upgrade to new version several times.");
                 }
             }
-            updateAttemtHasBeenMade = true;
+            updateAttemptHasBeenMade = true;
             core.runUpdater(updateFilePath, orginalFilePath, siteVersion, siteBuild);
         } catch (Exception e) {
             core.getUICallback().statusMessage("Update failed.", true);

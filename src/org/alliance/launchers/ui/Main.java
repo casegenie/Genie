@@ -31,6 +31,9 @@ public class Main {
     private static String link = "";
 
     public static void main(String[] args) {
+        if (!OSInfo.isWindows()) {
+            new DirectoryCheck();
+        }
         try {
             System.out.println("Launching Alliance v" + Version.VERSION + " build " + Version.BUILD_NUMBER);
             System.setProperty("alliance.build", "" + Version.BUILD_NUMBER);
