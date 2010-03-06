@@ -3,9 +3,10 @@ package org.alliance.core.comm;
 import com.stendahls.nif.util.jarverifier.JarVerifier;
 import org.alliance.Version;
 import org.alliance.core.CoreSubsystem;
-import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.file.FileManager;
 import org.alliance.launchers.OSInfo;
+import static org.alliance.core.CoreSubsystem.KB;
+import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,11 +41,7 @@ public class SiteUpdate implements Runnable {
     public SiteUpdate(CoreSubsystem core) throws IOException {
         this.core = core;
         updateFilePath = core.getFileManager().getCache().getCompleteFilesFilePath().getCanonicalPath() + System.getProperty("file.separator") + FileManager.UPDATE_FILE_NAME;
-        if (OSInfo.isWindows()) {
-            orginalFilePath = new File("alliance.dat").getCanonicalPath();
-        } else {
-            orginalFilePath = new File("alliance.jar").getCanonicalPath();
-        }
+        orginalFilePath = new File(STARTED_JAR_NAME).getCanonicalPath();
     }
 
     public int getSiteBuild() {

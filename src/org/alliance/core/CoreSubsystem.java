@@ -34,6 +34,7 @@ import org.alliance.launchers.ui.Main;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.InputSource;
+import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
@@ -540,7 +541,7 @@ public class CoreSubsystem implements Subsystem {
         uiCallback.handleError(e, source);
     }
 
-    public void restartProgram(boolean openWithUI) throws IOException {
+    public void restartProgram(boolean openWithUI) throws Exception {
         restartProgram(openWithUI, 2);
     }
 
@@ -549,16 +550,21 @@ public class CoreSubsystem implements Subsystem {
      * @param restartDelay Wait this many minutes before actually starting the program. This is for "Shutdown for 30 minuters" etc..
      * @throws java.io.IOException if the program cant be restarted
      */
-    public void restartProgram(boolean openWithUI, int restartDelay) throws IOException {
-        shutdown();
-
-        Main.stopStartSignalThread(); //such a fucking hack. When we run using the normal UI we need to signal the launcher that he needs to stop this startsignalthread
-        String s = "." + System.getProperty("file.separator") + "alliance" + //must have exe/script/batch in current directory to start program
-                (openWithUI ? "" : " /min")
-                + (restartDelay == 0 ? "" : " /w" + restartDelay);
-
-        Runtime.getRuntime().exec(s);
-        System.exit(0);
+    public void restartProgram(boolean openWithUI, int restartDelay) throws Exception {
+        if (OSInfo.isWindows()) {
+            shutdown();
+            Main.stopStartSignalThread(); //such a fucking hack. When we run using the normal UI we need to signal the launcher that he needs to stop this startsignalthread
+            String s = "." + System.getProperty("file.separator") + "alliance.exe"
+                    + (openWithUI ? "" : " /min")
+                    + (restartDelay == 0 ? "" : " /w" + restartDelay);
+            Runtime.getRuntime().exec(s);
+            System.exit(0);
+        } else {
+            shutdown();
+            Main.stopStartSignalThread();
+            LauncherJava.execJar(STARTED_JAR_NAME, new String[0], new String[]{openWithUI ? "" : "/min", restartDelay == 0 ? "" : "/w" + restartDelay}, "");
+            System.exit(0);
+        }
     }
 
     public void runUpdater(String srcDir, String targetDir, String version, int build) throws Exception {
@@ -570,7 +576,7 @@ public class CoreSubsystem implements Subsystem {
             System.exit(0);
         } else {
             shutdown();
-            LauncherJava.execJar("updater.jar", new String[0], "");
+            LauncherJava.execJar("updater.jar", new String[0], new String[0], "");
             System.exit(0);
         }
     }

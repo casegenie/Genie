@@ -84,10 +84,10 @@ public class LauncherJava {
      * @param jvmargs - arguments for the java virtual machine
      * @return Process
      */
-    public static Process execJar(String pathToJar, String[] jvmargs, String currentDir) throws Exception {
+    public static Process execJar(String pathToJar, String[] jvmargs, String[] args, String currentDir) throws Exception {
         String jvm = findJVM();
 
-        String[] command = new String[jvmargs.length + 3];
+        String[] command = new String[jvmargs.length + args.length + 3];
         command[0] = jvm;
 
         //copy arguments into command
@@ -96,12 +96,15 @@ public class LauncherJava {
         command[jvmargs.length + 1] = "-jar";
         command[jvmargs.length + 2] = new File(pathToJar).getAbsolutePath();
 
+        //add jar arguments
+        System.arraycopy(args, 0, command, jvmargs.length + 3, args.length);
+
         //combine to printable string for debugging
         StringBuffer wholeCommand = new StringBuffer();
         for (int i = 0; i < command.length; i++) {
             wholeCommand.append(command[i] + " ");
         }
-
+        
         logger.log(Level.INFO, "Executing Command: " + wholeCommand);
 
         try {

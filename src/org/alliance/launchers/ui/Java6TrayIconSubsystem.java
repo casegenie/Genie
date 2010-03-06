@@ -27,7 +27,6 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.TreeMap;
-import org.alliance.launchers.OSInfo;
 
 /**
  * New tray icon using java.awt.SystemTray (new stuff in Java 6).
@@ -186,20 +185,18 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         });
         m.add(mi);
 
-        if (OSInfo.isWindows()) {
-            m.addSeparator();
+        m.addSeparator();
 
-            mi = new MenuItem("Unload UI");
-            mi.setFont(f);
-            mi.addActionListener(new ActionListener() {
+        mi = new MenuItem("Unload UI");
+        mi.setFont(f);
+        mi.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    unloadUI();
-                }
-            });
-            m.add(mi);
-        }
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                unloadUI();
+            }
+        });
+        m.add(mi);
 
         m.addSeparator();
 

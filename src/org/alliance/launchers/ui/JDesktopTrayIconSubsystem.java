@@ -34,7 +34,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.alliance.launchers.OSInfo;
 
 /**
  * Created by IntelliJ IDEA.
@@ -223,21 +222,6 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
             }
         });
         m.add(mi);
-
-        if (OSInfo.isWindows()) {
-            m.addSeparator();
-
-            mi = new JMenuItem("Unload UI");
-            mi.setFont(f);
-            mi.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    unloadUI();
-                }
-            });
-            m.add(mi);
-        }
 
         m.addSeparator();
 
