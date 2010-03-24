@@ -30,15 +30,23 @@ public class DirectoryCheck {
                     }
                 }
             } catch (NullPointerException e) {
-                if (T.t) {
-                    e.printStackTrace();
-                    T.info("There was an error restarting alliance into the current directory, probably starting from debug build");
-                }
+                debugInfo(e);
+                return;
+            } catch (IndexOutOfBoundsException e) {
+                debugInfo(e);
                 return;
             }
         } else {
             STARTED_JAR_NAME = "alliance.dat";
         }
+    }
+
+    private void debugInfo(Exception e) {
+        if (T.t) {
+            e.printStackTrace();
+            T.info("There was an error restarting alliance into the current directory, probably starting from debug build");
+        }
+        STARTED_JAR_NAME = "debug.jar";
     }
 
     private String pathHelper() {
