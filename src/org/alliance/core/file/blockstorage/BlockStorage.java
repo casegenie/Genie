@@ -4,6 +4,7 @@ import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.BLOCK_SIZE;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
+import org.alliance.core.LanguageResource;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -82,7 +83,7 @@ public abstract class BlockStorage extends Thread {
                     if (T.t) {
                         T.info("Took from BlockStorage finishing que: " + bf);
                     }
-                    core.getUICallback().statusMessage("Verifying and defragmenting " + bf.getFd().getSubpath() + "...");
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "verify").replace("$FILENAME", bf.getFd().getSubpath()));
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
 
@@ -97,7 +98,7 @@ public abstract class BlockStorage extends Thread {
                             signalFileComplete(bf);
                         }
                     });
-                    core.getUICallback().statusMessage("File complete: " + bf.getFd().getSubpath());
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecomplete").replace("$FILENAME", bf.getFd().getSubpath()));
                 } catch (Exception e) {
                     core.reportError(e, bf.getFd() == null ? bf : bf);
                 }
@@ -140,8 +141,13 @@ public abstract class BlockStorage extends Thread {
     }
 
     /**
+     * @param root
+     * @param blockNumber
      * @param sliceOffset The offset into this block at wich the slice should be saved
+     * @param fd 
+     * @param slice 
      * @return Number of bytes written
+     * @throws IOException
      */
     public synchronized int saveSlice(Hash root, int blockNumber, int sliceOffset, ByteBuffer slice, FileDescriptor fd) throws IOException {
         if (T.t) {
@@ -189,7 +195,7 @@ public abstract class BlockStorage extends Thread {
             Hash h = bf.calculateHash(blockNumber);
             if (!h.equals(bf.getFd().getSubHash(blockNumber))) {
                 bf.blockCorrupted(blockNumber);
-                core.getUICallback().statusMessage("Part of file corrupted while downloading!! Retrying...");
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecorrupt"));
                 if (T.t) {
                     T.error("Tiger hash incorrect for block " + blockNumber + " when saved to disk!!!");
                 }

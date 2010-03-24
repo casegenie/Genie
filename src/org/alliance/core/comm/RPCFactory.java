@@ -37,6 +37,9 @@ import org.alliance.core.comm.rpc.UserList;
 
 public class RPCFactory {
 
+    private RPCFactory() {
+    }
+
     public static RPC newInstance(int packetId) {
         RPC rpc = null;
         switch (packetId) {

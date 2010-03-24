@@ -19,6 +19,9 @@ public class LauncherJava {
     private static Logger logger = Logger.getLogger("JavaLauncher");
     private static boolean debug = false;
 
+    private LauncherJava() {
+    }
+
     /**
      * Launch a java program.
      * @param mainClass - class with main method
@@ -26,7 +29,8 @@ public class LauncherJava {
      * @param jvmargs - arguments for the jvm
      * @param properties - any system properties
      * @param xDockName - Mac os x, application name
-     * @param xDockIcon - Mac os x, application icon
+     * @return
+     * @throws Exception
      */
     public static Process exec(String mainClass, String classpath, String[] jvmargs, String[] properties, String xDockName) throws Exception {
 
@@ -82,7 +86,10 @@ public class LauncherJava {
      * Execute a java jar file that contains a manifest.
      * @param pathToJar - absolute path to your jar
      * @param jvmargs - arguments for the java virtual machine
+     * @param args
+     * @param currentDir
      * @return Process
+     * @throws Exception
      */
     public static Process execJar(String pathToJar, String[] jvmargs, String[] args, String currentDir) throws Exception {
         String jvm = findJVM();
@@ -104,7 +111,7 @@ public class LauncherJava {
         for (int i = 0; i < command.length; i++) {
             wholeCommand.append(command[i] + " ");
         }
-        
+
         logger.log(Level.INFO, "Executing Command: " + wholeCommand);
 
         try {

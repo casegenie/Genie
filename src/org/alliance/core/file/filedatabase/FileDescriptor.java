@@ -9,6 +9,7 @@ import org.alliance.core.file.blockstorage.BlockFile;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.hash.Tiger;
 import org.alliance.core.file.share.T;
+import org.alliance.core.LanguageResource;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -90,7 +91,7 @@ public class FileDescriptor {
         int read;
         long startedLastReadAt = System.currentTimeMillis();
         if (callback != null) {
-            callback.statusMessage("Hashing " + file.getName() + "...");
+            callback.statusMessage(LanguageResource.getLocalizedString(getClass(), "hashing").replace("$FILENAME", file.getName()));
         }
         long updateHashMessageTick = System.currentTimeMillis() + 1500; //delay first update with 1500ms
         long startTick = System.currentTimeMillis();
@@ -115,13 +116,14 @@ public class FileDescriptor {
 
             startedLastReadAt = System.currentTimeMillis();
             if (callback != null && System.currentTimeMillis() - updateHashMessageTick > 500) {
-                String s2 = "";
+                String hashLimit = "";
                 if (hashSpeedInMbPerSecond > 0) {
-                    s2 = " [hash speed limit: " + hashSpeedInMbPerSecond + "Mb/s]";
+                    hashLimit = " " + LanguageResource.getLocalizedString(getClass(), "hashlimit").replace("$HLIMIT", Integer.toString(hashSpeedInMbPerSecond));
                 }
-                String s = "Hashing " + file.getName() + " (" + (totalRead * 100 / file.length()) + "% done @ "
-                        + TextUtils.formatByteSize(totalRead / ((System.currentTimeMillis() - startTick) / 1000))
-                        + "/s" + s2 + ")";
+                String s = LanguageResource.getLocalizedString(getClass(), "hashprogress").replace("$FILENAME", file.getName()).
+                        replace("$PERCENT", Long.toString(totalRead * 100 / file.length())).
+                        replace("$TICK", TextUtils.formatByteSize(totalRead / ((System.currentTimeMillis() - startTick) / 1000))).
+                        replace("$HLIMIT", hashLimit);
                 callback.statusMessage(s);
                 updateHashMessageTick = System.currentTimeMillis();
             }

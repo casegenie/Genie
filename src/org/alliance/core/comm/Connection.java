@@ -94,7 +94,9 @@ public abstract class Connection {
         return TextUtils.simplifyClassName(getClass()) + " [" + key + "]";
     }
 
-    /** Close this connection */
+    /** Close this connection
+     * @throws IOException 
+     */
     public void close() throws IOException {
         connected = false;
         netMan.closed(this);

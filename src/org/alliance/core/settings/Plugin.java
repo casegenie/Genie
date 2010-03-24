@@ -43,6 +43,10 @@ public class Plugin {
     /**
      * Code below gets a file in the root of the jar with a name of JARCLASSFILE
      * this class needs to contain the alliance class
+     * @param file 
+     * @return 
+     * @throws IOException
+     * @throws FileNotFoundException 
      */
     public boolean init(File file) throws IOException, FileNotFoundException {
         if (file.exists()) {

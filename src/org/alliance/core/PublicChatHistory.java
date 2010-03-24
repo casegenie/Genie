@@ -35,7 +35,6 @@ public class PublicChatHistory implements Serializable {
         }
     }
 
-    //Bastvera /clearlog
     public void clearHistory() {
         while (chatMessages.size() > 0) {
             chatMessages.remove(0);

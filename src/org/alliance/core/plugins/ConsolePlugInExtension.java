@@ -19,7 +19,8 @@ public interface ConsolePlugInExtension {
      * -Output should be displayed to the user using the Printer object passed in
      * 
      * @param line The command to be parsed
-     * @param print The printing method that is being used
+         * @param print The printing method that is being used
+         * @return 
      */
 	abstract boolean handleLine(String line, Printer print);
 	

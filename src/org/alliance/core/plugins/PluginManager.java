@@ -3,6 +3,7 @@ package org.alliance.core.plugins;
 import org.alliance.core.Manager;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
+import org.alliance.core.LanguageResource;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +12,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.ListIterator;
-
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -36,7 +36,7 @@ public class PluginManager extends Manager {
 
     @Override
     public void init() throws Exception {
-    	plugInConsoleExtensions = new ArrayList<ConsolePlugInExtension>();
+        plugInConsoleExtensions = new ArrayList<ConsolePlugInExtension>();
         if (!core.getSettings().getPluginlist().isEmpty()) {
             setupClassLoader();
             for (org.alliance.core.settings.Plugin p : core.getSettings().getPluginlist()) {
@@ -46,27 +46,26 @@ public class PluginManager extends Manager {
                     plugInConsoleExtensions.add(pi.getConsoleExtensions());
                     plugIns.add(pi);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, 
-                            "There was an error loading the main class of  " + p.getJar() + " so this plugin will be disabled");
+                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "classerror").replace("$PLUGIN", p.getJar()));
                 }
             }
         }
     }
-    
+
     public List<ConsolePlugInExtension> getPluginConsoleExtensions() {
-    	return plugInConsoleExtensions;
+        return plugInConsoleExtensions;
     }
 
     private void setupClassLoader() throws Exception {
         List<URL> l = new ArrayList<URL>();
-        for(ListIterator<Plugin> itr = core.getSettings().getPluginlist().listIterator(); itr.hasNext(); ) {
-            org.alliance.core.settings.Plugin p = (Plugin) itr.next();
+        for (ListIterator<Plugin> itr = core.getSettings().getPluginlist().listIterator(); itr.hasNext();) {
+            org.alliance.core.settings.Plugin p = itr.next();
             File f = new File(p.getJar());
             if (f.exists()) {
                 l.add(f.toURI().toURL());
             } else {
-                int response = JOptionPane.showConfirmDialog(null, "There was an error loading the plugin " + f + " because the file does not exist \n" +
-                        "would you like to attempt to locate the jar?", "Error Loading jar", JOptionPane.YES_NO_OPTION);
+                int response = JOptionPane.showConfirmDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror").
+                        replace("$PLUGIN", f.getName()), LanguageResource.getLocalizedString(getClass(), "loadingerrorheader"), JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     JFileChooser file = new JFileChooser();
                     FileNameExtensionFilter filter = new FileNameExtensionFilter("JAR files", "JAR", "jar", "Jar");
@@ -79,9 +78,7 @@ public class PluginManager extends Manager {
                             l.add(file.getSelectedFile().toURI().toURL());
                             itr.add(newPlugin);
                         } catch (FileNotFoundException e) {
-                            JOptionPane.showMessageDialog(null, 
-                                    "The Jar file " + file.getSelectedFile() + 
-                                        " is missing the launcher file, and was unable to be loaded correctly");
+                            JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror").replace("$PLUGIN", file.getSelectedFile().getName()));
                         }
                     }
                 } else {

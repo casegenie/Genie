@@ -17,6 +17,7 @@ public interface PlugIn {
      * Returns the callback object for the debug console.
      * 
      * Return null if no debug console extensions are implemented
+     * @return 
      */
     
     abstract ConsolePlugInExtension getConsoleExtensions();

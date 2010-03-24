@@ -39,7 +39,7 @@ public interface UICallback {
      * @param friend
      * @param shareBaseIndex
      * @param path
-     * @param files
+     * @param fileSize 
      */
     void receivedDirectoryListing(Friend friend, int shareBaseIndex, String path, TreeMap<String, Long> fileSize);
 

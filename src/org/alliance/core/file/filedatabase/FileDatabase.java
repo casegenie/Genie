@@ -2,13 +2,13 @@ package org.alliance.core.file.filedatabase;
 
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
-import org.alliance.core.SimpleTimer;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.core.file.FileManager;
 import org.alliance.launchers.console.Console;
 import static org.alliance.core.CoreSubsystem.KB;
+import org.alliance.core.LanguageResource;
 
 import java.io.File;
 import java.io.IOException;
@@ -97,7 +97,7 @@ public class FileDatabase {
             while (results.next()) {
                 removeEntry(results.getBytes("root_hash"));
                 removedFiles++;
-                core.getUICallback().statusMessage("Removed " + removedFiles + " files from removed share - " + basePath);
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare").replace("$NFILES", Integer.toString(removedFiles)).replace("$SHARE", basePath));
                 recurse = true;
             }
             if (recurse) {
@@ -118,7 +118,7 @@ public class FileDatabase {
         try {
             boolean recurse = false;
             while (results.next()) {
-                core.getUICallback().statusMessage("Searching for removed files: (" + scannedFiles * 100 / snapshotNumberOfShares + "%)");
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch").replace("$PERCENT", Integer.toString(scannedFiles * 100 / snapshotNumberOfShares)));
                 scannedFiles++;
                 if (!(new File(mergePathParts(results.getString("base_path"), results.getString("sub_path"), results.getString("filename"))).exists())) {
                     removeEntry(results.getBytes("root_hash"));
@@ -343,12 +343,6 @@ public class FileDatabase {
         return duplicates;
     }
 
-    public synchronized void flush() throws IOException {
-        core.getUICallback().statusMessage("<html><b><font color=blue>Saving settings...</font></b></html>");
-        SimpleTimer st = new SimpleTimer();
-        core.getUICallback().statusMessage("Saved settings in " + st.getTime());
-    }
-
     public boolean contains(String basePath, String path, boolean checkDuplicates) {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return false;
@@ -524,7 +518,7 @@ public class FileDatabase {
     }
 
     public void printStats(Console.Printer printer) throws IOException {
-        printer.println("Filedatabse stats:");
+        printer.println("Not yet implemented...");
     }
 
     private class FileIndex {

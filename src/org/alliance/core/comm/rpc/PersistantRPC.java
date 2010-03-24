@@ -35,6 +35,7 @@ public abstract class PersistantRPC extends RPC implements Serializable {
 
     /**
      * Return true if this PersistantRPC is older than a month.
+     * @return 
      */
     public boolean hasExpired() {
         return System.currentTimeMillis() - timestamp > ((long) 1000) * 60 * 60 * 24 * 31;

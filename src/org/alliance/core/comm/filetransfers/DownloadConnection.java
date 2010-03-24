@@ -7,6 +7,7 @@ import org.alliance.core.file.hash.Hash;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import org.alliance.core.LanguageResource;
 
 /**
  * Created by IntelliJ IDEA.
@@ -179,7 +180,7 @@ public class DownloadConnection extends TransferConnection {
                 }
             }
         } else {
-            setStatusString("Downloading block " + blockNumber);
+            setStatusString(LanguageResource.getLocalizedString(getClass(), "downblock").replace("$BNUMBER", Integer.toString(blockNumber)));
 
             if (T.t) {
                 T.info("Starting to download block " + blockNumber);

@@ -7,6 +7,7 @@ import org.alliance.core.comm.HandshakeConnection;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.PacketConnection;
+import org.alliance.core.LanguageResource;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -73,14 +74,14 @@ public class TCPNIONetworkLayer implements Runnable {
     public void connect(final String host, final int port, final AuthenticatedConnection connection) throws IOException {
         try {
             if (T.t) {
-                T.info("Attempting to connect to " + host + ":" + port + "... (outstanding connections: " +
-                        pendingConnectionAttempts.size() + ")");
+                T.info("Attempting to connect to " + host + ":" + port + "... (outstanding connections: "
+                        + pendingConnectionAttempts.size() + ")");
             }
             if (netMan.getCore().getSettings().getInternal().getEnableiprules() == 1) {
                 if (netMan.getCore().getSettings().getRulelist().checkConnection(host)) {
                     //Connect, continue
                 } else {
-                    netMan.getCore().getUICallback().statusMessage("Connection to " + host + " was blocked becuase of your ip rules");
+                    netMan.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "conblocked").replace("$HOST", host));
                     return;
                 }
             } else {
@@ -144,6 +145,10 @@ public class TCPNIONetworkLayer implements Runnable {
 
     /**
      * Packet must have been prepared for send using "Packet.prepareForSend"!
+     * @param key
+     * @param p
+     * @return
+     * @throws IOException
      */
     public int send(Object key, Packet p) throws IOException {
         if (p instanceof NIOPacket) {
@@ -215,8 +220,8 @@ public class TCPNIONetworkLayer implements Runnable {
                     SelectionKey key = (SelectionKey) it.next();
                     it.remove();
 
-                    Thread.currentThread().setName("NetworkLayer " + key + " -- " +
-                            netMan.getFriendManager().getCore().getSettings().getMy().getNickname());
+                    Thread.currentThread().setName("NetworkLayer " + key + " -- "
+                            + netMan.getFriendManager().getCore().getSettings().getMy().getNickname());
 
                     try {
                         if (key.isAcceptable()) {
@@ -484,6 +489,7 @@ public class TCPNIONetworkLayer implements Runnable {
 
     /**
      * Thread safe
+     * @return
      */
     public synchronized int getNumberOfPendingConnections() {
         return pendingConnectionAttempts.size();

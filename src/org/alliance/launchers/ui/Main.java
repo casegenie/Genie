@@ -227,8 +227,7 @@ public class Main {
             Subsystem core = (Subsystem) Class.forName("org.alliance.core.CoreSubsystem").newInstance();
             core.init(ResourceSingelton.getRl(), settings, l);
             if (T.t) {
-                T.info(""
-                        + "Subsystem CORE started in " + s.getTime());
+                T.info("Subsystem CORE started in " + s.getTime());
             }
             return core;
         } catch (Throwable t) {

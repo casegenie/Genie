@@ -38,6 +38,7 @@ public abstract class RPC {
     /**
      * Initializes this RCP in a mode where it has not been received from anyone - fromGuid is 0
      * @param rpcc
+     * @return
      */
     public RPC init(FriendConnection rpcc) {
         return init(rpcc, 0, 0);
@@ -48,6 +49,7 @@ public abstract class RPC {
      * @param rpcc
      * @param fromGuid
      * @param numHops
+     * @return 
      */
     public RPC init(FriendConnection rpcc, int fromGuid, int numHops) {
         this.con = rpcc;

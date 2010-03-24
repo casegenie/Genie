@@ -102,7 +102,7 @@ public class MyNode extends Node {
             NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
             List<InterfaceAddress> addresses = ni.getInterfaceAddresses();
             for (int i = 0; i < addresses.size(); i++) {
-                InetAddress ip = (InetAddress) addresses.get(i).getAddress();
+                InetAddress ip = addresses.get(i).getAddress();
                 if (!ip.isLoopbackAddress() && ip.getHostAddress().indexOf(":") == -1) {
                     externalIp = ip.getHostAddress();
                     alreadyTriedAutodetect = true;

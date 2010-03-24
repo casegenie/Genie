@@ -3,6 +3,8 @@ package org.alliance.core.comm.siteupdater;
 import org.alliance.Version;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.file.FileManager;
+import org.alliance.core.LanguageResource;
+import org.alliance.core.comm.T;
 import org.alliance.launchers.OSInfo;
 import static org.alliance.core.CoreSubsystem.KB;
 import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
@@ -20,7 +22,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.jar.JarFile;
-import org.alliance.core.comm.T;
 
 /**
  *
@@ -64,10 +65,10 @@ public class SiteUpdate implements Runnable {
                 if (isNewVersionAvailable()) {
                     core.siteUpdateAvailable();
                 } else {
-                    core.getUICallback().statusMessage("There are no updates available", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "noupdates"), true);
                 }
             } catch (IOException ex) {
-                core.getUICallback().statusMessage("Update check failed", true);
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatecheckfailed"), true);
             }
             try {
                 Thread.sleep(4 * 60 * 60 * 1000);//4h
@@ -77,7 +78,7 @@ public class SiteUpdate implements Runnable {
     }
 
     public boolean isNewVersionAvailable() throws IOException {
-        core.getUICallback().statusMessage("Checking for new version", true);
+        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "checking"), true);
         URLConnection http = new URL(INFO_URL).openConnection();
         http.setConnectTimeout(1000 * 15);
         http.setReadTimeout(1000 * 15);
@@ -104,7 +105,7 @@ public class SiteUpdate implements Runnable {
             @Override
             public void run() {
                 try {
-                    core.getUICallback().statusMessage("Downloading new Alliance update ...", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadingstart"), true);
                     URLConnection http = new URL(JAR_URL).openConnection();
                     http.setConnectTimeout(1000 * 15);
                     http.setReadTimeout(1000 * 15);
@@ -115,27 +116,28 @@ public class SiteUpdate implements Runnable {
                     int readed = 0;
                     while ((read = in.read(buf)) > 0) {
                         readed += read;
-                        core.getUICallback().statusMessage("Downloading new Alliance update ... " + Integer.toString(readed) + " bytes of " + Integer.toString(http.getContentLength()) + " bytes", true);
+                        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloading").
+                                replace("$READED", Integer.toString(readed)).replace("$TOTAL", Integer.toString(http.getContentLength())), true);
                         out.write(buf, 0, read);
                     }
                     out.close();
                     in.close();
                     checkJarFile();
                     core.updateDownloaded();
-                    core.getUICallback().statusMessage("Downloading new Alliance update ... completed", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadok"), true);
                 } catch (IOException ex) {
-                    core.getUICallback().statusMessage("Downloading new Alliance update ... failed", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadfailed"), true);
                 } catch (CertificateException ex) {
-                    core.getUICallback().statusMessage("Download corrupted ... Try downloading update again.", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 } catch (SecurityException ex) {
-                    core.getUICallback().statusMessage("Download corrupted ... Try downloading update again.", true);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 }
             }
         });
     }
 
     private void checkJarFile() throws IOException, CertificateException {
-        core.getUICallback().statusMessage("Verifying 2048 bit RSA signature of new update...", true);
+        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadverify"), true);
 
         if (T.t) {
             T.info("Loading certificate");
@@ -151,7 +153,7 @@ public class SiteUpdate implements Runnable {
         JarVerifier jv = new JarVerifier(new X509Certificate[]{cert});
         jv.verify(new JarFile(updateFilePath, true));
 
-        core.getUICallback().statusMessage("Update verified! Restarting.");
+        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadverifyok"));
 
         if (T.t) {
             T.info("Jar verified! Updating...");
@@ -168,9 +170,9 @@ public class SiteUpdate implements Runnable {
             updateAttemptHasBeenMade = true;
             core.runUpdater(updateFilePath, orginalFilePath, siteVersion, siteBuild);
         } catch (Exception e) {
-            core.getUICallback().statusMessage("Update failed.", true);
+            core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatefailed"), true);
             if (!OSInfo.isWindows()) {
-                core.getUICallback().statusMessage("Update failed. Try running updater manually.", true);
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatemanual"), true);
             }
         }
     }

@@ -162,6 +162,8 @@ public class FriendManager extends Manager {
 
     /**
      * Callback from netMan
+     * @param c
+     * @throws IOException 
      */
     public void connectionEstablished(AuthenticatedConnection c) throws IOException {
         if (getFriend(c.getRemoteUserGUID()) != null) {
@@ -217,6 +219,7 @@ public class FriendManager extends Manager {
 
     /**
      * Callback from netMan
+     * @param connection
      */
     public void connectionClosed(Connection connection) {
         if (connection instanceof AuthenticatedConnection) {

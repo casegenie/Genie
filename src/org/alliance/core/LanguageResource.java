@@ -15,18 +15,18 @@ import java.util.logging.Logger;
  */
 public class LanguageResource {
 
-    private ResourceBundle myResources;
+    private static ResourceBundle LANGUAGE_BUNDLE;
 
     public LanguageResource() {
         try {
             URL[] url = {new File("language/").toURI().toURL()};
-            myResources = ResourceBundle.getBundle("alliance", Locale.UK, new URLClassLoader(url));
+            LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", Locale.UK, new URLClassLoader(url));
         } catch (MalformedURLException ex) {
             Logger.getLogger(LanguageResource.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    public String getLocalizedString(Class<?> c, String key) {
-        return myResources.getString(c.getName() + "." + key);
+    public static String getLocalizedString(Class<?> c, String key) {
+        return LANGUAGE_BUNDLE.getString(c.getName() + "." + key);
     }
 }

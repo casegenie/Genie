@@ -109,7 +109,7 @@ public class CoreSubsystem implements Subsystem {
             progress = (StartupProgressListener) params[1];
         }
         langRes = new LanguageResource();
-        progress.updateProgress(langRes.getLocalizedString(getClass(), "loadingcore"));
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingcore"));
         setupLog();
         if (T.t && !isRunningAsTestSuite()) {
             final TraceHandler old = Trace.handler;
@@ -150,13 +150,13 @@ public class CoreSubsystem implements Subsystem {
 
         loadState();
         cryptoManager.init();
-        progress.updateProgress("Loading core (database manager)");
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingdatabase"));
         fileManager.init();
         friendManager.init();
-        progress.updateProgress("Loading core (network manager)");
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingnetwork"));
         networkManager.init();
         awayManager.init();
-        progress.updateProgress("Loading core (plugin manager)");
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingplugin"));
         pluginManager.init();
 
         if (!isRunningAsTestSuite()) {
@@ -202,7 +202,7 @@ public class CoreSubsystem implements Subsystem {
             traceLog = new Log(logpath + "logs/trace.log");
         } catch (FileNotFoundException e) {
             if (OSInfo.isMac()) {
-                OptionDialog.showErrorDialog(new JFrame(), "It seems that you are trying to run Alliance from a mounted image on Mac.[p]You need to drag'n'drop the Alliance icon you clicked on to your Applications folder and then start Alliance from there.[p]Alliance will now shut down.");
+                OptionDialog.showErrorDialog(new JFrame(), LanguageResource.getLocalizedString(getClass(), "setuplogmacerror"));
                 System.exit(1);
             } else {
                 throw new Exception("Permission problem. Can't write to files in Alliance application folder.");
