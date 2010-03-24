@@ -4,7 +4,7 @@ import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.Manager;
-import org.alliance.core.comm.SiteUpdate;
+import org.alliance.core.comm.siteupdater.SiteUpdate;
 import org.alliance.core.file.blockstorage.BlockMask;
 import org.alliance.core.file.blockstorage.BlockStorage;
 import org.alliance.core.file.blockstorage.CacheStorage;

@@ -1,6 +1,6 @@
 package org.alliance.core.file.share;
 
-import com.stendahls.trace.TraceChannel;
+import org.alliance.ui.windows.trace.TraceChannel;
 
 /**
  * User: maciek
@@ -11,6 +11,9 @@ public class T {
 
     public static final boolean t = true && org.alliance.T.t;
     private static TraceChannel tc = new TraceChannel("share");
+
+    private T() {
+    }
 
     public static void trace(Object message) {
         tc.trace(message);

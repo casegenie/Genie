@@ -1,6 +1,6 @@
 package org.alliance.core.crypto.cryptolayers;
 
-import com.stendahls.trace.TraceChannel;
+import org.alliance.ui.windows.trace.TraceChannel;
 
 /**
  * User: maciek
@@ -11,6 +11,9 @@ public class T {
 
     public static final boolean t = false && org.alliance.T.t;
     private static TraceChannel tc = new TraceChannel("cl");
+
+    private T() {
+    }
 
     public static void trace(Object message) {
         tc.trace(message);

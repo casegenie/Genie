@@ -1,6 +1,6 @@
 package org.alliance.misc;
 
-import com.stendahls.nif.util.SimpleTimer;
+import org.alliance.core.SimpleTimer;
 
 import java.io.BufferedWriter;
 import java.io.File;

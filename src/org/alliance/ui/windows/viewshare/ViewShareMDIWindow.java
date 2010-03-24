@@ -1,17 +1,18 @@
 package org.alliance.ui.windows.viewshare;
 
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.comm.rpc.GetHashesForPath;
 import org.alliance.core.file.filedatabase.FileType;
+import org.alliance.core.file.hash.Hash;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.MyNode;
 import org.alliance.core.node.Node;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
-import org.alliance.ui.windows.AllianceMDIWindow;
+import org.alliance.ui.windows.mdi.AllianceMDIWindow;
+import org.alliance.ui.dialogs.OptionDialog;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -39,7 +40,6 @@ import java.util.HashMap;
 import java.util.TreeMap;
 import javax.swing.JFileChooser;
 import javax.swing.ToolTipManager;
-import org.alliance.core.file.hash.Hash;
 
 /**
  * Created by IntelliJ IDEA.

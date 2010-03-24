@@ -1,11 +1,12 @@
 package org.alliance.ui.windows;
 
+import com.stendahls.XUI.XUIDialog;
+import com.stendahls.nif.util.EnumerationIteratorConverter;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
 import org.alliance.core.settings.Settings;
 import org.alliance.ui.UISubsystem;
-import com.stendahls.XUI.XUIDialog;
-import com.stendahls.nif.util.EnumerationIteratorConverter;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -27,8 +28,8 @@ public class AddPluginWindow extends XUIDialog {
         super(ui.getMainWindow());
         this.settings = ui.getCore().getSettings();
         this.core = ui.getCore();
-        init(ui.getRl(), ui.getRl().getResourceStream(
-                "xui/pluginwindow.xui.xml"));
+        init(ui.getRl(), ui.getRl().getResourceStream("xui/pluginwindow.xui.xml"));
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         pluginList = (JList) xui.getComponent("pluginList");
         pluginListModel = new DefaultListModel();
 

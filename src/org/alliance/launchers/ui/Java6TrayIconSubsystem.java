@@ -1,7 +1,6 @@
 package org.alliance.launchers.ui;
 
-import com.stendahls.nif.util.SimpleTimer;
-import com.stendahls.resourceloader.ResourceLoader;
+import com.stendahls.util.resourceloader.ResourceLoader;
 import com.stendahls.util.TextUtils;
 import org.alliance.Subsystem;
 import org.alliance.Version;
@@ -15,6 +14,7 @@ import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
+import org.alliance.core.SimpleTimer;
 
 import java.awt.Font;
 import java.awt.MenuItem;

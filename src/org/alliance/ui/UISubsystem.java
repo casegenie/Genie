@@ -1,16 +1,12 @@
 package org.alliance.ui;
 
-import com.stendahls.nif.ui.OptionDialog;
-import com.stendahls.nif.ui.framework.GlobalExceptionHandler;
-import com.stendahls.nif.ui.framework.SwingDeadlockWarningRepaintManager;
-import com.stendahls.nif.ui.framework.UINexus;
+import com.stendahls.XUI.SwingDeadlockWarningRepaintManager;
+import com.stendahls.XUI.XUIErrorDialogHelper;
+import com.stendahls.XUI.XUIException;
+import com.stendahls.nif.ui.mdi.infonodemdi.UINexus;
 import com.stendahls.nif.ui.toolbaractions.ToolbarActionManager;
-import com.stendahls.resourceloader.ResourceLoader;
-import com.stendahls.ui.ErrorDialog;
-import de.javasoft.plaf.synthetica.SyntheticaBlackStarLookAndFeel;
-import de.javasoft.plaf.synthetica.SyntheticaLookAndFeel;
-import java.awt.Font;
-import javax.swing.plaf.FontUIResource;
+import com.stendahls.util.resourceloader.ResourceLoader;
+import org.alliance.ui.dialogs.ErrorDialog;
 import org.alliance.Subsystem;
 import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.ERROR_URL;
@@ -18,15 +14,16 @@ import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.macos.OSXAdaptation;
 import org.alliance.ui.nodetreemodel.NodeTreeModel;
 import org.alliance.ui.nodetreemodel.NodeTreeNode;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
+import java.awt.Font;
 import java.awt.Window;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import org.jvnet.substance.SubstanceLookAndFeel;
+import javax.swing.plaf.FontUIResource;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,7 +45,9 @@ public class UISubsystem implements UINexus, Subsystem {
     }
 
     /**
+     * @param rl 
      * @param params - takes one parameter - a boolean indicating if Alliance should shutdown when window closes
+     * @throws Exception 
      */
     @Override
     public void init(ResourceLoader rl, final Object... params) throws Exception {
@@ -80,16 +79,13 @@ public class UISubsystem implements UINexus, Subsystem {
     }
 
     private void realInit(Object... params) {
+        XUIErrorDialogHelper.setErrorDialogClass(ErrorDialog.class.getName());
         ErrorDialog.setErrorReportUrl(ERROR_URL);
         ErrorDialog.setExceptionTranslator(new ErrorDialog.ExceptionTranslator() {
 
             @Override
             public String translate(Throwable t) {
                 Throwable innerError = t;
-
-                if (innerError.getStackTrace().length > 0 && innerError.getStackTrace()[0].toString().indexOf("de.javasoft.plaf.synthetica.StyleFactory$ComponentProperty.hashCode") != -1) {
-                    return null; //some wicked blackstar bug probably
-                }
 
                 if (innerError.getStackTrace().length > 0 && innerError.getStackTrace()[0].toString().indexOf("sun.java2d.pisces.Renderer.crossingListFinished") != -1) {
                     return null; //some java2d bug?
@@ -103,29 +99,19 @@ public class UISubsystem implements UINexus, Subsystem {
             if (core.getSettings().getInternal().getGuiskin().equals("OS Native")) {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             } else {
-                JFrame.setDefaultLookAndFeelDecorated(true);
-                JDialog.setDefaultLookAndFeelDecorated(true);
-                if (core.getSettings().getInternal().getGuiskin().equals("Alliance")) {
-                    //SubstanceLookAndFeel.setSkin(new MySkin(this));
-                    UIManager.setLookAndFeel(new SyntheticaBlackStarLookAndFeel());
-                    SyntheticaLookAndFeel.setFont("Dialog", 12);
-                } else {
-                    String theme = core.getSettings().getInternal().getGuiskin().replace(" ", "") + "Skin";
-                    Class.forName("org.jvnet.substance.skin." + theme);
-                    SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin." + theme);
-                }
+                SubstanceThemeHelper.setSubstanceTheme(core.getSettings().getInternal().getGuiskin());
             }
 
             if (core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() != null
                     && core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() == 1) {
-                Enumeration keys = UIManager.getDefaults().keys();
-                FontUIResource f = new FontUIResource(new javax.swing.plaf.FontUIResource("Dialog", Font.TRUETYPE_FONT, 12));
+                Enumeration<Object> keys = UIManager.getDefaults().keys();
+                FontUIResource f = new FontUIResource("Dialog", Font.TRUETYPE_FONT, 12);
                 while (keys.hasMoreElements()) {
                     Object key = keys.nextElement();
                     Object value = UIManager.get(key);
                     if (value instanceof FontUIResource) {
                         FontUIResource orig = (FontUIResource) value;
-                        Font font = new Font(f.getFontName(), orig.getStyle(), f.getSize());
+                        Font font = new Font(f.getFontName(), orig.getStyle(), orig.getSize());
                         UIManager.put(key, new FontUIResource(font));
                     }
                 }
@@ -164,19 +150,6 @@ public class UISubsystem implements UINexus, Subsystem {
     @Override
     public void handleErrorInEventLoop(Window parent, Throwable t, boolean fatal) {
         core.reportError(t, null);
-//        try {
-//            if (parent == null) parent = getMainWindow();
-//            if (parent instanceof JDialog) {
-//                new ErrorDialog((JDialog) parent, t, fatal);
-//            } else if (parent instanceof JFrame) {
-//                new ErrorDialog((JFrame) parent, t, fatal);
-//            } else {
-//                new ErrorDialog(t, fatal);
-//            }
-//        } catch (XUIException e) {
-//            if (T.t) T.error("Oh no! Could not open error dialog!");
-//            e.printStackTrace();
-//        }
     }
 
     @Override
@@ -247,9 +220,9 @@ public class UISubsystem implements UINexus, Subsystem {
         String osName = System.getProperty("os.name");
         try {
             if (osName.startsWith("Mac OS")) {
-                Class fileMgr = Class.forName("com.apple.eio.FileManager");
+                Class<?> fileMgr = Class.forName("com.apple.eio.FileManager");
                 Method openURL = fileMgr.getDeclaredMethod("openURL",
-                        new Class[]{String.class});
+                        new Class<?>[]{String.class});
                 openURL.invoke(null, new Object[]{url});
             } else if (osName.startsWith("Windows")) {
                 String s = "rundll32 url.dll,FileProtocolHandler " + url;
@@ -272,6 +245,18 @@ public class UISubsystem implements UINexus, Subsystem {
             }
         } catch (Exception e) {
             OptionDialog.showErrorDialog(getMainWindow(), "Could not open url: " + e);
+        }
+    }
+
+    private class GlobalExceptionHandler implements Thread.UncaughtExceptionHandler {
+
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            try {
+                new ErrorDialog(e, false);
+            } catch (XUIException e1) {
+                e1.printStackTrace();
+            }
         }
     }
 }

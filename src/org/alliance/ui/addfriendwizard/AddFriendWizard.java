@@ -1,13 +1,14 @@
 package org.alliance.ui.addfriendwizard;
 
 import com.stendahls.XUI.XUIDialog;
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.ui.JWizard;
 import org.alliance.core.node.Invitation;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import javax.swing.JLabel;
 import javax.swing.JRadioButton;
@@ -81,7 +82,6 @@ public class AddFriendWizard extends JWizard {
     public void XUILayoutComplete(final UISubsystem ui, XUIDialog outerDialog) {
         this.ui = ui;
         this.outerDialog = outerDialog;
-
         innerXUI.setEventHandler(this);
         next.setEnabled(false);
 
@@ -109,8 +109,8 @@ public class AddFriendWizard extends JWizard {
 
         //disable looking for friends in secondary connections if we have no friends
         //or if we have no friends to forward invitations to  
-        if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0 ||
-                ui.getCore().getFriendManager().friends().size() == 0) {
+        if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0
+                || ui.getCore().getFriendManager().friends().size() == 0) {
             innerXUI.getComponent("radio1_3").setEnabled(false);
         }
 
@@ -142,19 +142,19 @@ public class AddFriendWizard extends JWizard {
             final JLabel label = (JLabel) innerXUI.getComponent("waittext");
             label.setText("Please wait...");
             String subject = "";
-            String body = "\r\n\r\n\r\n" +
-                    "\r\n" +
-                    "You have been invited to my Alliance network! This is a private and secure network\r\n" +
-                    "where we can share files and chat.\r\n" +
-                    "\r\n" +
-                    "1. Download and run Alliance here:\r\n" +
-                    "http://www.alliancep2p.com/download\r\n" +
-                    "\r\n" +
-                    "2. After installation Alliance will ask you for a code. Enter this code:\r\n" +
-                    "\r\n" +
-                    ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString() + "\r\n" +
-                    "\r\n" +
-                    "Using this code you will connect to our private Alliance network.\r\n";
+            String body = "\r\n\r\n\r\n"
+                    + "\r\n"
+                    + "You have been invited to my Alliance network! This is a private and secure network\r\n"
+                    + "where we can share files and chat.\r\n"
+                    + "\r\n"
+                    + "1. Download and run Alliance here:\r\n"
+                    + "http://www.alliancep2p.com/download\r\n"
+                    + "\r\n"
+                    + "2. After installation Alliance will ask you for a code. Enter this code:\r\n"
+                    + "\r\n"
+                    + ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString() + "\r\n"
+                    + "\r\n"
+                    + "Using this code you will connect to our private Alliance network.\r\n";
 
             body = body.replace("\n", "%0A");
             body = body.replace("\r", "%0D");
@@ -163,11 +163,6 @@ public class AddFriendWizard extends JWizard {
             subject = subject.replace(" ", "%20");
             String s;
             s = "mailto:?body=" + body + "&subject=" + subject + "\"";
-//            if (OSInfo.isWindows())
-//                s = "cmd /k \"start mailto:?body="+body+"^&subject="+subject+"\"";
-//            else
-//                s = "mailto:?body="+body+"&subject="+subject;
-
             ui.openURL(s);
 
             Thread t = new Thread(new Runnable() {
@@ -196,6 +191,7 @@ public class AddFriendWizard extends JWizard {
     public static AddFriendWizard open(UISubsystem ui, int startAtStep) throws Exception {
         XUIDialog f = new XUIDialog(ui.getRl(), ui.getRl().getResourceStream("xui/addfriendwizard.xui.xml"), ui.getMainWindow());
         final AddFriendWizard wizard = (AddFriendWizard) f.getXUI().getComponent("wizard");
+        SubstanceThemeHelper.setButtonsToGeneralArea(wizard.getXUIComponents());
         wizard.XUILayoutComplete(ui, f);
         if (startAtStep == STEP_FORWARD_INVITATIONS) {
             wizard.goToForwardInvitations();

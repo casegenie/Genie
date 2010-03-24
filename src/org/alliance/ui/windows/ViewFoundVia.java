@@ -1,15 +1,16 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
+import org.alliance.core.node.Friend;
+import org.alliance.ui.UISubsystem;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.TreeSet;
-import org.alliance.ui.UISubsystem;
-
-import javax.swing.DefaultListModel;
-import javax.swing.JList;
-import org.alliance.core.node.Friend;
 
 public class ViewFoundVia extends XUIDialog {
 
@@ -19,8 +20,8 @@ public class ViewFoundVia extends XUIDialog {
     public ViewFoundVia(UISubsystem ui, Friend f) throws Exception {
         super(ui.getMainWindow());
 
-        init(ui.getRl(), ui.getRl().getResourceStream(
-                "xui/viewfoundvia.xui.xml"));
+        init(ui.getRl(), ui.getRl().getResourceStream("xui/viewfoundvia.xui.xml"));
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         fofList = (JList) xui.getComponent("fofList");
         fofListModel = new DefaultListModel();
 

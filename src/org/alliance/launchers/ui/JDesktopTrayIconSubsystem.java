@@ -1,9 +1,7 @@
 package org.alliance.launchers.ui;
 
-import com.stendahls.nif.util.SimpleTimer;
-import com.stendahls.resourceloader.ResourceLoader;
+import com.stendahls.util.resourceloader.ResourceLoader;
 import com.stendahls.util.TextUtils;
-import java.awt.Font;
 import org.alliance.Subsystem;
 import org.alliance.Version;
 import org.alliance.core.CoreSubsystem;
@@ -11,6 +9,7 @@ import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.core.T;
 import org.alliance.core.UICallback;
+import org.alliance.core.SimpleTimer;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.interactions.PostMessageInteraction;
@@ -20,6 +19,7 @@ import org.alliance.core.node.Node;
 import org.jdesktop.jdic.tray.SystemTray;
 import org.jdesktop.jdic.tray.TrayIcon;
 
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

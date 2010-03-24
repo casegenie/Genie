@@ -1,7 +1,6 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
@@ -15,6 +14,8 @@ import org.alliance.core.settings.Share;
 import org.alliance.launchers.ui.Main;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -96,6 +97,7 @@ public class OptionsWindow extends XUIDialog {
         this.ui = ui;
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionswindow.xui.xml"));
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
 
         xui.getComponent("server.port").setEnabled(false);
 

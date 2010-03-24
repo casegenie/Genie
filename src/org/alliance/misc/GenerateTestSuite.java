@@ -1,6 +1,6 @@
 package org.alliance.misc;
 
-import com.stendahls.nif.util.SXML;
+import com.stendahls.nif.util.xmlserializer.SXML;
 import com.stendahls.nif.util.xmlserializer.XMLSerializer;
 import org.alliance.core.settings.Friend;
 import org.alliance.core.settings.Internal;

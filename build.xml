@@ -80,17 +80,14 @@
         <jar jarfile="dist/alliance.dat">
              <zipfileset src="${dist.jar}" excludes="META-INF/*" />
             <zipfileset src="lib/clink.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/h2-1.2.128.jar" excludes="META-INF/*" />
+            <zipfileset src="lib/h2-1.2.127.jar" excludes="META-INF/*" />
             <zipfileset src="lib/idw-gpl.jar" excludes="META-INF/*" />
             <zipfileset src="lib/jdic.jar" excludes="META-INF/*" />
             <zipfileset src="lib/jnotify-0.91.jar" excludes="META-INF/*" />
             <zipfileset src="lib/junit-4.6.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/stendahls-commons.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/StendahlsTheme.jar" excludes="META-INF/*" />
+            <zipfileset src="lib/stendahls.jar" excludes="META-INF/*" />
             <zipfileset src="lib/swingx-0.8.0.jar" excludes="META-INF/*" />
             <zipfileset src="lib/substance-lite-feel.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/synthetica.jar" excludes="META-INF/*" />
-            <zipfileset src="lib/syntheticaBlackStar.jar" excludes="META-INF/*" />
             <manifest>
                 <attribute name="Main-Class" value="org.alliance.launchers.ui.Main"/>
             </manifest>

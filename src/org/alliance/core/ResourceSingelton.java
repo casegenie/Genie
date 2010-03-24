@@ -1,7 +1,7 @@
 package org.alliance.core;
 
-import com.stendahls.resourceloader.GeneralResourceLoader;
-import com.stendahls.resourceloader.ResourceLoader;
+import com.stendahls.util.resourceloader.GeneralResourceLoader;
+import com.stendahls.util.resourceloader.ResourceLoader;
 
 /**
  * Created by IntelliJ IDEA.
@@ -13,6 +13,9 @@ import com.stendahls.resourceloader.ResourceLoader;
 public class ResourceSingelton {
 
     private static GeneralResourceLoader rl;
+
+    private ResourceSingelton() {
+    }
 
     public static ResourceLoader getRl() {
         if (rl == null) {

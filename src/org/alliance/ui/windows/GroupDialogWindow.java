@@ -1,12 +1,14 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
+import org.alliance.ui.UISubsystem;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
+
 import java.awt.event.ActionEvent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
-import org.alliance.ui.UISubsystem;
 
 /**
  *
@@ -18,6 +20,7 @@ public class GroupDialogWindow extends XUIDialog {
 
     public GroupDialogWindow(UISubsystem ui, JFrame f) throws Exception {
         super(ui.getRl(), ui.getRl().getResourceStream("xui/groupdialogwindow.xui.xml"), ui.getMainWindow(), true);
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         ((JRadioButton) xui.getComponent("selectedpublic")).setSelected(true);
         EVENT_selectedpublic(null);
         display();

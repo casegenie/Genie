@@ -1,9 +1,9 @@
 package org.alliance.launchers.console;
 
-import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.util.TextUtils;
 import org.alliance.Subsystem;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.SimpleTimer;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.FriendConnection;

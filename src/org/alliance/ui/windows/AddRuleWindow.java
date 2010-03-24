@@ -1,8 +1,9 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
-import com.stendahls.nif.ui.OptionDialog;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class AddRuleWindow extends XUIDialog {
 
     private void init() throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/rulewindow.xui.xml"));
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         radioButtons.add((JRadioButton) xui.getComponent("radioAllow"));
         radioButtons.add((JRadioButton) xui.getComponent("radioDeny"));
 

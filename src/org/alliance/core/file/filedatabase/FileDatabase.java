@@ -1,8 +1,8 @@
 package org.alliance.core.file.filedatabase;
 
-import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.SimpleTimer;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.share.ShareBase;
@@ -79,7 +79,7 @@ public class FileDatabase {
                 core.getFileManager().getDbCore().getDbShares().deleteEntryByRootHash(rootHash);
                 shareSize -= result.getLong("size");
                 numberOfShares--;
-    }
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -400,13 +400,13 @@ public class FileDatabase {
         changeInUseQueue(true);
         try {
             ResultSet results = core.getFileManager().getDbCore().getDbShares().getNumberOfShares();
-                while (results.next()) {
-                    numberOfShares = results.getInt(1);
-                }
+            while (results.next()) {
+                numberOfShares = results.getInt(1);
+            }
             results = core.getFileManager().getDbCore().getDbShares().getTotalSizeOfFiles();
-                while (results.next()) {
-                    shareSize = results.getLong(1);
-                }
+            while (results.next()) {
+                shareSize = results.getLong(1);
+            }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -449,7 +449,7 @@ public class FileDatabase {
         int limiter = 0;
         ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesByBasePathAndSubPath(base.getPath(), subPath, false, 8196);
         try {
-        int politeCounter = 0;
+            int politeCounter = 0;
             while (results.next()) {
                 if (limiter > 96 * KB) {
                     //Limit to prevent BufferOverload when browsing directory with plenty of files with long names (Windows/winsxs is good example)

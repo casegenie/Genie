@@ -8,7 +8,7 @@ import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.PacedRunner;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
-import org.alliance.ui.windows.AllianceMDIWindow;
+import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 import org.jdesktop.swingx.JXTreeTable;
 
 import java.awt.Color;
@@ -100,7 +100,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         });
 
         table = new JXTreeTable(model = new SearchTreeTableModel(ui.getCore(), pacedRunner));
-        table.setColumnControlVisible(true);
+        table.setColumnControlVisible(false);
 
         table.getTableHeader().addMouseListener(new MouseAdapter() {
 
@@ -215,12 +215,11 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         table.getColumnModel().getColumn(0).setPreferredWidth(500);
         setFixedColumnSize(table.getColumnModel().getColumn(1), 50);
         setFixedColumnSize(table.getColumnModel().getColumn(2), 50);
-        setFixedColumnSize(table.getColumnModel().getColumn(3), 55);
+        setFixedColumnSize(table.getColumnModel().getColumn(3), 60);
         setFixedColumnSize(table.getColumnModel().getColumn(4), 25);
         setFixedColumnSize(table.getColumnModel().getColumn(5), 40);
 
         table.getColumnExt(2).setVisible(false); //tricky! the index points to the visible columns!
-//        table.getColumnExt(1).setVisible(false);
 
         ((JScrollPane) xui.getComponent("treepanel")).setViewportView(table);
 

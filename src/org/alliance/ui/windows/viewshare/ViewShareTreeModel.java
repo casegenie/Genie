@@ -1,6 +1,6 @@
 package org.alliance.ui.windows.viewshare;
 
-import com.stendahls.ui.T;
+import org.alliance.ui.T;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.core.comm.rpc.GetShareBaseList;

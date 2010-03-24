@@ -1,10 +1,10 @@
 package org.alliance.launchers.ui;
 
-import com.stendahls.nif.util.SimpleTimer;
 import org.alliance.Subsystem;
 import org.alliance.Version;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.core.T;
+import org.alliance.core.SimpleTimer;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 
@@ -243,7 +243,7 @@ public class Main {
             t.printStackTrace();
             //report error. Use reflection to init dialogs because we want NO references to UI stuff in this
             //class - we want this class to load fast (ie load minimal amount of classes)
-            Object errorDialog = Class.forName("com.stendahls.ui.ErrorDialog").newInstance();
+            Object errorDialog = Class.forName("org.alliance.ui.dialogs.ErrorDialog").newInstance();
             Method m = errorDialog.getClass().getMethod("init", Throwable.class, boolean.class);
             m.invoke(errorDialog, t, true);
         } catch (Exception e) {

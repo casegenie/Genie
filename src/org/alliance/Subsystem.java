@@ -1,6 +1,6 @@
 package org.alliance;
 
-import com.stendahls.resourceloader.ResourceLoader;
+import com.stendahls.util.resourceloader.ResourceLoader;
 
 /**
  * Created by IntelliJ IDEA.

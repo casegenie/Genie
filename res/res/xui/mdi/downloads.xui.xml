@@ -1,4 +1,3 @@
-
 <xui>
     <title value=""/>
     <body>
@@ -12,14 +11,18 @@
             <menuitem image="gfx/icons/loadingsharenode.png" text="Open file/folder" eventid="openfile"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
-            <strut width="7"/>
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
         </panel>
-        <scrollpanel expand="both" scrollbars="optional" id="scroll" bordertype="lowered">
-        </scrollpanel>
-        <panel axis="y" border="5">
-            <genericcomponent class="org.alliance.ui.JDownloadGrid" id="downloadgrid"/>
-            <panel axis="x" border="0" expand="horiz">
+        <panel axis="y" border="0">
+            <scrollpanel expand="both" scrollbars="optional" id="scroll" bordertype="lowered">
+                <table id="tableDownload"/>
+            </scrollpanel>
+        </panel>
+        <panel id="themed" axis="y" border="0"  expand="horiz">
+            <panel opaque="false" minheight="80" maxheight="80" height="80" axis="x" border="5">
+                <genericcomponent class="org.alliance.ui.JDownloadGrid" id="downloadgrid"/>
+            </panel>
+            <panel opaque="false" maxheight="40" axis="x" border="5">
                 <label text=" " id="downloadingfromtext"/>
                 <filler/>
                 <label text=" " id="uploadingtotext"/>

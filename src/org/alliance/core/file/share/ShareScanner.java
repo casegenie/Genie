@@ -1,9 +1,9 @@
 package org.alliance.core.file.share;
 
-import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.AwayManager;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.SimpleTimer;
 import static org.alliance.core.CoreSubsystem.GB;
 import org.alliance.core.file.FileManager;
 import org.alliance.core.file.filedatabase.FileDescriptor;

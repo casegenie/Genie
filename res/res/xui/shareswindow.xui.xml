@@ -1,17 +1,28 @@
-
 <xui>
     <title value="Shares Manager" image="gfx/icons/alliance.png"/>
     <body>
-        <panel axis="y" expand = "vert">
-            <scrollpanel width = "300" height="450" bordertype="lowered">
-                <tree id="sharesTree"/>
-            </scrollpanel>
-            <strut height="5"/>
+        <panel axis="y" width = "640" height="480" minwidth = "640" minheight="480">
+            <form>
+                <row>
+                    <cell>
+                        <scrollpanel width = "310" height="440" minwidth = "310" minheight="440" scrollbars="optional" bordertype="etched" bordertitle="Shared folders:">
+                            <list expand="both" id="sharesListSelected"/>
+                        </scrollpanel>
+                    </cell>
+                    <cell>
+                        <scrollpanel width = "310" height="440" minwidth = "310" minheight="440" scrollbars="optional" bordertype="etched" bordertitle="Select what folders you want to share:">
+                            <tree expand="both" id="sharesTreeBrowse"/>
+                        </scrollpanel>
+                    </cell>
+                </row>
+            </form>
             <panel border="0,5,0,0" axis="x" expand="horiz">
-                <filler/>
-                <button text="OK" eventid="ok"/>
+                <filler axis="x"/>
+                <button width="85" eventid="ok" text="OK"/>
                 <strut width="5"/>
+                <button width="85" eventid="cancel" text="Cancel"/>
             </panel>
+            <filler axis="y"/>
         </panel>
     </body>
 </xui>

@@ -1,12 +1,12 @@
 package org.alliance.ui.windows.viewshare;
 
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import org.alliance.core.comm.rpc.GetDirectoryListing;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.core.file.share.ShareBase;
 import org.alliance.ui.T;
+import org.alliance.ui.dialogs.OptionDialog;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -70,7 +70,7 @@ public abstract class ViewShareTreeNode implements ViewShareIdentifiableTreeNode
                                 if (T.t) {
                                     T.info("File: " + s);
                                 }
-                            }                            
+                            }
                             SwingUtilities.invokeLater(new Runnable() {
 
                                 @Override

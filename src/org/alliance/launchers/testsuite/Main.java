@@ -1,12 +1,12 @@
 package org.alliance.launchers.testsuite;
 
 import com.stendahls.XUI.XUIFrame;
-import com.stendahls.trace.Trace;
-import com.stendahls.trace.TraceHandler;
 import org.alliance.T;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.ResourceSingelton;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.windows.trace.Trace;
+import org.alliance.ui.windows.trace.TraceHandler;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;

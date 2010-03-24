@@ -1,6 +1,5 @@
 package org.alliance.ui.nodetreemodel;
 
-import com.stendahls.nif.ui.tree.GenericNode;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.node.Friend;

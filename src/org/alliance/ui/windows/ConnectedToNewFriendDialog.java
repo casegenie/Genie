@@ -1,9 +1,10 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.ui.JHtmlLabel;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -19,6 +20,7 @@ public class ConnectedToNewFriendDialog extends XUIDialog {
 
     public ConnectedToNewFriendDialog(UISubsystem ui, JFrame f, String name) throws Exception {
         super(ui.getRl(), ui.getRl().getResourceStream("xui/newfriendconnection.xui.xml"), f, true);
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         ((JHtmlLabel) xui.getComponent("label")).replaceString("$$NAME$$", name);
         ui.getMainWindow().setConnectedToNewFriendDialogShowing(true);
         display();

@@ -1,12 +1,12 @@
 package org.alliance.ui;
 
-import com.stendahls.nif.ui.OptionDialog;
 import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.UICallback;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.launchers.OSInfo;
+import org.alliance.ui.dialogs.OptionDialog;
 
 import java.io.File;
 import java.util.List;

@@ -5,6 +5,7 @@ import com.stendahls.ui.JHtmlLabel;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.node.FriendManager;
 import org.alliance.ui.UISubsystem;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.event.ActionEvent;
 import javax.swing.JCheckBox;
@@ -25,6 +26,7 @@ public class ForwardInvitationDialog extends XUIDialog {
         super(ui.getMainWindow());
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/forwardinvitation.xui.xml"));
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
 
         FriendManager fm = ui.getCore().getFriendManager();
         String from = fm.nicknameWithContactPath(pmi.getFromGuid());

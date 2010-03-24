@@ -1,14 +1,12 @@
 package org.alliance.core;
 
 import com.stendahls.XUI.XUIException;
-import com.stendahls.nif.ui.OptionDialog;
-import com.stendahls.nif.util.Log;
-import com.stendahls.nif.util.SXML;
+import com.stendahls.nif.util.xmlserializer.SXML;
 import com.stendahls.nif.util.xmlserializer.XMLSerializer;
-import com.stendahls.resourceloader.ResourceLoader;
-import com.stendahls.trace.Trace;
-import com.stendahls.trace.TraceHandler;
-import com.stendahls.ui.ErrorDialog;
+import com.stendahls.util.resourceloader.ResourceLoader;
+import org.alliance.ui.windows.trace.Trace;
+import org.alliance.ui.windows.trace.TraceHandler;
+import org.alliance.ui.dialogs.ErrorDialog;
 import org.alliance.Subsystem;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.rpc.AwayStatus;
@@ -31,12 +29,12 @@ import org.alliance.core.settings.Settings;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.launchers.ui.Main;
+import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
+import org.alliance.ui.dialogs.OptionDialog;
+
 import org.w3c.dom.Document;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.InputSource;
-import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
-
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,6 +51,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JFrame;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * This is the core of the entire Alliance system. There is not too much code here, it's more of a hub for the entire
@@ -79,6 +78,7 @@ public class CoreSubsystem implements Subsystem {
     public final static int BLOCK_SIZE = MB;
     public final static String ERROR_URL = "http://maciek.tv/alliance/errorreporter/";
     private ResourceLoader rl;
+    private LanguageResource langRes;
     private FriendManager friendManager;
     private FileManager fileManager;
     private NetworkManager networkManager;
@@ -108,8 +108,8 @@ public class CoreSubsystem implements Subsystem {
         if (params != null && params.length >= 2 && params[1] != null) {
             progress = (StartupProgressListener) params[1];
         }
-
-        progress.updateProgress("Loading core");
+        langRes = new LanguageResource();
+        progress.updateProgress(langRes.getLocalizedString(getClass(), "loadingcore"));
         setupLog();
         if (T.t && !isRunningAsTestSuite()) {
             final TraceHandler old = Trace.handler;
@@ -494,7 +494,9 @@ public class CoreSubsystem implements Subsystem {
         }
     }
 
-    /** Adds this callback using a DoubleUICallback class */
+    /** Adds this callback using a DoubleUICallback class
+     * @param u 
+     */
     public void addUICallback(UICallback u) {
         uiCallback = new DoubleUICallback(uiCallback, u);
     }
@@ -548,7 +550,7 @@ public class CoreSubsystem implements Subsystem {
     /**
      * @param openWithUI true if the UI should open once the program is restarted
      * @param restartDelay Wait this many minutes before actually starting the program. This is for "Shutdown for 30 minuters" etc..
-     * @throws java.io.IOException if the program cant be restarted
+     * @throws Exception if the program cant be restarted
      */
     public void restartProgram(boolean openWithUI, int restartDelay) throws Exception {
         if (OSInfo.isWindows()) {
@@ -569,12 +571,18 @@ public class CoreSubsystem implements Subsystem {
 
     public void runUpdater(String srcDir, String targetDir, String version, int build) throws Exception {
         if (OSInfo.isWindows()) {
+            if (!new File("updater.exe").exists()) {
+                throw new Exception("Can't find updater.exe");
+            }
             shutdown();
             String s = "cmd /c ." + System.getProperty("file.separator") + "updater.exe \""
                     + srcDir + "\" \"" + targetDir + "\" \"" + version + "\" \"" + build + "\"";
             Runtime.getRuntime().exec(s);
             System.exit(0);
         } else {
+            if (!new File("updater.jar").exists()) {
+                throw new Exception("Can't find updater.jar");
+            }
             shutdown();
             LauncherJava.execJar("updater.jar", new String[0], new String[0], "");
             System.exit(0);
@@ -692,6 +700,7 @@ public class CoreSubsystem implements Subsystem {
 
     /**
      * Logs network messages for debug purposes. An event can be for example "user x went online"
+     * @param event 
      */
     public void logNetworkEvent(String event) {
         uiCallback.logNetworkEvent(event);

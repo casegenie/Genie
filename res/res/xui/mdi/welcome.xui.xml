@@ -1,13 +1,11 @@
-
 <xui>
     <title value=""/>
     <body>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
-            <strut width="7"/>
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
         </panel>
-        <panel axis="x">
-            <scrollpanel scrollbars="optional">
+        <panel axis="y" border="0">
+            <scrollpanel scrollbars="optional" bordertype="lowered">
                 <panel axis="x" border="5,3,5,5">
                     <mlabel html="yes" id="label"/>
                 </panel>

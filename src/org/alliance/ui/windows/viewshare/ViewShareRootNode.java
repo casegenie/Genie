@@ -1,7 +1,7 @@
 package org.alliance.ui.windows.viewshare;
 
 import com.stendahls.nif.util.EnumerationIteratorConverter;
-import com.stendahls.ui.T;
+import org.alliance.ui.T;
 
 import javax.swing.tree.TreeNode;
 import java.util.ArrayList;

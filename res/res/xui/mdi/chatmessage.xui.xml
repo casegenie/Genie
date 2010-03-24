@@ -1,15 +1,15 @@
-
 <xui>
     <title value=""/>
     <body>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
-            <strut width="7"/>
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
         </panel>
-        <scrollpanel expand="both" scrollbars="optional" id="scrollpanel" bordertype="lowered">
-            <textarea id="textarea"/>
-        </scrollpanel>
-        <panel axis="x" expand="horiz">
+        <panel axis="y" border="0">
+            <scrollpanel expand="both" scrollbars="optional" id="scrollpanel" bordertype="lowered">
+                <textarea id="textarea"/>
+            </scrollpanel>
+        </panel>
+        <panel id="themed" axis="x" expand="horiz">
             <textfield eventid="chat1"/>
             <strut width="5"/>
             <button eventid="chat2" text="Send"/>

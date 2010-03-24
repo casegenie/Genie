@@ -1,4 +1,3 @@
-
 <xui>
     <title value="Manage Plugins" image="gfx/icons/alliance.png"/>
     <body>
@@ -6,8 +5,7 @@
             <panel axis="y" bordertype="etched" bordertitle="Plugins:">
                 <panel axis="x" expand="horiz">
                     <mlabel html="true">
-                            Add an Alliance plugin
-
+                        Add an Alliance plugin
                     </mlabel>
                 </panel>
                 <panel border="0,10,0,5" axis="x" expand="horiz">

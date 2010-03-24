@@ -1,8 +1,8 @@
 package org.alliance.core.file.filedatabase;
 
-import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.SimpleTimer;
 import static org.alliance.core.CoreSubsystem.BLOCK_SIZE;
 import org.alliance.core.UICallback;
 import org.alliance.core.file.blockstorage.BlockFile;
@@ -55,7 +55,7 @@ public class FileDescriptor {
         this.rootHash = rootHash;
         this.hashList = hashList;
         this.modifiedAt = modifiedAt;
-    } 
+    }
 
     public FileDescriptor(String basePath, File file, int hashSpeedInMbPerSecond) throws IOException {
         this(basePath, file, hashSpeedInMbPerSecond, null);
@@ -63,7 +63,11 @@ public class FileDescriptor {
 
     /**
      * Creates a new file descriptor from scratch. Including creating hashes.
+     * @param basePath 
      * @param file
+     * @param hashSpeedInMbPerSecond
+     * @param callback
+     * @throws IOException
      */
     public FileDescriptor(String basePath, File file, int hashSpeedInMbPerSecond, UICallback callback) throws IOException {
         basePath = TextUtils.makeSurePathIsMultiplatform(basePath);
@@ -115,13 +119,9 @@ public class FileDescriptor {
                 if (hashSpeedInMbPerSecond > 0) {
                     s2 = " [hash speed limit: " + hashSpeedInMbPerSecond + "Mb/s]";
                 }
-                String s = "Hashing " +
-                        file.getName() +
-                        " (" +
-                        (totalRead * 100 / file.length()) +
-                        "% done @ " +
-                        TextUtils.formatByteSize(totalRead / ((System.currentTimeMillis() - startTick) / 1000)) +
-                        "/s" + s2 + ")";
+                String s = "Hashing " + file.getName() + " (" + (totalRead * 100 / file.length()) + "% done @ "
+                        + TextUtils.formatByteSize(totalRead / ((System.currentTimeMillis() - startTick) / 1000))
+                        + "/s" + s2 + ")";
                 callback.statusMessage(s);
                 updateHashMessageTick = System.currentTimeMillis();
             }
@@ -154,7 +154,7 @@ public class FileDescriptor {
         size = file.length();
         subpath = createSubpath(file.getPath());
         modifiedAt = file.lastModified();
-        in.close();      
+        in.close();
 
         if (T.t) {
             T.debug("Hashed " + TextUtils.formatNumber("" + totalRead) + " bytes in " + st.getTime() + ". Hash list contains " + hashes.size() + " hashes.");

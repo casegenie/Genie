@@ -1,5 +1,7 @@
 package org.alliance.ui;
 
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -31,6 +33,7 @@ public class JSpeedDiagram extends JPanel implements Runnable {
     JSpeedDiagram(UISubsystem ui) {
         this.ui = ui;
         this.setBackground(Color.BLACK);
+        SubstanceThemeHelper.setColorization(this, new Double(1.0));
     }
 
     @Override
@@ -42,7 +45,7 @@ public class JSpeedDiagram extends JPanel implements Runnable {
                     panelHeight = getSize().height;
                     panelWidth = getSize().width;
 
-                    maxValue = 10;
+                    maxValue = 2;
 
                     int valueDownload = (int) (ui.getCore().getNetworkManager().getBandwidthIn().getCPS() / 1024);
                     int valueUpload = (int) (ui.getCore().getNetworkManager().getBandwidthOut().getCPS() / 1024);
@@ -102,6 +105,7 @@ public class JSpeedDiagram extends JPanel implements Runnable {
                         valuesUpload.remove(0);
                     }
                     SwingUtilities.invokeLater(new Runnable() {
+
                         @Override
                         public void run() {
                             repaint();

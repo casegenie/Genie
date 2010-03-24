@@ -1,6 +1,6 @@
 package org.alliance.core.comm.filetransfers;
 
-import com.stendahls.trace.TraceChannel;
+import org.alliance.ui.windows.trace.TraceChannel;
 
 /**
  * User: maciek
@@ -11,6 +11,9 @@ public class T {
 
     public static final boolean t = true && org.alliance.core.T.t;
     private static TraceChannel tc = new TraceChannel("dl/ul");
+
+    private T() {
+    }
 
     public static void trace(Object message) {
         tc.trace(message);

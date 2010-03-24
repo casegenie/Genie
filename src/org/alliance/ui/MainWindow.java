@@ -2,17 +2,14 @@ package org.alliance.ui;
 
 import com.stendahls.XUI.MenuItemDescriptionListener;
 import com.stendahls.XUI.XUIFrame;
-import com.stendahls.nif.ui.OptionDialog;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIManagerEventListener;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.nif.ui.mdi.infonodemdi.InfoNodeMDIManager;
 import com.stendahls.nif.ui.toolbaractions.ToolbarActionManager;
-import com.stendahls.nif.util.SXML;
+import com.stendahls.nif.util.xmlserializer.SXML;
 import com.stendahls.ui.JHtmlLabel;
-import com.stendahls.ui.util.RecursiveBackgroundSetter;
 import com.stendahls.util.TextUtils;
-import de.javasoft.plaf.synthetica.SyntheticaRootPaneUI;
 import static org.alliance.core.CoreSubsystem.MB;
 import org.alliance.core.NeedsUserInteraction;
 import org.alliance.core.PublicChatHistory;
@@ -32,24 +29,26 @@ import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
 import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
 import org.alliance.ui.windows.AddPluginWindow;
 import org.alliance.ui.windows.ConnectedToNewFriendDialog;
-import org.alliance.ui.windows.ConnectionsMDIWindow;
-import org.alliance.ui.windows.ConsoleMDIWindow;
-import org.alliance.ui.windows.DownloadsMDIWindow;
-import org.alliance.ui.windows.DuplicatesMDIWindow;
+import org.alliance.ui.windows.mdi.ConnectionsMDIWindow;
+import org.alliance.ui.windows.mdi.ConsoleMDIWindow;
+import org.alliance.ui.windows.mdi.DownloadsMDIWindow;
+import org.alliance.ui.windows.mdi.DuplicatesMDIWindow;
 import org.alliance.ui.windows.ForwardInvitationDialog;
-import org.alliance.ui.windows.FriendListMDIWindow;
-import org.alliance.ui.windows.FriendsTreeMDIWindow;
+import org.alliance.ui.windows.mdi.FriendListMDIWindow;
+import org.alliance.ui.windows.mdi.FriendsTreeMDIWindow;
 import org.alliance.ui.windows.OptionsWindow;
-import org.alliance.ui.windows.PrivateChatMessageMDIWindow;
-import org.alliance.ui.windows.PublicChatMessageMDIWindow;
-import org.alliance.ui.windows.TraceMDIWindow;
-import org.alliance.ui.windows.UploadsMDIWindow;
-import org.alliance.ui.windows.WelcomeMDIWindow;
+import org.alliance.ui.windows.mdi.PrivateChatMessageMDIWindow;
+import org.alliance.ui.windows.mdi.PublicChatMessageMDIWindow;
+import org.alliance.ui.windows.mdi.TraceMDIWindow;
+import org.alliance.ui.windows.mdi.UploadsMDIWindow;
+import org.alliance.ui.windows.mdi.WelcomeMDIWindow;
 import org.alliance.ui.windows.search.SearchMDIWindow;
 import org.alliance.ui.windows.viewshare.ViewShareMDIWindow;
-import org.alliance.ui.windows.SharesWindow;
+import org.alliance.ui.windows.shares.SharesWindow;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -60,7 +59,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
-import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -68,17 +66,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
-import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.plaf.metal.MetalButtonUI;
 
 /**
  * Created by IntelliJ IDEA.
@@ -105,11 +101,12 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         pml.updateProgress("Loading main window");
         init(ui.getRl(), "xui/mainwindow.xui.xml");
+        SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
+        SubstanceThemeHelper.setComponentToToolbarArea((JComponent) xui.getComponent("fakeShadow"));
+        SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("rescan"));
 
         bandwidthIn = (JProgressBar) xui.getComponent("bandwidthin");
         bandwidthOut = (JProgressBar) xui.getComponent("bandwidthout");
-
-        ((JButton) xui.getComponent("rescan")).setUI(new MetalButtonUI());
 
         xui.setEventHandler(this);
         xui.setMenuItemDescriptionListener(this);
@@ -141,8 +138,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
 
         mdiManager.selectWindow(publicChat);
-
-        RecursiveBackgroundSetter.setBackground(xui.getComponent("bottompanel"), new Color(0xE3E2E6), false);
 
         setTitle("Alliance");
 
@@ -374,9 +369,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             ObjectInputStream obj = new ObjectInputStream(in);
             setLocation((Point) obj.readObject());
             setSize((Dimension) obj.readObject());
-            if (getRootPane().getUI() instanceof SyntheticaRootPaneUI) {
-                ((SyntheticaRootPaneUI) getRootPane().getUI()).setMaximizedBounds(this);
-            }
             setExtendedState(obj.readInt());
             obj.close();
             setVisible(true);
@@ -820,7 +812,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_exitApp(ActionEvent e) throws Exception {
-        if (JOptionPane.showConfirmDialog(null, "Are you sure you wish to close Alliance?", "Are you sure?", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+        if (OptionDialog.showQuestionDialog(this, "Are you sure you wish to close Alliance?")) {
             if (ui.getCore() != null) {
                 ui.getCore().shutdown();
             }
@@ -830,17 +822,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 ui = null;
             }
             System.exit(0);
-        }
-    }
-
-    public void EVENT_addally(ActionEvent e) throws IOException {
-        String invitation = JOptionPane.showInputDialog(ui.getMainWindow(), "Enter the connection code you got from your friend: ");
-        try {
-            if (invitation != null) {
-                ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(invitation.trim(), null, 0);
-            }
-        } catch (EOFException ex) {
-            OptionDialog.showErrorDialog(this, "Your connection code is corrupt. It seems to be too short. Maybe you did not enter all characters? Please try again. If that doesn't help try with a new code.");
         }
     }
 

@@ -1,8 +1,8 @@
 package org.alliance.core.file.blockstorage;
 
-import com.stendahls.nif.util.SimpleTimer;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.SimpleTimer;
 import static org.alliance.core.CoreSubsystem.BLOCK_SIZE;
 import static org.alliance.core.CoreSubsystem.GB;
 import org.alliance.core.file.filedatabase.FileDescriptor;
@@ -251,6 +251,9 @@ public final class BlockFile {
     }
 
     /**
+     * @param blockNumber
+     * @param sliceOffset
+     * @param slice 
      * @return Number of bytes written, or -1 if the block is complete
      * @throws IOException
      */
