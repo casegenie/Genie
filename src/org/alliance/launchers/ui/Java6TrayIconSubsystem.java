@@ -15,6 +15,7 @@ import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.core.SimpleTimer;
+import org.alliance.core.LanguageResource;
 
 import java.awt.Font;
 import java.awt.MenuItem;
@@ -121,16 +122,16 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                     String msg = pmi.getMessage().replaceAll("\\<.*?\\>", "");      // Strip html
                     if (pmi instanceof PostMessageToAllInteraction) {
                         if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0) {
-                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "chatnew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
                         }
                     } else {
                         if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0) {
-                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
+                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "privatenew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.MessageType.INFO);
                         }
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage("Alliance needs your attention.", "", TrayIcon.MessageType.INFO);
+                        ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "attentionheader"), LanguageResource.getLocalizedString(getClass(), "attention"), TrayIcon.MessageType.INFO);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -154,7 +155,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                             e.printStackTrace();
                             //report error. Use reflection to init dialogs because we want NO references to UI stuff in this
                             //class - we want this class to load fast (ie load minimal amount of classes)
-                            Object errorDialog = Class.forName("com.stendahls.ui.ErrorDialog").newInstance();
+                            Object errorDialog = Class.forName("org.alliance.ui.dialogs.ErrorDialog").newInstance();
                             Method m = errorDialog.getClass().getMethod("init", Throwable.class, boolean.class);
                             m.invoke(errorDialog, e, false);
                         } catch (Throwable t) {
@@ -173,7 +174,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        MenuItem mi = new MenuItem("Open Alliance");
+        MenuItem mi = new MenuItem(LanguageResource.getLocalizedString(getClass(), "menuopen"));
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -187,7 +188,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
         m.addSeparator();
 
-        mi = new MenuItem("Unload UI");
+        mi = new MenuItem(LanguageResource.getLocalizedString(getClass(), "menuunload"));
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
@@ -200,7 +201,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
         m.addSeparator();
 
-        mi = new MenuItem("Exit");
+        mi = new MenuItem(LanguageResource.getLocalizedString(getClass(), "menuexit"));
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
@@ -262,7 +263,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
     @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
-            ti.displayMessage("", "Shutting down...", TrayIcon.MessageType.NONE);
+            ti.displayMessage("", LanguageResource.getLocalizedString(getClass(), "shutting"), TrayIcon.MessageType.NONE);
             balloonClickHandler = null;
         }
 
@@ -316,7 +317,7 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
                 return;
             }
             if (tray != null && ti != null) {
-                ti.displayMessage("", "Unloading UI...", TrayIcon.MessageType.NONE);
+                ti.displayMessage("", LanguageResource.getLocalizedString(getClass(), "unloading"), TrayIcon.MessageType.NONE);
                 balloonClickHandler = null;
             }
             core.restartProgram(false);

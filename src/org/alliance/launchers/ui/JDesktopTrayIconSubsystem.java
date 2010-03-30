@@ -16,6 +16,7 @@ import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
+import org.alliance.core.LanguageResource;
 import org.jdesktop.jdic.tray.SystemTray;
 import org.jdesktop.jdic.tray.TrayIcon;
 
@@ -132,16 +133,16 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                     String msg = pmi.getMessage().replaceAll("\\<.*?\\>", "");      // Strip html
                     if (pmi instanceof PostMessageToAllInteraction) {
                         if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0) {
-                            ti.displayMessage("Chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
+                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "chatnew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     } else {
                         if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0) {
-                            ti.displayMessage("Private chat message", core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
+                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "privatenew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage("Alliance needs your attention.", "Click here to find out why.", TrayIcon.INFO_MESSAGE_TYPE);
+                        ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "attentionheader"), LanguageResource.getLocalizedString(getClass(), "attention"), TrayIcon.INFO_MESSAGE_TYPE);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -155,7 +156,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
             @Override
             public void handleError(final Throwable e, final Object source) {
-                ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\nClick here to view detailed error (and send error report)", TrayIcon.ERROR_MESSAGE_TYPE);
+                ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\n" + LanguageResource.getLocalizedString(getClass(), "error"), TrayIcon.ERROR_MESSAGE_TYPE);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
 
@@ -165,7 +166,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                             e.printStackTrace();
                             //report error. Use reflection to init dialogs because we want NO references to UI stuff in this
                             //class - we want this class to load fast (ie load minimal amount of classes)
-                            Object errorDialog = Class.forName("com.stendahls.ui.ErrorDialog").newInstance();
+                            Object errorDialog = Class.forName("org.alliance.ui.dialogs.ErrorDialog").newInstance();
                             Method m = errorDialog.getClass().getMethod("init", Throwable.class, boolean.class);
                             m.invoke(errorDialog, e, false);
                         } catch (Throwable t) {
@@ -211,7 +212,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        JMenuItem mi = new JMenuItem("Open Alliance");
+        JMenuItem mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "menuopen"));
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -225,7 +226,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
         m.addSeparator();
 
-        mi = new JMenuItem("Exit");
+        mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "menuexit"));
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
@@ -236,8 +237,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         });
         m.add(mi);
 
-        ti = new TrayIcon(new ImageIcon(rl.getResource("gfx/icons/alliancetray.png")),
-                "Alliance", m);
+        ti = new TrayIcon(new ImageIcon(rl.getResource("gfx/icons/alliancetray.png")), "Alliance", m);
 
         ti.setIconAutoSize(true);
         ti.addBalloonActionListener(new ActionListener() {
@@ -310,7 +310,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
     @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
-            ti.displayMessage("", "Shutting down...", TrayIcon.NONE_MESSAGE_TYPE);
+            ti.displayMessage("", LanguageResource.getLocalizedString(getClass(), "shutting"), TrayIcon.NONE_MESSAGE_TYPE);
             balloonClickHandler = null;
         }
 
@@ -354,23 +354,5 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
     @Override
     public void run() {
         openUI();
-    }
-
-    private void unloadUI() {
-        try {
-            if (ui == null) {
-                if (T.t) {
-                    T.info("Subsystem already unloaded.");
-                }
-                return;
-            }
-            if (tray != null && ti != null) {
-                ti.displayMessage("", "Unloading UI...", TrayIcon.NONE_MESSAGE_TYPE);
-                balloonClickHandler = null;
-            }
-            core.restartProgram(false);
-        } catch (Exception t) {
-            core.reportError(t, this);
-        }
     }
 }
