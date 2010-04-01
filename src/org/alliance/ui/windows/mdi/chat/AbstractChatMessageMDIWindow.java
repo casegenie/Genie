@@ -1,4 +1,4 @@
-package org.alliance.ui.windows.mdi;
+package org.alliance.ui.windows.mdi.chat;
 
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
@@ -26,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 
 /**
  * Created by IntelliJ IDEA.

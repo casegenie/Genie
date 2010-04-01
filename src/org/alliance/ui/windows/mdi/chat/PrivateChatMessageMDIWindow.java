@@ -1,4 +1,4 @@
-package org.alliance.ui.windows.mdi;
+package org.alliance.ui.windows.mdi.chat;
 
 import org.alliance.core.comm.rpc.ChatMessageV3;
 import org.alliance.ui.UISubsystem;

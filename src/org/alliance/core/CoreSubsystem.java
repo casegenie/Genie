@@ -1,12 +1,10 @@
 package org.alliance.core;
 
-import com.stendahls.XUI.XUIException;
 import com.stendahls.nif.util.xmlserializer.SXML;
 import com.stendahls.nif.util.xmlserializer.XMLSerializer;
 import com.stendahls.util.resourceloader.ResourceLoader;
-import org.alliance.ui.windows.trace.Trace;
-import org.alliance.ui.windows.trace.TraceHandler;
-import org.alliance.ui.dialogs.ErrorDialog;
+import org.alliance.core.trace.Trace;
+import org.alliance.core.trace.TraceHandler;
 import org.alliance.Subsystem;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.rpc.AwayStatus;
@@ -43,6 +41,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.UnresolvedAddressException;
@@ -688,9 +687,11 @@ public class CoreSubsystem implements Subsystem {
             }
             if (GULCounter > 300) {
                 try {
-                    new ErrorDialog(new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
-                } catch (XUIException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                    Object errorDialog = Class.forName("org.alliance.ui.dialogs.ErrorDialog").newInstance();
+                    Method m = errorDialog.getClass().getMethod("init", Throwable.class, boolean.class);
+                    m.invoke(errorDialog, new Exception("UserList flood detected: " + GULCounter + "! <b>This is a fatal error. You need to restart Alliance.</b> Please send this error report by pressing 'send error'."), true);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
             GULCounter = 0;

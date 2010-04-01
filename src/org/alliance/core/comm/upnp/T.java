@@ -1,6 +1,6 @@
 package org.alliance.core.comm.upnp;
 
-import org.alliance.ui.windows.trace.TraceChannel;
+import org.alliance.core.trace.TraceChannel;
 
 /**
  * User: maciek

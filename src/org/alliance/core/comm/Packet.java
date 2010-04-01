@@ -1,6 +1,6 @@
 package org.alliance.core.comm;
 
-import org.alliance.ui.windows.trace.TraceChannel;
+import org.alliance.core.trace.TraceChannel;
 import com.stendahls.util.TextUtils;
 
 import java.io.IOException;

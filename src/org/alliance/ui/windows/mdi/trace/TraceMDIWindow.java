@@ -1,7 +1,7 @@
-package org.alliance.ui.windows.mdi;
+package org.alliance.ui.windows.mdi.trace;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
-import org.alliance.ui.windows.trace.TraceWindow;
+import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 import org.alliance.ui.UISubsystem;
 
 import java.io.IOException;

@@ -1,6 +1,6 @@
 package org.alliance.ui;
 
-import org.alliance.ui.windows.trace.TraceChannel;
+import org.alliance.core.trace.TraceChannel;
 
 /**
  * User: maciek

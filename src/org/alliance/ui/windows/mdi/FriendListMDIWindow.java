@@ -72,7 +72,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         statusright = (JLabel) xui.getComponent("statusright");
 
         createUI();
-        setTitle("My  Network");
+        setTitle("My Network");
     }
 
     public void update() {

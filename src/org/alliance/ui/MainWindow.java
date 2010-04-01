@@ -41,13 +41,13 @@ import org.alliance.ui.windows.ForwardInvitationDialog;
 import org.alliance.ui.windows.mdi.FriendListMDIWindow;
 import org.alliance.ui.windows.mdi.FriendsTreeMDIWindow;
 import org.alliance.ui.windows.OptionsWindow;
-import org.alliance.ui.windows.mdi.PrivateChatMessageMDIWindow;
-import org.alliance.ui.windows.mdi.PublicChatMessageMDIWindow;
-import org.alliance.ui.windows.mdi.TraceMDIWindow;
+import org.alliance.ui.windows.mdi.chat.PrivateChatMessageMDIWindow;
+import org.alliance.ui.windows.mdi.chat.PublicChatMessageMDIWindow;
+import org.alliance.ui.windows.mdi.trace.TraceMDIWindow;
 import org.alliance.ui.windows.mdi.UploadsMDIWindow;
 import org.alliance.ui.windows.mdi.WelcomeMDIWindow;
-import org.alliance.ui.windows.search.SearchMDIWindow;
-import org.alliance.ui.windows.viewshare.ViewShareMDIWindow;
+import org.alliance.ui.windows.mdi.search.SearchMDIWindow;
+import org.alliance.ui.windows.mdi.viewshare.ViewShareMDIWindow;
 import org.alliance.ui.windows.shares.SharesWindow;
 
 import java.awt.Color;

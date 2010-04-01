@@ -1,6 +1,6 @@
 package org.alliance.core.file.blockstorage;
 
-import org.alliance.ui.windows.trace.TraceChannel;
+import org.alliance.core.trace.TraceChannel;
 
 /**
  * User: maciek
