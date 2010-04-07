@@ -9,6 +9,7 @@ import com.stendahls.util.resourceloader.ResourceLoader;
 import org.alliance.ui.dialogs.ErrorDialog;
 import org.alliance.Subsystem;
 import org.alliance.core.CoreSubsystem;
+import org.alliance.core.LanguageResource;
 import static org.alliance.core.CoreSubsystem.ERROR_URL;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.macos.OSXAdaptation;
@@ -33,7 +34,7 @@ import javax.swing.plaf.FontUIResource;
  */
 public class UISubsystem implements UINexus, Subsystem {
 
-    public static final boolean NODE_TREE_MODEL_DISABLED = false; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
+    public static final boolean NODE_TREE_MODEL_DISABLED = true; //it's disabled when it's a production release because there's a bug in it and it's not really needed anyway
     private MainWindow mainWindow;
     private ResourceLoader rl;
     private CoreSubsystem core;
@@ -63,7 +64,7 @@ public class UISubsystem implements UINexus, Subsystem {
         if (params != null && params.length >= 2 && params[1] != null) {
             progress = (StartupProgressListener) params[1];
         }
-        progress.updateProgress("Loading user interface");
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "uiloading"));
 
         if (SwingUtilities.isEventDispatchThread()) {
             realInit(params);
@@ -244,7 +245,7 @@ public class UISubsystem implements UINexus, Subsystem {
                 }
             }
         } catch (Exception e) {
-            OptionDialog.showErrorDialog(getMainWindow(), "Could not open url: " + e);
+            OptionDialog.showErrorDialog(getMainWindow(), LanguageResource.getLocalizedString(getClass(), "browsererror", e.toString()));
         }
     }
 

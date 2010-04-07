@@ -5,6 +5,7 @@ import org.alliance.core.UICallback;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
+import org.alliance.core.LanguageResource;
 import org.alliance.launchers.OSInfo;
 import org.alliance.ui.dialogs.OptionDialog;
 
@@ -67,7 +68,6 @@ public class UIBridge implements UICallback {
     @Override
     public boolean isUIVisible() {
         return ui.getMainWindow().isVisible();
-        //return ui.getMainWindow().isVisible() && ui.getMainWindow().getState() != Frame.ICONIFIED;
     }
 
     @Override
@@ -105,6 +105,8 @@ public class UIBridge implements UICallback {
 
     @Override
     public void firstDownloadEverFinished() {
+        UISound Sound = new UISound(new File(ui.getCore().getSettings().getInternal().getDownloadsound()));
+        Sound.start();
         if (ui.getCore().getSettings().getInternal().getHasneverdownloadedafile() != null && ui.getCore().getSettings().getInternal().getHasneverdownloadedafile() == 1) {
             ui.getCore().getSettings().getInternal().setHasneverdownloadedafile(0);
             if (OSInfo.isWindows()) {
@@ -112,14 +114,11 @@ public class UIBridge implements UICallback {
 
                     @Override
                     public void run() {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(),
-                                "Congratulations! You have downloaded your first file using Alliance.[p]To find your Alliance downloads use the shortcut on the Desktop called 'My Alliance Downloads'.");
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "firstdownload"));
                     }
                 });
             }
         }
-        UISound Sound = new UISound(new File(ui.getCore().getSettings().getInternal().getDownloadsound()));
-        Sound.start();
     }
 
     @Override

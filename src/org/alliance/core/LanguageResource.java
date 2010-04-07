@@ -50,7 +50,7 @@ public class LanguageResource {
     }
 
     private static String getKeyHeader(Class<?> c) {
-        return c.getName().substring(13);
+        return c.getName().substring(13).replaceAll("\\$\\d*", "");
     }
 
     private static String getResource(String... strings) {

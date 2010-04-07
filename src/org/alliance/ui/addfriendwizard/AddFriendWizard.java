@@ -4,6 +4,7 @@ import com.stendahls.XUI.XUIDialog;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.ui.JWizard;
 import org.alliance.core.node.Invitation;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
@@ -66,7 +67,7 @@ public class AddFriendWizard extends JWizard {
     private static final String PORT_OPEN_TEST_URL = "http://maciek.tv/porttest?port=";
 
     public AddFriendWizard() throws Exception {
-        setSuperTitle("Add connection wizard");
+        setSuperTitle(LanguageResource.getLocalizedString(getClass(), "windowheader"));
     }
 
     @Override

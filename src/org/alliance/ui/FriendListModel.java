@@ -3,6 +3,8 @@ package org.alliance.ui;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.PacedRunner;
 import org.alliance.core.node.Friend;
+import org.alliance.core.LanguageResource;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -94,7 +96,7 @@ public class FriendListModel extends DefaultListModel {
             drawList(ts, group);
         }
         if (groups.size() > 0) {
-            addElement("Not in a Group");
+            addElement(LanguageResource.getLocalizedString(getClass(), "nogroup"));
             drawList(ts, "");
         }
 

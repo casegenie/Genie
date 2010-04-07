@@ -25,6 +25,7 @@ import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.interactions.NewVersionAvailableInteraction;
+import org.alliance.core.LanguageResource;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
@@ -99,7 +100,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     public void init(final UISubsystem ui, StartupProgressListener pml) throws Exception {
         this.ui = ui;
 
-        pml.updateProgress("Loading main window");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
         init(ui.getRl(), "xui/mainwindow.xui.xml");
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         SubstanceThemeHelper.setComponentToToolbarArea((JComponent) xui.getComponent("fakeShadow"));
@@ -121,18 +122,18 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         setupMDIManager();
 
-        pml.updateProgress("Loading main window (friend list)");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "friendloading"));
         mdiManager.addWindow(new FriendListMDIWindow(mdiManager, ui));
-        pml.updateProgress("Loading main window (public chat)");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "chatloading"));
         mdiManager.addWindow(publicChat = new PublicChatMessageMDIWindow(ui));
-        pml.updateProgress("Loading main window (search)");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "searchloading"));
         mdiManager.addWindow(new SearchMDIWindow(ui));
-        pml.updateProgress("Loading main window (download)");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "downloadsloading"));
         mdiManager.addWindow(new DownloadsMDIWindow(ui));
-        pml.updateProgress("Loading main window (uploads)");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "uploadsloading"));
         EVENT_uploads(null);
 
-        pml.updateProgress("Loading main window");
+        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
         for (PublicChatHistory.Entry e : ui.getCore().getPublicChatHistory().allMessages()) {
             publicChat.addMessage(ui.getCore().getFriendManager().nickname(e.fromGuid), e.message, e.tick, true);
         }
@@ -156,7 +157,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
                 @Override
                 public void run() {
-                    OptionDialog.showInformationDialog(MainWindow.this, "Welcome to Alliance![p]Before starting you need to enter your nickname.[p]The options window will now open.[p]");
+                    OptionDialog.showInformationDialog(MainWindow.this, LanguageResource.getLocalizedString(getClass(), "welcomeinfo"));
                     try {
                         EVENT_options(null);
                     } catch (Exception e) {
@@ -280,7 +281,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (OSInfo.supportsTrayIcon() || OSInfo.isMac()) {
             setVisible(false);
         } else {
-            OptionDialog.showInformationDialog(this, "You cant hide the Alliance window on your system. Simply close the window to shutdown Alliance.");
+            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "hideinfo"));
         }
     }
 
@@ -314,10 +315,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         });
     }
 
-    public void tryQuit() {
-        shutdown();
-    }
-
     @Override
     public void showMenuItemDescription(String description) {
         setStatusMessage(description);
@@ -342,7 +339,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             if (T.t) {
                 T.info("Serializing window state");
             }
-            FileOutputStream out = new FileOutputStream(ui.getCore().getSettings().getInternal().getWindowstatefile() + System.getProperty("tracewindow.id"));
+            FileOutputStream out = new FileOutputStream(ui.getCore().getSettings().getInternal().getWindowstatefile());
             ObjectOutputStream obj = new ObjectOutputStream(out);
 
             obj.writeObject(getLocation());
@@ -363,9 +360,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             T.info("Deserializing window state");
         }
         try {
-            // TODO tracewindow.id is read, but never set? => everytime null?
-            // TODO user.home isn't the right place to put this file into, should be appdata/alliance or something similar
-            FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile() + System.getProperty("tracewindow.id"));
+            FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile());
             ObjectInputStream obj = new ObjectInputStream(in);
             setLocation((Point) obj.readObject());
             setSize((Dimension) obj.readObject());
@@ -507,9 +502,11 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                             getUploadsWindow().update();
                         }
                         // if (mdiManager != null && getFriendListMDIWindow() != null) getFriendListMDIWindow().update(); //updated by paced runner in friendlistmodel
-                        shareMessage.setText("Share: " + TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getShareSize()) + " in " + ui.getCore().getShareManager().getFileDatabase().getNumberOfShares() + " files");
-                        updateBandwidth("Downloading", "downloaded", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
-                        updateBandwidth("Uploading", "uploaded", bandwidthOut, ui.getCore().getNetworkManager().getBandwidthOut());
+                        shareMessage.setText(LanguageResource.getLocalizedString(getClass(), "sharesinfo",
+                                TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getShareSize()),
+                                Integer.toString(ui.getCore().getShareManager().getFileDatabase().getNumberOfShares())));
+                        updateBandwidth("in", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
+                        updateBandwidth("out", bandwidthOut, ui.getCore().getNetworkManager().getBandwidthOut());
                         displayNagAboutInvitingFriendsIfNeeded();
                     }
 
@@ -530,11 +527,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                                         if (ui.getCore().getNetworkManager().getBandwidthIn().getCPS() > ui.getCore().getNetworkManager().getBandwidthIn().getHighestCPS() / 3) {
                                             //downloading at fairly high speed - let's show the infomration dialog
                                             ui.getCore().getSettings().getInternal().setLastnaggedaboutinvitingafriend(System.currentTimeMillis());
-                                            if (OptionDialog.showQuestionDialog(MainWindow.this,
-                                                    "You have not invited any friends to your Alliance network.[p]"
-                                                    + "If you invite friends you will be able to download more files faster and the network will become more reliable.[p]"
-                                                    + "[b]It is important for all Alliance users to invite at least once friend.[/b][p]"
-                                                    + "Would you like to invite a friend to your Alliance network now?[p]")) {
+                                            if (OptionDialog.showQuestionDialog(MainWindow.this, LanguageResource.getLocalizedString(getClass(), "invitenag"))) {
                                                 ui.getCore().getSettings().getInternal().setHastriedtoinviteafriend(1);
                                                 openWizardAt(AddFriendWizard.STEP_PORT_OPEN_TEST);
                                             }
@@ -549,7 +542,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         }
                     }
 
-                    private void updateBandwidth(String s, String s2, JProgressBar pb, BandwidthAnalyzer a) {
+                    private void updateBandwidth(String type, JProgressBar pb, BandwidthAnalyzer a) {
                         double curr = a.getCPS();
                         double max = a.getHighestCPS();
                         pb.setString(a.getCPSHumanReadable());
@@ -559,7 +552,23 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         } else {
                             pb.setValue((int) (curr * 100 / max));
                         }
-                        pb.setToolTipText("<html>" + s + " at " + a.getCPSHumanReadable() + "<br>Speed record: " + a.getHighestCPSHumanReadable() + "<br>Total bytes " + s2 + ": " + TextUtils.formatByteSize(a.getTotalBytes()) + "</html>");
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("<html>");
+                        if (type.equals("in")) {
+                            sb.append(LanguageResource.getLocalizedString(getClass(), "downloading", a.getCPSHumanReadable()));
+                        } else {
+                            sb.append(LanguageResource.getLocalizedString(getClass(), "uploading", a.getCPSHumanReadable()));
+                        }
+                        sb.append("<br>");
+                        sb.append(LanguageResource.getLocalizedString(getClass(), "speedrecord", a.getHighestCPSHumanReadable()));
+                        sb.append("<br>");
+                        if (type.equals("in")) {
+                            sb.append(LanguageResource.getLocalizedString(getClass(), "downtotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
+                        } else {
+                            sb.append(LanguageResource.getLocalizedString(getClass(), "uptotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
+                        }
+                        sb.append("</html>");
+                        pb.setToolTipText(sb.toString());
                     }
                 });
             }
@@ -631,16 +640,17 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
             } else if (nui instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
-                    OptionDialog.showInformationDialog(this, "A new version of Alliance has been downloaded.[p]Alliance will now run updater to install new version.");
+                    OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "newupdateok"));
                     ui.getCore().getFileManager().getSiteUpdater().prepareUpdate();
                 }
             } else if (nui instanceof NewVersionAvailableInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
                     try {
-                        OptionDialog updateDialog = new OptionDialog(this, "Update Available", "A new update for Alliance is available:[p][b]Alliance Version "
-                                + ui.getCore().getFileManager().getSiteUpdater().getSiteVersion()
-                                + " build (" + ui.getCore().getFileManager().getSiteUpdater().getSiteBuild()
-                                + ")[/b][p]Do you want to update now?[p][a href='.']View more information about this update[/a]", 1, 1);
+                        OptionDialog updateDialog = new OptionDialog(this, LanguageResource.getLocalizedString(getClass(), "newupdateheader"),
+                                LanguageResource.getLocalizedString(getClass(), "newupdate",
+                                ui.getCore().getFileManager().getSiteUpdater().getSiteVersion(),
+                                Integer.toString(ui.getCore().getFileManager().getSiteUpdater().getSiteBuild()))
+                                + "[a href='.']" + LanguageResource.getLocalizedString(getClass(), "newupdateinfo") + "[/a]", 1, 1);
                         JLayeredPane lp = (JLayeredPane) updateDialog.getRootPane().getComponent(1);
                         JPanel p = (JPanel) ((JPanel) lp.getComponent(0)).getComponent(0);
                         for (Component c : p.getComponents()) {
@@ -661,7 +671,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                             ui.getCore().getFileManager().getSiteUpdater().beginDownload();
                         }
                     } catch (Exception ex) {
-                        ui.getCore().getUICallback().statusMessage("Update check failed", true);
+                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "newupdateerror"), true);
                     }
                 }
             } else if (nui instanceof ForwardedInvitationInteraction) {
@@ -671,7 +681,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         T.error("Already was connected to this friend!!");
                     }
                 } else {
-                    if (ui.getCore().getSettings().getInternal().getAutomaticallydenyallinvitations() == 0 && OptionDialog.showQuestionDialog(this, fii.getRemoteName() + " wants to connect to you. " + fii.getRemoteName() + " has a connection to " + fii.getMiddleman(ui.getCore()).getNickname() + ". [p]Do you want to connect to " + fii.getRemoteName() + "?[p]")) {
+                    if (ui.getCore().getSettings().getInternal().getAutomaticallydenyallinvitations() == 0
+                            && OptionDialog.showQuestionDialog(this, LanguageResource.getLocalizedString(getClass(), "friendattempt", fii.getRemoteName(), fii.getRemoteName(), fii.getMiddleman(ui.getCore()).getNickname(), fii.getRemoteName()))) {
                         try {
                             ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(ui.getCore()));
                             openWizardAt(AddFriendWizard.STEP_ATTEMPT_CONNECT, fii.getFromGuid());
@@ -805,14 +816,15 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_trace(ActionEvent e) throws Exception {
         if (!org.alliance.T.t) {
-            OptionDialog.showInformationDialog(this, "The trace has been disabled in this build of Alliance.");
+            ((JComponent) e.getSource()).setEnabled(false);
+            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "menudisabled"));
         } else {
             createTraceWindow();
         }
     }
 
     public void EVENT_exitApp(ActionEvent e) throws Exception {
-        if (OptionDialog.showQuestionDialog(this, "Are you sure you wish to close Alliance?")) {
+        if (OptionDialog.showQuestionDialog(this, LanguageResource.getLocalizedString(getClass(), "exit"))) {
             if (ui.getCore() != null) {
                 ui.getCore().shutdown();
             }
@@ -851,7 +863,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_friendtree(ActionEvent e) throws Exception {
         if (UISubsystem.NODE_TREE_MODEL_DISABLED) {
-            OptionDialog.showInformationDialog(this, "The network topology is disabled because it is buggy and can cause a network to crash.");
+            ((JComponent) e.getSource()).setEnabled(false);
+            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "menudisabled"));
         } else {
             mdiManager.addWindow(new FriendsTreeMDIWindow(mdiManager, ui));
         }
