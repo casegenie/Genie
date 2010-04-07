@@ -81,7 +81,7 @@ public class TCPNIONetworkLayer implements Runnable {
                 if (netMan.getCore().getSettings().getRulelist().checkConnection(host)) {
                     //Connect, continue
                 } else {
-                    netMan.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "conblocked").replace("$HOST", host));
+                    netMan.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "conblocked", host));
                     return;
                 }
             } else {

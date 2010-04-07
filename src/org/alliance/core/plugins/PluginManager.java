@@ -46,7 +46,7 @@ public class PluginManager extends Manager {
                     plugInConsoleExtensions.add(pi.getConsoleExtensions());
                     plugIns.add(pi);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "classerror").replace("$PLUGIN", p.getJar()));
+                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "classerror", p.getJar()));
                 }
             }
         }
@@ -64,8 +64,8 @@ public class PluginManager extends Manager {
             if (f.exists()) {
                 l.add(f.toURI().toURL());
             } else {
-                int response = JOptionPane.showConfirmDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror").
-                        replace("$PLUGIN", f.getName()), LanguageResource.getLocalizedString(getClass(), "loadingerrorheader"), JOptionPane.YES_NO_OPTION);
+                int response = JOptionPane.showConfirmDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror", f.getName()),
+                        LanguageResource.getLocalizedString(getClass(), "loadingerrorheader"), JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     JFileChooser file = new JFileChooser();
                     FileNameExtensionFilter filter = new FileNameExtensionFilter("JAR files", "JAR", "jar", "Jar");
@@ -78,7 +78,7 @@ public class PluginManager extends Manager {
                             l.add(file.getSelectedFile().toURI().toURL());
                             itr.add(newPlugin);
                         } catch (FileNotFoundException e) {
-                            JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror").replace("$PLUGIN", file.getSelectedFile().getName()));
+                            JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "launchererror", file.getSelectedFile().getName()));
                         }
                     }
                 } else {

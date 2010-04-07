@@ -82,9 +82,9 @@ public class HashesForPath extends CompressedRPC {
             }
 
             if (core.getFileManager().containsComplete(hash)) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "samefile").replace("$FILENAME", commonPath));
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "samefile", commonPath));
             } else if (core.getNetworkManager().getDownloadManager().getDownload(hash) != null) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadinprogress").replace("$FILENAME", commonPath));
+                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadinprogress", commonPath));
             } else {
                 core.getNetworkManager().getDownloadManager().queDownload(hash, commonPath, guid);
             }

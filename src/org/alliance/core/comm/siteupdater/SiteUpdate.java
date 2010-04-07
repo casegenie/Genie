@@ -116,8 +116,9 @@ public class SiteUpdate implements Runnable {
                     int readed = 0;
                     while ((read = in.read(buf)) > 0) {
                         readed += read;
-                        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloading").
-                                replace("$READED", Integer.toString(readed)).replace("$TOTAL", Integer.toString(http.getContentLength())), true);
+                        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloading",
+                                Integer.toString(readed), Integer.toString(http.getContentLength())),
+                                true);
                         out.write(buf, 0, read);
                     }
                     out.close();

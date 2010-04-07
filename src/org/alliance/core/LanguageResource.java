@@ -29,24 +29,46 @@ public class LanguageResource {
     }
 
     public static String getLocalizedString(Class<?> c, String key) {
-        return LANGUAGE_BUNDLE.getString(c.getName() + "." + key);
+        return getResource(getKeyHeader(c), key);
     }
 
-    public static void translateXUIToolbar(Class<?> c, ArrayList<JButton> buttons) {
+    public static String getLocalizedString(Class<?> c, String key, String... params) {
+        String paramsString = getResource(getKeyHeader(c), key);
+        for (String param : params) {
+            paramsString = paramsString.replaceFirst("\\$[^\\$]*\\$", param);
+        }
+        return paramsString;
+    }
+
+    public static void getLocalizedXUIToolbar(Class<?> c, ArrayList<JButton> buttons) {
         for (JButton b : buttons) {
             String tooltipText = b.getToolTipText();
-            tooltipText = tooltipText.replace("$DES", LANGUAGE_BUNDLE.getString(c.getName() + ".toolbar." + b.getActionCommand() + ".description"));
-            tooltipText = tooltipText.replace("$NAME", LANGUAGE_BUNDLE.getString(c.getName() + ".toolbar." + b.getActionCommand() + ".name"));
+            tooltipText = tooltipText.replace("$DES$", getResource(getKeyHeader(c), "toolbar", b.getActionCommand(), "description"));
+            tooltipText = tooltipText.replace("$NAME$", getResource(getKeyHeader(c), "toolbar", b.getActionCommand(), "name"));
             b.setToolTipText(tooltipText);
         }
     }
 
-    /*public static void translateXUIElements(Collection c) {
-        for (Object o : c) {
-            if (o instanceof XUIElement) {
-                XUIElement element = (XUIElement) o;
-                System.out.println(element.getId());
-            }
+    private static String getKeyHeader(Class<?> c) {
+        return c.getName().substring(13);
+    }
+
+    private static String getResource(String... strings) {
+        StringBuilder sb = new StringBuilder(50);
+        for (String s : strings) {
+            sb.append(s);
+            sb.append(".");
         }
+        sb.deleteCharAt(sb.length() - 1);
+        return LANGUAGE_BUNDLE.getString(sb.toString());
+    }
+
+    /*public static void translateXUIElements(Collection c) {
+    for (Object o : c) {
+    if (o instanceof XUIElement) {
+    XUIElement element = (XUIElement) o;
+    System.out.println(element.getId());
+    }
+    }
     }*/
 }

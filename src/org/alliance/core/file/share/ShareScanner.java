@@ -112,7 +112,7 @@ public class ShareScanner extends Thread {
                         break;
                     }
                     try {
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning").replace("$BASE", base.toString()), true);
+                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", base.toString()), true);
                         scanPath(base);
                     } catch (Exception e) {
                         if (T.t) {
@@ -217,7 +217,7 @@ public class ShareScanner extends Thread {
         }
         try {
             filesScanned++;
-            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "searchnew").replace("$PATH", path));
+            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "searchnew", path));
             if (!manager.getFileDatabase().contains(basePath, path, true)) {
                 hash(basePath, new File(path));
             }
@@ -251,13 +251,12 @@ public class ShareScanner extends Thread {
         try {
             fd = new FileDescriptor(basePath, file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
         } catch (FileDescriptor.FileModifiedWhileHashingException e) {
-            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashmodified").replace("$FILENAME", file.getName()));
+            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashmodified", file.getName()));
             queFileForHashing(file.toString(), true);
             return;
         }
-        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashok").
-                replace("$FILENAME", file.getName()).replace("$TIME", st.getTime()).
-                replace("$TICK", TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.)))));
+        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashok",
+                file.getName(), st.getTime(), TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.)))));
         manager.getFileDatabase().addEntry(fd);
 
         bytesScanned += fd.getSize();
@@ -339,7 +338,7 @@ public class ShareScanner extends Thread {
                     if (manager.getFileDatabase().contains(basePath, oldFile, false)) {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, oldFile);
                         manager.getFileDatabase().removeEntry(rootHash);
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile").replace("$FILENAME", oldFile), true);
+                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile", oldFile), true);
                         queFileForHashing(newFile, false);
                     }
                 } catch (IOException e) {
@@ -361,7 +360,7 @@ public class ShareScanner extends Thread {
                     if (manager.getFileDatabase().contains(basePath, file, false)) {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, file);
                         manager.getFileDatabase().removeEntry(rootHash);
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile").replace("$FILENAME", file), true);
+                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile", file), true);
                     }
                 } catch (IOException e) {
                     core.reportError(e, this);

@@ -72,7 +72,7 @@ public abstract class AllianceMDIWindow extends MDIWindow {
 
         this.toolbar = ((JToolBar) this.xui.getComponent("toolbar"));
         ui.getToolbarActionManager().fillToolbar(this.toolbar, toolbarName, this);
-        LanguageResource.translateXUIToolbar(getClass(), ui.getToolbarActionManager().getButtonsBy(this));
+        LanguageResource.getLocalizedXUIToolbar(getClass(), ui.getToolbarActionManager().getButtonsBy(this));
 
         setIcon(new ImageIcon(ui.getRl().getResource("gfx/icons/" + mdiWindowIdentifier + ".png")));
     }

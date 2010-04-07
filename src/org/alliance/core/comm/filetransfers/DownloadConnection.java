@@ -180,7 +180,7 @@ public class DownloadConnection extends TransferConnection {
                 }
             }
         } else {
-            setStatusString(LanguageResource.getLocalizedString(getClass(), "downblock").replace("$BNUMBER", Integer.toString(blockNumber)));
+            setStatusString(LanguageResource.getLocalizedString(getClass(), "downblock", Integer.toString(blockNumber)));
 
             if (T.t) {
                 T.info("Starting to download block " + blockNumber);
