@@ -3,13 +3,11 @@ package org.alliance.core.comm.rpc;
 import org.alliance.core.T;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
-import org.alliance.core.file.filedatabase.FileType;
 import static org.alliance.core.comm.rpc.SearchHits.MAX_SEARCH_HITS;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import org.alliance.core.comm.SearchHit;
-import org.alliance.core.file.filedatabase.ExtensionFileType;
 
 /**
  *
@@ -37,21 +35,9 @@ public class Search extends RPC {
         query = in.readUTF();
 
         core.logNetworkEvent("Search query " + query + " from " + con.getRemoteFriend());
-
-        // FileType ft = FileType.EVERYTHING;
+    
         byte type = in.readByte();
-        /* if (FileType.getFileTypeById(type) != null) {
-        ft = FileType.getFileTypeById(type);
-        if (ft.fileTypeIdentifier() instanceof ExtensionFileType) {
-        ExtensionFileType extft = (ExtensionFileType) ft.fileTypeIdentifier();
-        String[] extensions = extft.getExtensions();
-        for(String ex : extensions){
-        System.out.println(ex);
-        }
-        }
-        }*/
-
-        //TODO FileTYPE searching
+      
         SearchHits sh = new SearchHits();
         ArrayList<SearchHit> hitList = core.getShareManager().getFileDatabase().getSearchHits(query, type, MAX_SEARCH_HITS);
         for (SearchHit hit : hitList) {

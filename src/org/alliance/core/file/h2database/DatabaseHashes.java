@@ -45,7 +45,7 @@ public class DatabaseHashes {
         }
     }
 
-    public ResultSet getEntriesRootHash(byte[] rootHash) {
+    public ResultSet getEntriesBy(byte[] rootHash) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT * FROM hashes WHERE root_hash=? ORDER BY block_number;");

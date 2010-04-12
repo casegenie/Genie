@@ -15,6 +15,7 @@ public class DatabaseCore {
     private final CoreSubsystem core;
     private Connection conn;
     private boolean connected;
+    private DatabaseSharesBases dbSharesBases;
     private DatabaseShares dbShares;
     private DatabaseHashes dbHashes;
     private DatabaseDuplicates dbDuplicates;
@@ -36,6 +37,7 @@ public class DatabaseCore {
             String path = core.getSettings().getInternal().getDatabasefile();
             conn = DriverManager.getConnection(DRIVERURL + TYPE + path + OPTIONS, USER, PASSWORD);
             changeCache(8 * 1024);
+            dbSharesBases = new DatabaseSharesBases(conn);
             dbShares = new DatabaseShares(conn);
             dbHashes = new DatabaseHashes(conn);
             dbDuplicates = new DatabaseDuplicates(conn);
@@ -52,7 +54,7 @@ public class DatabaseCore {
         long time = System.currentTimeMillis();
         //Wait max 10 seconds
         while (core.getFileManager().getFileDatabase().isDbInUse() && System.currentTimeMillis() - time < 1000 * 10) {
-        try {
+            try {
                 Thread.sleep(250);
             } catch (InterruptedException ex) {
             }
@@ -91,7 +93,11 @@ public class DatabaseCore {
         return dbDuplicates;
     }
 
+    public DatabaseSharesBases getDbSharesBases() {
+        return dbSharesBases;
+    }
+
     public boolean isConnected() {
         return connected;
-}
+    }
 }

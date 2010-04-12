@@ -24,7 +24,7 @@ import java.util.Collection;
  */
 public class SearchHits extends CompressedRPC {
 
-    public static final int MAX_SEARCH_HITS = 100;
+    public static final int MAX_SEARCH_HITS = 50;
     private ArrayList<SearchHit> hits = new ArrayList<SearchHit>();
 
     public SearchHits() {

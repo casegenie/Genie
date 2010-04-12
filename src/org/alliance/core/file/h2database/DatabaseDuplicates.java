@@ -45,7 +45,7 @@ public class DatabaseDuplicates {
         }
     }
 
-    public ResultSet getEntryByPath(String path) {
+    public ResultSet getEntryBy(String path) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT * FROM duplicates WHERE path=?;");

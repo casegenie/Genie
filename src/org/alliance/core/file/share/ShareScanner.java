@@ -99,14 +99,13 @@ public class ShareScanner extends Thread {
 
             if (System.currentTimeMillis() - lastFullScanCompletedAt > getShareManagerCycle() || shouldBeFastScan) {
 
-                ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
-
                 //Scan shares for removed files
                 manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
-                manager.getFileDatabase().removeObsoleteEntries(al);
+                manager.getFileDatabase().removeObsoleteEntries();
 
                 long time = System.currentTimeMillis();
                 filesScanned = 0;
+                ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
                 for (ShareBase base : al) {
                     if (!alive) {
                         break;

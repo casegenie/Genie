@@ -35,6 +35,7 @@ public class LanguageResource {
     public static String getLocalizedString(Class<?> c, String key, String... params) {
         String paramsString = getResource(getKeyHeader(c), key);
         for (String param : params) {
+            param = param.replace("\\", "\\\\");
             paramsString = paramsString.replaceFirst("\\$[^\\$]*\\$", param);
         }
         return paramsString;

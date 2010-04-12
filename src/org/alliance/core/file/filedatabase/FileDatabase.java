@@ -63,6 +63,7 @@ public class FileDatabase {
         changeInUseQueue(true);
         FileIndex fileIndex = new FileIndex(fd.getBasePath(), mergePathParts(fd.getBasePath(), fd.getSubpath(), null));
         byte fileType = FileType.getByFileName(fileIndex.getFilename()).id();
+        core.getFileManager().getDbCore().getDbSharesBases().addEntry(fileIndex.getBasePath());
         if (core.getFileManager().getDbCore().getDbShares().addEntry(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename(), fileType, fd.getSize(), fd.getRootHash().array(), fd.getModifiedAt())) {
             shareSize += fd.getSize();
             numberOfShares++;
@@ -82,10 +83,10 @@ public class FileDatabase {
             return;
         }
         changeInUseQueue(true);
-        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryByRootHash(rootHash);
+        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryBy(rootHash);
         try {
             while (result.next()) {
-                core.getFileManager().getDbCore().getDbShares().deleteEntryByRootHash(rootHash);
+                core.getFileManager().getDbCore().getDbShares().deleteEntryBy(rootHash);
                 shareSize -= result.getLong(ID_SIZE);
                 numberOfShares--;
             }
@@ -95,85 +96,52 @@ public class FileDatabase {
         changeInUseQueue(false);
     }
 
-    private void removeObsoleteShare(String basePath, int removedFiles) {
+    public void removeObsoleteEntries() {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return;
         }
         changeInUseQueue(true);
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesByBasePath(basePath, 1024, 0);
         try {
-            boolean recurse = false;
-            while (results.next()) {
-                removeEntry(results.getBytes(ID_ROOT_HASH));
-                removedFiles++;
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", Integer.toString(removedFiles), basePath));
-                recurse = true;
-            }
-            if (recurse) {
-                removeObsoleteShare(basePath, removedFiles);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        changeInUseQueue(false);
-    }
-
-    private int removeObsoleteFiles(String subPath, int offset, int scannedFiles, int snapshotNumberOfShares) {
-        if (!core.getFileManager().getDbCore().isConnected()) {
-            return scannedFiles;
-        }
-        changeInUseQueue(true);
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBySubPath(subPath, 1024, offset);
-        try {
-            boolean recurse = false;
-            while (results.next()) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch", Integer.toString(scannedFiles * 100 / snapshotNumberOfShares)));
-                scannedFiles++;
-                if (!(new File(mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME))).exists())) {
-                    removeEntry(results.getBytes(ID_ROOT_HASH));
-                }
-                recurse = true;
-            }
-            if (recurse) {
-                scannedFiles = removeObsoleteFiles(subPath, offset + 1024, scannedFiles, snapshotNumberOfShares);
-            }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        }
-        changeInUseQueue(false);
-        return scannedFiles;
-    }
-
-    public void removeObsoleteEntries(ArrayList<ShareBase> shareBase) {
-        if (!core.getFileManager().getDbCore().isConnected()) {
-            return;
-        }
-        changeInUseQueue(true);
-        // long time = System.currentTimeMillis();
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getBasePaths();
-        try {
-            //Clean by removed sharabases
+            //Clean by removed sharabases           
             ArrayList<String> shares = new ArrayList<String>();
             for (ShareBase sharebase : core.getFileManager().getShareManager().shareBases()) {
                 shares.add(sharebase.getPath());
             }
+            ResultSet results = core.getFileManager().getDbCore().getDbSharesBases().getBasePaths();
             while (results.next()) {
                 if (!shares.contains(results.getString(ID_BASE_PATH))) {
-                    removeObsoleteShare(results.getString(ID_BASE_PATH), 0);
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)));
+                    core.getFileManager().getDbCore().getDbSharesBases().deleteEntryBy(results.getString(ID_BASE_PATH));
                 }
             }
             //Clean by removed files
+            if (!core.getFileManager().getDbCore().isConnected()) {
+                return;
+            }
             int scannedFiles = 0;
+            ArrayList<String> subPaths = new ArrayList<String>();
             results = core.getFileManager().getDbCore().getDbShares().getSubPaths();
-            int snapshotNumberOfShares = numberOfShares;
             while (results.next()) {
-                scannedFiles = removeObsoleteFiles(results.getString(ID_SUB_PATH), 0, scannedFiles, snapshotNumberOfShares);
+                subPaths.add(results.getString(ID_SUB_PATH));
+            }
+            int snapshotNumberOfShares = numberOfShares;
+            for (String subPath : subPaths) {
+                if (!core.getFileManager().getDbCore().isConnected()) {
+                    return;
+                }
+                results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(subPath);
+                while (results.next()) {
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch", Integer.toString(scannedFiles * 100 / snapshotNumberOfShares)));
+                    scannedFiles++;
+                    if (!(new File(mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME))).exists())) {
+                        removeEntry(results.getBytes(ID_ROOT_HASH));
+                    }
+                }
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
         changeInUseQueue(false);
-        //System.out.println("removeObsoleteShares - " + (System.currentTimeMillis() - time));
     }
 
     public FileDescriptor getFd(Hash rootHash) {
@@ -182,7 +150,7 @@ public class FileDatabase {
         }
         changeInUseQueue(true);
         // long time = System.currentTimeMillis();
-        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryByRootHash(rootHash.array());
+        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryBy(rootHash.array());
         try {
             while (result.next()) {
                 String basePath = result.getString(ID_BASE_PATH);
@@ -197,7 +165,7 @@ public class FileDatabase {
                     return null;
                 }
 
-                result = core.getFileManager().getDbCore().getDbHashes().getEntriesRootHash(rootHash.array());
+                result = core.getFileManager().getDbCore().getDbHashes().getEntriesBy(rootHash.array());
                 ArrayList<Hash> hashArray = new ArrayList<Hash>();
                 while (result.next()) {
                     hashArray.add(new Hash(result.getBytes(ID_HASH)));
@@ -221,7 +189,7 @@ public class FileDatabase {
         }
         changeInUseQueue(true);
         FileIndex fileIndex = new FileIndex(basePath, path);
-        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryBy(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
         try {
             while (result.next()) {
                 changeInUseQueue(false);
@@ -243,7 +211,7 @@ public class FileDatabase {
         try {
             FileIndex fileIndex = new FileIndex(basePath, mergePathParts(basePath, path, null));
             if (!path.endsWith("/")) {
-                ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+                ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryBy(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
                 while (result.next()) {
                     File f = new File(mergePathParts(result.getString(ID_BASE_PATH), result.getString(ID_SUB_PATH), result.getString(ID_FILENAME)));
                     if (f.lastModified() != result.getLong(ID_MODIFIED)) {
@@ -253,7 +221,7 @@ public class FileDatabase {
                     }
                 }
             } else {
-                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesByBasePathAndSubPath(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
+                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
                 path = path.substring(0, path.length() - 1);
                 path = path.substring(0, path.lastIndexOf("/") + 1);
                 path = basePath + "/" + path;
@@ -282,12 +250,12 @@ public class FileDatabase {
         try {
             FileIndex fileIndex = new FileIndex(basePath, mergePathParts(basePath, path, null));
             if (!path.endsWith("/")) {
-                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntryByFullPath(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
+                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntryBy(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename());
                 while (results.next()) {
                     hashSize.put(new Hash(results.getBytes(ID_ROOT_HASH)), results.getLong(ID_SIZE));
                 }
             } else {
-                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesByBasePathAndSubPath(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
+                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(fileIndex.getBasePath(), fileIndex.getSubPath(), true, 512);
                 while (results.next()) {
                     hashSize.put(new Hash(results.getBytes(ID_ROOT_HASH)), results.getLong(ID_SIZE));
                 }
@@ -300,35 +268,37 @@ public class FileDatabase {
     }
 
     public synchronized ArrayList<SearchHit> getSearchHits(String query, byte type, int limit) {
-        //long time = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
         ArrayList<SearchHit> hitList = new ArrayList<SearchHit>();
         if (!core.getFileManager().getDbCore().isConnected()) {
             return hitList;
         }
         changeInUseQueue(true);
         priority = true;
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBySearchQuery(query, type, limit);
         try {
-            Hash root;
-            String path;
-            long size;
-            int hashedDaysAgo;
-            String basepath;
+            ResultSet results = core.getFileManager().getDbCore().getDbShares().getFilenamesBy(query, limit);
+            ArrayList<String> filenames = new ArrayList<String>();
             while (results.next()) {
-                root = new Hash(results.getBytes(ID_ROOT_HASH));
-                basepath = results.getString(ID_BASE_PATH);
-                path = mergePathParts(null, results.getString(ID_SUB_PATH), results.getString(ID_FILENAME));
-                size = results.getLong(ID_SIZE);
-                hashedDaysAgo = (int) ((System.currentTimeMillis() - results.getLong(ID_MODIFIED)) / 1000 / 60 / 60 / 24);
-                if (hashedDaysAgo > 255) {
-                    hashedDaysAgo = 255;
+                filenames.add(results.getString(ID_FILENAME));
+            }
+            for (String filename : filenames) {
+                results = core.getFileManager().getDbCore().getDbShares().getEntryBy(filename, type);
+                while (results.next()) {
+                    Hash root = new Hash(results.getBytes(ID_ROOT_HASH));
+                    String basePath = results.getString(ID_BASE_PATH);
+                    String path = mergePathParts(null, results.getString(ID_SUB_PATH), results.getString(ID_FILENAME));
+                    long size = results.getLong(ID_SIZE);
+                    int hashedDaysAgo = (int) ((System.currentTimeMillis() - results.getLong(ID_MODIFIED)) / 1000 / 60 / 60 / 24);
+                    if (hashedDaysAgo > 255) {
+                        hashedDaysAgo = 255;
+                    }
+                    hitList.add(new SearchHit(root, path, size, basePath, hashedDaysAgo));
                 }
-                hitList.add(new SearchHit(root, path, size, basepath, hashedDaysAgo));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
-        //System.out.println("getsearchhit - " + (System.currentTimeMillis() - time));
+        System.out.println("getsearchhit - " + (System.currentTimeMillis() - time));
         priority = false;
         changeInUseQueue(false);
         return hitList;
@@ -365,7 +335,7 @@ public class FileDatabase {
                     changeInUseQueue(false);
                     return true;
                 } else if (checkDuplicates) {
-                    result = core.getFileManager().getDbCore().getDbDuplicates().getEntryByPath(mergePathParts(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename()));
+                    result = core.getFileManager().getDbCore().getDbDuplicates().getEntryBy(mergePathParts(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename()));
                     changeInUseQueue(false);
                     return result.next();
                 } else {
@@ -385,7 +355,7 @@ public class FileDatabase {
             return false;
         }
         changeInUseQueue(true);
-        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryByRootHash(rootHash.array());
+        ResultSet result = core.getFileManager().getDbCore().getDbShares().getEntryBy(rootHash.array());
         try {
             changeInUseQueue(false);
             return result.next();
@@ -450,7 +420,7 @@ public class FileDatabase {
         changeInUseQueue(true);
         priority = true;
         int limiter = 0;
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesByBasePathAndSubPath(base.getPath(), subPath, false, 8196);
+        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(base.getPath(), subPath, false, 8196);
         try {
             int politeCounter = 0;
             while (results.next()) {
