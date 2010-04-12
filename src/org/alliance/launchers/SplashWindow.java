@@ -22,8 +22,7 @@ import java.awt.Window;
 public class SplashWindow extends Window implements Runnable, StartupProgressListener {
 
     private Image image;
-    private String statusMessage = "";
-    private int progressPercent = -1;
+    private String statusMessage = "";    
 
     public SplashWindow() throws Exception {
         super(new Frame());
@@ -44,7 +43,6 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
         toFront();
         requestFocus();
     }
-    private int progressBarLength = 100, progressBarHeight = 8;
 
     @Override
     public void paint(Graphics frontG) {
@@ -59,39 +57,13 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
         int texty = image.getHeight(null) - 10;
         g.drawString(statusMessage, 10, texty);
         String s = "Version " + Version.VERSION + " build (" + Version.BUILD_NUMBER + ")";
-        g.drawString(s, image.getWidth(null) - 10 - g.getFontMetrics().stringWidth(s), texty);
-
-        if (progressPercent >= 0) {
-            int a = progressPercent * 3 / 2;
-            if (a > 70) {
-                a = 70;
-            }
-            g.setColor(new Color(255, 255, 255, a));
-            progressBarLength = image.getWidth(null) - 15 * 4;
-            progressBarHeight = 20;
-            int x = image.getWidth(null) / 2 - progressBarLength / 2;
-            int y = image.getHeight(null) - 51;
-            g.drawRect(x, y, progressBarLength, progressBarHeight);
-            g.fillRect(x + 2, y + 2, (progressBarLength - 3) * progressPercent / 100, progressBarHeight - 3);
-        }
-
+        g.drawString(s, image.getWidth(null) - 10 - g.getFontMetrics().stringWidth(s), texty);     
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
     }
 
     @Override
     public void update(Graphics g) {
         paint(g);
-    }
-
-    public void setStatusMessage(String statusMessage) {
-        this.statusMessage = statusMessage;
-        if (getGraphics() != null) {
-            paint(getGraphics());
-        }
-    }
-
-    public void setProgressPercent(int i) {
-        progressPercent = i;
     }
 
     @Override
@@ -102,6 +74,9 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
 
     @Override
     public void updateProgress(String message) {
-        setStatusMessage(message + "...");
+        this.statusMessage = message + "...";
+        if (getGraphics() != null) {
+            paint(getGraphics());
+        }
     }
 }
