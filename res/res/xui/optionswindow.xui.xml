@@ -132,26 +132,6 @@
                 </panel>
                 <filler/>
             </tab>
-            <tab text="Share" tooltip="Add or remove directories to share">
-                <panel axis="y" bordertype="etched" bordertitle="Shared folders:">
-                    <panel border="0,0,0,5" axis="x" expand="horiz">
-                        <label text="Select what folders you want to share with your friends: "/>
-                        <filler/>
-                    </panel>
-                    <scrollpanel bordertype="lowered">
-                        <list id="shareList"/>
-                    </scrollpanel>
-                    <panel border="0,5,0,0" axis="x" expand="horiz">
-                        <filler/>
-                        <button text="Edit group name" eventid="editgroupname"/>
-                        <strut width="5"/>
-                        <button text="Add..." eventid="addfolder"/>
-                        <strut width="5"/>
-                        <button text="Remove" eventid="removefolder"/>
-                    </panel>
-                    <strut height="25"/>
-                </panel>
-            </tab>
             <tab text="Sound">
                 <panel axis="y" bordertype="etched" bordertitle="Sound notification">
                     <form expand="horiz" border="5">

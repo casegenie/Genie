@@ -1,0 +1,24 @@
+<xui>
+    <title value="New group name" image="gfx/icons/alliance.png"/>
+    <body>
+        <panel border="5" axis="y">
+            <panel axis="x" border="0" expand="horiz">
+                <mlabel html="yes" border="0" id="label">
+                   Please enter a new group name:
+                </mlabel>
+            </panel>
+            <strut height="5"/>
+            <panel axis="x" border="0" expand="horiz">
+                <strut width="10"/>
+                <textfield width="200" minwidth="200" id="customtext"/>
+                <filler/>
+            </panel>           
+            <strut height="5"/>
+            <panel axis="x" border="0" expand="horiz">
+                <filler axis="x"/>
+                <button text="OK" eventid="confirm" width="80"/>
+                <filler axis="x"/>
+            </panel>
+        </panel>
+    </body>
+</xui>

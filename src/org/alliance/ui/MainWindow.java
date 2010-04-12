@@ -807,7 +807,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_addshare(ActionEvent e) throws Exception {
-        new OptionsWindow(ui, true);
+        new SharesWindow(ui);
     }
 
     public void EVENT_plugins(ActionEvent e) throws Exception {

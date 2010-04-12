@@ -22,13 +22,13 @@ import sun.swing.SwingUtilities2;
  */
 public class SubstanceThemeHelper {
 
-    private static boolean customSkin = false;
+    private static boolean CUSTOM_SKIN = false;
 
     private SubstanceThemeHelper() {
     }
 
     public static void setComponentToGeneralArea(JComponent comp) {
-        if (!customSkin) {
+        if (!CUSTOM_SKIN) {
             return;
         }
         SubstanceLookAndFeel.setDecorationType(comp, DecorationAreaType.GENERAL);
@@ -36,7 +36,7 @@ public class SubstanceThemeHelper {
     }
 
     public static void setComponentToToolbarArea(JComponent comp) {
-        if (!customSkin) {
+        if (!CUSTOM_SKIN) {
             return;
         }
         SubstanceLookAndFeel.setDecorationType(comp, DecorationAreaType.TOOLBAR);
@@ -44,7 +44,7 @@ public class SubstanceThemeHelper {
     }
 
     public static void setPanelsToFooterArea(Collection c) {
-        if (!customSkin) {
+        if (!CUSTOM_SKIN) {
             return;
         }
         for (Object o : c) {
@@ -58,7 +58,7 @@ public class SubstanceThemeHelper {
     }
 
     public static void setButtonsToGeneralArea(Collection c) {
-        if (!customSkin) {
+        if (!CUSTOM_SKIN) {
             return;
         }
         for (Object o : c) {
@@ -89,7 +89,7 @@ public class SubstanceThemeHelper {
         Object aaTextInfo = SwingUtilities2.AATextInfo.getAATextInfo(lafCond);
         UIManager.getDefaults().put(SwingUtilities2.AA_TEXT_PROPERTY_KEY, aaTextInfo);
         if (theme.equals("Alliance")) {
-            SubstanceThemeHelper.customSkin = true;
+            SubstanceThemeHelper.CUSTOM_SKIN = true;
             SubstanceLookAndFeel.setSkin(new AllianceTheme());
             InfoDefaultTheme.setLightColor(new Color(227, 226, 230));
             InfoDefaultTheme.setDarkColor(new Color(220, 219, 224));

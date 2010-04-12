@@ -11,7 +11,6 @@ import org.alliance.ui.util.CutCopyPastePopup;
 import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
-import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -40,20 +39,17 @@ import java.net.URLConnection;
 public class AddFriendWizard extends JWizard {
 
     public static final int STEP_INTRO = 0;
-    public static final int STEP_SELECT_INVITATION_TYPE = 1;
-    public static final int STEP_ENTER_INVITATION = 2;
-    public static final int STEP_INCORRECT_INVITATION_CODE = 3;
-    public static final int STEP_ATTEMPT_CONNECT = 4;
-    public static final int STEP_CONNECTION_FAILED = 5;
-    public static final int STEP_FORWARD_INVITATIONS = 6;
-    public static final int STEP_FORWARD_INVITATIONS_COMPLETE = 7;
-    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD = 8;
-    public static final int STEP_MANUAL_INVITE = 9;
-    public static final int STEP_PORT_OPEN_TEST = 10;
-    public static final int STEP_PORT_NOT_OPEN = 11;
-    public static final int STEP_INVITE_MSN = 12;
-    public static final int STEP_INVITE_EMAIL = 13;
-    public static final int STEP_MANUAL_CONNECTION_OK = 14;
+    public static final int STEP_ENTER_INVITATION = 1;
+    public static final int STEP_INCORRECT_INVITATION_CODE = 2;
+    public static final int STEP_ATTEMPT_CONNECT = 3;
+    public static final int STEP_CONNECTION_FAILED = 4;
+    public static final int STEP_FORWARD_INVITATIONS = 5;
+    public static final int STEP_FORWARD_INVITATIONS_COMPLETE = 6;
+    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD = 7;
+    public static final int STEP_MANUAL_INVITE = 8;
+    public static final int STEP_PORT_OPEN_TEST = 9;
+    public static final int STEP_PORT_NOT_OPEN = 10;
+    public static final int STEP_MANUAL_CONNECTION_OK = 11;
     private int radioButtonSelected;
     private UISubsystem ui;
     private XUIDialog outerDialog;
@@ -96,9 +92,9 @@ public class AddFriendWizard extends JWizard {
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_2"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_3"));
 
-        JHtmlLabel l = (JHtmlLabel) innerXUI.getComponent("portclosed");
-        l.replaceString("$PORT$", "" + ui.getCore().getSettings().getServer().getPort());
-        l.addHyperlinkListener(new HyperlinkListener() {
+        JHtmlLabel portclosed = (JHtmlLabel) innerXUI.getComponent("portclosed");
+        portclosed.replaceString("$PORT$", "" + ui.getCore().getSettings().getServer().getPort());
+        portclosed.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -114,20 +110,9 @@ public class AddFriendWizard extends JWizard {
                 || ui.getCore().getFriendManager().friends().size() == 0) {
             innerXUI.getComponent("radio1_3").setEnabled(false);
         }
-
-        final JHtmlLabel l2 = (JHtmlLabel) innerXUI.getComponent("text");
-        l2.addHyperlinkListener(new HyperlinkListener() {
-
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-                    goToManualInvite();
-                }
-            }
-        });
-
-        final JHtmlLabel l3 = (JHtmlLabel) innerXUI.getComponent("newcode");
-        l3.addHyperlinkListener(new HyperlinkListener() {
+       
+        final JHtmlLabel newcode = (JHtmlLabel) innerXUI.getComponent("newcode");
+        newcode.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
             public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -136,57 +121,6 @@ public class AddFriendWizard extends JWizard {
                 }
             }
         });
-    }
-
-    public void EVENT_email(ActionEvent e) {
-        try {
-            final JLabel label = (JLabel) innerXUI.getComponent("waittext");
-            label.setText("Please wait...");
-            String subject = "";
-            String body = "\r\n\r\n\r\n"
-                    + "\r\n"
-                    + "You have been invited to my Alliance network! This is a private and secure network\r\n"
-                    + "where we can share files and chat.\r\n"
-                    + "\r\n"
-                    + "1. Download and run Alliance here:\r\n"
-                    + "http://www.alliancep2p.com/download\r\n"
-                    + "\r\n"
-                    + "2. After installation Alliance will ask you for a code. Enter this code:\r\n"
-                    + "\r\n"
-                    + ui.getCore().getInvitaitonManager().createInvitation().getCompleteInvitaitonString() + "\r\n"
-                    + "\r\n"
-                    + "Using this code you will connect to our private Alliance network.\r\n";
-
-            body = body.replace("\n", "%0A");
-            body = body.replace("\r", "%0D");
-
-            body = body.replace(" ", "%20");
-            subject = subject.replace(" ", "%20");
-            String s;
-            s = "mailto:?body=" + body + "&subject=" + subject + "\"";
-            ui.openURL(s);
-
-            Thread t = new Thread(new Runnable() {
-
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1000 * 10);
-                    } catch (InterruptedException e1) {
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            label.setText("");
-                        }
-                    });
-                }
-            });
-            t.start();
-        } catch (Exception e1) {
-            ui.handleErrorInEventLoop(e1);
-        }
     }
 
     public static AddFriendWizard open(UISubsystem ui, int startAtStep) throws Exception {
@@ -297,22 +231,11 @@ public class AddFriendWizard extends JWizard {
     private void goToCreateInvitation() {
         EVENT_createnew(null);
         goToManualInvite();
-        /*setStep(STEP_SELECT_INVITATION_TYPE);
-        next.setEnabled(true);
-        cancel.setText("Finish");
-        cancel.setEnabled(false);
-        EVENT_createnew(null);*/
     }
 
     private void goToConnectionFailed() {
         next.setEnabled(false);
         if (invitationFromGuid != null) {
-            /*          this should not be needed - is made automatically
-            try {
-            ui.getCore().getFriendManager().forwardInvitationTo(invitationFromGuid);
-            } catch(Exception e) {
-            ui.handleErrorInEventLoop(e);
-            }*/
             setStep(STEP_CONNECTION_FAILED_FOR_FORWARD);
             next.setEnabled(false);
             prev.setEnabled(false);
@@ -346,31 +269,10 @@ public class AddFriendWizard extends JWizard {
             } else {
                 goToForwardInvitations();
             }
-        } else if (getStep() == STEP_SELECT_INVITATION_TYPE) {
-            if (isRadioButtonSelected("invite_msn")) {
-                setStep(STEP_INVITE_MSN);
-                next.setEnabled(false);
-                cancel.setEnabled(false);
-            } else if (isRadioButtonSelected("invite_email")) {
-                setStep(STEP_INVITE_EMAIL);
-                next.setEnabled(false);
-                cancel.setEnabled(false);
-            } else if (isRadioButtonSelected("invite_manual")) {
-                goToManualInvite();
-            } else {
-                if (T.t) {
-                    T.error("Could not find selected ratiobutton! Internal error");
-                }
-            }
         } else if (getStep() == STEP_ENTER_INVITATION) {
             handleInvitationCode();
         } else if (getStep() == STEP_CONNECTION_FAILED) {
             goToPortTest();
-            /*            if (radioButtonSelected == 0) {
-            goToPortTest();
-            } else {
-            goToEnterInvitation();
-            }*/
         } else if (getStep() == STEP_FORWARD_INVITATIONS) {
             if (forwardInvitationNodesList != null) {
                 forwardInvitationNodesList.forwardSelectedInvitations();
@@ -383,10 +285,6 @@ public class AddFriendWizard extends JWizard {
                 T.ass(false, "Reached step in wizard that was unexcpected (" + getStep() + ")");
             }
         }
-    }
-
-    private boolean isRadioButtonSelected(String s) {
-        return ((JRadioButton) innerXUI.getComponent(s)).isSelected();
     }
 
     public void connectionWasSuccessful() {
@@ -456,8 +354,6 @@ public class AddFriendWizard extends JWizard {
     @Override
     public void prevStep() {
         if (getStep() == STEP_FORWARD_INVITATIONS) {
-            setStep(STEP_INTRO);
-        } else if (getStep() == STEP_SELECT_INVITATION_TYPE) {
             setStep(STEP_INTRO);
         } else if (getStep() == STEP_ENTER_INVITATION) {
             setStep(STEP_INTRO);

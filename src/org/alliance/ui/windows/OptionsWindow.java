@@ -3,33 +3,24 @@ package org.alliance.ui.windows;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
-import com.stendahls.util.TextUtils;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.node.Friend;
 import org.alliance.core.settings.My;
 import org.alliance.core.settings.Routerule;
 import org.alliance.core.settings.SettingClass;
 import org.alliance.core.settings.Settings;
-import org.alliance.core.settings.Share;
-import org.alliance.launchers.ui.Main;
-import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -38,15 +29,10 @@ import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
-import java.util.TreeSet;
 
 /**
  * Created by IntelliJ IDEA. User: maciek Date: 2006-mar-20 Time: 22:33:46 To
@@ -77,22 +63,13 @@ public class OptionsWindow extends XUIDialog {
         "internal.guiskin"};
     private UISubsystem ui;
     private HashMap<String, JComponent> components = new HashMap<String, JComponent>();
-    private JList shareList;
     private JList ruleList;
-    private DefaultListModel shareListModel;
-    private DefaultListModel groupNamesModel;
-    private DefaultListModel viewModel;
     private DefaultListModel ruleListModel;
-    private boolean shareListHasBeenModified = false;
     private JTextField nickname, downloadFolder;
     private boolean openedWithUndefiniedNickname;
     private int uploadThrottleBefore;
 
-    public OptionsWindow(UISubsystem ui) throws Exception {
-        this(ui, false);
-    }
-
-    public OptionsWindow(final UISubsystem ui, boolean startInShareTab) throws Exception {
+    public OptionsWindow(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow());
         this.ui = ui;
 
@@ -103,20 +80,10 @@ public class OptionsWindow extends XUIDialog {
 
         nickname = (JTextField) xui.getComponent("my.nickname");
         downloadFolder = (JTextField) xui.getComponent("internal.downloadfolder");
-        shareList = (JList) xui.getComponent("shareList");
-        ruleList = (JList) xui.getComponent("ruleList");
-        shareListModel = new DefaultListModel();
-        viewModel = new DefaultListModel(); //Model for view: groupname name + path
-        groupNamesModel = new DefaultListModel(); //Bastvera (Model for groupname names synchronized with folder path names)
+     
+        ruleList = (JList) xui.getComponent("ruleList");           
         ruleListModel = new DefaultListModel();
-        for (Share share : ui.getCore().getSettings().getSharelist()) {
-            shareListModel.addElement(share.getPath());
-            groupNamesModel.addElement(share.getSgroupname());
-            viewModel.addElement("[" + share.getSgroupname() + "] " + share.getPath());
-        }
-
-        shareList.setModel(viewModel);
-
+      
         for (Routerule rule : ui.getCore().getSettings().getRulelist()) {
             ruleListModel.addElement(rule);
         }
@@ -137,11 +104,7 @@ public class OptionsWindow extends XUIDialog {
                 }
             });
         }
-
-        if (startInShareTab) {
-            ((JTabbedPane) xui.getComponent("tab")).setSelectedIndex(1);
-        }
-
+      
         uploadThrottleBefore = ui.getCore().getSettings().getInternal().getUploadthrottle();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -235,24 +198,8 @@ public class OptionsWindow extends XUIDialog {
             setSettingValue(k, getComponentValue(c));
         }
 
-        // update shares
         Settings settings = ui.getCore().getSettings();
-        settings.getSharelist().clear();
-
-        // remove paths that are subdirectories of other shares
-        //while (removeDuplicateShare());
-
-        for (String path : EnumerationIteratorConverter.iterable(shareListModel.elements(), String.class)) {
-            //Bastvera (Fetching groupname names for each shared folder from our synchronized model)
-            String network = groupNamesModel.getElementAt(shareListModel.indexOf(path)).toString();
-            settings.getSharelist().add(new Share(path, network));
-        }
-        ui.getCore().getShareManager().updateShareBases();
-        if (shareListHasBeenModified) {
-            //Bastvera (Force Hashing after OK/Apply Button)
-            ui.getCore().getShareManager().getShareScanner().startScan(true);
-        }
-
+       
         ui.getCore().getFriendManager().getMe().setNickname(nickname.getText());
         if (ui.getNodeTreeModel(false) != null) {
             ui.getNodeTreeModel(false).signalNodeChanged(
@@ -273,56 +220,7 @@ public class OptionsWindow extends XUIDialog {
         ui.getCore().saveSettings();
         return true;
     }
-
-    /**
-     * @return True if a duplicate share was removed - in this case this method
-     *         needs to be called again in order to check for more duplicated to
-     *         remove. This is becase only one duplicate is removed at a time.
-     */
-    private boolean removeDuplicateShare() {
-        for (Iterator<String> i = EnumerationIteratorConverter.iterable(
-                shareListModel.elements(), String.class).iterator(); i.hasNext();) {
-            String path = i.next();
-            ArrayList<String> al = new ArrayList<String>();
-            for (String s : EnumerationIteratorConverter.iterable(
-                    shareListModel.elements(), String.class)) {
-                al.add(s);
-            }
-            al.add(ui.getCore().getSettings().getInternal().getDownloadfolder());
-
-            for (String s : al) {
-                String pathA = TextUtils.makeSurePathIsMultiplatform(new File(
-                        path).getAbsolutePath());
-                String sA = TextUtils.makeSurePathIsMultiplatform(new File(s).getAbsolutePath());
-                if (!sA.equals(pathA) && pathContains(pathA, sA)) {
-                    OptionDialog.showInformationDialog(
-                            ui.getMainWindow(),
-                            "The folder " + pathA + " is already shared as " + sA + ". There is no need to add it in your shares.");
-                    groupNamesModel.removeElementAt(shareListModel.indexOf(path)); //Synchro remove if duplicate
-                    viewModel.removeElementAt(shareListModel.indexOf(path));
-                    shareListModel.removeElement(path);
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    private boolean pathContains(String path, String file) {
-        String s1[] = TextUtils.makeSurePathIsMultiplatform(path).split("/");
-        String s2[] = TextUtils.makeSurePathIsMultiplatform(file).split("/");
-        if (s1.length < s2.length) {
-            return false;
-        }
-
-        for (int i = 0; i < s2.length; i++) {
-            if (!s1[i].equals(s2[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-
+     
     private boolean nicknameIsOk() {
         if (nickname.getText().equals(My.UNDEFINED_NICKNAME)) {
             OptionDialog.showErrorDialog(ui.getMainWindow(),
@@ -377,54 +275,7 @@ public class OptionsWindow extends XUIDialog {
         k = k.substring(k.indexOf('.') + 1);
         SettingClass setting = getSettingClass(clazz);
         setting.setValue(k, val);
-    }
-
-    public void EVENT_addfolder(ActionEvent e) {
-        JFileChooser fc = new JFileChooser(
-                shareListModel.getSize() > 0 ? shareListModel.getElementAt(
-                shareListModel.getSize() - 1).toString() : ".");
-        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        int returnVal = fc.showOpenDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            String path = fc.getSelectedFile().getPath();
-            if (T.t) {
-                T.trace("adding: " + path);
-            }
-            if (!new File(path).exists()) {
-                path = new File(path).getParent();
-            }
-
-            //Bastvera (For preventing adding same folder couple of times)
-            for (int i = 0; i < shareListModel.getSize(); i++) {
-                if (shareListModel.getElementAt(i).toString().equalsIgnoreCase(path)) {
-                    return;
-                }
-            }
-
-            shareListModel.addElement(path);
-            shareListHasBeenModified = true;
-            shareList.revalidate();
-
-            //Bastvera (Adding group name)
-            String groupname = "Public";
-            try {
-                GroupDialogWindow dialogWindow = new GroupDialogWindow(ui, null);
-                groupname = dialogWindow.getGroupname();
-            } catch (Exception ex) {
-            }
-            if (groupname == null || groupname.trim().length() == 0) {
-                groupname = "Public";
-            } else {
-                groupname = sortGroupName(groupname);
-            }
-            groupNamesModel.addElement(groupname);
-            viewModel.addElement("[" + groupname + "] " + path);
-
-            //Bastvera Here removingDuplicate start once after each add folder
-            while (removeDuplicateShare()) {
-            }
-        }
-    }
+    }   
 
     public void EVENT_addrule(ActionEvent e) throws Exception {
         AddRuleWindow window = new AddRuleWindow(ui);
@@ -495,93 +346,7 @@ public class OptionsWindow extends XUIDialog {
             downloadFolder.setText(path);
         }
     }
-
-    private void copyDirectory(File sourceLocation, File targetLocation) throws IOException {
-        if (sourceLocation.isDirectory()) {
-            if (!targetLocation.exists()) {
-                targetLocation.mkdir();
-            }
-            String[] children = sourceLocation.list();
-            for (int i = 0; i < children.length; i++) {
-                copyDirectory(new File(sourceLocation, children[i]),
-                        new File(targetLocation, children[i]));
-            }
-        } else {
-            InputStream in = new FileInputStream(sourceLocation);
-            OutputStream out = new FileOutputStream(targetLocation);
-            byte[] buf = new byte[1024];
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            in.close();
-            out.close();
-        }
-    }
-
-    private void deleteDirectory(File sourceLocation) throws IOException {
-        if (sourceLocation.isDirectory()) {
-            String[] children = sourceLocation.list();
-            for (int i = 0; i < children.length; i++) {
-                deleteDirectory(new File(sourceLocation, children[i]));
-            }
-        } else {
-            sourceLocation.delete();
-        }
-    }
-
-    public void EVENT_standalonecopy(ActionEvent e) {
-        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in your userprofile folder.\nAlliance will copy all data then close. Restart manually.");
-        if (delete) {
-            try {
-                apply();
-                ui.getCore().saveSettings();
-
-                deleteDirectory(new File("data/"));
-                new File("data/").delete();
-
-                copyDirectory(new File(Main.localizeHomeDir() + "data/"), new File("data/"));
-
-                new File("standaloneVersion").createNewFile();
-                System.exit(0);
-
-            } catch (IOException ex) {
-                OptionDialog.showErrorDialog(new JFrame(), "Error. Be sure you have Administrator permissions.");
-            } catch (Exception ex) {
-            }
-        }
-    }
-
-    public void EVENT_standalonedelete(ActionEvent e) {
-        Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "This operation requires Administrator privileges, don't use it without them.\nFor security make backup of \"alliance\\data\" in alliance folder.\nAlliance will copy all data then close. Restart manually.");
-        if (delete) {
-            try {
-                apply();
-                ui.getCore().saveSettings();
-
-                if (!(new File(Main.localizeHomeDir()).exists())) {
-                    new File(System.getenv("APPDATA") + "/Alliance").mkdirs();
-                }
-
-                new File("standaloneVersion").delete();
-
-                deleteDirectory(new File(Main.localizeHomeDir() + "data/"));
-                new File(Main.localizeHomeDir() + "data/").delete();
-
-                copyDirectory(new File("data/"), new File(Main.localizeHomeDir() + "data/"));
-                System.exit(0);
-
-            } catch (IOException ex) {
-                OptionDialog.showErrorDialog(new JFrame(), "Error. Be sure you have Administrator permissions.");
-                try {
-                    new File("standaloneVersion").createNewFile();
-                } catch (IOException ex1) {
-                }
-            } catch (Exception ex) {
-            }
-        }
-    }
-
+   
     private void browseSound(String s) {
         JFileChooser fc = new JFileChooser("");
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -634,67 +399,7 @@ public class OptionsWindow extends XUIDialog {
         ((JTextField) xui.getComponent("internal.downloadsound")).setText("");
         ((JTextField) xui.getComponent("internal.publicsound")).setText("");
     }
-
-    /**
-     * Triggered when "remove folder" button is pressed in the option->share
-     * menu
-     *
-     * @param e
-     */
-    public void EVENT_removefolder(ActionEvent e) {
-        if (shareList.getSelectedIndex() != -1) {
-            int selected = shareList.getSelectedIndex(); //Bastvera (If we remove folder index changes so we need to keep it for groupModel)
-            shareListModel.remove(selected);
-            groupNamesModel.remove(selected); //Bastvera (Synchronized remove group names if folder removed)
-            viewModel.remove(selected);
-            shareListHasBeenModified = true;
-            shareList.revalidate();
-        }
-    }
-
-    private String sortGroupName(String groupname) {
-        TreeSet<String> groupSort = new TreeSet<String>();
-        String[] dividegroup = groupname.split(",");
-        for (String group : dividegroup) {
-            if (group.trim().length() > 1) {
-                groupSort.add(group.trim().toUpperCase().substring(0, 1) + group.trim().toLowerCase().substring(1));//Uppercase 1st letter rest Lowercase
-            } else if (group.trim().length() == 1) {
-                groupSort.add(group.trim().toUpperCase());
-            }
-        }
-        groupname = "";
-        for (String group : groupSort) {
-            groupname += group.trim() + ",";
-        }
-        if (groupname.lastIndexOf(",") == groupname.length() - 1 && groupname.length() > 0) {
-            groupname = groupname.substring(0, groupname.length() - 1);
-        }
-        if (groupname.length() == 0) {
-            return "Public";
-        }
-        return groupname;
-    }
-
-    public void EVENT_editgroupname(ActionEvent e) { //Editing group names
-        if (shareList.getSelectedIndex() != -1) {
-            int[] selection = shareList.getSelectedIndices();
-            String groupname = JOptionPane.showInputDialog("Edit group name for (" + selection.length + ") folders.\nDivide multiple group names with commas.\nExample 1: music,games\nExample 2: music,games,private", groupNamesModel.get(shareList.getSelectedIndex()));
-            if (groupname == null) {
-                return;
-            }
-            if (groupname.trim().length() == 0) {
-                groupname = "Public";
-            } else {
-                groupname = sortGroupName(groupname);
-            }
-            for (int position : selection) {
-                groupNamesModel.set(position, groupname);
-                viewModel.setElementAt("[" + groupname + "] " + shareListModel.get(position), position);
-            }
-            shareList.revalidate();
-        }
-    }
-
+       
     private void checkCheckBoxStatus() {
         if (getComponentValue(components.get("internal.alwaysallowfriendsoffriendstoconnecttome")).toString().equalsIgnoreCase("1")) {
             setComponentValue(components.get("internal.alwaysallowfriendsoftrustedfriendstoconnecttome"), "false");
@@ -712,19 +417,6 @@ public class OptionsWindow extends XUIDialog {
             setComponentValue(components.get("internal.alwaysdenyuntrustedinvitations"), "false");
             components.get("internal.alwaysdenyuntrustedinvitations").setEnabled(false);
         }
-
-        /* if (!OSInfo.isWindows()) {
-        xui.getComponent("standalonedelete").setEnabled(false);
-        xui.getComponent("standalonecopy").setEnabled(false);
-        } else {
-        if (new File("standaloneVersion").exists()) {
-        xui.getComponent("standalonedelete").setEnabled(true);
-        xui.getComponent("standalonecopy").setEnabled(false);
-        } else {
-        xui.getComponent("standalonedelete").setEnabled(false);
-        xui.getComponent("standalonecopy").setEnabled(true);
-        }
-        }*/
     }
 
     private void configureCheckBoxListeners() {
