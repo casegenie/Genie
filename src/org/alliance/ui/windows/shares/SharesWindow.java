@@ -221,6 +221,11 @@ public class SharesWindow extends XUIDialog {
             }
 
             @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
             public void mouseClicked(MouseEvent e) {
             }
 
@@ -258,8 +263,11 @@ public class SharesWindow extends XUIDialog {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                int[] indicates = {selectionHelper(e), selectionHelper(e) + 1};
-                shareList.setSelectedIndices(indicates);
+                maybeShowPopup(e);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
             }
 
@@ -276,6 +284,8 @@ public class SharesWindow extends XUIDialog {
             }
 
             private void maybeShowPopup(MouseEvent e) {
+                int[] indicates = {selectionHelper(e), selectionHelper(e) + 1};
+                shareList.setSelectedIndices(indicates);
                 if (e.isPopupTrigger()) {
                     if (shareList.getSelectedIndex() != -1) {
                         popupList.show(e.getComponent(), e.getX(), e.getY());

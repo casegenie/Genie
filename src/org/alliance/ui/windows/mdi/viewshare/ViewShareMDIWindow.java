@@ -243,8 +243,6 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         if (T.t) {
             T.info("Sending link: " + link);
         }
-        System.out.println(link);
-
         ui.getMainWindow().getPublicChat().send(link);
         ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getPublicChat());
     }

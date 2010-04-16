@@ -1,140 +1,105 @@
 <xui>
-    <title value="Add Connection Wizard"/>
     <body>
-        <wizard id="wizard" implementation="org.alliance.ui.addfriendwizard.AddFriendWizard" text="" image="gfx/wizardimage.jpg">
-            <step text="">
-                <mlabel html="yes">This will help you connect to your friends, coworkers or family members using Alliance.
-                    [p]
+        <wizard id="wizard" implementation="org.alliance.ui.addfriendwizard.AddFriendWizard" image="gfx/wizardimage.jpg">
+            <step>
+                <mlabel id="helptext" html="yes">%text%
                 </mlabel>
                 <strut height="5"/>
                 <panel axis="x" border="0" expand="horiz">
                     <strut width="10"/>
-                    <radiobutton eventid="radio1_1" group="a" text="I have a code I received from a friend"/>
+                    <radiobutton eventid="radio1_1" group="a" text="%text%"/>
                     <filler/>
                 </panel>
                 <panel axis="x" border="0" expand="horiz">
                     <strut width="10"/>
-                    <radiobutton eventid="radio1_2" id="b" group="a" text="I want to invite a friend to my Alliance network"/>
+                    <radiobutton eventid="radio1_2" group="a" text="%text%"/>
                     <filler/>
                 </panel>
                 <panel axis="x" border="0" expand="horiz">
                     <strut width="10"/>
-                    <radiobutton eventid="radio1_3" group="a" text="I want to connect to friends of my friends"/>
+                    <radiobutton eventid="radio1_3" group="a" text="%text%"/>
                     <filler/>
                 </panel>
                 <strut height="5"/>
             </step>
-            <step text="Enter connection code">
-                <mlabel html="yes">Enter the connection code you got from your friend: </mlabel>
+            <step text="%stepcode%">
+                <mlabel id="entercode" html="yes">%text%
+                </mlabel>
                 <strut height="15"/>
                 <panel axis="x" border="0" expand="horiz">
-                    <label text="Connection code: "/>
-                    <textfield text="" id="codeinput" defaultfocus="true"/>
+                    <label id="codelabel" text="%text%"/>
+                    <textfield id="codeinput" defaultfocus="true"/>
                     <strut width="5"/>
                 </panel>
                 <strut height="15"/>
-                <mlabel html="yes">You can right click on the white area above and select paste to paste a code for the clipboard.
-                    [p]
-                    When you press next Alliance will attempt to connect using the code.
+                <mlabel id="codecopy" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="Incorrect connection code">
-                <mlabel html="yes">The connection code seems to be corrupt.
-                    [p]
-                    Please press back and try entering the code again.
+            <step text="%stepwrongcode%">
+                <mlabel id="corruptcode" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="Attempting to connect">
-                <mlabel html="yes">Attempting to connect using connection code...</mlabel>
+            <step text="%stepconnect%">
+                <mlabel id="attempting" html="yes">%text%
+                </mlabel>
                 <strut height="15"/>
                 <progressbar indeterminate="yes"/>
                 <strut height="15"/>
-                <mlabel html="yes">Please wait...</mlabel>
-            </step>
-            <step text="Connection failed!">
-                <mlabel html="yes">[b]Could not connect[/b]
-                    [p]
-                    Your friend has his Alliance turned off or his firewall is blocking the connection.
-                    [p]
-                    It is recommended that you create a connection code for your friend instead.
-                    [p]
-                    Press next to continue
+                <mlabel id="pleasewait" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="Connect to second degree connections">
-                <mlabel html="yes">
-                    Below is a list of new people found in your network:
-                    [p]
+            <step text="%stepconnectfail%">
+                <mlabel id="connectfail" html="yes">%text%
+                </mlabel>
+            </step>
+            <step text="%stepsecond%">
+                <mlabel id="second" html="yes">%text%
                 </mlabel>
                 <scrollpanel bordertype="lowered" height="200" id="scrollpanel">
                 </scrollpanel>
                 <panel border="5,5,0,0" axis="x">
                     <filler expand="horiz"/>
-                    <button text="Select trusted" eventid="selecttrusted"/>
+                    <button text="%text%" eventid="selecttrusted"/>
                     <strut width="5"/>
-                    <button text="Select all" eventid="selectall"/>
+                    <button text="%text%" eventid="selectall"/>
                     <strut width="5"/>
-                    <button text="Select none" eventid="selectnone"/>
+                    <button text="%text%" eventid="selectnone"/>
                 </panel>
-                <mlabel html="yes">
-                    [p]
-                    Select the people you want to connect to and click next.
-                    [p]
+                <mlabel id="secondselect" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="">
-                <mlabel html="yes">
-                    You have sent invitations to all selected connections!
-                    [p]
-                    Now you have to wait for your connections to accept your invitations.
-                    [p]
-                    Click Finish to complete the wizard.
+            <step>
+                <mlabel id="secondsend" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="">
-                <mlabel html="yes">
-                    Could not connect!
-                    [p]
-                    The remote person has his Alliance turned off or his firewall is blocking the connection.
-                    [p]
-                    Will automatically try to reconnect later.
-                    [p]
-                    Click Finish to complete the wizard.
+            <step>
+                <mlabel id="connecterror" html="yes">%text%
                 </mlabel>
             </step>
-            <step text="Invite a friend">
-                <mlabel html="yes">
-                    Right click on the text below and select "Copy". Send the text to your friend by pasting it into an e-mail or a MSN message.
+            <step text="%stepinvite%">
+                <mlabel id="friendcopy" html="yes">%text%
                 </mlabel>
                 <strut height="15"/>
                 <scrollpanel border="0" bordertype="lowered" minheight="150" height="150">
-                    <textarea id="code" border="5" text="Loading..."/>
+                    <textarea id="code" border="5" text="%text%"/>
                 </scrollpanel>
                 <strut height="15"/>
-                <mlabel html="yes" id="newcode">
-                    Each code is valid once so you need to [a href='']generate a new code[/a] for each friend you invite.
+                <mlabel html="yes" id="newcode">%text%
                 </mlabel>
             </step>
-            <step text="Checking internet connection">
-                <mlabel html="yes">
-                    Please wait while your internet connection is beeing tested...
+            <step text="%stepcheck%">
+                <mlabel id="checkwait" html="yes">%text%
                 </mlabel>
                 <strut height="15"/>
                 <progressbar indeterminate="true"/>
             </step>
-            <step text="Alliance port not open">
-                <mlabel html="yes" id="portclosed">
-                    It is not possible to connect to your Alliance application. The port that Alliance uses on your computer is blocked by an internet firewall or router.
-                    [p]
-                    [b]You can not invite anyone to your network unless you open this port.[/b] You can only receive invitations - your friends can invite you but you cannot invite friends.
-                    [p]
-                    The port that Alliance uses on your computer is [b]$PORT$[/b]. Go to [a href=http://www.portforward.com]http://www.portforward.com[/a] for more information on how to open this port.
-                    [p]
-                    If you only want to connect to friends that are in the same LAN as your are (for example a university, workplace or building) you can open the options, enable "LAN Support" and try again.
+            <step text="%stepport%">
+                <mlabel html="yes" id="portclosed">%text%
                 </mlabel>
             </step>
-            <step text="Manual connection ok">
-                <mlabel html="yes">[b]Connection OK.[/b]</mlabel>
+            <step text="%stepmanual%">
+                <mlabel id="manualok" html="yes">%text%
+                </mlabel>
             </step>
         </wizard>
     </body>

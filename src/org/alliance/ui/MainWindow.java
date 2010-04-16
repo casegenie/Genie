@@ -102,6 +102,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
         init(ui.getRl(), "xui/mainwindow.xui.xml");
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         SubstanceThemeHelper.setComponentToToolbarArea((JComponent) xui.getComponent("fakeShadow"));
         SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("rescan"));
@@ -112,6 +113,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         xui.setEventHandler(this);
         xui.setMenuItemDescriptionListener(this);
         statusMessage = (JLabel) xui.getComponent("statusbar");
+        statusMessage.setText(" ");
         shareMessage = (JLabel) xui.getComponent("sharing");
 
         setupToolbar();
@@ -823,7 +825,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
     }
 
-    public void EVENT_exitApp(ActionEvent e) throws Exception {
+    public void EVENT_exitapp(ActionEvent e) throws Exception {
         if (OptionDialog.showQuestionDialog(this, LanguageResource.getLocalizedString(getClass(), "exit"))) {
             if (ui.getCore() != null) {
                 ui.getCore().shutdown();

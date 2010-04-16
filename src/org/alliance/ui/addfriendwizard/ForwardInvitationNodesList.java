@@ -4,6 +4,7 @@ import org.alliance.core.CoreSubsystem;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.UntrustedNode;
 import org.alliance.core.node.Invitation;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 
 import java.awt.Component;
@@ -117,8 +118,7 @@ public class ForwardInvitationNodesList extends JList {
             this.connectedThrough = connectedThrough;
             this.guid = guid;
             this.trusted = trusted;
-
-            toString = "<html>" + nickname + " <font color=gray>(connected to " + connectedThrough + ")</font></html>";
+            toString = "<html>" + LanguageResource.getLocalizedString(getClass(), "friend", nickname + " <font color=gray>", connectedThrough) + "</font></html>";
         }
 
         @Override
@@ -132,9 +132,9 @@ public class ForwardInvitationNodesList extends JList {
         private CoreSubsystem core;
 
         public ForwardInvitationListModel(final CoreSubsystem core) {
-        	this.core = core;
+            this.core = core;
 
-        	TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
+            TreeSet<Integer> secondaryNodeGuids = new TreeSet<Integer>(new Comparator<Integer>() {
 
                 @Override
                 public int compare(Integer o1, Integer o2) {
@@ -152,8 +152,8 @@ public class ForwardInvitationNodesList extends JList {
                 if (f.friendsFriends() != null) {
                     Collection<UntrustedNode> ff = f.friendsFriends();
                     for (UntrustedNode n : ff.toArray(new UntrustedNode[ff.size()])) {
-                        if (core.getFriendManager().getFriend(n.getGuid()) == null &&
-                                core.getFriendManager().getMyGUID() != n.getGuid()) {
+                        if (core.getFriendManager().getFriend(n.getGuid()) == null
+                                && core.getFriendManager().getMyGUID() != n.getGuid()) {
                             secondaryNodeGuids.add(n.getGuid());
                         }
                     }
