@@ -391,20 +391,16 @@ public class SharesWindow extends XUIDialog {
         rebuildGroupMenu();
     }
 
-    private String createNewGroup() {
-        try {
-            AddGroupDialog groupDialog = new AddGroupDialog(ui, null);
-            String groupString = groupDialog.getGroupname();
-            if (groupString == null || groupString.trim().length() == 0) {
-                return null;
-            }
-            if (groupString.contains(GROUP_SEPARATOR)) {
-                groupString = groupString.replace(GROUP_SEPARATOR, "");
-            }
-            return groupString.trim();
-        } catch (Exception ex) {
+    private String createNewGroup() throws Exception {
+        AddGroupDialog groupDialog = new AddGroupDialog(ui, null);
+        String groupString = groupDialog.getGroupname();
+        if (groupString == null || groupString.trim().length() == 0) {
             return null;
         }
+        if (groupString.contains(GROUP_SEPARATOR)) {
+            groupString = groupString.replace(GROUP_SEPARATOR, "");
+        }
+        return groupString.trim();
     }
 
     private String sortGroupNames(String groupString) {

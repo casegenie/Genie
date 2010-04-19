@@ -142,8 +142,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         mdiManager.selectWindow(publicChat);
 
-        setTitle("Alliance");
-
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         getRootPane().setWindowDecorationStyle(JRootPane.FRAME);
 

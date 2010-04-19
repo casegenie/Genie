@@ -6,6 +6,7 @@ import com.stendahls.util.resourceloader.GeneralResourceLoader;
 import com.stendahls.util.resourceloader.ResourceLoader;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.Component;
@@ -121,11 +122,13 @@ public class ErrorDialog extends XUIDialog {
             error.printStackTrace();
 
             init(rl, rl.getResourceStream("res/xui/template/errordialog.xui.xml"));
+            LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
 
+            setTitle(LanguageResource.getLocalizedString(getClass(), "titleerror"));
             if (!(fatal)) {
                 ((JLabel) this.xui.getComponent("image")).setIcon(new ImageIcon(rl.getResource("res/gfx/icons/warning.png")));
-                setTitle("Warning");
+                setTitle(LanguageResource.getLocalizedString(getClass(), "titlewarning"));
             }
             Component remove;
             Component keep;
@@ -151,7 +154,11 @@ public class ErrorDialog extends XUIDialog {
             if (errorMessage == null) {
                 dispose();
             } else {
-                label.replaceString("$ERROR$", TextUtils.cutOffWithDots(errorMessage, 130));
+                if (!(fatal)) {
+                    label.setText(LanguageResource.getLocalizedString(getClass(), "xui.nonfatal", TextUtils.cutOffWithDots(errorMessage, 130)));
+                } else {
+                    label.setText(LanguageResource.getLocalizedString(getClass(), "xui.fatal", TextUtils.cutOffWithDots(errorMessage, 130)));
+                }
                 display();
             }
         } catch (Exception e) {
@@ -184,10 +191,11 @@ public class ErrorDialog extends XUIDialog {
     public void EVENT_view(ActionEvent e) {
         try {
             XUIDialog xd = new XUIDialog(this.xui.getResourceLoader(), this.xui.getResourceLoader().getResourceStream("res/xui/template/viewerror.xui.xml"), this);
+            LanguageResource.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xd.getXUI().getXUIComponents());
             xui.setEventHandler(this);
-            JTextArea ta = (JTextArea) xd.getXUI().getComponent("ta");
-            System.out.println(ta);
+            xd.setTitle(LanguageResource.getLocalizedString(getClass(), "titlereport"));
+            JTextArea ta = (JTextArea) xd.getXUI().getComponent("reportarea");
             ta.setFont(new Font("Tahoma", 0, 11));
             ta.setLineWrap(true);
             ta.setText(this.errorReport);
@@ -200,8 +208,10 @@ public class ErrorDialog extends XUIDialog {
     public void EVENT_send(ActionEvent e) {
         try {
             XUIDialog xd = new XUIDialog(this.xui.getResourceLoader(), this.xui.getResourceLoader().getResourceStream("res/xui/template/usercomment.xui.xml"), this);
+            LanguageResource.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xd.getXUI().getXUIComponents());
-            JTextArea ta = (JTextArea) xd.getXUI().getComponent("ta");
+            xd.setTitle(LanguageResource.getLocalizedString(getClass(), "titlereport"));
+            JTextArea ta = (JTextArea) xd.getXUI().getComponent("commentarea");
             xd.display();
             String userComment = ta.getText();
             ErrorDialog temporary = this;
@@ -220,9 +230,9 @@ public class ErrorDialog extends XUIDialog {
             wr.close();
             rd.close();
 
-            String s = "Error report succesfully sent. Thank you for your feedback.";
+            String s = LanguageResource.getLocalizedString(getClass(), "sendok");
             if (this.fatal) {
-                s = s + "\nThe application will now shut down.";
+                s = s + "\n" + LanguageResource.getLocalizedString(getClass(), "shutdown");
             }
             OptionDialog.showInformationDialog(this, s);
         } catch (Exception e1) {

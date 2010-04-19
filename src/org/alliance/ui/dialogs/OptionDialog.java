@@ -27,6 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import org.alliance.core.LanguageResource;
 
 public class OptionDialog extends JDialog implements ActionListener {
 
@@ -41,6 +42,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static final int YES_NO_BUTTONS = 1;
     public static final int YES_NO_CANCEL_BUTTONS = 2;
     public static final int OK_CANCEL_BUTTONS = 3;
+    private static Class c;
     private static String[] imageForType = {"information", "question", "warning", "error"};
     private static String[] buttonTexts = {"ok", "yes_no", "yes_no_cancel", "ok_cancel"};
     private static ImageIcon[] imageIcons;
@@ -50,6 +52,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public OptionDialog(JFrame parent, String title, String message, int dialogType, int buttonType) throws Exception {
         super(parent, title, true);
         init(title, message, dialogType, buttonType);
+        c = getClass();
     }
 
     public OptionDialog(JDialog parent, String title, String message, int dialogType, int buttonType) throws Exception {
@@ -58,7 +61,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     }
 
     private void init(String title, String message, int dialogType, int buttonType) throws Exception {
-        setTitle(title);
+        setTitle(LanguageResource.getLocalizedString(getClass(), title));
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
@@ -104,20 +107,20 @@ public class OptionDialog extends JDialog implements ActionListener {
         panel.setLayout(new FlowLayout(1, 5, 5));
         switch (buttonType) {
             case 0:
-                panel.add(createButton("OK", "ok", "o", true));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "ok"), "ok", "o", true));
                 break;
             case 1:
-                panel.add(createButton("Yes", "yes", "y", true));
-                panel.add(createButton("No", "no", "n", false));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "yes"), "yes", "y", true));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "no"), "no", "n", false));
                 break;
             case 2:
-                panel.add(createButton("Yes", "yes", "y", true));
-                panel.add(createButton("No", "no", "n", false));
-                panel.add(createButton("Cancel", "cancel", "c", false));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "yes"), "yes", "y", true));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "no"), "no", "n", false));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
                 break;
             case 3:
-                panel.add(createButton("OK", "ok", "o", true));
-                panel.add(createButton("Cancel", "cancel", "c", false));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "ok"), "ok", "o", true));
+                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
         }
 
         add(panel, "South");
@@ -157,6 +160,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     }
 
     public boolean showAndGetResult() {
+
         display();
         return this.result;
     }
@@ -193,7 +197,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static void showInformationDialog(JFrame parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Information", message, 0, 0);
+            od = new OptionDialog(parent, "information", message, 0, 0);
             od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);
@@ -203,7 +207,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static void showInformationDialog(JDialog parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Information", message, 0, 0);
+            od = new OptionDialog(parent, "information", message, 0, 0);
             od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);
@@ -213,7 +217,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static boolean showQuestionDialog(JFrame parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Question", message, 1, 1);
+            od = new OptionDialog(parent, "question", message, 1, 1);
             return od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);
@@ -224,7 +228,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static boolean showQuestionDialog(JDialog parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Question", message, 1, 1);
+            od = new OptionDialog(parent, "question", message, 1, 1);
             return od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);
@@ -235,7 +239,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static Boolean showConfirmDialog(JFrame parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Confirmation", message, 2, 2);
+            od = new OptionDialog(parent, "confirmation", message, 2, 2);
             boolean res = od.showAndGetResult();
             if (od.isCancelled()) {
                 return null;
@@ -250,7 +254,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static Boolean showConfirmDialog(JDialog parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Confirmation", message, 2, 2);
+            od = new OptionDialog(parent, "confirmation", message, 2, 2);
             boolean res = od.showAndGetResult();
             if (od.isCancelled()) {
                 return null;
@@ -265,7 +269,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static void showErrorDialog(JFrame parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Error", message, 3, 0);
+            od = new OptionDialog(parent, "error", message, 3, 0);
             od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);
@@ -275,7 +279,7 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static void showErrorDialog(JDialog parent, String message) {
         OptionDialog od = null;
         try {
-            od = new OptionDialog(parent, "Error", message, 3, 0);
+            od = new OptionDialog(parent, "error", message, 3, 0);
             od.showAndGetResult();
         } catch (Exception e) {
             couldNotOpen(e);

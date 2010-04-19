@@ -1,5 +1,4 @@
 <xui>
-    <title value="Program Error"/>
     <body>
         <panel axis="x" border="4">
             <panel axis="y" expand="vert">
@@ -9,36 +8,24 @@
             <panel axis="y" border="6">
                 <scrollpanel scrollbars="vertoptional" width="300">
                     <panel axis="x" border="0">
-                        <mlabel html="yes" id="fatal">
-                            The program encountered an error and needs to close.
-                            [br][br]
-                            If you where in the middle of something, the information you where working on might be lost.
-                            [br][br]
-                            [b]Please tell us about this problem.[/b] Click 'Send error' to automatically report this problem.
-                            [br][br]
-                            Error: $ERROR$
+                        <mlabel html="yes" id="fatal">%text%
                         </mlabel>
-                        <mlabel html="yes" id="nonfatal">
-                            The program encountered an error. You can continue working with the program but it might be unstable.
-                            [br][br]
-                            [b]Please tell us about this problem.[/b] Click 'Send error' to automatically report this problem.
-                            [br][br]
-                            $ERROR$
+                        <mlabel html="yes" id="nonfatal">%text%
                         </mlabel>
                     </panel>
                 </scrollpanel>
             </panel>
             <panel axis="y" border="6" expand="vert">
-                <button text="View Error" expand="vert" width="110" eventid="view"/>
+                <button text="%text%" expand="vert" width="110" eventid="view"/>
                 <strut height="6"/>
-                <button text="Send Error" expand="vert" width="110" eventid="send"/>
+                <button text="%text%" expand="vert" width="110" eventid="send"/>
                 <filler expand="vert"/>
                 <strut height="55"/>
                 <panel border="0" axis="x" expand="horiz">
                     <filler/>
-                    <button text="Quit" eventid="quit"/>
+                    <button text="%text%" eventid="quit"/>
                     <strut width="5" id="close2"/>
-                    <button text="Close" eventid="close"/>
+                    <button text="%text%" eventid="close"/>
                 </panel>
             </panel>
         </panel>
