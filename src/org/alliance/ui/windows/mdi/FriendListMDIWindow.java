@@ -125,6 +125,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             }
 
             @Override
+            public void mousePressed(MouseEvent e) {
+                maybeShowPopup(e);
+            }
+
+            @Override
             public void mouseClicked(MouseEvent e) {
                 try {
                     EVENT_viewshare(null);
