@@ -13,11 +13,11 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
-import javax.swing.JToggleButton;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -68,15 +68,8 @@ public class LanguageResource {
             if (comp.getToolTipText() != null && !comp.getToolTipText().isEmpty()) {
                 comp.setToolTipText(getResource(getKeyHeader(c), "xui", element.getId(), "tooltip"));
             }
-            if (comp instanceof JButton) {
-                JButton button = (JButton) comp;
-                if (button.getText() != null && !button.getText().isEmpty()) {
-                    button.setText(getResource(getKeyHeader(c), "xui", element.getId()));
-                }
-                continue;
-            }
-            if (comp instanceof JToggleButton) {
-                JToggleButton button = (JToggleButton) comp;
+            if (comp instanceof AbstractButton) {
+                AbstractButton button = (AbstractButton) comp;
                 if (button.getText() != null && !button.getText().isEmpty()) {
                     button.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
@@ -96,15 +89,15 @@ public class LanguageResource {
                 }
                 continue;
             }
-            if (comp instanceof JMenuItem) {
-                JMenuItem menu = (JMenuItem) comp;
-                if (menu.getText() != null && !menu.getText().isEmpty()) {
-                    menu.setText(getResource(getKeyHeader(c), "xui", element.getId()));
+            if (comp instanceof JTextArea) {
+                JTextArea area = (JTextArea) comp;
+                if (area.getText() != null && !area.getText().isEmpty()) {
+                    area.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
                 continue;
-            }           
-           // System.out.println(element.getId());
-           // System.out.println(element.getComponent());
+            }
+            // System.out.println(element.getId());
+            // System.out.println(element.getComponent());
         }
     }
 
