@@ -1,5 +1,7 @@
 package org.alliance.ui.util;
 
+import org.alliance.core.LanguageResource;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -23,24 +25,24 @@ public class CutCopyPastePopup extends JPopupMenu implements ActionListener {
     public CutCopyPastePopup(JTextComponent target) {
         this.target = target;
 
-        JMenuItem mi = new JMenuItem("Cut");
+        JMenuItem mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "cut"));
         mi.addActionListener(this);
         mi.setActionCommand("cut");
         add(mi);
 
-        mi = new JMenuItem("Copy");
+        mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "copy"));
         mi.addActionListener(this);
         mi.setActionCommand("copy");
         add(mi);
 
-        mi = new JMenuItem("Paste");
+        mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "paste"));
         mi.addActionListener(this);
         mi.setActionCommand("paste");
         add(mi);
 
         add(new JSeparator());
 
-        mi = new JMenuItem("Select all");
+        mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "selectall"));
         mi.addActionListener(this);
         mi.setActionCommand("selectall");
         add(mi);
