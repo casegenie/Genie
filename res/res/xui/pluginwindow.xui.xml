@@ -1,15 +1,13 @@
 <xui>
-    <title value="Manage Plugins" image="gfx/icons/alliance.png"/>
     <body>
         <panel axis="y" expand = "vert">
-            <panel axis="y" bordertype="etched" bordertitle="Plugins:">
+            <panel id="header" axis="y" bordertype="etched" bordertitle="%text%">
                 <panel axis="x" expand="horiz">
-                    <mlabel html="true">
-                        Add an Alliance plugin
+                    <mlabel id="addlabel" html="true">%text%
                     </mlabel>
                 </panel>
                 <panel border="0,10,0,5" axis="x" expand="horiz">
-                    <label text="Loaded plugins: "/>
+                    <label id="loaded" text="%text%"/>
                     <filler/>
                 </panel>
                 <scrollpanel bordertype="lowered">
@@ -17,16 +15,16 @@
                 </scrollpanel>
                 <panel border="150,5,0,0" axis="x" expand="horiz">
                     <filler/>
-                    <button text="Add Plugin" eventid="addplugin"/>
+                    <button text="%text%" eventid="addplugin"/>
                     <strut width="5"/>
-                    <button text="Remove Plugin" eventid="removeplugin"/>
+                    <button text="%text%" eventid="removeplugin"/>
                 </panel>
                 <strut height="25"/>
                 <panel border="0,5,0,0" axis="x" expand="horiz">
                     <filler/>
-                    <button text="OK" eventid="ok"/>
+                    <button text="%text%" eventid="ok"/>
                     <strut width="5"/>
-                    <button text ="Cancel" eventid="cancel"/>
+                    <button text ="%text%" eventid="cancel"/>
                 </panel>
             </panel>
         </panel>

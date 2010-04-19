@@ -18,6 +18,8 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextArea;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.TitledBorder;
 
 /**
  *
@@ -68,6 +70,15 @@ public class LanguageResource {
             if (comp.getToolTipText() != null && !comp.getToolTipText().isEmpty()) {
                 comp.setToolTipText(getResource(getKeyHeader(c), "xui", element.getId(), "tooltip"));
             }
+            if (comp.getBorder() instanceof CompoundBorder) {
+                CompoundBorder b = (CompoundBorder) comp.getBorder();
+                if (b.getOutsideBorder() instanceof TitledBorder) {
+                    TitledBorder border = (TitledBorder) b.getOutsideBorder();
+                    if (border != null && !border.getTitle().isEmpty()) {
+                        border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
+                    }
+                }
+            }
             if (comp instanceof AbstractButton) {
                 AbstractButton button = (AbstractButton) comp;
                 if (button.getText() != null && !button.getText().isEmpty()) {
@@ -96,8 +107,8 @@ public class LanguageResource {
                 }
                 continue;
             }
-            // System.out.println(element.getId());
-            // System.out.println(element.getComponent());
+//            System.out.println(element.getId());
+//            System.out.println(element.getComponent());
         }
     }
 
