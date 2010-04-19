@@ -1,6 +1,7 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
@@ -46,12 +47,12 @@ public class AddRuleWindow extends XUIDialog {
         // Remove if it's allow or deny
         if (human.charAt(0) == 'A') {
             //Allow should be checked
-            JRadioButton temp = (JRadioButton) xui.getComponent("radioAllow");
+            JRadioButton temp = (JRadioButton) xui.getComponent("radioallow");
             allow = true;
             temp.setSelected(true);
         } else {
             //Deny should be checked
-            JRadioButton temp = (JRadioButton) xui.getComponent("radioDeny");
+            JRadioButton temp = (JRadioButton) xui.getComponent("radiodeny");
             temp.setSelected(true);
         }
         display();
@@ -60,9 +61,11 @@ public class AddRuleWindow extends XUIDialog {
 
     private void init() throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/rulewindow.xui.xml"));
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        radioButtons.add((JRadioButton) xui.getComponent("radioAllow"));
-        radioButtons.add((JRadioButton) xui.getComponent("radioDeny"));
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        radioButtons.add((JRadioButton) xui.getComponent("radioallow"));
+        radioButtons.add((JRadioButton) xui.getComponent("radiodeny"));
 
         for (int i = 0; i < OPTIONS.length; i++) {
             FIELDS.add((JTextField) xui.getComponent(OPTIONS[i]));
@@ -102,15 +105,15 @@ public class AddRuleWindow extends XUIDialog {
             try {
                 temp = Integer.parseInt(FIELDS.get(i).getText().trim());
                 if (temp < 0 || temp > 255) {
-                    JOptionPane.showMessageDialog(null, "Invalid IP Bock entered - " + temp);
+                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "invalid", Integer.toString(temp)));
                     return;
                 }
                 human += temp + ".";
             } catch (NumberFormatException e) {
                 if (FIELDS.get(i).getText().trim().length() == 0) {
-                    OptionDialog.showErrorDialog(this, "All IP number text boxes must be filled in.");
+                    OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "ipfill"));
                 } else {
-                    OptionDialog.showErrorDialog(this, "The block " + FIELDS.get(i).getText().trim() + " contains a invalid character");
+                    OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "badblock", FIELDS.get(i).getText().trim()));
                 }
                 return;
             }
@@ -119,28 +122,27 @@ public class AddRuleWindow extends XUIDialog {
         try {
             Integer mask = new Integer(FIELDS.get(OPTIONS.length - 1).getText());
             if (mask < 0 || mask > 32) {
-                JOptionPane.showMessageDialog(null,
-                        "Please enter a mask between 0 and 32");
+                JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "maskrange"));
                 return;
             }
             human = human.subSequence(0, human.length() - 1) + "/" + mask;
         } catch (NumberFormatException e) {
             if (FIELDS.get(OPTIONS.length - 1).getText().trim().length() == 0) {
-                OptionDialog.showErrorDialog(this, "You must enter a mask");
+                OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "entermask"));
             } else {
-                OptionDialog.showErrorDialog(this, "Mask is not a valid number");
+                OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "invalidmask"));
             }
             return;
         }
         dispose();
     }
 
-    public void EVENT_radioAllow(ActionEvent a) throws Exception {
+    public void EVENT_radioallow(ActionEvent a) throws Exception {
         this.allow = true;
         ok.setEnabled(true);
     }
 
-    public void EVENT_radioDeny(ActionEvent a) throws Exception {
+    public void EVENT_radiodeny(ActionEvent a) throws Exception {
         this.allow = false;
         ok.setEnabled(true);
     }

@@ -5,6 +5,7 @@ import com.stendahls.nif.util.EnumerationIteratorConverter;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
 import org.alliance.core.settings.Settings;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -29,7 +30,9 @@ public class AddPluginWindow extends XUIDialog {
         this.settings = ui.getCore().getSettings();
         this.core = ui.getCore();
         init(ui.getRl(), ui.getRl().getResourceStream("xui/pluginwindow.xui.xml"));
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
         pluginList = (JList) xui.getComponent("pluginList");
         pluginListModel = new DefaultListModel();
 
@@ -48,8 +51,7 @@ public class AddPluginWindow extends XUIDialog {
 
     public void EVENT_ok(ActionEvent a) throws Exception {
         settings.getPluginlist().clear();
-        for (Plugin plugin : EnumerationIteratorConverter.iterable(
-                pluginListModel.elements(), Plugin.class)) {
+        for (Plugin plugin : EnumerationIteratorConverter.iterable(pluginListModel.elements(), Plugin.class)) {
             settings.getPluginlist().add(plugin);
         }
         core.saveSettings();
@@ -63,7 +65,7 @@ public class AddPluginWindow extends XUIDialog {
 
     public void EVENT_addplugin(ActionEvent a) throws Exception {
         JFileChooser file = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JAR files", "JAR", "jar", "Jar");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(LanguageResource.getLocalizedString(getClass(), "files"), "JAR", "jar", "Jar");
         file.setFileFilter(filter);
         int returnVal = file.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -73,8 +75,7 @@ public class AddPluginWindow extends XUIDialog {
                 pluginListModel.add(pluginListModel.size(), newPlugin);
                 this.addedOrRemovedSomething = true;
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null,
-                        "Could not parse given jar file to find entry point");
+                JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "error"));
             }
         }
     }
