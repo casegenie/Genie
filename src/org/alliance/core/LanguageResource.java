@@ -65,47 +65,47 @@ public class LanguageResource {
         for (Object o : coll) {
             XUIElement element = (XUIElement) o;
             JComponent comp = (JComponent) element.getComponent();
-            if (comp.getToolTipText() != null && !comp.getToolTipText().isEmpty()) {
+            if (comp.getToolTipText() != null && !comp.getToolTipText().trim().isEmpty()) {
                 comp.setToolTipText(getResource(getKeyHeader(c), "xui", element.getId(), "tooltip"));
             }
             if (comp.getBorder() instanceof CompoundBorder) {
                 CompoundBorder b = (CompoundBorder) comp.getBorder();
                 if (b.getOutsideBorder() instanceof TitledBorder) {
                     TitledBorder border = (TitledBorder) b.getOutsideBorder();
-                    if (border != null && !border.getTitle().isEmpty()) {
+                    if (border != null && !border.getTitle().trim().isEmpty()) {
                         border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
                     }
                 }
             } else if (comp.getBorder() instanceof TitledBorder) {
                 TitledBorder border = (TitledBorder) comp.getBorder();
-                if (border != null && !border.getTitle().isEmpty()) {
+                if (border != null && !border.getTitle().trim().isEmpty()) {
                     border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
                 }
             }
             if (comp instanceof AbstractButton) {
                 AbstractButton button = (AbstractButton) comp;
-                if (button.getText() != null && !button.getText().isEmpty()) {
+                if (button.getText() != null && !button.getText().trim().isEmpty()) {
                     button.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JLabel) {
                 JLabel label = (JLabel) comp;
-                if (label.getText() != null && !label.getText().isEmpty()) {
+                if (label.getText() != null && !label.getText().trim().isEmpty()) {
                     label.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JHtmlLabel) {
                 JHtmlLabel label = (JHtmlLabel) comp;
-                if (label.getText() != null && !label.getText().isEmpty()) {
+                if (label.getText() != null && !label.getText().trim().isEmpty()) {
                     label.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JTextArea) {
                 JTextArea area = (JTextArea) comp;
-                if (area.getText() != null && !area.getText().isEmpty()) {
+                if (area.getText() != null && !area.getText().trim().isEmpty()) {
                     area.setText(getResource(getKeyHeader(c), "xui", element.getId()));
                 }
                 continue;

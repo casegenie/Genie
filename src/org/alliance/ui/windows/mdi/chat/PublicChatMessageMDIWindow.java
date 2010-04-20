@@ -1,5 +1,6 @@
 package org.alliance.ui.windows.mdi.chat;
 
+import org.alliance.core.LanguageResource;
 import org.alliance.core.comm.rpc.ChatMessageV3;
 import org.alliance.core.node.Friend;
 import org.alliance.ui.UISubsystem;
@@ -17,8 +18,8 @@ public class PublicChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
 
     public PublicChatMessageMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "publicchat", ui);
-
-        setTitle("Chat");
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
 
         postInit();
     }

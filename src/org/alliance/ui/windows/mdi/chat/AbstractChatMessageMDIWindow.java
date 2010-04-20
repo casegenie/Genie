@@ -3,12 +3,14 @@ package org.alliance.ui.windows.mdi.chat;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import org.alliance.core.file.hash.Hash;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
+import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -25,8 +27,6 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import org.alliance.ui.dialogs.OptionDialog;
-import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 
 /**
  * Created by IntelliJ IDEA.
@@ -94,7 +94,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
 
         textarea.setEditable(false);
         textarea.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        textarea.setFont(new Font("Dialog", Font.TRUETYPE_FONT, 12));
+
         textarea.setBackground(Color.white);
         textarea.addHyperlinkListener(new HyperlinkListener() {
 
@@ -107,7 +107,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                             String allowedChars = "abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-%.;/?:@&=+$_.!~*'()#";
                             for (int i = 0; i < link.length(); i++) {
                                 if (allowedChars.indexOf(link.toLowerCase().charAt(i)) == -1) {
-                                    OptionDialog.showInformationDialog(ui.getMainWindow(), "Character " + link.charAt(i) + " is not allowed in link.");
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "invalid", Character.toString(link.charAt(i))));
                                     return;
                                 }
                             }
@@ -119,27 +119,27 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                     T.trace("Part: " + s);
                                 }
                                 if (s.length() < 2) {
-                                    OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
                                     return;
                                 }
                             }
                             int guid = Integer.parseInt(hashes[0]);
-                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Add " + (hashes.length - 1) + " files to downloads?")) {
+                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
                                 ArrayList<Integer> al = new ArrayList<Integer>();
                                 al.add(guid);
                                 for (int i = 1; i < hashes.length; i++) {
-                                    ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);
+                                    ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);//TODO: LOCALIZE
                                 }
                                 ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                             }
                         } else {
-                            OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                            OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
                             return;
                         }
                     } catch (IOException e1) {
                         ui.getCore().reportError(e1, this);
                     } catch (NumberFormatException e1) {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
                         return;
                     }
                 }
@@ -152,7 +152,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         super.postInit();
     }
 
-    public void EVENT_chat1(ActionEvent e) throws Exception {
+    public void EVENT_send(ActionEvent e) throws Exception {
         chatMessage();
     }
 
@@ -171,7 +171,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         } else if (chat.getText().trim().equals("/clear")) {
             chatClear();
             return;
-        } else if (chat.getText().trim().equals("/clearlog")) { //Bastvera /clearlog functionality
+        } else if (chat.getText().trim().equals("/clearlog")) {
             chatClear();
             ui.getCore().getPublicChatHistory().clearHistory();
             return;
@@ -201,7 +201,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         return text;
     }
 
-    private String escapeHTML(String text) { //Bastvera Https/ftp support;
+    private String escapeHTML(String text) { //Https/ftp support;
         text = text.replace("<", "&lt;"); //unHTML
         text = text.replace(">", "&gt;");
         text = text.replace("&lt;a href=\"", "");
