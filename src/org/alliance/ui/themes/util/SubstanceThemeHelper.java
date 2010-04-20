@@ -101,4 +101,8 @@ public class SubstanceThemeHelper {
             SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin." + theme);
         }
     }
+
+    public static boolean isSubstanceInUse() {
+        return CUSTOM_SKIN;
+    }
 }

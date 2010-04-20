@@ -3,8 +3,10 @@ package org.alliance.ui.windows.shares;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.util.TextUtils;
 import org.alliance.core.settings.Share;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.AddGroupDialog;
+import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.Component;
@@ -29,7 +31,6 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
-import org.alliance.ui.dialogs.OptionDialog;
 
 public class SharesWindow extends XUIDialog {
 
@@ -54,7 +55,9 @@ public class SharesWindow extends XUIDialog {
         this.ui = ui;
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/shareswindow.xui.xml"));
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
 
         setupPopupMenu();
         setupShareTree();
@@ -171,7 +174,7 @@ public class SharesWindow extends XUIDialog {
         File[] roots = File.listRoots();
         for (int i = 0; i < roots.length; i++) {
             DefaultMutableTreeNode rootPath = new DefaultMutableTreeNode(roots[i].toString());
-            rootPath.insert(new DefaultMutableTreeNode("Loading..."), 0);
+            rootPath.insert(new DefaultMutableTreeNode(LanguageResource.getLocalizedString(getClass(), "loadnode")), 0);
             sharesTreeModel.insertNodeInto(rootPath, root, i);
         }
         sharesTree.setModel(sharesTreeModel);
@@ -182,7 +185,7 @@ public class SharesWindow extends XUIDialog {
             public void treeExpanded(TreeExpansionEvent event) {
                 DefaultMutableTreeNode selectedDirNode = (DefaultMutableTreeNode) event.getPath().getLastPathComponent();
 
-                if (selectedDirNode.getFirstChild().toString().equals("Loading...")) {
+                if (selectedDirNode.getFirstChild().toString().equals(LanguageResource.getLocalizedString(getClass(), "loadnode"))) {
                     //Get path from selection
                     Object[] pathParts = event.getPath().getPath();
                     StringBuilder path = new StringBuilder();
@@ -198,7 +201,7 @@ public class SharesWindow extends XUIDialog {
                         for (File file : selectedDir.listFiles()) {
                             if (file.isDirectory() && !file.isHidden()) {
                                 DefaultMutableTreeNode newDirNode = new DefaultMutableTreeNode(file.getName());
-                                newDirNode.insert(new DefaultMutableTreeNode("Loading..."), 0);
+                                newDirNode.insert(new DefaultMutableTreeNode(LanguageResource.getLocalizedString(getClass(), "loadnode")), 0);
                                 sharesTreeModel.insertNodeInto(newDirNode, selectedDirNode, i);
                                 i++;
                             }
@@ -245,7 +248,7 @@ public class SharesWindow extends XUIDialog {
     private void setupShareList() {
         shareList = (JList) xui.getComponent("sharesListSelected");
         shareListModel = new DefaultListModel();
-        shareList.setCellRenderer(new SharesListCellRenderer());
+        shareList.setCellRenderer(new SharesListCellRenderer(LanguageResource.getLocalizedString(getClass(), "group")).getRenderer());
         shareList.setModel(shareListModel);
         for (Share share : ui.getCore().getSettings().getSharelist()) {
             shareListModel.addElement(share.getPath());
@@ -350,9 +353,8 @@ public class SharesWindow extends XUIDialog {
                 String pathDir = TextUtils.makeSurePathIsMultiplatform(new File(shareRow).getAbsolutePath());
                 String checkPathDir = TextUtils.makeSurePathIsMultiplatform(new File(share).getAbsolutePath());
                 if (!checkPathDir.equals(pathDir) && pathContains(pathDir, checkPathDir)) {
-                    OptionDialog.showInformationDialog(ui.getMainWindow(),
-                            "The folder " + pathDir + " is already shared as "
-                            + checkPathDir + ". There is no need to add it in your shares.");
+                    OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(),
+                            "subshare", pathDir, checkPathDir));
                     shareListModel.removeElementAt(i);
                     shareListModel.removeElementAt(i);
                     return true;

@@ -1,42 +1,41 @@
 <xui>
-    <title value="Shares Manager" image="gfx/icons/alliance.png"/>
     <body>
         <popupmenu id="popupTree" detached="yes">
-            <menuitem image="gfx/icons/add.png" text="Add to share" eventid="addshare"/>
+            <menuitem image="gfx/icons/add.png" text="%text%" eventid="addshare"/>
         </popupmenu>
         <popupmenu id="popupList" detached="yes">
-            <menuitem image="gfx/icons/remove.png" text="Remove from share" eventid="removeshare"/>
-            <menuitem image="gfx/icons/editgroup.png" text="Locate in directory tree" eventid="locate"/>
-            <menu id="addgroup" image="gfx/icons/editgroup.png" text="Add to group">
-                <menuitem image="gfx/icons/editgroup.png" text="Add new group" eventid="addnewgroup"/>
+            <menuitem image="gfx/icons/remove.png" text="%text%" eventid="removeshare"/>
+            <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="locate"/>
+            <menu id="addgroup" image="gfx/icons/editgroup.png" text="%text%">
+                <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="addnewgroup"/>
             </menu>
-            <menu id="removegroup" image="gfx/icons/editgroup.png" text="Remove from group">
-                <menuitem image="gfx/icons/editgroup.png" text="Set to Public" eventid="settopublic"/>
+            <menu id="removegroup" image="gfx/icons/editgroup.png" text="%text%">
+                <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="settopublic"/>
             </menu>
         </popupmenu>
         <panel axis="y" width="640" height="480" minwidth="640" minheight="480" border="0">
             <panel axis="x" border="0">
                 <panel axis="y" border="0">
-                    <scrollpanel width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="Shared folders:">
+                    <scrollpanel id="shared" width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
                         <list expand="both" id="sharesListSelected"/>
                     </scrollpanel>
-                    <panel axis="x" expand="horiz" bordertype="etched" bordertitle="Options:">
+                    <panel id="options" axis="x" expand="horiz" bordertype="etched" bordertitle="%text%">
                         <panel axis="y" border="0">
-                            <checkbox id="public" text="Allow public"/>
-                            <checkbox id="cache" text="Allow cache"/>
+                            <checkbox id="public" text="%text%"/>
+                            <checkbox id="cache" text="%text%"/>
                         </panel>
                         <filler axis="x"/>
                     </panel>
                 </panel>
-                <scrollpanel width = "310" minwidth = "310" scrollbars="optional" bordertype="etched" bordertitle="Select what folders you want to share:">
+                <scrollpanel id="selection" width = "310" minwidth = "310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
                     <tree expand="both" id="sharesTreeBrowse"/>
                 </scrollpanel>
             </panel>
             <panel border="5" axis="x" expand="horiz">
                 <filler axis="x"/>
-                <button width="85" eventid="ok" text="OK"/>
+                <button width="85" eventid="ok" text="%text%"/>
                 <strut width="5"/>
-                <button width="85" eventid="cancel" text="Cancel"/>
+                <button width="85" eventid="cancel" text="%text%"/>
             </panel>
         </panel>
     </body>

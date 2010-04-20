@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -34,7 +32,7 @@ public class LanguageResource {
             URL[] url = {new File("language/").toURI().toURL()};
             LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", Locale.UK, new URLClassLoader(url));
         } catch (MalformedURLException ex) {
-            Logger.getLogger(LanguageResource.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -77,6 +75,11 @@ public class LanguageResource {
                     if (border != null && !border.getTitle().isEmpty()) {
                         border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
                     }
+                }
+            } else if (comp.getBorder() instanceof TitledBorder) {
+                TitledBorder border = (TitledBorder) comp.getBorder();
+                if (border != null && !border.getTitle().isEmpty()) {
+                    border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
                 }
             }
             if (comp instanceof AbstractButton) {
