@@ -249,6 +249,12 @@ public class AddFriendWizard extends JWizard {
         }
     }
 
+    private void goToConnectionOk() {
+        setStep(STEP_MANUAL_CONNECTION_OK);
+        next.setEnabled(false);
+        prev.setEnabled(false);
+    }
+
     @Override
     public void setStep(int i) {
         super.setStep(i);
@@ -346,9 +352,13 @@ public class AddFriendWizard extends JWizard {
                     if (T.t) {
                         T.info("Looks like we connected succesfully.");
                     }
-                    setStep(STEP_MANUAL_CONNECTION_OK);
-                    next.setEnabled(false);
-                    prev.setEnabled(false);
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            goToConnectionOk();
+                        }
+                    });
                 }
             }
         });

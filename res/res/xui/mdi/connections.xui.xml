@@ -1,5 +1,4 @@
 <xui>
-    <title value=""/>
     <body>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <toolbar opaque="false" id="toolbar" expand="horiz"/>

@@ -10,6 +10,7 @@ import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -26,6 +27,8 @@ import javax.swing.border.TitledBorder;
 public class LanguageResource {
 
     private static ResourceBundle LANGUAGE_BUNDLE;
+    private static final String PACKAGES_HEAD = "org.alliance.";
+    private static final String MISSING_TEXT = "%Missing translation!%";
 
     public LanguageResource() {
         try {
@@ -37,11 +40,11 @@ public class LanguageResource {
     }
 
     public static String getLocalizedString(Class<?> c, String key) {
-        return getResource(getKeyHeader(c), key);
+        return getResource(c, key);
     }
 
     public static String getLocalizedString(Class<?> c, String key, String... params) {
-        StringBuilder paramsString = new StringBuilder(getResource(getKeyHeader(c), key));
+        StringBuilder paramsString = new StringBuilder(getResource(c, key));
         for (String param : params) {
             int paramStart = paramsString.indexOf("<%");
             int paramEnd = paramsString.indexOf("%>") + 2;
@@ -55,8 +58,8 @@ public class LanguageResource {
     public static void getLocalizedXUIToolbar(Class<?> c, ArrayList<JButton> buttons) {
         for (JButton b : buttons) {
             String tooltipText = b.getToolTipText();
-            tooltipText = tooltipText.replace("%DES%", getResource(getKeyHeader(c), "toolbar", b.getActionCommand(), "description"));
-            tooltipText = tooltipText.replace("%NAME%", getResource(getKeyHeader(c), "toolbar", b.getActionCommand(), "name"));
+            tooltipText = tooltipText.replace("%DES%", getResource(c, "toolbar", b.getActionCommand(), "description"));
+            tooltipText = tooltipText.replace("%NAME%", getResource(c, "toolbar", b.getActionCommand(), "name"));
             b.setToolTipText(tooltipText);
         }
     }
@@ -66,47 +69,47 @@ public class LanguageResource {
             XUIElement element = (XUIElement) o;
             JComponent comp = (JComponent) element.getComponent();
             if (comp.getToolTipText() != null && !comp.getToolTipText().trim().isEmpty()) {
-                comp.setToolTipText(getResource(getKeyHeader(c), "xui", element.getId(), "tooltip"));
+                comp.setToolTipText(getResource(c, "xui", element.getId(), "tooltip"));
             }
             if (comp.getBorder() instanceof CompoundBorder) {
                 CompoundBorder b = (CompoundBorder) comp.getBorder();
                 if (b.getOutsideBorder() instanceof TitledBorder) {
                     TitledBorder border = (TitledBorder) b.getOutsideBorder();
                     if (border != null && !border.getTitle().trim().isEmpty()) {
-                        border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
+                        border.setTitle(getResource(c, "xui", element.getId(), "border"));
                     }
                 }
             } else if (comp.getBorder() instanceof TitledBorder) {
                 TitledBorder border = (TitledBorder) comp.getBorder();
                 if (border != null && !border.getTitle().trim().isEmpty()) {
-                    border.setTitle(getResource(getKeyHeader(c), "xui", element.getId(), "border"));
+                    border.setTitle(getResource(c, "xui", element.getId(), "border"));
                 }
             }
             if (comp instanceof AbstractButton) {
                 AbstractButton button = (AbstractButton) comp;
                 if (button.getText() != null && !button.getText().trim().isEmpty()) {
-                    button.setText(getResource(getKeyHeader(c), "xui", element.getId()));
+                    button.setText(getResource(c, "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JLabel) {
                 JLabel label = (JLabel) comp;
                 if (label.getText() != null && !label.getText().trim().isEmpty()) {
-                    label.setText(getResource(getKeyHeader(c), "xui", element.getId()));
+                    label.setText(getResource(c, "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JHtmlLabel) {
                 JHtmlLabel label = (JHtmlLabel) comp;
                 if (label.getText() != null && !label.getText().trim().isEmpty()) {
-                    label.setText(getResource(getKeyHeader(c), "xui", element.getId()));
+                    label.setText(getResource(c, "xui", element.getId()));
                 }
                 continue;
             }
             if (comp instanceof JTextArea) {
                 JTextArea area = (JTextArea) comp;
                 if (area.getText() != null && !area.getText().trim().isEmpty()) {
-                    area.setText(getResource(getKeyHeader(c), "xui", element.getId()));
+                    area.setText(getResource(c, "xui", element.getId()));
                 }
                 continue;
             }
@@ -115,17 +118,34 @@ public class LanguageResource {
         }
     }
 
-    private static String getKeyHeader(Class<?> c) {
-        return c.getName().substring(13).replaceAll("\\$\\d*", "");
-    }
-
-    private static String getResource(String... strings) {
-        StringBuilder sb = new StringBuilder(50);
+    private static String getResource(Class<?> c, String... strings) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getKeyHeader(c));
+        sb.append(".");
         for (String s : strings) {
             sb.append(s);
             sb.append(".");
         }
         sb.deleteCharAt(sb.length() - 1);
-        return LANGUAGE_BUNDLE.getString(sb.toString());
+        String localized = null;
+        try {
+            localized = LANGUAGE_BUNDLE.getString(sb.toString());
+        } catch (MissingResourceException e) {
+            //Test if getClass() is invoked by inherited methods from extended class that belongs to alliance package
+            if (c.getSuperclass() != null && c.getSuperclass().getName().startsWith(PACKAGES_HEAD)) {
+                System.out.println(e.toString());
+                localized = getResource(c.getSuperclass(), strings);
+            }
+        }
+        if (localized == null) {
+            return MISSING_TEXT;
+        } else {
+            return localized;
+        }
+    }
+
+    private static String getKeyHeader(Class<?> c) {
+        return c.getName().substring(PACKAGES_HEAD.length()).replaceAll("\\$\\d*", "");
+
     }
 }

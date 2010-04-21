@@ -118,7 +118,7 @@ public class ForwardInvitationNodesList extends JList {
             this.connectedThrough = connectedThrough;
             this.guid = guid;
             this.trusted = trusted;
-            toString = "<html>" + LanguageResource.getLocalizedString(getClass(), "friend", nickname + " <font color=gray>", connectedThrough) + "</font></html>";
+            toString = "<html>" + LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "friend", nickname + " <font color=gray>", connectedThrough) + "</font></html>";
         }
 
         @Override

@@ -2,6 +2,7 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.filetransfers.Download;
 import org.alliance.core.comm.filetransfers.DownloadConnection;
@@ -59,6 +60,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
     public DownloadsMDIWindow(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "downloads", ui);
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
 
         table = (JTable) xui.getComponent("tableDownload");
         table.setModel(model = new DownloadsTableModel());
@@ -130,8 +132,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         popup = (JPopupMenu) xui.getComponent("popup");
 
         update();
-
-        setTitle("Downloads");
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
         listenExternalLinks();
         postInit();
     }
@@ -164,7 +165,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     }
 
     private void showTotalBytesReceived() {
-        status.setText("Total bytes received: " + TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes()));
+        status.setText(LanguageResource.getLocalizedString(getClass(), "bytetotal", TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes())));
     }
 
     private String getDownloadingFromText(DownloadWrapper w) {
@@ -172,12 +173,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         final String s;
         for (DownloadConnection c : w.download.connections()) {
             if (text == null) {
-                text = "Downloading from ";
+                text = LanguageResource.getLocalizedString(getClass(), "from") + " ";
             }
             if (c.getRemoteFriend() != null) {
                 text += c.getRemoteFriend().getNickname() + " (" + c.getBandwidthIn().getCPSHumanReadable() + "), ";
             } else {
-                text += "<unknown>, ";
+                text += LanguageResource.getLocalizedString(getClass(), "unknown") + ", ";
             }
         }
         if (text != null) {
@@ -198,12 +199,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 UploadConnection uc = (UploadConnection) c;
                 if (uc.getRoot() != null && uc.getRoot().equals(w.download.getRoot())) {
                     if (text == null) {
-                        text = "Uploading to ";
+                        text = LanguageResource.getLocalizedString(getClass(), "to") + " ";
                     }
                     if (uc.getRemoteFriend() != null) {
                         text += uc.getRemoteFriend().getNickname() + " (" + c.getBandwidthOut().getCPSHumanReadable() + "), ";
                     } else {
-                        text += "<unknown>, ";
+                        text += LanguageResource.getLocalizedString(getClass(), "unknown") + ", ";
                     }
                 }
             }
@@ -320,7 +321,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     if (download.getNConnections() == 0) {
                         name = download.getAuxInfoFilename();
                     } else {
-                        name = download.getAuxInfoFilename() + " - starting...";
+                        name = LanguageResource.getLocalizedString(getClass(), "starting", download.getAuxInfoFilename());
                     }
                     size = "?";
                 } else {
@@ -376,19 +377,19 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return "Name";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "name");
                 case 1:
-                    return "Progress";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "progress");
                 case 2:
-                    return "Size";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "size");
                 case 3:
-                    return "ETA";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "eta");
                 case 4:
-                    return "Speed";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "speed");
                 case 5:
                     return "#";
                 default:
-                    return "undefined";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -408,7 +409,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 case 5:
                     return rows.get(rowIndex).numberOfConnections;
                 default:
-                    return "undefined";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }
@@ -430,7 +431,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         });
     }
 
-    public void EVENT_moveDown(ActionEvent e) {
+    public void EVENT_movedown(ActionEvent e) {
         int selection[] = table.getSelectedRows();
         if (selection != null && selection.length > 0) {
             for (int i : selection) {
@@ -454,7 +455,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         }
     }
 
-    public void EVENT_moveUp(ActionEvent e) {
+    public void EVENT_moveup(ActionEvent e) {
         int selection[] = table.getSelectedRows();
         if (selection != null && selection.length > 0) {
             for (int i : selection) {
@@ -478,7 +479,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         }
     }
 
-    public void EVENT_moveTop(ActionEvent e) {
+    public void EVENT_movetop(ActionEvent e) {
         int selection[] = table.getSelectedRows();
         int offset = 0;
         if (selection != null && selection.length > 0) {
@@ -497,12 +498,11 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 offset++;
             }
             model.fireTableStructureChanged();
-            //for(int i : selection) if (i>0) table.getSelectionModel().addSelectionInterval(i-1,i-1);
             table.getSelectionModel().addSelectionInterval(0, selection.length - 1);
         }
     }
 
-    public void EVENT_moveBottom(ActionEvent e) {
+    public void EVENT_movebottom(ActionEvent e) {
         int selection[] = table.getSelectedRows();
 
         int offset = 0;
@@ -521,13 +521,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 offset++;
             }
             model.fireTableStructureChanged();
-            //for(int i : selection) if (i<rows.size()-1) table.getSelectionModel().addSelectionInterval(i+1,i+1);
             ListSelectionModel sm = table.getSelectionModel();
             sm.addSelectionInterval(rows.size() - selection.length, rows.size() - 1);
         }
     }
 
-    public void moveUp(int i, DownloadWrapper dw) {
+    private void moveUp(int i, DownloadWrapper dw) {
         if (i == 0) {
             return;
         }
@@ -535,7 +534,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         rows.add(i - 1, dw);
     }
 
-    public void moveDown(int i, DownloadWrapper dw) {
+    private void moveDown(int i, DownloadWrapper dw) {
         if (i == rows.size() - 1) {
             return;
         }
@@ -543,7 +542,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         rows.add(i + 1, dw);
     }
 
-    public void moveTop(int i, DownloadWrapper dw) {
+    private void moveTop(int i, DownloadWrapper dw) {
         if (i == 0) {
             return;
         }
@@ -551,7 +550,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         rows.add(0, dw);
     }
 
-    public void movePos(int pos, int i, DownloadWrapper dw) {
+    private void movePos(int pos, int i, DownloadWrapper dw) {
         rows.remove(i);
         if (pos > i) {
             pos--;
@@ -559,7 +558,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         rows.add(pos, dw);
     }
 
-    public void moveBottom(int i, DownloadWrapper dw) {
+    private void moveBottom(int i, DownloadWrapper dw) {
         if (i == rows.size() - 1) {
             return;
         }
@@ -574,7 +573,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (selection.length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only open one folder or file");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onlyone"));
             return;
         }
 
@@ -583,24 +582,18 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             String path = ui.getCore().getSettings().getInternal().getDownloadfolder() + "\\" + d.getAuxInfoFilename();
             try {
                 Desktop.getDesktop().open(new File(path));
-            } catch (IOException ex) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
-            } catch (IllegalArgumentException ex) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
-            } catch (UnsupportedOperationException ex) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), "This operation is not supported on this architecture");
+            } catch (Exception ex) {
+                OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "openerror"));
             }
         } else {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "File hasn't been downloaded yet");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "nodownload"));
         }
     }
 
     public void EVENT_opendownloaddir(ActionEvent e) {
         try {
             Desktop.getDesktop().open(new File(ui.getCore().getSettings().getInternal().getDownloadfolder()));
-        } catch (IOException ex) {
-        } catch (IllegalArgumentException ex) {
-        } catch (UnsupportedOperationException ex) {
+        } catch (Exception ex) {
         }
     }
 
@@ -621,7 +614,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
             @Override
             public String getDescription() {
-                return ("Alliance files");
+                return LanguageResource.getLocalizedString(getClass(), "alliancefile");
             }
         });
         int returnVal = fc.showOpenDialog(this);
@@ -649,16 +642,16 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 String[] hashes = link.split("\\|");
                 for (String s : hashes) {
                     if (s.length() < 2) {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(), "This link is not allowed.");
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
                         return;
                     }
                 }
                 int guid = Integer.parseInt(hashes[0]);
-                if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Add " + (hashes.length - 1) + " files to downloads?")) {
+                if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
                     ArrayList<Integer> al = new ArrayList<Integer>();
                     al.add(guid);
                     for (int i = 1; i < hashes.length; i++) {
-                        ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);
+                        ui.getCore().getNetworkManager().getDownloadManager().queDownload(new Hash(hashes[i]), "Link from chat", al);//TODO: Translate
                     }
                     ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                 }
@@ -674,9 +667,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             for (int i : selection) {
                 Download d = rows.get(i).download;
                 if (!d.isComplete()) {
-                    if (OptionDialog.showQuestionDialog(
-                            ui.getMainWindow(),
-                            "Are you sure you want to remove the selected downloads from your harddrive and download queue?")) {
+                    if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "remove"))) {
                         break;
                     } else {
                         return;
@@ -730,10 +721,10 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 int v = (Integer) value;
                 DownloadWrapper w = rows.get(rowIndex);
                 if (w.state == Download.State.WAITING_TO_START) {
-                    setString("queued");
+                    setString(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "queue"));
                     setValue(0);
                 } else if (w.state == Download.State.COMPLETED) {
-                    setString("complete");
+                    setString(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "complete"));
                     setValue(100);
                 } else {
                     setValue(v);

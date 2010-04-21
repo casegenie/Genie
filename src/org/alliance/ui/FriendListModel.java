@@ -39,7 +39,6 @@ public class FriendListModel extends DefaultListModel {
                     @Override
                     public void run() {
                         updateFriendList();
-                        ui.getMainWindow().getFriendListMDIWindow().update();
                     }
                 });
             }

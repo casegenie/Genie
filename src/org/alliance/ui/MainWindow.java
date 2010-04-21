@@ -501,7 +501,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         if (mdiManager != null && getUploadsWindow() != null) {
                             getUploadsWindow().update();
                         }
-                        // if (mdiManager != null && getFriendListMDIWindow() != null) getFriendListMDIWindow().update(); //updated by paced runner in friendlistmodel
+                        if (mdiManager != null && getFriendListMDIWindow() != null) {
+                            getFriendListMDIWindow().update();
+                        }
                         shareMessage.setText(LanguageResource.getLocalizedString(getClass(), "sharesinfo",
                                 TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getShareSize()),
                                 Integer.toString(ui.getCore().getShareManager().getFileDatabase().getNumberOfShares())));

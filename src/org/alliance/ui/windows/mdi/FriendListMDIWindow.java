@@ -3,6 +3,7 @@ package org.alliance.ui.windows.mdi;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.MyNode;
 import org.alliance.core.node.Node;
@@ -42,8 +43,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     private JList list;
     private ImageIcon iconFriendDimmed, iconFriendOld;
     private JLabel statusright;
-    private String[] LEVEL_NAMES = {"Rookie", "True Member", "Experienced", "King"};
-    private String[] LEVEL_ICONS = {"friend_lame", "friend", "friend_cool", "friend_king"};
+    private static String[] LEVEL_NAMES;
+    private static final String[] LEVEL_ICONS = {"friend_lame", "friend", "friend_cool", "friend_king"};
     private ImageIcon[] friendIcons;
     private ImageIcon[] friendIconsAway;
     private ImageIcon groupIcon;
@@ -56,6 +57,12 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     public FriendListMDIWindow(MDIManager manager, UISubsystem ui) throws Exception {
         super(manager, "friendlist", ui);
         this.ui = ui;
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+
+        LEVEL_NAMES = new String[]{LanguageResource.getLocalizedString(getClass(), "rookie"),
+                    LanguageResource.getLocalizedString(getClass(), "true"),
+                    LanguageResource.getLocalizedString(getClass(), "exp"),
+                    LanguageResource.getLocalizedString(getClass(), "king")};
 
         groupIcon = new ImageIcon(ui.getRl().getResource("gfx/icons/editgroup.png"));
         friendIcons = new ImageIcon[LEVEL_ICONS.length];
@@ -72,11 +79,15 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         statusright = (JLabel) xui.getComponent("statusright");
 
         createUI();
-        setTitle("My Network");
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
     }
 
     public void update() {
-        statusright.setText("Online: " + ui.getCore().getFriendManager().getNFriendsConnected() + "/" + ui.getCore().getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared()) + ")");
+        StringBuilder sb = new StringBuilder();
+        sb.append(LanguageResource.getLocalizedString(getClass(), "online")).append(" ");
+        sb.append(ui.getCore().getFriendManager().getNFriendsConnected()).append("/").append(ui.getCore().getFriendManager().getNFriends());
+        sb.append(" (").append(TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared())).append(")");
+        statusright.setText(sb.toString());
         if (selectedObjects != null) {
             int[] selectedIndexes = new int[list.getModel().getSize()];
             for (int i = 0; i < list.getModel().getSize(); i++) {
@@ -108,14 +119,14 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     }
 
     private void createUI() throws Exception {
-        list = (JList) xui.getComponent("friendlistList");
+        list = (JList) xui.getComponent("friendlist");
         list.setModel(ui.getFriendListModel());
         SystemFlavorMap.getDefaultFlavorMap();
         list.setCellRenderer(new FriendListRenderer());
 
         popup = (JPopupMenu) xui.getComponent("popup");
         updateMyLevelInformation();
-        statusright.setText("Online: " + ui.getCore().getFriendManager().getNFriendsConnected() + "/" + ui.getCore().getFriendManager().getNFriends() + " (" + TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared()) + ")");
+        update();
 
         list.addMouseListener(new MouseAdapter() {
 
@@ -166,28 +177,28 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         String s = "";
         switch (getMyNumberOfInvites()) {
             case 0:
-                s = "Invite 1 friend to become ";
+                s = LanguageResource.getLocalizedString(getClass(), "invite1");
                 break;
             case 1:
-                s = "Invite 2 friends to become ";
+                s = LanguageResource.getLocalizedString(getClass(), "invite2");
                 break;
             case 2:
-                s = "Invite 1 friend to become ";
+                s = LanguageResource.getLocalizedString(getClass(), "invite1");
                 break;
             default:
-                s = "Invite " + (ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing() - getMyNumberOfInvites()) + " friend to become ";
+                s = LanguageResource.getLocalizedString(getClass(), "invite", Integer.toString(ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing() - getMyNumberOfInvites()));
                 break;
         }
         if (getMyLevel() < LEVEL_NAMES.length - 1) {
-            s += "'" + getLevelName(getMyLevel() + 1) + "' (";
-            ((JLabel) xui.getComponent("nextLevelText")).setText(s);
-            ((JLabel) xui.getComponent("nextLevelIcon")).setIcon(new ImageIcon(ui.getRl().getResource(getLevelIcon(getMyLevel() + 1, false))));
-            ((JLabel) xui.getComponent("levelEnding")).setText(")");
+            s += " '" + getLevelName(getMyLevel() + 1) + "' (";
+            ((JLabel) xui.getComponent("nextleveltext")).setText(s);
+            ((JLabel) xui.getComponent("nextlevelicon")).setIcon(new ImageIcon(ui.getRl().getResource(getLevelIcon(getMyLevel() + 1, false))));
+            ((JLabel) xui.getComponent("levelending")).setText(")");
         } else {
-            ((JLabel) xui.getComponent("nextLevelText")).setText("");
-            ((JLabel) xui.getComponent("nextLevelIcon")).setText("");
-            ((JLabel) xui.getComponent("nextLevelIcon")).setIcon(null);
-            ((JLabel) xui.getComponent("levelEnding")).setText("");
+            ((JLabel) xui.getComponent("nextleveltext")).setText("");
+            ((JLabel) xui.getComponent("nextlevelicon")).setText("");
+            ((JLabel) xui.getComponent("nextlevelicon")).setIcon(null);
+            ((JLabel) xui.getComponent("levelending")).setText("");
         }
     }
 
@@ -287,7 +298,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
             Node n = (Node) value;
 
-            //Bastvera for displaying group names/trusted status in friend list + popup
             String groupname = "";
             String trusted = "";
             String sharesize = TextUtils.formatByteSize(n.getShareSize());
@@ -295,17 +305,16 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 Friend f = (Friend) n;
                 groupname = f.getUGroupName();
                 if (groupname.length() == 0) {
-                    groupname = "Not in a Group";
+                    groupname = LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "nogroup");
                 }
                 if (f.getTrusted() == 1) {
                     trusted = "(T) ";
                 }
             } else {
-                groupname = "Not Allowed";
+                groupname = LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "wronggroup");
             }
 
             if (n.isConnected()) {
-
                 if (!n.isAway()) {
                     setIcon(friendIcons[getLevel(n.getNumberOfInvitedFriends())]);
                 } else {
@@ -316,13 +325,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 } else {
                     setForeground(Color.black);
                 }
-//                setText(f.getNickname()+" ("+ TextUtils.formatByteSize(f.getShareSize())+")");
                 String s = "";
                 if (n instanceof Friend) {
                     s = trusted + nickname(n.getGuid());
-                    //s += FriendListMDIWindow.this.ui.getCore().getFriendManager().contactPath(n.getGuid());
                 } else {
-                    s = "[Myself] - ";
+                    s = LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "myself") + " - ";
                     s += n.getNickname();
                 }
                 s += " (" + sharesize + ")";
@@ -331,8 +338,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 setIcon(iconFriendOld);
                 setForeground(Color.lightGray);
                 if (n.getLastSeenOnlineAt() != 0) {
-                    setText(trusted + nickname(n.getGuid()) + " (offline for "
-                            + ((System.currentTimeMillis() - n.getLastSeenOnlineAt()) / 1000 / 60 / 60 / 24) + " days)");
+                    setText(trusted + LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "myself",
+                            nickname(n.getGuid()), Long.toString((System.currentTimeMillis() - n.getLastSeenOnlineAt()) / 1000 / 60 / 60 / 24)));
                 } else {
                     setText(trusted + nickname(n.getGuid()));
                 }
@@ -343,18 +350,20 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             }
 
             String cp = FriendListMDIWindow.this.ui.getCore().getFriendManager().contactPath(n.getGuid());
+            StringBuilder sb = new StringBuilder("<html>");
             if (cp.trim().length() > 0) {
-                cp = "Found " + cp + "<br>";
+                sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "subfriends", cp)).append("<br>");
             }
-            setToolTipText("<html>" + cp
-                    + "Share: " + sharesize + " in " + n.getNumberOfFilesShared() + " files<br>"
-                    + "Invited friends: " + n.getNumberOfInvitedFriends() + "<br>"
-                    + "Upload speed record: " + TextUtils.formatByteSize((long) n.getHighestOutgoingCPS()) + "/s<br>"
-                    + "Download speed record: " + TextUtils.formatByteSize((long) n.getHighestIncomingCPS()) + "/s<br>"
-                    + "Bytes uploaded: " + TextUtils.formatByteSize(n.getTotalBytesSent()) + "<br>"
-                    + "Bytes downloaded: " + TextUtils.formatByteSize(n.getTotalBytesReceived()) + "<br>"
-                    + "Ratio (ul:dl): " + n.calculateRatio() + "<br>"
-                    + "Group name: " + groupname + "</html>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "share", sharesize,
+                    Integer.toString(n.getNumberOfFilesShared()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "invites", Integer.toString(n.getNumberOfInvitedFriends()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "upspeed", TextUtils.formatByteSize((long) n.getHighestOutgoingCPS()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "downspeed", TextUtils.formatByteSize((long) n.getHighestIncomingCPS()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "uptotal", TextUtils.formatByteSize(n.getTotalBytesSent()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "downtotal", TextUtils.formatByteSize(n.getTotalBytesReceived()))).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "ratio", n.calculateRatio())).append("<br>");
+            sb.append(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "group", groupname)).append("</html>");
+            setToolTipText(sb.toString());
             return this;
         }
     }
@@ -365,11 +374,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
     public void EVENT_editname(ActionEvent e) {
         if (list.getSelectedValue() instanceof MyNode) {
-            OptionDialog.showInformationDialog(ui.getMainWindow(), "If you want to change your nickname you need to open the Options (View->Options)");
+            OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "ownname"));
         } else if (list.getSelectedValue() instanceof Friend) {
             Friend f = (Friend) list.getSelectedValue();
             if (f != null) {
-                String pi = JOptionPane.showInputDialog("Enter nickname for friend: " + nickname(f.getGuid()), nickname(f.getGuid()));
+                String pi = JOptionPane.showInputDialog(LanguageResource.getLocalizedString(getClass(), "editname", nickname(f.getGuid())), nickname(f.getGuid()));
                 if (pi != null) {
                     f.setNicknameToShowInUI(pi);
                 }
@@ -409,8 +418,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             Friend f = (Friend) list.getSelectedValue();
             if (f != null) {
                 if (!f.isConnected()) {
-//                  just ignore the request
-//                OptionDialog.showErrorDialog(ui.getMainWindow(), "User must be online in order to view his share.");
                 } else {
                     ui.getMainWindow().viewShare(f);
                 }
@@ -428,7 +435,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         if (list.getSelectedValue() instanceof Friend) {
             Object[] friends = list.getSelectedValues();
             if (friends != null && friends.length > 0) {
-                Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to permanently delete these (" + friends.length + ") connections?");
+                Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "delete", Integer.toString(friends.length)));
                 if (delete == null) {
                     return;
                 }
@@ -465,10 +472,10 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     hostname = "";
                 }
 
-                String input = JOptionPane.showInputDialog("Enter hostname for friend: " + nickname(friend.getGuid()), hostname);
+                String input = JOptionPane.showInputDialog(LanguageResource.getLocalizedString(getClass(), "edithost", nickname(friend.getGuid())), hostname);
                 if (input != null && !hostname.equalsIgnoreCase(input)) {
                     if (input.length() == 0) {
-                        OptionDialog.showErrorDialog(ui.getMainWindow(), "Hostname can not be empty. Changes ignored.");
+                        OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "wronghost"));
                     } else {
                         friend.setLastKnownHost(input);
                         try {
@@ -517,6 +524,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         if (list.getSelectedValue() instanceof Friend) {
             Object[] friends = list.getSelectedValues();
             if (friends != null && friends.length > 0) {
+                //TODO: Translate Future Replacer
                 String groupname = JOptionPane.showInputDialog("Edit group name for (" + friends.length + ") friend.\nDivide multiple group names with commas.\nExample 1: music,games\nExample 2: music,games,private", ((Friend) friends[0]).getUGroupName());
                 if (groupname == null) {
                     return;

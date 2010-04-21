@@ -2,8 +2,8 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
-import org.alliance.ui.dialogs.OptionDialog;
 
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.File;
 import java.util.HashMap;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -33,6 +32,9 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
     public DuplicatesMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "duplicates", ui);
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+
+        ui.getToolbarActionManager().getButtonBy("delete", this).setEnabled(false);
 
         table = (JTable) xui.getComponent("table");
         table.setModel(new DuplicatesMDIWindow.TableModel());
@@ -44,60 +46,51 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setColumnSelectionAllowed(false);
 
-        setTitle("Duplicates in my share");
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
         HashMap<String, String> duplicates = ui.getCore().getFileManager().getFileDatabase().getDuplicates(8196);
         for (String path : duplicates.keySet()) {
             dups.add(new Dup(path, duplicates.get(path)));
         }
         duplicates.clear();
-        ((JLabel) xui.getComponent("status")).setText("Number of duplicates: " + dups.size());
+        ((JLabel) xui.getComponent("status")).setText(LanguageResource.getLocalizedString(getClass(), "size", (dups.size() < 8196 ? Integer.toString(dups.size()) : dups.size() + "+")));
         postInit();
     }
 
     public void EVENT_delete(ActionEvent e) throws Exception {
-        if (e != null) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "This function is disabled in this version of Alliance.");
-            return;
-        }
-        if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) {
-            return;
-        }
-        if (table.getSelectedColumnCount() > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "Please select files on only one column - not both.");
-            return;
-        }
+        //TODO: Duplicates Deleting
+        /*if (table.getSelectedColumnCount() <= 0 && table.getSelectedRowCount() <= 0) {
+        return;
+        }      
 
         ArrayList<String> filesThatNeedHashing = new ArrayList<String>();
         ArrayList<String> al = new ArrayList<String>();
         for (int i : table.getSelectedRows()) {
-            if (table.getSelectedColumn() == 0) {
-                al.add(dups.get(i).inShare);
-                filesThatNeedHashing.add(dups.get(i).duplicate);
-            } else if (table.getSelectedColumn() == 1) {
-                al.add(dups.get(i).duplicate);
-            }
+        if (table.getSelectedColumn() == 0) {
+        al.add(dups.get(i).inShare);
+        filesThatNeedHashing.add(dups.get(i).duplicate);
+        } else if (table.getSelectedColumn() == 1) {
+        al.add(dups.get(i).duplicate);
+        }
         }
 
         if (OptionDialog.showQuestionDialog(ui.getMainWindow(), "Are you sure you want to delete " + al.size() + " file(s)?")) {
-            int deleted = 0;
+        int deleted = 0;
 
-            for (String s : al) {
-                if (!new File(s).delete()) {
-                    /*OptionDialog.showErrorDialog(ui.getMainWindow(), "Could not delete "+s+".");
-                    return;*/
-                } else {
-                    deleted++;
-                }
-            }
-
-            //duplicates that no longer have their corresponding file in share - make sure they are hashed now.
-            for (String f : filesThatNeedHashing) {
-                ui.getCore().getShareManager().getShareScanner().signalFileCreated(f);
-            }
-
-            OptionDialog.showInformationDialog(ui.getMainWindow(), deleted + "/" + al.size() + " files deleted. Note that it might take a while before the duplicate list is updated.");
-            revert();
+        for (String s : al) {
+        if (!new File(s).delete()) {
+        } else {
+        deleted++;
         }
+        }
+
+        //duplicates that no longer have their corresponding file in share - make sure they are hashed now.
+        /*for (String f : filesThatNeedHashing) {
+        ui.getCore().getShareManager().getShareScanner().signalFileCreated(f);
+        }
+
+        OptionDialog.showInformationDialog(ui.getMainWindow(), deleted + "/" + al.size() + " files deleted. Note that it might take a while before the duplicate list is updated.");
+        revert();
+        }*/
     }
 
     @Override
@@ -139,11 +132,11 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return "In share";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "share");
                 case 1:
-                    return "Duplicate";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "duplicate");
                 default:
-                    return "undefined";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -155,7 +148,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
                 case 1:
                     return dups.get(rowIndex).duplicate;
                 default:
-                    return "undefined";
+                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }

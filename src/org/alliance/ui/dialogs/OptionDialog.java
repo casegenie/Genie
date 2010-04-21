@@ -42,7 +42,6 @@ public class OptionDialog extends JDialog implements ActionListener {
     public static final int YES_NO_BUTTONS = 1;
     public static final int YES_NO_CANCEL_BUTTONS = 2;
     public static final int OK_CANCEL_BUTTONS = 3;
-    private static Class c;
     private static String[] imageForType = {"information", "question", "warning", "error"};
     private static String[] buttonTexts = {"ok", "yes_no", "yes_no_cancel", "ok_cancel"};
     private static ImageIcon[] imageIcons;
@@ -52,7 +51,6 @@ public class OptionDialog extends JDialog implements ActionListener {
     public OptionDialog(JFrame parent, String title, String message, int dialogType, int buttonType) throws Exception {
         super(parent, title, true);
         init(title, message, dialogType, buttonType);
-        c = getClass();
     }
 
     public OptionDialog(JDialog parent, String title, String message, int dialogType, int buttonType) throws Exception {

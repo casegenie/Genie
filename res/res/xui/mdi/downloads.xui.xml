@@ -1,14 +1,13 @@
 <xui>
-    <title value=""/>
     <body>
         <popupmenu id="popup" detached="yes">
-            <menuitem image="gfx/icons/cleanup.png" text="Clear Completed" eventid="cleanup"/>
-            <menuitem image="gfx/icons/delete.png" text="Remove" eventid="remove"/>
-            <menuitem image="gfx/icons/up.png" text="Move Up" eventid="moveUp"/>
-            <menuitem image="gfx/icons/down.png" text="Move Down" eventid="moveDown"/>
-            <menuitem image="gfx/icons/top.png" text="Move To Top" eventid="moveTop"/>
-            <menuitem image="gfx/icons/bottom.png" text="Move To Bottom" eventid="moveBottom"/>
-            <menuitem image="gfx/icons/loadingsharenode.png" text="Open file/folder" eventid="openfile"/>
+            <menuitem image="gfx/icons/cleanup.png" text="%text%" eventid="cleanup"/>
+            <menuitem image="gfx/icons/delete.png" text="%text%" eventid="remove"/>
+            <menuitem image="gfx/icons/up.png" text="%text%" eventid="moveup"/>
+            <menuitem image="gfx/icons/down.png" text="%text%" eventid="movedown"/>
+            <menuitem image="gfx/icons/top.png" text="%text%" eventid="movetop"/>
+            <menuitem image="gfx/icons/bottom.png" text="%text%" eventid="movebottom"/>
+            <menuitem image="gfx/icons/loadingsharenode.png" text="%text%" eventid="openfile"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
