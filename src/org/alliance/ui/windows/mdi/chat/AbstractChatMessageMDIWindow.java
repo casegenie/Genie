@@ -89,7 +89,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         JScrollPane sp = (JScrollPane) xui.getComponent("scrollpanel");
         sp.setViewportView(textarea);
 
-        chat = (JTextField) xui.getComponent("chat1");
+        chat = (JTextField) xui.getComponent("chat");
         new CutCopyPastePopup(chat);
 
         textarea.setEditable(false);
@@ -156,6 +156,10 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         chatMessage();
     }
 
+    public void EVENT_chat(ActionEvent e) throws Exception {
+        chatMessage();
+    }
+
     private void chatClear() {
         chatLines.clear();
         regenerateHtml();
@@ -177,10 +181,6 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
             return;
         }
         send(chat.getText().replace("<", "&lt;")); //unHTML
-    }
-
-    public void EVENT_chat2(ActionEvent e) throws Exception {
-        chatMessage();
     }
 
     private String checkLinks(String text, String pString) {

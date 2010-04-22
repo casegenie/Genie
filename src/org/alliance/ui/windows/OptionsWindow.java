@@ -3,7 +3,9 @@ package org.alliance.ui.windows;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
+import java.awt.Component;
 import static org.alliance.core.CoreSubsystem.KB;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.node.Friend;
 import org.alliance.core.settings.My;
 import org.alliance.core.settings.Routerule;
@@ -33,6 +35,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
+import java.util.Locale;
+import javax.swing.ListCellRenderer;
 
 /**
  * Created by IntelliJ IDEA. User: maciek Date: 2006-mar-20 Time: 22:33:46 To
@@ -60,7 +64,7 @@ public class OptionsWindow extends XUIDialog {
         "internal.alwaysallowfriendsoftrustedfriendstoconnecttome",
         "internal.alwaysdenyuntrustedinvitations", "internal.rdnsname",
         "internal.pmsound", "internal.downloadsound", "internal.publicsound",
-        "internal.guiskin"};
+        "internal.guiskin", "internal.language"};
     private UISubsystem ui;
     private HashMap<String, JComponent> components = new HashMap<String, JComponent>();
     private JList ruleList;
@@ -80,10 +84,10 @@ public class OptionsWindow extends XUIDialog {
 
         nickname = (JTextField) xui.getComponent("my.nickname");
         downloadFolder = (JTextField) xui.getComponent("internal.downloadfolder");
-     
-        ruleList = (JList) xui.getComponent("ruleList");           
+
+        ruleList = (JList) xui.getComponent("ruleList");
         ruleListModel = new DefaultListModel();
-      
+
         for (Routerule rule : ui.getCore().getSettings().getRulelist()) {
             ruleListModel.addElement(rule);
         }
@@ -104,11 +108,11 @@ public class OptionsWindow extends XUIDialog {
                 }
             });
         }
-      
+
         uploadThrottleBefore = ui.getCore().getSettings().getInternal().getUploadthrottle();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+        fillLanguage();
         pack();
 
         // we set this AFTER we pack the frame - so that the frame isnt made
@@ -127,6 +131,20 @@ public class OptionsWindow extends XUIDialog {
         Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(ss.width / 2 - getWidth() / 2, ss.height / 2 - getHeight() / 2);
         setVisible(true);
+    }
+
+    private void fillLanguage() {
+        JComboBox language = (JComboBox) xui.getComponent("internal.language"); 
+        File languageDir = new File(LanguageResource.LANGUAGE_PATH);
+        for (String filename : languageDir.list()) {
+            if (filename.startsWith("alliance_")) {
+                String id = filename.substring(filename.indexOf("_") + 1, filename.lastIndexOf("."));
+                Locale l = new Locale(id);
+                if (!l.getDisplayLanguage().equalsIgnoreCase(id)) {
+                    language.addItem(l.getDisplayLanguage());
+                }
+            }
+        }
     }
 
     private String getSettingValue(String k) throws Exception {
@@ -199,7 +217,7 @@ public class OptionsWindow extends XUIDialog {
         }
 
         Settings settings = ui.getCore().getSettings();
-       
+
         ui.getCore().getFriendManager().getMe().setNickname(nickname.getText());
         if (ui.getNodeTreeModel(false) != null) {
             ui.getNodeTreeModel(false).signalNodeChanged(
@@ -220,7 +238,7 @@ public class OptionsWindow extends XUIDialog {
         ui.getCore().saveSettings();
         return true;
     }
-     
+
     private boolean nicknameIsOk() {
         if (nickname.getText().equals(My.UNDEFINED_NICKNAME)) {
             OptionDialog.showErrorDialog(ui.getMainWindow(),
@@ -261,7 +279,7 @@ public class OptionsWindow extends XUIDialog {
             return ((JCheckBox) c).isSelected() ? 1 : 0;
         }
         if (c instanceof JComboBox) {
-            if (components.get("internal.guiskin").equals(c)) {
+            if (components.get("internal.guiskin").equals(c) || components.get("internal.language").equals(c)) {
                 return ((JComboBox) c).getSelectedItem();
             } else {
                 return "" + ((JComboBox) c).getSelectedIndex();
@@ -275,7 +293,7 @@ public class OptionsWindow extends XUIDialog {
         k = k.substring(k.indexOf('.') + 1);
         SettingClass setting = getSettingClass(clazz);
         setting.setValue(k, val);
-    }   
+    }
 
     public void EVENT_addrule(ActionEvent e) throws Exception {
         AddRuleWindow window = new AddRuleWindow(ui);
@@ -346,7 +364,7 @@ public class OptionsWindow extends XUIDialog {
             downloadFolder.setText(path);
         }
     }
-   
+
     private void browseSound(String s) {
         JFileChooser fc = new JFileChooser("");
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -399,7 +417,7 @@ public class OptionsWindow extends XUIDialog {
         ((JTextField) xui.getComponent("internal.downloadsound")).setText("");
         ((JTextField) xui.getComponent("internal.publicsound")).setText("");
     }
-       
+
     private void checkCheckBoxStatus() {
         if (getComponentValue(components.get("internal.alwaysallowfriendsoffriendstoconnecttome")).toString().equalsIgnoreCase("1")) {
             setComponentValue(components.get("internal.alwaysallowfriendsoftrustedfriendstoconnecttome"), "false");

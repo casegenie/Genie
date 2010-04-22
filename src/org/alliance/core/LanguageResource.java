@@ -4,6 +4,7 @@ import com.stendahls.XUI.XUIElement;
 import com.stendahls.ui.JHtmlLabel;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -26,17 +27,27 @@ import javax.swing.border.TitledBorder;
  */
 public class LanguageResource {
 
+    public static final String LANGUAGE_PATH = "language/";
     private static ResourceBundle LANGUAGE_BUNDLE;
     private static final String PACKAGES_HEAD = "org.alliance.";
     private static final String MISSING_TEXT = "%Missing translation!%";
 
-    public LanguageResource() {
-        try {
-            URL[] url = {new File("language/").toURI().toURL()};
-            LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", Locale.UK, new URLClassLoader(url));
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
+    public LanguageResource(String language) throws MalformedURLException {
+        URL[] url = {new File(LANGUAGE_PATH).toURI().toURL()};
+        Locale locale = null;
+        Locale def = Locale.getDefault();
+        Locale.setDefault(Locale.ENGLISH);
+        for (Locale l : Locale.getAvailableLocales()) {
+            if (l.getDisplayLanguage().equalsIgnoreCase(language)) {
+                locale = l;
+                break;
+            }
         }
+        Locale.setDefault(def);
+        if (locale == null) {
+            locale = Locale.ENGLISH;
+        }
+        LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", locale, new URLClassLoader(url));
     }
 
     public static String getLocalizedString(Class<?> c, String key) {
@@ -113,8 +124,6 @@ public class LanguageResource {
                 }
                 continue;
             }
-//            System.out.println(element.getId());
-//            System.out.println(element.getComponent());
         }
     }
 
@@ -129,7 +138,11 @@ public class LanguageResource {
         sb.deleteCharAt(sb.length() - 1);
         String localized = null;
         try {
-            localized = LANGUAGE_BUNDLE.getString(sb.toString());
+            try {
+                localized = new String(LANGUAGE_BUNDLE.getString(sb.toString()).getBytes("ISO-8859-1"), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                localized = LANGUAGE_BUNDLE.getString(sb.toString());
+            }
         } catch (MissingResourceException e) {
             //Test if getClass() is invoked by inherited methods from extended class that belongs to alliance package
             if (c.getSuperclass() != null && c.getSuperclass().getName().startsWith(PACKAGES_HEAD)) {

@@ -1,7 +1,6 @@
 <xui>
-    <title value="Options" image="gfx/icons/alliance.png"/>
     <body>
-        <tabbedpanel height="600" id="tab">
+        <tabbedpanel height="700" id="tab">
             <tab text="General" tooltip="General options">
                 <panel axis="y" bordertype="etched" bordertitle="Personal information">
                     <form expand="horiz" border="5">
@@ -23,6 +22,29 @@
                     <panel axis="x">
                         <mlabel html="true">
                             Note that your nickname can be seen by second degree friends in the network.
+                        </mlabel>
+                    </panel>
+                </panel>
+                <panel axis="y" bordertype="etched" bordertitle="Language">
+                    <form expand="horiz" border="5">
+                        <row>
+                            <cell>
+                                <panel border="0" axis="y">
+                                    <filler/>
+                                    <label text="Language: "/>
+                                </panel>
+                            </cell>
+                            <cell>
+                                <panel border="0" axis="x">
+                                    <filler axis="x"/>
+                                    <dropdown width="250" minwidth="250" id="internal.language"/>
+                                </panel>
+                            </cell>
+                        </row>
+                    </form>
+                    <panel axis="x">
+                        <mlabel html="true">
+                            Restart needed.
                         </mlabel>
                     </panel>
                 </panel>

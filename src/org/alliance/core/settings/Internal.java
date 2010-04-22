@@ -105,6 +105,7 @@ public class Internal extends SettingClass {
     private String serverlistenip = "";
     private Integer enableiprules = 0;
     private String guiskin = "Alliance";
+    private String language = "English";
 
     public Internal() {
     }
@@ -594,5 +595,13 @@ public class Internal extends SettingClass {
 
     public void setGuiskin(String guiskin) {
         this.guiskin = guiskin;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }

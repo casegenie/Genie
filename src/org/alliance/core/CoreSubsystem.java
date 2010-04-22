@@ -77,7 +77,6 @@ public class CoreSubsystem implements Subsystem {
     public final static int BLOCK_SIZE = MB;
     public final static String ERROR_URL = "http://maciek.tv/alliance/errorreporter/";
     private ResourceLoader rl;
-    private LanguageResource langRes;
     private FriendManager friendManager;
     private FileManager fileManager;
     private NetworkManager networkManager;
@@ -107,8 +106,7 @@ public class CoreSubsystem implements Subsystem {
         if (params != null && params.length >= 2 && params[1] != null) {
             progress = (StartupProgressListener) params[1];
         }
-        langRes = new LanguageResource();
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingcore"));
+        progress.updateProgress(".");
         setupLog();
         if (T.t && !isRunningAsTestSuite()) {
             final TraceHandler old = Trace.handler;
@@ -124,6 +122,7 @@ public class CoreSubsystem implements Subsystem {
                 }
             };
         }
+        progress.updateProgress("..");
 
         if (T.t) {
             T.info("CoreSubsystem starting...");
@@ -133,8 +132,10 @@ public class CoreSubsystem implements Subsystem {
         this.settingsFile = String.valueOf(params[0]);
 
         Thread.currentThread().setName("Booting Core");
-
+        progress.updateProgress("...");
         loadSettings();
+        new LanguageResource(settings.getInternal().getLanguage());
+        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingcore"));
 
         fileManager = new FileManager(this, settings);
         friendManager = new FriendManager(this, settings);

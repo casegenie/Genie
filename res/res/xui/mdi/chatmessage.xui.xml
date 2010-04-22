@@ -9,7 +9,7 @@
             </scrollpanel>
         </panel>
         <panel id="themed" axis="x" expand="horiz">
-            <textfield eventid="chat1"/>
+            <textfield eventid="chat"/>
             <strut width="5"/>
             <button eventid="send" text="%text%"/>
         </panel>
