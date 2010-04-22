@@ -41,13 +41,11 @@ public class FolderNode extends SearchTreeNode {
 
     @Override
     public TreeNode getChildAt(int childIndex) {
-//        if (shouldDelegate()) getDelegate().getChildAt(childIndex);
         return children.get(childIndex);
     }
 
     @Override
     public int getChildCount() {
-//        if (shouldDelegate()) getDelegate().getChildCount();
         return children.size();
     }
 
@@ -58,25 +56,21 @@ public class FolderNode extends SearchTreeNode {
 
     @Override
     public int getIndex(TreeNode node) {
-//        if (shouldDelegate()) getDelegate().getIndex(node);
         return children.indexOf(node);
     }
 
     @Override
     public boolean getAllowsChildren() {
-//        if (shouldDelegate()) getDelegate().getAllowsChildren();
         return true;
     }
 
     @Override
     public boolean isLeaf() {
-//        if (shouldDelegate()) getDelegate().isLeaf();
         return children.size() == 0;
     }
 
     @Override
     public Enumeration children() {
-//        if (shouldDelegate()) getDelegate().children();
         return EnumerationIteratorConverter.enumeration(children.iterator());
     }
 
@@ -101,19 +95,16 @@ public class FolderNode extends SearchTreeNode {
 
     @Override
     public String toString() {
-//        if (shouldDelegate()) return getDelegate().getName();
         return name;
     }
 
     @Override
     public String getName() {
-//        if (shouldDelegate()) getDelegate().getName();
         return name;
     }
 
     @Override
     public double getSources() {
-//        if (shouldDelegate()) getDelegate().getSources();
         return totalHits / children.size();
     }
 
@@ -128,24 +119,14 @@ public class FolderNode extends SearchTreeNode {
 
     @Override
     public long getSize() {
-//        if (shouldDelegate()) getDelegate().getSize();
         return totalSize;
     }
 
     @Override
     public int getDaysAgo() {
-//        if (shouldDelegate()) getDelegate().getDaysAgo();
         return newestDaysAgo;
     }
 
-//    private FileNode getDelegate() {
-//        if(T.t) T.ass(shouldDelegate(),"Should not delegate now!");
-//        return children.get(0);
-//    }
-//
-//    private boolean shouldDelegate() {
-//        return children.size() == 1;
-//    }
     public boolean containedInShare(CoreSubsystem core) {
         for (Hash h : mapping.keySet()) {
             if (!core.getFileManager().getFileDatabase().contains(h)) {

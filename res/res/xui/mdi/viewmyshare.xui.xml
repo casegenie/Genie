@@ -1,10 +1,9 @@
 <xui>
-    <title value=""/>
     <body>
         <popupmenu id="popupme" detached="yes">
-            <menuitem image="gfx/icons/sendtochat.png" text="Send as link to chat" eventid="sendtochat"/>
-            <menuitem image="gfx/icons/download.png" text="Create link on hdd" eventid="linktohdd"/>
-            <menuitem image="gfx/icons/loadingsharenode.png" text="Open file/folder" eventid="openfile"/>
+            <menuitem image="gfx/icons/sendtochat.png" text="%text%" eventid="sendtochat"/>
+            <menuitem image="gfx/icons/download.png" text="%text%" eventid="linktohdd"/>
+            <menuitem image="gfx/icons/loadingsharenode.png" text="%text%" eventid="openfile"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
@@ -13,13 +12,13 @@
             <scrollpanel expand="both" scrollbars="optional" id="treepanel" bordertype="lowered">
                 <panel axis="x">
                     <filler/>
-                    <label text="Please wait..."/>
+                    <label id="wait" text="%text%"/>
                     <filler/>
                 </panel>
             </scrollpanel>
         </panel>
         <panel id="themed" border="5" axis="x" expand="horiz">
-            <label border="0" image="gfx/icons/tip.png" text="Tip: Right click on a folder or file to send it as a link to the chat!"/>
+            <label id="tip" border="0" image="gfx/icons/tip.png" text="%text%"/>
             <filler/>
         </panel>
         <panel axis="x" opaque="false" border="8,6,0,1" expand="horiz">

@@ -1,8 +1,7 @@
 <xui>
-    <title value=""/>
     <body>
         <popupmenu id="popup" detached="yes">
-            <menuitem image="gfx/icons/download.png" text="Download" eventid="download"/>
+            <menuitem image="gfx/icons/download.png" text="%text%" eventid="download"/>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <toolbar opaque="false" id="toolbar" expand="horiz"/>
@@ -11,7 +10,7 @@
             <scrollpanel expand="both" scrollbars="optional" id="treepanel" bordertype="lowered">
                 <panel axis="x">
                     <filler/>
-                    <label text="Please wait..."/>
+                    <label id="wait" text="%text%"/>
                     <filler/>
                 </panel>
             </scrollpanel>
@@ -20,9 +19,7 @@
             <image src="gfx/icons/tip.png"/>
             <strut width="3"/>
             <panel opaque="false" axis="y" border="0,0,0,0" expand="horiz">
-                <mlabel html="yes" id="chatmessage">
-                    Tip: Right click on a folder or file to download it. You can also [a href=c]start a private chat[/a] with this user.
-                </mlabel>
+                <mlabel html="yes" id="chatmessage"/>
             </panel>
             <filler/>
         </panel>

@@ -1,5 +1,6 @@
 package org.alliance.ui.windows.mdi.search;
 
+import org.alliance.core.LanguageResource;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.PacedRunner;
 import org.alliance.core.comm.SearchHit;
@@ -61,19 +62,19 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
     public String getColumnName(int columnIndex) {
         switch (columnIndex) {
             case 0:
-                return "File";
+                return LanguageResource.getLocalizedString(getClass(), "file");
             case 1:
-                return "Size";
+                return LanguageResource.getLocalizedString(getClass(), "size");
             case 2:
-                return "Type";
+                return LanguageResource.getLocalizedString(getClass(), "type");
             case 3:
-                return "Days ago";
+                return LanguageResource.getLocalizedString(getClass(), "days");
             case 4:
                 return "#";
             case 5:
-                return "Speed";
+                return LanguageResource.getLocalizedString(getClass(), "speed");
             default:
-                return "undefined";
+                return LanguageResource.getLocalizedString(getClass(), "undefined");
         }
     }
 

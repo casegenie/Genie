@@ -1,6 +1,7 @@
 package org.alliance.ui.windows.mdi.viewshare;
 
 import com.stendahls.nif.util.EnumerationIteratorConverter;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.comm.rpc.GetDirectoryListing;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
@@ -54,7 +55,7 @@ public abstract class ViewShareTreeNode implements ViewShareIdentifiableTreeNode
                                 f.getFriendConnection().send(new GetDirectoryListing(getShareBaseIndex(), getFileItemPath()));
                             } else {
                                 OptionDialog.showInformationDialog(root.getModel().getUi().getMainWindow(),
-                                        f.getNickname() + " has gone offline!");
+                                        LanguageResource.getLocalizedString(getClass(), "offline", f.getNickname()));
                             }
                         } else {
                             ShareBase sb = root.getModel().getCore().getShareManager().getBaseByIndex(getShareBaseIndex());
@@ -90,7 +91,7 @@ public abstract class ViewShareTreeNode implements ViewShareIdentifiableTreeNode
                 @Override
                 public void run() {
                     if (children.size() == 0) {
-                        children.add(new ViewShareLoadingNode(root, ViewShareTreeNode.this));
+                        children.add(new ViewShareLoadingNode(LanguageResource.getLocalizedString(getClass(), "loading"), root, ViewShareTreeNode.this));
                         root.getModel().nodeStructureChanged(ViewShareTreeNode.this);
                     }
                 }

@@ -3,6 +3,7 @@ package org.alliance.ui.windows.mdi.viewshare;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.comm.rpc.GetHashesForPath;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.file.hash.Hash;
@@ -61,6 +62,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
     public ViewShareMDIWindow(final UISubsystem ui, Node remote) throws Exception {
         super(ui.getMainWindow().getMDIManager(), (remote instanceof MyNode) ? "viewmyshare" : "viewshare", ui);
         this.remote = remote;
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         setTitle(remote.getNickname());
 
         iconLoading = new ImageIcon(ui.getRl().getResource("gfx/icons/loadingsharenode.png"));
@@ -121,6 +123,10 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
 
         if (!(remote instanceof MyNode)) {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
+            StringBuilder sb = new StringBuilder();
+            sb.append(LanguageResource.getLocalizedString(getClass(), "tip")).append(" ");
+            sb.append("[a href=c]").append(LanguageResource.getLocalizedString(getClass(), "chat")).append("[/a]");
+            l.setText(sb.toString());
             l.addHyperlinkListener(new HyperlinkListener() {
 
                 @Override
@@ -137,13 +143,19 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         }
 
         JLabel status = (JLabel) xui.getComponent("status");
-        status.setText(TextUtils.formatByteSize(remote.getShareSize()) + " in " + remote.getNumberOfFilesShared() + " files"); //Bastvera (Share files counter)
+        status.setText(LanguageResource.getLocalizedString(getClass(), "shares", TextUtils.formatByteSize(remote.getShareSize()),
+                Integer.toString(remote.getNumberOfFilesShared())));
+
         status = (JLabel) xui.getComponent("status2");
-        status.setText("Uploaded: " + TextUtils.formatByteSize(remote.getTotalBytesSent()) + " (" + TextUtils.formatByteSize((long) remote.getHighestOutgoingCPS()) + "/s)");
+        status.setText(LanguageResource.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(remote.getTotalBytesSent()),
+                TextUtils.formatByteSize((long) remote.getHighestOutgoingCPS())));
+
         status = (JLabel) xui.getComponent("status3");
-        status.setText("Downloaded: " + TextUtils.formatByteSize(remote.getTotalBytesReceived()) + " (" + TextUtils.formatByteSize((long) remote.getHighestIncomingCPS()) + "/s)");
+        status.setText(LanguageResource.getLocalizedString(getClass(), "downtotal", TextUtils.formatByteSize(remote.getTotalBytesReceived()),
+                TextUtils.formatByteSize((long) remote.getHighestIncomingCPS())));
+
         status = (JLabel) xui.getComponent("status4");
-        status.setText(remote.getNumberOfInvitedFriends() + " friends invited");
+        status.setText(LanguageResource.getLocalizedString(getClass(), "invites", Integer.toString(remote.getNumberOfInvitedFriends())));
 
         postInit();
     }
@@ -177,19 +189,15 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only open one folder or file");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onlyone"));
             return;
         }
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
         String path = ui.getCore().getShareManager().getBaseByIndex(node.getShareBaseIndex()).getPath() + "/" + node.getFileItemPath();
         try {
             Desktop.getDesktop().open(new File(path));
-        } catch (IOException ex) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
-        } catch (IllegalArgumentException ex) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "This type of file hasn't been associated with any program");
-        } catch (UnsupportedOperationException ex) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "This operation is not supported on this architecture");
+        } catch (Exception ex) {
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "openerror"));
         }
     }
 
@@ -201,13 +209,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only send one folder or file to the chat");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onesend"));
             return;
         }
 
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
         if (!(node instanceof ViewShareFileNode)) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can not send entire root folders to the chat");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "senderror"));
             return;
         }
 
@@ -255,13 +263,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can only save link to one folder or file.");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onehdd"));
             return;
         }
 
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
         if (!(node instanceof ViewShareFileNode)) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), "You can not save link for entire root folders.");
+            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "hdderror"));
             return;
         }
 
@@ -318,7 +326,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         for (TreePath p : tree.getSelectionPaths()) {
             ViewShareTreeNode n = (ViewShareTreeNode) p.getLastPathComponent();
             if (!(n instanceof ViewShareFileNode)) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), "You can not download entire root folders");
+                OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notroot"));
                 return;
             }
         }
@@ -397,9 +405,9 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                     setIcon(fileTypeIcons[FileType.getByFileName(n.getName()).id()]);
                     long size = n.getSize();
                     if (size > 0) {
-                        setToolTipText("Size: " + TextUtils.formatByteSize(n.getSize()));
+                        setToolTipText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "filesize", TextUtils.formatByteSize(n.getSize())));
                     } else {
-                        setToolTipText("Size: N/A");
+                        setToolTipText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "filesizena"));
                     }
                 } else {
                     if (expanded) {

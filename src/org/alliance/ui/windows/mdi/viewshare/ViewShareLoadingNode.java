@@ -8,8 +8,8 @@ package org.alliance.ui.windows.mdi.viewshare;
  */
 public class ViewShareLoadingNode extends ViewShareFileNode {
 
-    public ViewShareLoadingNode(ViewShareRootNode root, ViewShareTreeNode parent) {
-        super("Loading...", 0L, root, parent);
+    public ViewShareLoadingNode(String text, ViewShareRootNode root, ViewShareTreeNode parent) {
+        super(text, 0L, root, parent);
     }
 
     @Override

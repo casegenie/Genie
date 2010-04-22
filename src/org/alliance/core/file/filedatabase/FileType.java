@@ -1,5 +1,7 @@
 package org.alliance.core.file.filedatabase;
 
+import org.alliance.core.LanguageResource;
+
 /**
  * Created by IntelliJ IDEA.
  * User: maciek
@@ -9,15 +11,15 @@ package org.alliance.core.file.filedatabase;
  */
 public enum FileType {
 
-    EVERYTHING("All Files", 0, new FileTypeIdentifier() {
+    EVERYTHING("everything", 0, new FileTypeIdentifier() {
 
 @Override
 public boolean matches(String s) {
     return true;
 }
 }),
-    AUDIO("Audio", 1, new ExtensionFileType(new String[]{"mp3", "mp4", "wav", "acc", "ogg", "asf", "wma", "aiff"})),
-    ARCHIVE("Archives", 4, new ExtensionFileType(new String[]{"rar", "zip", "tar", "gz", "7z"}) {
+    AUDIO("audio", 1, new ExtensionFileType(new String[]{"mp3", "mp4", "wav", "acc", "ogg", "asf", "wma", "aiff"})),
+    ARCHIVE("archive", 4, new ExtensionFileType(new String[]{"rar", "zip", "tar", "gz", "7z"}) {
 
 @Override
 public boolean matches(String s) {
@@ -30,17 +32,17 @@ public boolean matches(String s) {
     return true;
 }
 }),
-    CDDVD("CD/DVD Images", 3, new ExtensionFileType(new String[]{"iso", "img", "bin", "cue", "mdf", "mds"})),
-    DOCUMENT("Documents", 6, new ExtensionFileType(new String[]{"doc", "txt", "nfo"})),
-    IMAGE("Pictures", 5, new ExtensionFileType(new String[]{"jpg", "jpeg", "gif", "png", "bmp", "tiff"})),
-    PRESENTATION("Presentations", 7, new ExtensionFileType(new String[]{"key", "pps", "ppt"})),
-    VIDEO("Video", 2, new ExtensionFileType(new String[]{"avi", "mkv", "mpg", "mpeg", "mov", "asf", "wmv", "divx", "xvid", "rmvb", "rm", "ogm"}));
+    CDDVD("cddvd", 3, new ExtensionFileType(new String[]{"iso", "img", "bin", "cue", "mdf", "mds"})),
+    DOCUMENT("document", 6, new ExtensionFileType(new String[]{"doc", "txt", "nfo"})),
+    IMAGE("image", 5, new ExtensionFileType(new String[]{"jpg", "jpeg", "gif", "png", "bmp", "tiff"})),
+    PRESENTATION("presentation", 7, new ExtensionFileType(new String[]{"key", "pps", "ppt"})),
+    VIDEO("video", 2, new ExtensionFileType(new String[]{"avi", "mkv", "mpg", "mpeg", "mov", "asf", "wmv", "divx", "xvid", "rmvb", "rm", "ogm"}));
     private final String description;
     private final byte id;
     private final FileTypeIdentifier fileTypeIdentifier;
 
     FileType(String description, int id, FileTypeIdentifier fileTypeIdentifier) {
-        this.description = description;
+        this.description = LanguageResource.getLocalizedString(getClass(), description);
         this.id = (byte) id;
         this.fileTypeIdentifier = fileTypeIdentifier;
     }

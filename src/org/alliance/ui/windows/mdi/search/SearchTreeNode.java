@@ -1,5 +1,7 @@
 package org.alliance.ui.windows.mdi.search;
 
+import org.alliance.core.LanguageResource;
+
 import javax.swing.tree.TreeNode;
 
 /**
@@ -25,7 +27,7 @@ public abstract class SearchTreeNode implements TreeNode {
             case 5:
                 return getSpeed();
             default:
-                return "Undefined";
+                return LanguageResource.getLocalizedString(getClass(), "undefined");
         }
     }
 

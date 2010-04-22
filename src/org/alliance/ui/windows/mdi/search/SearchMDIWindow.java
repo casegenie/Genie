@@ -3,6 +3,7 @@ package org.alliance.ui.windows.mdi.search;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
+import org.alliance.core.LanguageResource;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.PacedRunner;
@@ -63,8 +64,9 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
     public SearchMDIWindow(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "search", ui);
-
         this.ui = ui;
+        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+
         fileTypeIcons = new ImageIcon[8];
         for (int i = 0; i < fileTypeIcons.length; i++) {
             fileTypeIcons[i] = new ImageIcon(ui.getRl().getResource("gfx/filetypes/" + i + ".png"));
@@ -77,7 +79,19 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
         pacedRunner = new PacedRunner(500);
 
+        StringBuilder sb = new StringBuilder();
+        sb.append(LanguageResource.getLocalizedString(getClass(), "look")).append(" &#160; ");
+        sb.append("[a href=\"http://").append(FileType.VIDEO.id()).append("\"]").append(FileType.VIDEO.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.AUDIO.id()).append("\"]").append(FileType.AUDIO.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.CDDVD.id()).append("\"]").append(FileType.CDDVD.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.IMAGE.id()).append("\"]").append(FileType.IMAGE.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.DOCUMENT.id()).append("\"]").append(FileType.DOCUMENT.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.ARCHIVE.id()).append("\"]").append(FileType.ARCHIVE.description()).append("[/a] &#160; ");
+        sb.append("[a href=\"http://").append(FileType.PRESENTATION.id()).append("\"]").append(FileType.PRESENTATION.description()).append("[/a][br]");
+        sb.append(LanguageResource.getLocalizedString(getClass(), "tip"));
+
         JHtmlLabel label = (JHtmlLabel) xui.getComponent("label");
+        label.setText(sb.toString());
         label.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
@@ -94,7 +108,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                         ui.handleErrorInEventLoop(e1);
                     }
                 } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-                    ui.getMainWindow().setStatusMessage("Click here to search for new and popular files in type " + ft.description());
+                    ui.getMainWindow().setStatusMessage(LanguageResource.getLocalizedString(getClass(), "search", ft.description()));
                 }
             }
         });
@@ -147,8 +161,11 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                             FileNode fn = (FileNode) n;
                             double d = fn.getTotalMaxCPS();
                             double r = ui.getCore().getSettings().getInternal().getRecordinspeed();
-                            left.setText("<html>" + fn.getListOfUsers(ui.getCore()) + " (Max speed: <b>" + TextUtils.formatByteSize((long) d) + "/s</b>, ETA: " +
-                                    formatETA((int) Math.round(fn.getSize() / (d > r ? r : d))) + "</font>)</html>");
+                            StringBuilder sb = new StringBuilder("<html>");
+                            sb.append(fn.getListOfUsers(ui.getCore()));
+                            sb.append(" (").append(LanguageResource.getLocalizedString(getClass(), "speed")).append(" <b>").append(TextUtils.formatByteSize((long) d)).append("/s</b>, ");
+                            sb.append(LanguageResource.getLocalizedString(getClass(), "eta")).append(" ").append(formatETA((int) Math.round(fn.getSize() / (d > r ? r : d)))).append("</font>)</html>");
+                            left.setText(sb.toString());
                             right.setText("<html><b>" + simplifyPath(fn) + "</b></html>");
                         }
                     }
@@ -229,8 +246,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         for (FileType v : FileType.values()) {
             type.addItem(v.description());
         }
-
-        setTitle("File search");
+        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
         postInit();
     }
 
@@ -267,9 +283,9 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                 final String path = getPathIfPathSelected(i);
                 for (final FileNode n : getFileNodesByRow(i)) {
                     if (ui.getCore().getFileManager().containsComplete(n.getSh().getRoot())) {
-                        ui.getCore().getUICallback().statusMessage("You already have the file " + n.getName() + "!");
+                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "have", n.getName()));
                     } else if (ui.getCore().getNetworkManager().getDownloadManager().getDownload(n.getSh().getRoot()) != null) {
-                        ui.getCore().getUICallback().statusMessage("You are already downloading " + n.getName() + "!");
+                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "download", n.getName()));
                     } else {
                         ui.getCore().invokeLater(new Runnable() {
 
@@ -346,7 +362,6 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
     private void search(String text) throws IOException {
         search(text, FileType.values()[type.getSelectedIndex()]);
-//        if (keywords.isSelected()) search.setText("");
     }
 
     public void searchForNewFilesOfType(FileType ft) throws IOException {
@@ -358,9 +373,10 @@ public class SearchMDIWindow extends AllianceMDIWindow {
 
         String s;
         if (t.trim().length() == 0) {
-            s = "Searching for all files of type " + ft.description();
+
+            s = LanguageResource.getLocalizedString(getClass(), "searchall", ft.description());
         } else {
-            s = "Searching for " + t + " in " + ft.description() + "...";
+            s = LanguageResource.getLocalizedString(getClass(), "searchtype", t, ft.description());
         }
         left.setText(s);
         table.setTreeTableModel(model = new SearchTreeTableModel(ui.getCore(), pacedRunner));
@@ -468,7 +484,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
             int val = (Integer) value;
             if (val == 255) {
-                setText("Old");
+                setText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "dayold"));
             } else {
                 setText(String.valueOf(val));
             }
