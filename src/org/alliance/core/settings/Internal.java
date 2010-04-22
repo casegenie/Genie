@@ -105,7 +105,7 @@ public class Internal extends SettingClass {
     private String serverlistenip = "";
     private Integer enableiprules = 0;
     private String guiskin = "Alliance";
-    private String language = "English";
+    private String language = "en";
 
     public Internal() {
     }

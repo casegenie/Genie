@@ -35,15 +35,12 @@ public class LanguageResource {
     public LanguageResource(String language) throws MalformedURLException {
         URL[] url = {new File(LANGUAGE_PATH).toURI().toURL()};
         Locale locale = null;
-        Locale def = Locale.getDefault();
-        Locale.setDefault(Locale.ENGLISH);
         for (Locale l : Locale.getAvailableLocales()) {
-            if (l.getDisplayLanguage().equalsIgnoreCase(language)) {
+            if (language.endsWith(l.toString())) {
                 locale = l;
                 break;
             }
         }
-        Locale.setDefault(def);
         if (locale == null) {
             locale = Locale.ENGLISH;
         }

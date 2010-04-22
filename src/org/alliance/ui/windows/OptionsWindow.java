@@ -3,7 +3,6 @@ package org.alliance.ui.windows;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import com.stendahls.ui.JHtmlLabel;
-import java.awt.Component;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.LanguageResource;
 import org.alliance.core.node.Friend;
@@ -36,7 +35,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.Locale;
-import javax.swing.ListCellRenderer;
 
 /**
  * Created by IntelliJ IDEA. User: maciek Date: 2006-mar-20 Time: 22:33:46 To
@@ -134,14 +132,17 @@ public class OptionsWindow extends XUIDialog {
     }
 
     private void fillLanguage() {
-        JComboBox language = (JComboBox) xui.getComponent("internal.language"); 
+        JComboBox language = (JComboBox) xui.getComponent("internal.language");
         File languageDir = new File(LanguageResource.LANGUAGE_PATH);
         for (String filename : languageDir.list()) {
             if (filename.startsWith("alliance_")) {
                 String id = filename.substring(filename.indexOf("_") + 1, filename.lastIndexOf("."));
                 Locale l = new Locale(id);
                 if (!l.getDisplayLanguage().equalsIgnoreCase(id)) {
-                    language.addItem(l.getDisplayLanguage());
+                    language.addItem(l.getDisplayLanguage() + " - " + id);
+                    if (id.equals("en")) {
+                        language.setSelectedItem(l.getDisplayLanguage() + " - " + id);
+                    }
                 }
             }
         }
