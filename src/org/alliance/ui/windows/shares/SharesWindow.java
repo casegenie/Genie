@@ -5,27 +5,21 @@ import com.stendahls.util.TextUtils;
 import org.alliance.core.settings.Share;
 import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
-import org.alliance.ui.dialogs.AddGroupDialog;
 import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
+import org.alliance.ui.windows.EditGroupWindow;
 
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.TreeSet;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.event.MenuEvent;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.JTree;
-import javax.swing.event.MenuListener;
 import javax.swing.event.TreeExpansionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -41,14 +35,8 @@ public class SharesWindow extends XUIDialog {
     private DefaultListModel shareListModel;
     private JPopupMenu popupList;
     private JPopupMenu popupTree;
-    private JMenu addGroupMenu;
-    private JMenu removeGroupMenu;
-    private MouseAdapter addGroupAdapter;
-    private MouseAdapter removeGroupAdapter;
-    private TreeSet<String> groups = new TreeSet<String>();
     private boolean shareListHasBeenModified = false;
     private final static String PUBLIC_GROUP = "Public";
-    private final static String GROUP_SEPARATOR = ",";
 
     public SharesWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow());
@@ -71,96 +59,6 @@ public class SharesWindow extends XUIDialog {
     private void setupPopupMenu() {
         popupList = (JPopupMenu) xui.getComponent("popupList");
         popupTree = (JPopupMenu) xui.getComponent("popupTree");
-        addGroupMenu = (JMenu) xui.getComponent("addgroup");
-        removeGroupMenu = (JMenu) xui.getComponent("removegroup");
-
-        removeGroupMenu.addMenuListener(new MenuListener() {
-
-            @Override
-            public void menuSelected(MenuEvent e) {
-                String groupString = shareListModel.elementAt(shareList.getSelectedIndex() + 1).toString();
-                ArrayList<String> groupList = new ArrayList<String>();
-                for (String group : groupString.split(GROUP_SEPARATOR)) {
-                    groupList.add(group);
-                }
-                for (Component c : removeGroupMenu.getMenuComponents()) {
-                    if (c instanceof JMenuItem) {
-                        JMenuItem menuItem = (JMenuItem) c;
-                        if (groupList.contains(menuItem.getText())) {
-                            menuItem.setVisible(true);
-                        } else {
-                            menuItem.setVisible(false);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void menuDeselected(MenuEvent e) {
-            }
-
-            @Override
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
-
-        addGroupMenu.addMenuListener(new MenuListener() {
-
-            @Override
-            public void menuSelected(MenuEvent e) {
-                String groupString = shareListModel.elementAt(shareList.getSelectedIndex() + 1).toString();
-                ArrayList<String> groupList = new ArrayList<String>();
-                for (String group : groupString.split(GROUP_SEPARATOR)) {
-                    groupList.add(group);
-                }
-                for (Component c : addGroupMenu.getMenuComponents()) {
-                    if (c instanceof JMenuItem) {
-                        JMenuItem menuItem = (JMenuItem) c;
-                        if (!groupList.contains(menuItem.getText())) {
-                            menuItem.setVisible(true);
-                        } else {
-                            menuItem.setVisible(false);
-                        }
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-            @Override
-            public void menuDeselected(MenuEvent e) {
-            }
-
-            @Override
-            public void menuCanceled(MenuEvent e) {
-            }
-        });
-
-        addGroupAdapter = new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent evt) {
-                int groupRowId = shareList.getSelectedIndex() + 1;
-                String existingsGroups = shareListModel.elementAt(groupRowId).toString();
-                existingsGroups = existingsGroups.replace(PUBLIC_GROUP, "");
-                String groupString = sortGroupNames(existingsGroups + GROUP_SEPARATOR + ((JMenuItem) evt.getComponent()).getText());
-                shareListModel.setElementAt(groupString, groupRowId);
-            }
-        };
-
-        removeGroupAdapter = new MouseAdapter() {
-
-            @Override
-            public void mouseReleased(MouseEvent evt) {
-                int groupRowId = shareList.getSelectedIndex() + 1;
-                String existingsGroups = shareListModel.elementAt(groupRowId).toString();
-                existingsGroups = existingsGroups.replace(((JMenuItem) evt.getComponent()).getText(), "");
-                String groupString = sortGroupNames(existingsGroups);
-                shareListModel.setElementAt(groupString, groupRowId);
-            }
-        };
     }
 
     private void setupShareTree() {
@@ -253,14 +151,7 @@ public class SharesWindow extends XUIDialog {
         for (Share share : ui.getCore().getSettings().getSharelist()) {
             shareListModel.addElement(share.getPath());
             shareListModel.addElement(share.getSgroupname());
-            //Store all groups from this share
-            for (String group : share.getSgroupname().split(GROUP_SEPARATOR)) {
-                if (!group.equals(PUBLIC_GROUP)) {
-                    groups.add(sortGroupNames(group));
-                }
-            }
         }
-        rebuildGroupMenu();
 
         shareList.addMouseListener(new MouseAdapter() {
 
@@ -296,23 +187,6 @@ public class SharesWindow extends XUIDialog {
                 }
             }
         });
-    }
-
-    private void rebuildGroupMenu() {
-        addGroupMenu.removeAll();
-        removeGroupMenu.removeAll();
-        for (String group : groups) {
-            JMenuItem addMenu = new JMenuItem(group);
-            JMenuItem removeMenu = new JMenuItem(group);
-            addMenu.addMouseListener(addGroupAdapter);
-            removeMenu.addMouseListener(removeGroupAdapter);
-            addGroupMenu.add(addMenu);
-            removeGroupMenu.add(removeMenu);
-        }
-        addGroupMenu.addSeparator();
-        removeGroupMenu.addSeparator();
-        addGroupMenu.add(xui.getComponent("addnewgroup"));
-        removeGroupMenu.add(xui.getComponent("settopublic"));
     }
 
     public void EVENT_addshare(ActionEvent a) throws Exception {
@@ -379,55 +253,18 @@ public class SharesWindow extends XUIDialog {
         return true;
     }
 
-    public void EVENT_addnewgroup(ActionEvent a) throws Exception {
-        String newGroup = createNewGroup();
-        if (newGroup == null || newGroup.equalsIgnoreCase(PUBLIC_GROUP)) {
+    public void EVENT_changegroup(ActionEvent a) throws Exception {
+        int groupRowId = shareList.getSelectedIndex() + 1;
+        EditGroupWindow editWindow = new EditGroupWindow(ui, shareListModel.elementAt(groupRowId).toString());
+        String groupString = editWindow.getGroupString();
+        if (groupString == null) {
             return;
         }
-        int groupRowId = shareList.getSelectedIndex() + 1;
-        String existingsGroups = shareListModel.elementAt(groupRowId).toString();
-        existingsGroups = existingsGroups.replace(PUBLIC_GROUP, "");
-        String groupString = sortGroupNames(existingsGroups + GROUP_SEPARATOR + newGroup);
-        shareListModel.setElementAt(groupString, groupRowId);
-        groups.add(sortGroupNames(newGroup));
-        rebuildGroupMenu();
-    }
-
-    private String createNewGroup() throws Exception {
-        AddGroupDialog groupDialog = new AddGroupDialog(ui, null);
-        String groupString = groupDialog.getGroupname();
-        if (groupString == null || groupString.trim().length() == 0) {
-            return null;
+        if (groupString.isEmpty()) {
+            shareListModel.setElementAt(PUBLIC_GROUP, groupRowId);
+        } else {
+            shareListModel.setElementAt(groupString, groupRowId);
         }
-        if (groupString.contains(GROUP_SEPARATOR)) {
-            groupString = groupString.replace(GROUP_SEPARATOR, "");
-        }
-        return groupString.trim();
-    }
-
-    private String sortGroupNames(String groupString) {
-        TreeSet<String> groupSorted = new TreeSet<String>();
-        String[] groupsSplit = groupString.split(GROUP_SEPARATOR);
-        for (String group : groupsSplit) {
-            group = group.trim().toLowerCase();
-            if (group.length() > 1) {
-                //Uppercase 1st letter rest Lowercase 
-                groupSorted.add(Character.toUpperCase(group.charAt(0)) + group.substring(1));
-            } else if (group.length() == 1) {
-                groupSorted.add(group.toUpperCase());
-            }
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String group : groupSorted) {
-            sb.append(group.trim());
-            sb.append(GROUP_SEPARATOR);
-        }
-        try {
-            sb.deleteCharAt(sb.length() - 1);
-        } catch (StringIndexOutOfBoundsException ex) {
-            return PUBLIC_GROUP;
-        }
-        return sb.toString();
     }
 
     public void EVENT_locate(ActionEvent a) throws Exception {

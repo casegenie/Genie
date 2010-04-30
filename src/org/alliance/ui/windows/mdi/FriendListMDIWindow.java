@@ -9,6 +9,7 @@ import org.alliance.core.node.MyNode;
 import org.alliance.core.node.Node;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.OptionDialog;
+import org.alliance.ui.windows.EditGroupWindow;
 import org.alliance.ui.windows.ViewFoundVia;
 
 import java.awt.Color;
@@ -22,7 +23,7 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.TreeSet;
+import java.util.ArrayList;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
@@ -30,6 +31,11 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,8 +54,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     private ImageIcon[] friendIcons;
     private ImageIcon[] friendIconsAway;
     private ImageIcon groupIcon;
-    private Object[] selectedObjects;
     private JPopupMenu popup;
+    private boolean reSelectIndices = false;
 
     public FriendListMDIWindow() {
     }
@@ -88,21 +94,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         sb.append(ui.getCore().getFriendManager().getNFriendsConnected()).append("/").append(ui.getCore().getFriendManager().getNFriends());
         sb.append(" (").append(TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared())).append(")");
         statusright.setText(sb.toString());
-        if (selectedObjects != null) {
-            int[] selectedIndexes = new int[list.getModel().getSize()];
-            for (int i = 0; i < list.getModel().getSize(); i++) {
-
-                for (Object selection : selectedObjects) {
-                    if (list.getModel().getElementAt(i).equals(selection)) {
-                        selectedIndexes[i] = i;
-                        break;
-                    } else {
-                        selectedIndexes[i] = -1;
-                    }
-                }
-            }
-            list.setSelectedIndices(selectedIndexes);
-        }
         try {
             updateMyLevelInformation();
         } catch (IOException ex) {
@@ -110,8 +101,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     }
 
     static {
-        final SystemFlavorMap sfm =
-                (SystemFlavorMap) SystemFlavorMap.getDefaultFlavorMap();
+        final SystemFlavorMap sfm = (SystemFlavorMap) SystemFlavorMap.getDefaultFlavorMap();
         final String nat = "text/plain";
         final DataFlavor df = new DataFlavor("text/plain; charset=ASCII; class=java.io.InputStream", "Plain Text");
         sfm.addUnencodedNativeForFlavor(df, nat);
@@ -147,7 +137,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 } catch (Exception ex) {
                     ui.handleErrorInEventLoop(ex);
                 }
-                selectedObjects = list.getSelectedValues();
             }
 
             private void maybeShowPopup(MouseEvent e) {
@@ -163,10 +152,76 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     if (!b) {
                         list.getSelectionModel().setSelectionInterval(row, row);
                     }
+                    if (list.getSelectedValue() instanceof String) {
+                        return;
+                    }
                     popup.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
+
+        list.getModel().addListDataListener(new ListDataListener() {
+
+            @Override
+            public void intervalAdded(ListDataEvent e) {
+                reSelectIndices = true;
+            }
+
+            @Override
+            public void intervalRemoved(ListDataEvent e) {
+                reSelectIndices = true;
+            }
+
+            @Override
+            public void contentsChanged(ListDataEvent e) {
+                reSelectIndices = true;
+            }
+        });
+
+        list.addListSelectionListener(new ListSelectionListener() {
+
+            private Object[] lastSelected;
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!reSelectIndices) {
+                    try {
+                        lastSelected = list.getSelectedValues();
+                    } catch (ArrayIndexOutOfBoundsException ex) {
+                        //Do nothing
+                    }
+                }
+
+                if (reSelectIndices && lastSelected != null) {
+                    SwingUtilities.invokeLater(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            ArrayList<Integer> selectionList = new ArrayList<Integer>();
+                            for (int i = 0; i < list.getModel().getSize(); i++) {
+                                if (selectionList.size() == lastSelected.length) {
+                                    break;
+                                }
+                                for (Object selection : lastSelected) {
+                                    if (list.getModel().getElementAt(i).equals(selection)) {
+                                        selectionList.add(i);
+                                        break;
+                                    }
+                                }
+                            }
+
+                            int[] selectedIndices = new int[selectionList.size()];
+                            for (int i = 0; i < selectedIndices.length; i++) {
+                                selectedIndices[i] = selectionList.get(i);
+                            }
+                            list.setSelectedIndices(selectedIndices);
+                        }
+                    });
+                }
+                reSelectIndices = false;
+            }
+        });
+
         postInit();
     }
 
@@ -382,7 +437,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 if (pi != null) {
                     f.setNicknameToShowInUI(pi);
                 }
-                ui.getFriendListModel().signalFriendChanged(f);
+                ui.getFriendListModel().signalFriendChanged();
             }
         } else {
             return;
@@ -449,6 +504,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                         }
                     }
                     revert();
+                    ui.getFriendListModel().signalFriendChanged();
                 }
             } else {
                 return;
@@ -520,48 +576,26 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         }
     }
 
-    public void EVENT_editgroupname(ActionEvent e) { //Editing friends group names
+    public void EVENT_editgroupname(ActionEvent e) throws Exception {
         if (list.getSelectedValue() instanceof Friend) {
             Object[] friends = list.getSelectedValues();
             if (friends != null && friends.length > 0) {
-                //TODO: Translate Future Replacer
-                String groupname = JOptionPane.showInputDialog("Edit group name for (" + friends.length + ") friend.\nDivide multiple group names with commas.\nExample 1: music,games\nExample 2: music,games,private", ((Friend) friends[0]).getUGroupName());
-                if (groupname == null) {
+                Friend fr = (Friend) friends[0];
+                EditGroupWindow editWindow = new EditGroupWindow(ui, fr.getUGroupName());
+                String groupString = editWindow.getGroupString();
+                if (groupString == null) {
                     return;
-                }
-                if (groupname.trim().length() == 0) {
-                    groupname = "";
-                } else {
-                    TreeSet<String> groupSort = new TreeSet<String>();
-                    String[] dividegroup = groupname.split(",");
-                    for (String group : dividegroup) {
-                        if (group.trim().length() > 0) {
-                            groupSort.add(group.trim().toUpperCase().substring(0, 1) + group.trim().toLowerCase().substring(1));//Uppercase 1st letter rest Lowercase
-                        } else if (group.trim().length() == 1) {
-                            groupSort.add(group.trim().toUpperCase());
-                        }
-                    }
-                    groupname = "";
-                    for (String group : groupSort) {
-                        groupname += group.trim() + ",";
-                    }
-                    if (groupname.lastIndexOf(",") == groupname.length() - 1 && groupname.length() > 0) {
-                        groupname = groupname.substring(0, groupname.length() - 1);
-                    }
                 }
                 for (Object friend : friends) {
                     if (friend instanceof Friend) {
                         Friend f = (Friend) friend;
                         if (f != null) {
-                            f.setUGroupName(groupname);
+                            f.setUGroupName(groupString);
                         }
                     }
                 }
-                try {
-                    ui.getCore().saveSettings();
-                    revert();
-                } catch (Exception ex) {
-                }
+                ui.getFriendListModel().signalFriendChanged();
+                ui.getCore().saveSettings();
             }
         } else {
             return;
@@ -589,7 +623,6 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                 for (int x = 1; x <= text.length(); x++) {
                     if (((Friend) friend).getNickname().toLowerCase().startsWith(text.substring(0, x).toLowerCase()) && x > nhit) {
                         list.setSelectedValue(friend, true);
-                        selectedObjects = list.getSelectedValues();
                         nhit++;
                     }
                 }

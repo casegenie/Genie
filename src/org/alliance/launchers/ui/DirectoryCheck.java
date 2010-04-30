@@ -11,7 +11,7 @@ import org.alliance.launchers.OSInfo;
  */
 public class DirectoryCheck {
 
-    public static String STARTED_JAR_NAME;
+    public static String STARTED_JAR_NAME = "debug.jar";
 
     public DirectoryCheck(String[] args) {
         if (!OSInfo.isWindows()) {
@@ -46,7 +46,6 @@ public class DirectoryCheck {
             e.printStackTrace();
             T.info("There was an error restarting alliance into the current directory, probably starting from debug build");
         }
-        STARTED_JAR_NAME = "debug.jar";
     }
 
     private String pathHelper() {

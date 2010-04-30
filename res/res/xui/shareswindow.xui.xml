@@ -6,10 +6,8 @@
         <popupmenu id="popupList" detached="yes">
             <menuitem image="gfx/icons/remove.png" text="%text%" eventid="removeshare"/>
             <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="locate"/>
-            <menu id="addgroup" image="gfx/icons/editgroup.png" text="%text%">
-                <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="addnewgroup"/>
-            </menu>
-            <menu id="removegroup" image="gfx/icons/editgroup.png" text="%text%">
+            <menu id="editgroup" image="gfx/icons/editgroup.png" text="%text%">
+                <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="changegroup"/>
                 <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="settopublic"/>
             </menu>
         </popupmenu>

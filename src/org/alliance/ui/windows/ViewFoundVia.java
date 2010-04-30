@@ -43,7 +43,7 @@ public class ViewFoundVia extends XUIDialog {
         });
 
         Collection<Friend> allfriends = ui.getCore().getFriendManager().friends();
-        for (Friend friend : allfriends.toArray(new Friend[ui.getCore().getFriendManager().friends().size()])) {
+        for (Friend friend : allfriends.toArray(new Friend[allfriends.size()])) {
             if (friend.getFriendsFriend(f.getGuid()) != null) {
                 ts.add(friend);
             }

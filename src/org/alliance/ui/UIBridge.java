@@ -41,7 +41,7 @@ public class UIBridge implements UICallback {
                     ui.getNodeTreeModel(false).signalNodeChanged(node);
                 }
                 if (node instanceof Friend) {
-                    ui.getFriendListModel().signalFriendChanged((Friend) node);
+                    ui.getFriendListModel().signalFriendChanged();
                 }
             }
         });
@@ -57,7 +57,7 @@ public class UIBridge implements UICallback {
                     if (ui.getMainWindow().getFriendMDIWindow() != null) {
                         ui.getMainWindow().getFriendMDIWindow().revert();
                     }
-                    ui.getFriendListModel().signalFriendAdded(friend);
+                    ui.getFriendListModel().signalFriendAdded();
                 } catch (Exception e) {
                     ui.handleErrorInEventLoop(e);
                 }

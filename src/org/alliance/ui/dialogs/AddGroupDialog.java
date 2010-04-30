@@ -15,7 +15,7 @@ import javax.swing.JTextField;
  */
 public class AddGroupDialog extends XUIDialog {
 
-    private String groupname;
+    private String groupName;
 
     public AddGroupDialog(UISubsystem ui, JFrame f) throws Exception {
         super(ui.getRl(), ui.getRl().getResourceStream("xui/groupdialog.xui.xml"), ui.getMainWindow(), true);
@@ -24,16 +24,18 @@ public class AddGroupDialog extends XUIDialog {
         ((JTextField) xui.getComponent("customtext")).selectAll();
         ((JTextField) xui.getComponent("customtext")).requestFocus();
         setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        pack();
         display();
         this.requestFocus();
     }
 
-    public String getGroupname() {
-        return groupname;
+    public String getGroupName() {
+        return groupName;
     }
 
-    public void EVENT_confirm(ActionEvent e) {
-        groupname = ((JTextField) xui.getComponent("customtext")).getText();
+    public void EVENT_confirm(ActionEvent e) throws Exception {
+        groupName = ((JTextField) xui.getComponent("customtext")).getText();
         dispose();
     }
 }
