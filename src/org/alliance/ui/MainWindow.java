@@ -39,7 +39,7 @@ import org.alliance.ui.windows.mdi.ConsoleMDIWindow;
 import org.alliance.ui.windows.mdi.DownloadsMDIWindow;
 import org.alliance.ui.windows.mdi.DuplicatesMDIWindow;
 import org.alliance.ui.windows.ForwardInvitationDialog;
-import org.alliance.ui.windows.mdi.FriendListMDIWindow;
+import org.alliance.ui.windows.mdi.friends.FriendListMDIWindow;
 import org.alliance.ui.windows.mdi.FriendsTreeMDIWindow;
 import org.alliance.ui.windows.OptionsWindow;
 import org.alliance.ui.windows.mdi.chat.PrivateChatMessageMDIWindow;

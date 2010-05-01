@@ -25,6 +25,7 @@ public class FriendListModel extends DefaultListModel {
     private PacedRunner pacedRunner;
     private TreeSet<Friend> friendsSorted;
     private TreeSet<String> groupsSorted;
+    private ArrayList<String> hiddenGroups;
     private ArrayList<Friend> friends;
 
     public FriendListModel(CoreSubsystem core, final UISubsystem ui) {
@@ -44,6 +45,8 @@ public class FriendListModel extends DefaultListModel {
                 });
             }
         }, 1000);
+
+        hiddenGroups = new ArrayList<String>();
 
         friendsSorted = new TreeSet<Friend>(new Comparator<Friend>() {
 
@@ -68,11 +71,10 @@ public class FriendListModel extends DefaultListModel {
                 return o1.compareToIgnoreCase(o2);
             }
         });
-
         updateFriendList();
     }
 
-    public void updateFriendList() {
+    private void updateFriendList() {
         ignoreFires = true;
 
         friends = new ArrayList<Friend>(core.getFriendManager().friends());
@@ -94,25 +96,34 @@ public class FriendListModel extends DefaultListModel {
         //Draw custom groups
         if (groupsSorted.size() > 0) {
             for (String group : groupsSorted) {
-                addElement(group);
-                for (Friend f : friends) {
-                    if (f.getUGroupName().equals(group)) {
-                        addElement(f);
-                    }
-                }
+                drawGroups(group, false);
             }
         }
         groupsSorted.clear();
         //Draw no groups
-        addElement(LanguageResource.getLocalizedString(getClass(), "nogroup"));
-        for (Friend f : friends) {
-            if (f.getUGroupName().isEmpty()) {
-                addElement(f);
-            }
-        }
+        drawGroups(LanguageResource.getLocalizedString(getClass(), "nogroup"), true);
+
         friends.clear();
         ignoreFires = false;
         fireIntervalAdded(this, 0, size() - 1);
+    }
+
+    private void drawGroups(String group, boolean noGroup) {
+        int groupPosition = getSize();
+        int totalFriends = 0;
+        int onlineFriends = 0;
+        for (Friend f : friends) {
+            if (f.getUGroupName().equals(group) || (f.getUGroupName().isEmpty() && noGroup)) {
+                if (!hiddenGroups.contains(group)) {
+                    addElement(f);
+                }
+                totalFriends++;
+                if (f.isConnected()) {
+                    onlineFriends++;
+                }
+            }
+        }
+        add(groupPosition, group + " (" + onlineFriends + "/" + totalFriends + ")");
     }
 
     private void sortByRank() {
@@ -158,6 +169,16 @@ public class FriendListModel extends DefaultListModel {
 
     public void signalFriendAdded() {
         pacedRunner.invoke();
+    }
+
+    public void changeHiddenGroups(String group) {
+        group = group.substring(0, group.lastIndexOf(" "));
+        if (hiddenGroups.contains(group)) {
+            hiddenGroups.remove(group);
+        } else {
+            hiddenGroups.add(group);
+        }
+        updateFriendList();
     }
 
     @Override
