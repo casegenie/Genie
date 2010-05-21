@@ -77,7 +77,14 @@ public class LanguageResource {
             XUIElement element = (XUIElement) o;
             JComponent comp = (JComponent) element.getComponent();
             if (comp.getToolTipText() != null && !comp.getToolTipText().trim().isEmpty()) {
-                comp.setToolTipText(getResource(c, "xui", element.getId(), "tooltip"));
+                String text = getResource(c, "xui", element.getId(), "tooltip");
+                if (text.indexOf("[/") != -1) {
+                    text = text.replace("[br]", "<br>&nbsp;");
+                    text = text.replace('[', '<');
+                    text = text.replace(']', '>');
+                    text = "<html>&nbsp;" + text + "&nbsp;</html>";
+                }
+                comp.setToolTipText(text);
             }
             if (comp.getBorder() instanceof CompoundBorder) {
                 CompoundBorder b = (CompoundBorder) comp.getBorder();
@@ -156,6 +163,5 @@ public class LanguageResource {
 
     private static String getKeyHeader(Class<?> c) {
         return c.getName().substring(PACKAGES_HEAD.length()).replaceAll("\\$\\d*", "");
-
     }
 }
