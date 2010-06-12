@@ -8,6 +8,7 @@ import org.alliance.core.comm.RPC;
 import org.alliance.core.node.Friend;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 
 /**
  *
@@ -28,34 +29,41 @@ public class UserInfo extends RPC {
     @Override
     public void execute(Packet in) throws IOException {
         Friend f = con.getRemoteFriend();
-        if (f == null) {
-            //this can happen when a friend is removed using the UI. Just blow this connection away.
-            con.close();
-            return;
-        }
+
         boolean guidMismatch = false;
         int remoteGUID = in.readInt();
         if (remoteGUID != f.getGuid()) {
             if (T.t) {
                 T.warn("GUID mismatch!!! Closing connection.");
             }
-//            f.setGuid(remoteGUID);
             guidMismatch = true;
         }
 
         int port = in.readInt();
-        f.updateLastKnownHostInfo(manager.getNetMan().getSocketFor(con).getInetAddress().getHostAddress(), port);
+        String host = manager.getNetMan().getSocketFor(con).getInetAddress().getHostAddress();
         f.setShareSize(in.readLong());
-        int buildNumber = in.readInt();
-        f.setAllianceBuildNumber(buildNumber);       
+        f.setAllianceBuildNumber(in.readInt());
+        f.setTotalBytesReceived(in.readLong());
+        f.setTotalBytesSent(in.readLong());
+        f.setHighestIncomingCPS(in.readInt());
+        f.setHighestOutgoingCPS(in.readInt());
+        f.setNumberOfFilesShared(in.readInt());
+        f.setNumberOfInvitedFriends(in.readInt());
+        String dnsName = "";
+        try {
+            dnsName = in.readUTF();
+        } catch (BufferUnderflowException ex) {
+            //No DNS info = Packet from old Alliance version
+        }
+        f.updateLastKnownHostInfo(host, port, dnsName);
 
         //now that we have a good connection to friend: verify that we only have ONE connection
         if (con.getRemoteFriend().hasMultipleFriendConnections()) {
             if (T.t) {
                 T.trace("Has multple connections to a friend. Figuring out wich one of us should close the connection");
             }
-            if ((con.getDirection() == Connection.Direction.IN && con.getRemoteUserGUID() > manager.getMyGUID()) ||
-                    (con.getDirection() == Connection.Direction.OUT && manager.getMyGUID() > con.getRemoteUserGUID())) {
+            if ((con.getDirection() == Connection.Direction.IN && con.getRemoteUserGUID() > manager.getMyGUID())
+                    || (con.getDirection() == Connection.Direction.OUT && manager.getMyGUID() > con.getRemoteUserGUID())) {
                 //serveral connections. Its up to us to close one
                 if (T.t) {
                     T.info("Already connected to " + con.getRemoteFriend() + ". Closing connection");
@@ -70,8 +78,9 @@ public class UserInfo extends RPC {
         } else {
             //this is the place for an event: "FriendSuccessfullyConnected".
             core.getNetworkManager().signalFriendConnected(con.getRemoteFriend());
-
             core.getUICallback().nodeOrSubnodesUpdated(con.getRemoteFriend());
+            core.updateLastSeenOnlineFor(con.getRemoteFriend());
+            System.setProperty("alliance.network.friendsonline", "" + manager.getNFriendsConnected());
         }
     }
 
@@ -81,6 +90,13 @@ public class UserInfo extends RPC {
         p.writeInt(core.getSettings().getServer().getPort());
         p.writeLong(core.getFileManager().getFileDatabase().getShareSize());
         p.writeInt(Version.BUILD_NUMBER);
+        p.writeLong(core.getNetworkManager().getBandwidthIn().getTotalBytes());
+        p.writeLong(core.getNetworkManager().getBandwidthOut().getTotalBytes());
+        p.writeInt((int) Math.round(core.getNetworkManager().getBandwidthIn().getHighestCPS()));
+        p.writeInt((int) Math.round(core.getNetworkManager().getBandwidthOut().getHighestCPS()));
+        p.writeInt(core.getFileManager().getFileDatabase().getNumberOfShares());
+        p.writeInt(core.getSettings().getMy().getInvitations());
+        p.writeUTF(core.getSettings().getServer().getDnsname());
         return p;
     }
 }

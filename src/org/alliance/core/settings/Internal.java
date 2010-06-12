@@ -102,10 +102,15 @@ public class Internal extends SettingClass {
     //This is here because if we download the last block of a 4Gb file we seek to 4Gb into
     //an empry file. This makes XP grind to a halt. 100 means expand 100mb per block at most
     private Integer uploadthrottle = 0; //zero to disable
-    private String serverlistenip = "";
     private Integer enableiprules = 0;
+    private Integer allnic = 0;
     private String guiskin = "Alliance";
     private String language = "en";
+    private String globalfont = "";
+    private Integer globalsize = 12;
+    private String chatfont = "";
+    private Integer chatsize = 12;
+    private Integer firststart = 1;
 
     public Internal() {
     }
@@ -437,14 +442,6 @@ public class Internal extends SettingClass {
         this.rdnsname = rdnsname;
     }
 
-    public String getServerlistenip() {
-        return serverlistenip;
-    }
-
-    public void setServerlistenip(String serverlistenip) {
-        this.serverlistenip = serverlistenip;
-    }
-
     public Integer getTotalmegabytesdownloaded() {
         return totalmegabytesdownloaded;
     }
@@ -603,5 +600,53 @@ public class Internal extends SettingClass {
 
     public void setLanguage(String language) {
         this.language = language;
+    }
+
+    public Integer getAllnic() {
+        return allnic;
+    }
+
+    public void setAllnic(Integer allnic) {
+        this.allnic = allnic;
+    }
+
+    public String getChatfont() {
+        return chatfont;
+    }
+
+    public void setChatfont(String chatfont) {
+        this.chatfont = chatfont;
+    }
+
+    public Integer getChatsize() {
+        return chatsize;
+    }
+
+    public void setChatsize(Integer chatsize) {
+        this.chatsize = chatsize;
+    }
+
+    public String getGlobalfont() {
+        return globalfont;
+    }
+
+    public void setGlobalfont(String globalfont) {
+        this.globalfont = globalfont;
+    }
+
+    public Integer getGlobalsize() {
+        return globalsize;
+    }
+
+    public void setGlobalsize(Integer globalsize) {
+        this.globalsize = globalsize;
+    }
+
+    public Integer getFirststart() {
+        return firststart;
+    }
+
+    public void setFirststart(Integer firststart) {
+        this.firststart = firststart;
     }
 }

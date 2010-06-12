@@ -9,7 +9,6 @@ import org.alliance.Subsystem;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.rpc.AwayStatus;
 import org.alliance.core.comm.rpc.GetUserInfo;
-import org.alliance.core.comm.rpc.GetUserInfoV2;
 import org.alliance.core.comm.upnp.UPnPManager;
 import org.alliance.core.crypto.CryptoManager;
 import org.alliance.core.file.FileManager;
@@ -656,7 +655,6 @@ public class CoreSubsystem implements Subsystem {
 
     public void refreshFriendInfo() throws IOException {
         networkManager.sendToAllFriends(new GetUserInfo());
-        networkManager.sendToAllFriends(new GetUserInfoV2());
     }
 
     public void updateDownloaded() {

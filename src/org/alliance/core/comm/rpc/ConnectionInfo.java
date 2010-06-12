@@ -6,6 +6,7 @@ import org.alliance.core.comm.RPC;
 import org.alliance.core.node.Friend;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 
 /**
  *
@@ -33,10 +34,16 @@ public class ConnectionInfo extends RPC {
     public void execute(Packet in) throws IOException {
         int guid = in.readInt();
         if (guid != manager.getMyGUID()) {
-        	friend = manager.getFriend(guid);
+            friend = manager.getFriend(guid);
 
             String host = in.readUTF();
             int port = in.readInt();
+            String dnsName = "";
+            try {
+                dnsName = in.readUTF();
+            } catch (BufferUnderflowException ex) {
+                //No DNS info = Packet from old Alliance version
+            }
 
             if (friend == null) {
                 if (T.t) {
@@ -48,7 +55,7 @@ public class ConnectionInfo extends RPC {
                         T.info("Already connected to friend.");
                     }
                 } else {
-                    if (friend.updateLastKnownHostInfo(host, port)) {
+                    if (friend.updateLastKnownHostInfo(host, port, dnsName)) {
                         manager.getFriendConnector().wakeUp();
                     }
                 }
@@ -61,6 +68,7 @@ public class ConnectionInfo extends RPC {
         p.writeInt(friend.getGuid());
         p.writeUTF(friend.getLastKnownHost());
         p.writeInt(friend.getLastKnownPort());
+        p.writeUTF(friend.getLastKnownDns());
         return p;
     }
 }

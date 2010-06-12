@@ -47,6 +47,7 @@ public class NetworkManager extends Manager {
     public static final boolean DIRECTLY_CALL_READYTOSEND = true;
     private int serverPort;
     private boolean alive = true;
+    private IpDetection ipDetection;
     private TCPNIONetworkLayer networkLayer;
     private CryptoLayer cryptoLayer;
     private FriendManager friendManager;
@@ -81,6 +82,11 @@ public class NetworkManager extends Manager {
             }
         }
         this.serverPort = p;
+
+        ipDetection = new IpDetection(this);
+        Thread ipT = new Thread(ipDetection);
+        ipT.setName("IP Detection");
+        ipT.start();
 
         networkLayer = new TCPNIONetworkLayer(this);
         cryptoLayer = core.getCryptoManager().getCryptoLayer();
@@ -426,6 +432,10 @@ public class NetworkManager extends Manager {
 
     public CoreSubsystem getCore() {
         return core;
+    }
+
+    public IpDetection getIpDetection() {
+        return ipDetection;
     }
 
     public int getNConnectionsOfType(Class<? extends Connection> clazz) {

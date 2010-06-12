@@ -293,7 +293,7 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
             T.trace("Attempting to map port: " + port);
         }
 
-        String localAddress = InetAddress.getLocalHost().getHostAddress();
+        String localAddress = core.getNetworkManager().getIpDetection().getLastLocalIp();
         int localPort = port;
 
         /*
@@ -533,9 +533,9 @@ public class UPnPManager extends ControlPoint implements DeviceChangeListener {
         start();
         waitForDevice();
         // if we haven't discovered the router by now, its not there
-        stop();
+        stop();        
         boolean natted = isNATPresent();
-        if (natted) {
+        if (natted) {           
             mappedPort = mapPort(core.getNetworkManager().getServerPort());
             if (mappedPort != core.getNetworkManager().getServerPort()) {
                 if (T.t) {

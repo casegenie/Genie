@@ -150,7 +150,6 @@ public class LanguageResource {
         } catch (MissingResourceException e) {
             //Test if getClass() is invoked by inherited methods from extended class that belongs to alliance package
             if (c.getSuperclass() != null && c.getSuperclass().getName().startsWith(PACKAGES_HEAD)) {
-                System.out.println(e.toString());
                 localized = getResource(c.getSuperclass(), strings);
             }
         }

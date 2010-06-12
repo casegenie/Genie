@@ -34,7 +34,7 @@ public class BlockConsumer implements DataConsumer {
         //@todo: this is not optimal. We treat block downloads in consumerque the same way
         // as block downloads actually beeing downloaded. This is here to signal that this block is in
         //progress - although it's actually only in the consumerQue (probably)
-        storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, ByteBuffer.allocate(0), fd);
+        storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, ByteBuffer.allocate(0), fd, dc.getDownload().getDownloadDir());
     }
     private boolean firstConsume = true;
 
@@ -95,7 +95,7 @@ public class BlockConsumer implements DataConsumer {
         } else {
             saveBuffer.flip();
 
-            sliceOffset += storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, saveBuffer, fd);
+            sliceOffset += storage.saveSlice(fd.getRootHash(), blockNumber, sliceOffset, saveBuffer, fd, dc.getDownload().getDownloadDir());
             saveBuffer.compact();
             if (sliceOffset >= BlockFile.getBlockSize(blockNumber, fd.getSize())) {
                 blockComplete();

@@ -16,7 +16,11 @@ import org.alliance.core.node.Friend;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -47,13 +51,15 @@ public class Download {
     //Auxiliary information thats only used in the UI and when taking a decision whether to start another download
     private String auxInfoFilename;
     private ArrayList<Integer> auxInfoGuids;
+    private String downloadDir;
 
-    public Download(DownloadManager parent, Hash root, BlockStorage storage, String filename, ArrayList<Integer> guids) throws IOException {
+    public Download(DownloadManager parent, Hash root, BlockStorage storage, String filename, ArrayList<Integer> guids, String downloadDir) throws IOException {
         this.manager = parent;
         this.root = root;
         this.storage = storage;
         this.auxInfoFilename = filename;
         this.auxInfoGuids = guids;
+        this.downloadDir = downloadDir;
 
         setFd(manager.getCore().getFileManager().getFd(root)); //not sure there is one, but when resuming there is
 
@@ -444,6 +450,7 @@ public class Download {
     public void serializeTo(ObjectOutputStream out) throws IOException {
         out.write(root.array());
         out.writeUTF(auxInfoFilename);
+        out.writeUTF(downloadDir);
         out.writeObject(auxInfoGuids);
         out.writeInt(storage.getStorageTypeId());
     }
@@ -453,12 +460,13 @@ public class Download {
             Hash h = new Hash();
             int r = in.read(h.array());
             String fn = in.readUTF();
+            String downDir = in.readUTF();
             ArrayList<Integer> guids = (ArrayList<Integer>) in.readObject();
             if (T.t) {
                 T.ass(r == h.array().length, "Incorrect length when deserializing download");
             }
             BlockStorage bs = BlockStorage.getById(m.getCore(), in.readInt());
-            Download d = new Download(m, h, bs, fn, guids);
+            Download d = new Download(m, h, bs, fn, guids, downDir);
             d.fd = d.manager.getCore().getFileManager().getFd(h);
             return d;
         } catch (ClassNotFoundException e) {
@@ -468,6 +476,10 @@ public class Download {
 
     public String getAuxInfoFilename() {
         return auxInfoFilename;
+    }
+
+    public String getDownloadDir() {
+        return downloadDir;
     }
 
     public ArrayList<Integer> getAuxInfoGuids() {

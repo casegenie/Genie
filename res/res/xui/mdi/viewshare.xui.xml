@@ -2,6 +2,9 @@
     <body>
         <popupmenu id="popup" detached="yes">
             <menuitem image="gfx/icons/download.png" text="%text%" eventid="download"/>
+            <menu id="downloadto" image="gfx/icons/download.png" text="%text%">
+                <menuitem image="gfx/icons/download.png" text="%text%" eventid="browse"/>
+            </menu>
         </popupmenu>
         <panel opaque="false" border="0" axis="x" expand="horiz" height="24">
             <toolbar opaque="false" id="toolbar" expand="horiz"/>

@@ -18,7 +18,6 @@ import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.comm.rpc.Ping;
 import org.alliance.core.comm.rpc.PleaseForwardInvitation;
 import org.alliance.core.comm.rpc.UserInfo;
-import org.alliance.core.comm.rpc.UserInfoV2;
 import org.alliance.core.comm.rpc.UserList;
 import org.alliance.ui.addfriendwizard.ForwardInvitationNodesList;
 
@@ -156,7 +155,6 @@ public class FriendManager extends Manager {
 
     private void sendMyInfoToAllMyFriends() throws IOException {
         netMan.sendToAllFriends(new UserInfo());
-        netMan.sendToAllFriends(new UserInfoV2());
         netMan.sendToAllFriends(new UserList());
     }
 

@@ -119,7 +119,7 @@ public class Main {
         return dir;
     }
 
-    private static String getSettingsFile() {
+    public static String getSettingsFile() {
         return localizeHomeDir() + "data/settings.xml";
     }
 

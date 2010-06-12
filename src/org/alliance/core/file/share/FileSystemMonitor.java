@@ -28,7 +28,8 @@ public class FileSystemMonitor {
     public FileSystemMonitor(ShareManager manager) throws IOException {
         this.manager = manager;
         if (OSInfo.isWindows()) {
-            extractNativeLibs();
+            extractNativeLibs("jnotify.dll");
+            extractNativeLibs("jnotify_64bit.dll");
         }
     }
 
@@ -39,11 +40,7 @@ public class FileSystemMonitor {
         while (watchers.size() > 0) {
             if (T.t) {
                 T.info("Should stop win32 watcher: " + watchers.get(0) + " but removing is buggy so just let it run in background.");
-            }
-            /*            if(T.t)T.info("Stopping win32 watcher: "+watchers.get(0));
-            if (!JNotify.removeWatch(watchers.get(0))) {
-            if(T.t)T.error("Could not stop watch with id: "+watchers.get(0));
-            }*/
+            }        
             watchers.remove(0);
         }
     }
@@ -56,9 +53,9 @@ public class FileSystemMonitor {
             kill();
         }
 
-        int mask = JNotify.FILE_CREATED |
-                JNotify.FILE_DELETED |
-                JNotify.FILE_RENAMED;
+        int mask = JNotify.FILE_CREATED
+                | JNotify.FILE_DELETED
+                | JNotify.FILE_RENAMED;
 
         for (final ShareBase sb : manager.shareBases()) {
             if (!new File(sb.getPath()).exists()) {
@@ -144,8 +141,7 @@ public class FileSystemMonitor {
         }
     }
 
-    private void extractNativeLibs() throws IOException {
-        String name = "jnotify.dll";
+    private void extractNativeLibs(String name) throws IOException {
         File f = new File(name);
         if (!f.exists()) {
             if (org.alliance.core.T.t) {

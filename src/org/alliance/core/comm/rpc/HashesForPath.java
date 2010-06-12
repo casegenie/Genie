@@ -63,6 +63,7 @@ public class HashesForPath extends CompressedRPC {
         guid.add(con.getRemoteUserGUID());
 
         String subPath = "";
+        String downloadDir = "";
         for (Hash hash : hashPath.keySet()) {
             String commonPath = TextUtils.makeSurePathIsMultiplatform(hashPath.get(hash));
 
@@ -81,12 +82,16 @@ public class HashesForPath extends CompressedRPC {
                 commonPath = commonPath.replace(subPath, "");
             }
 
+            if (downloadDir != null && downloadDir.isEmpty()) {
+                downloadDir = core.getFileManager().getDownloadStorage().getCustomDownloadDir(con.getRemoteUserGUID(), commonPath);
+            }
+
             if (core.getFileManager().containsComplete(hash)) {
                 core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "samefile", commonPath));
             } else if (core.getNetworkManager().getDownloadManager().getDownload(hash) != null) {
                 core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadinprogress", commonPath));
             } else {
-                core.getNetworkManager().getDownloadManager().queDownload(hash, commonPath, guid);
+                core.getNetworkManager().getDownloadManager().queDownload(hash, commonPath, guid, downloadDir);
             }
         }
         hashPath.clear();

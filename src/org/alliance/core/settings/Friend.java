@@ -8,13 +8,16 @@ package org.alliance.core.settings;
  */
 public class Friend {
 
-    private String nickname, host;
+    private String nickname;
+    private String host; //obtained from friend
+    private String fixedhost = ""; //manual edited by user
+    private String dns = ""; //obtained from friend or trough rDNS
     private Integer guid, port;
     private Long lastseenonlineat;
     private Integer middlemanguid; //0 if a first degree friend, guid of middleman if introduced by someone to me
     private String renamednickname; //used to display a different nickname then the "anonymous" one in ones UI
-    private String ugroupname; //Bastvera (settings.xml variable)
-    private Integer trusted;
+    private String ugroupname = "";
+    private Integer trusted = 0; //0 untrusted
 
     public Friend() {
     }
@@ -24,8 +27,6 @@ public class Friend {
         this.host = lasthost;
         this.guid = guid;
         this.port = lastport;
-        this.ugroupname = ""; //Bastvera (Default group name for New Friend)
-        this.trusted = 0;
     }
 
     public Friend(String nickname, String lasthost, Integer guid, Integer lastport, Integer introducedBy) {
@@ -94,14 +95,11 @@ public class Friend {
         this.renamednickname = renamednickname;
     }
 
-    public void setUgroupname(String ugroupname) { //Bastvera (Renaming group name)
+    public void setUgroupname(String ugroupname) {
         this.ugroupname = ugroupname;
     }
 
-    public String getUgroupname() {  //Bastvera (Loading group name from settings.xml)
-        if (ugroupname == null) {
-            ugroupname = "";
-        }
+    public String getUgroupname() {
         return ugroupname;
     }
 
@@ -110,9 +108,22 @@ public class Friend {
     }
 
     public Integer getTrusted() {
-        if (trusted == null) {
-            trusted = 0;
-        }
         return trusted;
+    }
+
+    public String getDns() {
+        return dns;
+    }
+
+    public void setDns(String dns) {
+        this.dns = dns;
+    }
+
+    public String getFixedhost() {
+        return fixedhost;
+    }
+
+    public void setFixedhost(String fixedhost) {
+        this.fixedhost = fixedhost;
     }
 }

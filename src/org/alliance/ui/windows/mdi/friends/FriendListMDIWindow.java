@@ -96,7 +96,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         list = (JList) xui.getComponent("friendlist");
         list.setModel(ui.getFriendListModel());
         SystemFlavorMap.getDefaultFlavorMap();
-        list.setCellRenderer(new FriendListCellRenderer(this, ui).getRenderer());
+        list.setCellRenderer(new FriendListCellRenderer(this, ui));
         popup = (JPopupMenu) xui.getComponent("popup");
         updateMyLevelInformation();
         update();
@@ -424,7 +424,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         if (list.getSelectedValue() instanceof Friend) {
             Friend friend = (Friend) list.getSelectedValue();
             if (friend != null) {
-                String hostname = friend.getLastKnownHost();
+                String hostname = friend.getFixedHost();
 
                 if (hostname == null) {
                     hostname = "";
@@ -432,18 +432,14 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
                 String input = JOptionPane.showInputDialog(LanguageResource.getLocalizedString(getClass(), "edithost", getNickname(friend.getGuid())), hostname);
                 if (input != null && !hostname.equalsIgnoreCase(input)) {
-                    if (input.length() == 0) {
-                        OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "wronghost"));
-                    } else {
-                        friend.setLastKnownHost(input);
-                        try {
-                            if (friend.isConnected()) {
-                                friend.reconnect();
-                            } else {
-                                friend.connect();
-                            }
-                        } catch (IOException e1) {
+                    friend.setFixedHost(input.trim());
+                    try {
+                        if (friend.isConnected()) {
+                            friend.reconnect();
+                        } else {
+                            friend.connect();
                         }
+                    } catch (IOException e1) {
                     }
                 }
             } else {

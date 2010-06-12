@@ -4,6 +4,7 @@
             <menuitem image="gfx/icons/add.png" text="%text%" eventid="addshare"/>
         </popupmenu>
         <popupmenu id="popupList" detached="yes">
+            <menuitem image="gfx/icons/add.png" text="%text%" eventid="addbrowse"/>
             <menuitem image="gfx/icons/remove.png" text="%text%" eventid="removeshare"/>
             <menuitem image="gfx/icons/editgroup.png" text="%text%" eventid="locate"/>
             <menu id="editgroup" image="gfx/icons/editgroup.png" text="%text%">
@@ -13,27 +14,27 @@
         </popupmenu>
         <panel axis="y" width="640" height="480" minwidth="640" minheight="480" border="0">
             <panel axis="x" border="0">
+                <scrollpanel id="shared" width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
+                    <list expand="both" id="sharesListSelected"/>
+                </scrollpanel>
                 <panel axis="y" border="0">
-                    <scrollpanel id="shared" width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
-                        <list expand="both" id="sharesListSelected"/>
+                    <scrollpanel id="selection" width = "310" minwidth = "310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
+                        <tree expand="both" id="sharesTreeBrowse"/>
                     </scrollpanel>
-                    <panel id="options" axis="x" expand="horiz" bordertype="etched" bordertitle="%text%">
-                        <panel axis="y" border="0">
-                            <checkbox id="public" text="%text%"/>
-                            <checkbox id="cache" text="%text%"/>
-                        </panel>
-                        <filler axis="x"/>
+                    <panel id="jump" axis="x" expand="horiz" bordertype="etched" bordertitle="%text%">
+                        <label id="jumptext" text="%text%"/>
+                        <strut width="5"/>
+                        <textfield id="quick"/>
                     </panel>
                 </panel>
-                <scrollpanel id="selection" width = "310" minwidth = "310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
-                    <tree expand="both" id="sharesTreeBrowse"/>
-                </scrollpanel>
             </panel>
             <panel border="5" axis="x" expand="horiz">
                 <filler axis="x"/>
                 <button width="85" eventid="ok" text="%text%"/>
                 <strut width="5"/>
                 <button width="85" eventid="cancel" text="%text%"/>
+                <strut width="5"/>
+                <button width="85" eventid="apply" text="%text%"/>
             </panel>
         </panel>
     </body>

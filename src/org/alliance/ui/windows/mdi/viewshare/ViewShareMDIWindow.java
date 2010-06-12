@@ -27,9 +27,11 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreePath;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +42,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.ToolTipManager;
 
 /**
@@ -55,9 +59,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
     private JTree tree;
     private ViewShareTreeModel model;
     private JPopupMenu popup;
+    private Icon iconDown;
     private final Icon iconLoading;
     private ImageIcon[] fileTypeIcons;
     private ImageIcon folderIconExpanded, folderIconCollapsed;
+    private JMenu downToMenu;
+    private static String LAST_USED_DIR;
+    private MouseListener downloadToListener;
 
     public ViewShareMDIWindow(final UISubsystem ui, Node remote) throws Exception {
         super(ui.getMainWindow().getMDIManager(), (remote instanceof MyNode) ? "viewmyshare" : "viewshare", ui);
@@ -66,6 +74,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         setTitle(remote.getNickname());
 
         iconLoading = new ImageIcon(ui.getRl().getResource("gfx/icons/loadingsharenode.png"));
+        iconDown = new ImageIcon(ui.getRl().getResource("gfx/icons/download.png"));
         //@todo: this is done in other places too. AND it's a waste of reasources to load these every time
         fileTypeIcons = new ImageIcon[8];
         for (int i = 0; i < fileTypeIcons.length; i++) {
@@ -80,7 +89,6 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         tree.setShowsRootHandles(true);
         tree.setCellRenderer(new ViewShareTreeRenderer());
         ToolTipManager.sharedInstance().registerComponent(tree);
-
 
         tree.addMouseListener(new MouseAdapter() {
 
@@ -111,6 +119,35 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                         if (!mouseClickedOnASelectedNode) {
                             tree.setSelectionPath(underMouse);
                         }
+                        if (LAST_USED_DIR == null) {
+                            popup.show(e.getComponent(), e.getX(), e.getY());
+                            return;
+                        }
+                        if (downToMenu.getMenuComponentCount() > 2) {
+                            JMenuItem oldItem = (JMenuItem) downToMenu.getMenuComponent(downToMenu.getMenuComponentCount() - 1);
+                            if (TextUtils.makeSurePathIsMultiplatform(oldItem.getToolTipText()).equals(LAST_USED_DIR)) {
+                                popup.show(e.getComponent(), e.getX(), e.getY());
+                                return;
+                            }
+                            downToMenu.remove(downToMenu.getMenuComponentCount() - 1);
+                        } else {
+                            downToMenu.addSeparator();
+                            JMenuItem item = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "lastused"));
+                            item.setEnabled(false);
+                            item.setFont(new Font(item.getFont().getFamily(), Font.ITALIC, item.getFont().getSize()));
+                            downToMenu.add(item);
+                        }
+                        StringBuilder shortLastUsedDir = new StringBuilder(LAST_USED_DIR.substring(LAST_USED_DIR.lastIndexOf("/") + 1));
+                      //  if (shortLastUsedDir.length() == 0) {
+                            shortLastUsedDir.append((new File(LAST_USED_DIR)).getAbsolutePath());
+                      //  } else {
+                            shortLastUsedDir.replace(0, 1, shortLastUsedDir.substring(0, 1).toUpperCase());
+                      //  }
+                        JMenuItem item = new JMenuItem(shortLastUsedDir.toString());
+                        item.setIcon(iconDown);
+                        item.setToolTipText((new File(LAST_USED_DIR)).getAbsolutePath());
+                        item.addMouseListener(downloadToListener);
+                        downToMenu.add(item);
                         popup.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -120,6 +157,14 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         ((JScrollPane) xui.getComponent("treepanel")).setViewportView(tree);
 
         popup = (JPopupMenu) xui.getComponent(remote instanceof MyNode ? "popupme" : "popup");
+        downToMenu = ((JMenu) xui.getComponent("downloadto"));
+        downloadToListener = new MouseAdapter() {
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                download(LAST_USED_DIR);
+            }
+        };
 
         if (!(remote instanceof MyNode)) {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
@@ -316,7 +361,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         ui.getMainWindow().chatMessage(remote.getGuid(), null, 0, false);
     }
 
-    public void EVENT_download(ActionEvent e) {
+    private void download(final String downloadDir) {
         if (!(remote instanceof Friend)) {
             return; //ignore if user tries to download a file from himself (remote is instanceof MyNode then)
         }
@@ -344,6 +389,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                 for (ViewShareFileNode p : paths) {
                     if (remote.isConnected()) {
                         try {
+                            ui.getCore().getFileManager().getDownloadStorage().addCustomDownload(remote.getGuid(), downloadDir, p.getFileItemPath());
                             ((Friend) remote).getFriendConnection().send(new GetHashesForPath(p.getShareBaseIndex(), p.getFileItemPath()));
                         } catch (IOException e1) {
                             ui.getCore().reportError(e1, this);
@@ -357,6 +403,25 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             }
         });
         ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
+    }
+
+    public void EVENT_download(ActionEvent e) {
+        download(null);
+    }
+
+    public void EVENT_browse(ActionEvent e) {
+        JFileChooser fc = new JFileChooser(".");
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = fc.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String path = TextUtils.makeSurePathIsMultiplatform(fc.getSelectedFile().getAbsolutePath());
+            if (!new File(path).exists()) {
+                download(null);
+                return;
+            }
+            download(path);
+            LAST_USED_DIR = path;
+        }
     }
 
     @Override

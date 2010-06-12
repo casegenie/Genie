@@ -33,7 +33,7 @@ import java.util.List;
 public class DownloadManager extends Manager implements Runnable {
 
     private static final int NUMBER_OF_GETBLOCKMASK_REQUESTS_TO_SEND = 250;
-    private static final byte SERIALIZATION_VERSION = 2;
+    private static final byte SERIALIZATION_VERSION = 3;
     private NetworkManager netMan;
     private CoreSubsystem core;
     private HashMap<Hash, Download> downloads = new HashMap<Hash, Download>();
@@ -115,9 +115,9 @@ public class DownloadManager extends Manager implements Runnable {
         while (sent < NUMBER_OF_GETBLOCKMASK_REQUESTS_TO_SEND && blockMaskRequestQue.size() > 0) {
             BlockMaskRequest r = blockMaskRequestQue.get(blockMaskRequestQue.size() - 1);
             blockMaskRequestQue.remove(blockMaskRequestQue.size() - 1);
-            if (r.friend.isConnected() &&
-                    downloads.containsKey(r.download.getRoot()) &&
-                    r.download.isInterestedInBlockMasks()) {
+            if (r.friend.isConnected()
+                    && downloads.containsKey(r.download.getRoot())
+                    && r.download.isInterestedInBlockMasks()) {
                 r.friend.getFriendConnection().send(new GetBlockMask(r.download.getRoot()));
                 sent++;
             }
@@ -130,11 +130,15 @@ public class DownloadManager extends Manager implements Runnable {
     }
 
     public void queDownload(Hash root, String filename, ArrayList<Integer> guids) throws IOException {
-        queDownload(root, core.getFileManager().getDownloadStorage(), filename, guids, false);
+        queDownload(root, core.getFileManager().getDownloadStorage(), filename, guids, false, null);
     }
 
-    public void queDownload(Hash root, BlockStorage storage, String filename, ArrayList<Integer> guids, boolean highPrio) throws IOException {
-        Download dl = new Download(this, root, storage, filename, guids);
+    public void queDownload(Hash root, String filename, ArrayList<Integer> guids, String downloadDir) throws IOException {
+        queDownload(root, core.getFileManager().getDownloadStorage(), filename, guids, false, downloadDir);
+    }
+
+    public void queDownload(Hash root, BlockStorage storage, String filename, ArrayList<Integer> guids, boolean highPrio, String downloadDir) throws IOException {
+        Download dl = new Download(this, root, storage, filename, guids, downloadDir);
         queDownload(dl, highPrio);
     }
 
@@ -208,7 +212,7 @@ public class DownloadManager extends Manager implements Runnable {
         Download d = downloads.get(root);
         if (d != null) {
             d.blockMaskReceived(srcGuid, hops, bm);
-        } else {
+        } else {          
             if (T.t) {
                 T.trace("Ignoring blockmask for " + root);
             }

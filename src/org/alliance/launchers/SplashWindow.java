@@ -68,7 +68,6 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
 
     @Override
     public void run() {
-        setVisible(false);
         dispose();
     }
 

@@ -4,8 +4,6 @@ import org.alliance.core.comm.rpc.AwayStatus;
 import org.alliance.core.comm.rpc.BlockMaskResult;
 import org.alliance.core.comm.rpc.Broadcast;
 import org.alliance.core.comm.rpc.ChatMessage;
-import org.alliance.core.comm.rpc.ChatMessageV2;
-import org.alliance.core.comm.rpc.ChatMessageV3;
 import org.alliance.core.comm.rpc.ConnectToMe;
 import org.alliance.core.comm.rpc.ConnectionInfo;
 import org.alliance.core.comm.rpc.DirectoryListing;
@@ -17,7 +15,6 @@ import org.alliance.core.comm.rpc.GetIsFriend;
 import org.alliance.core.comm.rpc.GetMyExternalIp;
 import org.alliance.core.comm.rpc.GetShareBaseList;
 import org.alliance.core.comm.rpc.GetUserInfo;
-import org.alliance.core.comm.rpc.GetUserInfoV2;
 import org.alliance.core.comm.rpc.GetUserList;
 import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.comm.rpc.HashesForPath;
@@ -32,10 +29,9 @@ import org.alliance.core.comm.rpc.Search;
 import org.alliance.core.comm.rpc.SearchHits;
 import org.alliance.core.comm.rpc.ShareBaseList;
 import org.alliance.core.comm.rpc.UserInfo;
-import org.alliance.core.comm.rpc.UserInfoV2;
 import org.alliance.core.comm.rpc.UserList;
 
-public class RPCFactory {
+public class RPCFactory { //Old RPC can be reused after increasing PROTOCOL_VERSION
 
     private RPCFactory() {
     }
@@ -59,7 +55,7 @@ public class RPCFactory {
                 rpc = new GetIsFriend();
                 break;
             case 6:
-                rpc = new GetUserInfo();
+                //Old RPC GetUserInfo; v1.0.6
                 break;
             case 7:
                 rpc = new GetUserList();
@@ -71,7 +67,7 @@ public class RPCFactory {
                 rpc = new IsFriend();
                 break;
             case 10:
-                //Old RPC NewVersionAvailable;
+                //Old RPC NewVersionAvailable; v1.0.6
                 break;
             case 11:
                 rpc = new NoRouteToHost();
@@ -89,10 +85,10 @@ public class RPCFactory {
                 rpc = new Search();
                 break;
             case 17:
-                //Old RPC SearchHits;
+                //Old RPC SearchHits; v1.0.6
                 break;
             case 18:
-                rpc = new UserInfo();
+                //Old RPC UserInfo(); v1.0.6
                 break;
             case 19:
                 rpc = new UserList();
@@ -128,13 +124,13 @@ public class RPCFactory {
                 rpc = new ConnectToMe();
                 break;
             case 30:
-                rpc = new ChatMessage();
+                //Old RPC ChatMessage(); v1.0.6
                 break;
             case 31:
-                rpc = new GetUserInfoV2();
+                rpc = new GetUserInfo();
                 break;
             case 32:
-                rpc = new UserInfoV2();
+                rpc = new UserInfo();
                 break;
             case 33:
                 rpc = new SearchHits();
@@ -143,10 +139,10 @@ public class RPCFactory {
                 rpc = new AwayStatus();
                 break;
             case 35:
-                rpc = new ChatMessageV2();
+                //Old RPC ChatMessageV2(); v1.0.6
                 break;
             case 36:
-                rpc = new ChatMessageV3();
+                rpc = new ChatMessage();
                 break;
             case 37:
                 rpc = new PlugInCommunication();
@@ -176,9 +172,7 @@ public class RPCFactory {
         if (rpc instanceof GetIsFriend) {
             return 5;
         }
-        if (rpc instanceof GetUserInfo) {
-            return 6;
-        }
+        //Old RPC GetUserInfo return 6; v1.0.6
         if (rpc instanceof GetUserList) {
             return 7;
         }
@@ -188,7 +182,7 @@ public class RPCFactory {
         if (rpc instanceof IsFriend) {
             return 9;
         }
-        //Old RPC NewVersionAvailable return 10;
+        //Old RPC NewVersionAvailable return 10; v1.0.6
         if (rpc instanceof NoRouteToHost) {
             return 11;
         }
@@ -204,10 +198,8 @@ public class RPCFactory {
         if (rpc instanceof Search) {
             return 16;
         }
-        //Old RPC SearchHits return 17;
-        if (rpc instanceof UserInfo) {
-            return 18;
-        }
+        //Old RPC SearchHits return 17;v 1.0.6
+        //Old RPC UserInfo return 18; v1.0.6
         if (rpc instanceof UserList) {
             return 19;
         }
@@ -241,13 +233,11 @@ public class RPCFactory {
         if (rpc instanceof ConnectToMe) {
             return 29;
         }
-        if (rpc instanceof ChatMessage) {
-            return 30;
-        }
-        if (rpc instanceof GetUserInfoV2) {
+        //Old RPC ChatMessage return 30; v1.0.6
+        if (rpc instanceof GetUserInfo) {
             return 31;
         }
-        if (rpc instanceof UserInfoV2) {
+        if (rpc instanceof UserInfo) {
             return 32;
         }
         if (rpc instanceof SearchHits) {
@@ -256,10 +246,8 @@ public class RPCFactory {
         if (rpc instanceof AwayStatus) {
             return 34;
         }
-        if (rpc instanceof ChatMessageV2) {
-            return 35;
-        }
-        if (rpc instanceof ChatMessageV3) {
+        //Old RPC ChatMessageV2 return 35; v1.0.6  
+        if (rpc instanceof ChatMessage) {
             return 36;
         }
         if (rpc instanceof PlugInCommunication) {

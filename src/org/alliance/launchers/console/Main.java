@@ -17,14 +17,12 @@ import java.io.InputStreamReader;
 public class Main {
 
     public Main(String args[]) throws Exception {
-        System.out.println("Console starting with settings " + args[0] + "...");
-
         trace();
 
         Thread.currentThread().setName("Main program thread");
 
         CoreSubsystem core = new CoreSubsystem();
-        core.init(ResourceSingelton.getRl(), args[0]);
+        core.init(ResourceSingelton.getRl(), org.alliance.launchers.ui.Main.getSettingsFile());
 
         FriendManager manager = core.getFriendManager();
 

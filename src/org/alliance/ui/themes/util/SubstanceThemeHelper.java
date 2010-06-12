@@ -4,8 +4,8 @@ import com.stendahls.XUI.elements.button;
 import com.stendahls.XUI.elements.panel;
 import com.stendahls.nif.ui.mdi.infonodemdi.theme.InfoDefaultTheme;
 import org.alliance.ui.themes.AllianceTheme;
-import org.jvnet.substance.SubstanceLookAndFeel;
-import org.jvnet.substance.painter.decoration.DecorationAreaType;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceLookAndFeel;
 
 import java.awt.Color;
 import java.util.Collection;

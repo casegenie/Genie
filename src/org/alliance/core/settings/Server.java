@@ -11,9 +11,12 @@ import java.util.Arrays;
 public class Server extends SettingClass {
 
     private Integer port;
-    private String hostname;
-    private Integer lansupport = 0;
+    private Integer staticip = 0;
+    private Integer dnsmode = 0;
+    private Integer lanmode = 0;
+    private Integer ipv6 = 0;
     private String dnsname = "";
+    private String bindnic = "";
 
     public Server() {
     }
@@ -30,6 +33,46 @@ public class Server extends SettingClass {
         this.port = port;
     }
 
+    public Integer getStaticip() {
+        return staticip;
+    }
+
+    public void setStaticip(Integer staticip) {
+        this.staticip = staticip;
+    }
+
+    public Integer getIpv6() {
+        return ipv6;
+    }
+
+    public void setIpv6(Integer ipv6) {
+        this.ipv6 = ipv6;
+    }
+
+    public Integer getLanmode() {
+        return lanmode;
+    }
+
+    public void setLanmode(Integer lanmode) {
+        this.lanmode = lanmode;
+    }
+
+    public Integer getDnsmode() {
+        return dnsmode;
+    }
+
+    public void setDnsmode(Integer dnsmode) {
+        this.dnsmode = dnsmode;
+    }
+
+    public String getBindnic() {
+        return bindnic;
+    }
+
+    public void setBindnic(String bindnic) {
+        this.bindnic = bindnic;
+    }
+
     public static int createRandomPort() {
         int p;
         do {
@@ -40,22 +83,6 @@ public class Server extends SettingClass {
 
     public static boolean isReservedPort(int port) {
         return Arrays.binarySearch(reservedPorts, port) >= 0;
-    }
-
-    public Integer getLansupport() {
-        return lansupport;
-    }
-
-    public void setLansupport(Integer lansupport) {
-        this.lansupport = lansupport;
-    }
-
-    public String getHostname() {
-        return hostname;
-    }
-
-    public void setHostname(String hostname) {
-        this.hostname = hostname;
     }
 
     public String getDnsname() {

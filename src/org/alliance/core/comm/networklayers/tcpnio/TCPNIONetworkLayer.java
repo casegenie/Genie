@@ -274,13 +274,8 @@ public class TCPNIONetworkLayer implements Runnable {
                 serverSocket.setReceiveBufferSize(bs);
             }
             serverSocket.setReuseAddress(true);
-            InetSocketAddress address;
-            if (netMan.getCore().getSettings().getInternal().getServerlistenip().trim().length() > 0) {
-                address = new InetSocketAddress(netMan.getCore().getSettings().getInternal().getServerlistenip(),
-                        netMan.getServerPort());
-            } else {
-                address = new InetSocketAddress(netMan.getServerPort());
-            }
+            InetSocketAddress address = new InetSocketAddress(netMan.getIpDetection().getLastLocalIp(), netMan.getServerPort());
+
             serverSocket.bind(address);
             ssc.register(selector, SelectionKey.OP_ACCEPT);
 

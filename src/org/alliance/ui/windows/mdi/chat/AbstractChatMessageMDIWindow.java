@@ -11,6 +11,7 @@ import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -60,6 +61,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
 
     protected AbstractChatMessageMDIWindow(MDIManager manager, String mdiWindowIdentifier, UISubsystem ui) throws Exception {
         super(manager, mdiWindowIdentifier, ui);
+        this.ui = ui;
         chatLines = new TreeSet<ChatLine>(new Comparator<ChatLine>() {
 
             @Override
@@ -84,6 +86,10 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     @Override
     protected void postInit() {
         textarea = new JEditorPane("text/html", "");
+        if (ui.getCore().getSettings().getInternal().getChatfont() != null && !ui.getCore().getSettings().getInternal().getChatfont().isEmpty()) {
+            textarea.setFont(new Font(ui.getCore().getSettings().getInternal().getChatfont(), Font.PLAIN,
+                    ui.getCore().getSettings().getInternal().getChatsize()));
+        }
         new CutCopyPastePopup(textarea);
 
         JScrollPane sp = (JScrollPane) xui.getComponent("scrollpanel");

@@ -1,7 +1,7 @@
 <xui>
     <body>
-        <panel axis="y" expand = "vert">
-            <scrollpanel width = "300" height="450" bordertype="lowered">
+        <panel axis="y" expand="vert">
+            <scrollpanel width="300" height="450" bordertype="lowered">
                 <list id="fofList"/>
             </scrollpanel>
             <strut height="5"/>

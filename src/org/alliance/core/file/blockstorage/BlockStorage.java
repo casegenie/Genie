@@ -146,10 +146,11 @@ public abstract class BlockStorage extends Thread {
      * @param sliceOffset The offset into this block at wich the slice should be saved
      * @param fd 
      * @param slice 
+     * @param dir
      * @return Number of bytes written
      * @throws IOException
      */
-    public synchronized int saveSlice(Hash root, int blockNumber, int sliceOffset, ByteBuffer slice, FileDescriptor fd) throws IOException {
+    public synchronized int saveSlice(Hash root, int blockNumber, int sliceOffset, ByteBuffer slice, FileDescriptor fd, String downDir) throws IOException {
         if (T.t) {
             T.ass(fd.getRootHash().equals(root), "Root hash mismatch in block storage! " + root + " " + fd.getRootHash());
         }
@@ -213,7 +214,11 @@ public abstract class BlockStorage extends Thread {
                     }
                     bf.save();
                     String dir = completeFilePath.toString();
-                    bf.getFd().setBasePath(dir);
+                    if (downDir != null) {
+                        bf.getFd().setBasePath(downDir);
+                    } else {
+                        bf.getFd().setBasePath(dir);
+                    }
                     recentlyDownloaded.add(root);
                     queForCompletion(bf);
                 }

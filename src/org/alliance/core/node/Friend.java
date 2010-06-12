@@ -23,6 +23,8 @@ public class Friend extends Node {
 
     private ArrayList<Connection> connections = new ArrayList<Connection>();
     private String lastKnownHost;
+    private String lastKnownDns;
+    private String fixedHost;
     private int lastKnownPort;
     private FriendManager manager;
     private FriendConnection friendConnection;
@@ -35,7 +37,7 @@ public class Friend extends Node {
     private int numberOfFilesShared, numberOfInvitedFriends;
     private boolean isAway;
     private String nicknameToShowInUI;
-    private String ugroupname;  //Network name for Friend
+    private String ugroupname;
     private int trusted;
 
     public Friend(FriendManager manager, org.alliance.core.settings.Friend f) {
@@ -44,9 +46,11 @@ public class Friend extends Node {
         guid = f.getGuid();
         lastKnownHost = f.getHost();
         lastKnownPort = f.getPort();
+        fixedHost = f.getFixedhost();
+        lastKnownDns = f.getDns();
         lastSeenOnlineAt = f.getLastseenonlineat() == null ? 0 : f.getLastseenonlineat();
         middlemanGuid = f.getMiddlemanguid() == null ? 0 : f.getMiddlemanguid();
-        ugroupname = f.getUgroupname(); //Bastvera (Load net name for Friend from settings.xml)
+        ugroupname = f.getUgroupname();
         trusted = f.getTrusted();
     }
 
@@ -68,39 +72,34 @@ public class Friend extends Node {
         }
     }
 
-    /**
-     *
-     * @param host
-     * @param port
-     * @return True if the host info did actually change
-     * @throws IOException
-     */
-    public boolean updateLastKnownHostInfo(String host, int port) throws IOException {
-        Settings s = manager.getSettings();
-
-        if (TextUtils.isIpNumber(host) && TextUtils.isIpNumber(s.getFriend(guid).getHost())) {
-            if (T.t) {
-                T.info("Updating host info for " + this + ": " + host + ":" + port);
-            }
-            boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
-            lastKnownHost = rDNSConvert(host, s.getFriend(guid));
-            lastKnownPort = port;
-            s.getFriend(guid).setHost(lastKnownHost);
-            s.getFriend(guid).setPort(lastKnownPort);
-            return hostInfoChanged;
-        } else if (!TextUtils.isIpNumber(host) && !s.getFriend(guid).getHost().equals(host)) {
-            if (T.t) {
-                T.info("Updating host info for " + this + ": " + host + ":" + port);
-            }
-            boolean hostInfoChanged = lastKnownHost == null || !lastKnownHost.equals(host) || lastKnownPort != port;
-            lastKnownHost = host;
-            lastKnownPort = port;
-            s.getFriend(guid).setHost(lastKnownHost);
-            s.getFriend(guid).setPort(lastKnownPort);
-            return hostInfoChanged;
-        } else {
+    public boolean updateLastKnownHostInfo(String host, int port, String dnsName) throws IOException {
+        boolean hostInfoChanged = lastKnownHost == null
+                || !lastKnownHost.equals(host)
+                || lastKnownPort != port
+                || !lastKnownDns.equals(dnsName);
+        if (!hostInfoChanged) {
             return false;
         }
+        if (T.t) {
+            T.info("Updating host info for " + this + ": " + host + ":" + port + ":" + dnsName);
+        }
+        Settings s = manager.getSettings();
+        if (TextUtils.isIpNumber(host)) {
+            lastKnownHost = host;
+            lastKnownPort = port;
+            lastKnownDns = dnsName;
+            s.getFriend(guid).setHost(lastKnownHost);
+            s.getFriend(guid).setPort(lastKnownPort);
+            s.getFriend(guid).setDns(lastKnownDns);
+            return true;
+        } else if (!TextUtils.isIpNumber(host)) {
+            lastKnownDns = host;
+            lastKnownPort = port;
+            s.getFriend(guid).setDns(lastKnownDns);
+            s.getFriend(guid).setPort(lastKnownPort);
+            return true;
+        }
+        return false;
     }
 
     public String rDNSConvert(String host, org.alliance.core.settings.Friend f) {
@@ -136,21 +135,21 @@ public class Friend extends Node {
         }
     }
 
-    /**
-     * Updates host settings of the friend
-     * @param host New hostname or IP-Address
-     */
-    public void setLastKnownHost(String host) {
-        lastKnownHost = host;
-        manager.getSettings().getFriend(guid).setHost(lastKnownHost);
+    public void setFixedHost(String host) {
+        this.fixedHost = host;
+        manager.getSettings().getFriend(guid).setFixedhost(fixedHost);
     }
 
-    public void setUGroupName(String ugroupname) { //Bastvera (Network name setting for friend
+    public String getFixedHost() {
+        return fixedHost;
+    }
+
+    public void setUGroupName(String ugroupname) {
         this.ugroupname = ugroupname;
         manager.getSettings().getFriend(guid).setUgroupname(ugroupname);
     }
 
-    public String getUGroupName() { //Bastvera (Used by AuthenticatedConnection.java)
+    public String getUGroupName() {
         return ugroupname;
     }
 
@@ -196,8 +195,26 @@ public class Friend extends Node {
         }
     }
 
-    public String getLastKnownHost() {
+    public String getLastKnownHost() {           
+        if (!fixedHost.isEmpty()) {
+            try {
+                InetAddress inetAdd = InetAddress.getByName(fixedHost);             
+                return inetAdd.getHostAddress();
+            } catch (UnknownHostException ex) {
+            }
+        }
+        if (!lastKnownDns.isEmpty()) {
+            try {
+                InetAddress inetAdd = InetAddress.getByName(lastKnownDns);             
+                return inetAdd.getHostAddress();
+            } catch (UnknownHostException ex) {
+            }
+        }      
         return lastKnownHost;
+    }
+
+    public String getLastKnownDns() {
+        return lastKnownDns;
     }
 
     public int getLastKnownPort() {
@@ -235,8 +252,8 @@ public class Friend extends Node {
 
     @Override
     public boolean hasNotBeenOnlineForLongTime() {
-        return System.currentTimeMillis() - lastSeenOnlineAt >
-                manager.getCore().getSettings().getInternal().getDaysnotconnectedwhenold() * 24 * 60 * 60 * 1000;
+        return System.currentTimeMillis() - lastSeenOnlineAt
+                > manager.getCore().getSettings().getInternal().getDaysnotconnectedwhenold() * 24 * 60 * 60 * 1000;
     }
 
     public int getMiddlemanGuid() {

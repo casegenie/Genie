@@ -7,6 +7,7 @@ import org.alliance.core.node.MyNode;
 import org.alliance.core.settings.Server;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 
 /**
  * This connection swings both ways - it's used by invitor and invited
@@ -87,21 +88,10 @@ public class InvitationConnection extends AuthenticatedConnection {
         Server server = core.getSettings().getServer();
         MyNode me = core.getFriendManager().getMe();
 
-        if (server.getHostname() != null) {
-            p.writeUTF(server.getHostname());
-        } else if (server.getDnsname() != null) {
-            if (server.getDnsname().trim().length() > 0) {
-                p.writeUTF(server.getDnsname());
-            } else {
-                p.writeUTF(me.getExternalIp(core));
-            }
-        } else {
-            p.writeUTF(me.getExternalIp(core));
-        }
-
+        p.writeUTF(me.getExternalIp(core));
         p.writeInt(server.getPort());
-
         p.writeUTF(me.getNickname());
+        p.writeUTF(server.getDnsname());
 
         send(p);
     }
@@ -123,6 +113,12 @@ public class InvitationConnection extends AuthenticatedConnection {
             String host = p.readUTF();
             int port = p.readInt();
             String name = p.readUTF();
+            String dnsName = "";
+            try {
+                dnsName = p.readUTF();
+            } catch (BufferUnderflowException ex) {
+                //No DNS info = Packet from old Alliance version
+            }
 
             org.alliance.core.settings.Friend newFriend = new org.alliance.core.settings.Friend(name, host, guid, port, middleman == null ? null : middleman.getGuid());
             for (org.alliance.core.settings.Friend f : core.getSettings().getFriendlist()) {
@@ -130,7 +126,7 @@ public class InvitationConnection extends AuthenticatedConnection {
                     //friend already my friend, update ip number
                     org.alliance.core.node.Friend friend = core.getFriendManager().getFriend(f.getGuid());
                     if (friend != null && !friend.isConnected()) {
-                        if (friend.updateLastKnownHostInfo(host, port)) {
+                        if (friend.updateLastKnownHostInfo(host, port, dnsName)) {
                             core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
                         }
                     }

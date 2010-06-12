@@ -41,7 +41,7 @@ import org.alliance.ui.windows.mdi.DuplicatesMDIWindow;
 import org.alliance.ui.windows.ForwardInvitationDialog;
 import org.alliance.ui.windows.mdi.friends.FriendListMDIWindow;
 import org.alliance.ui.windows.mdi.FriendsTreeMDIWindow;
-import org.alliance.ui.windows.OptionsWindow;
+import org.alliance.ui.windows.options.OptionsWindow;
 import org.alliance.ui.windows.mdi.chat.PrivateChatMessageMDIWindow;
 import org.alliance.ui.windows.mdi.chat.PublicChatMessageMDIWindow;
 import org.alliance.ui.windows.mdi.trace.TraceMDIWindow;
@@ -152,13 +152,14 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         t.setPriority(Thread.MIN_PRIORITY);
         t.start();
 
-        if (ui.getCore().getSettings().getMy().hasUndefinedNickname()) {
+        if (ui.getCore().getSettings().getInternal().getFirststart() == 1) {
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
                     OptionDialog.showInformationDialog(MainWindow.this, LanguageResource.getLocalizedString(getClass(), "welcomeinfo"));
                     try {
+                        ui.getCore().getSettings().getInternal().setFirststart(0);
                         EVENT_options(null);
                     } catch (Exception e) {
                         ui.handleErrorInEventLoop(e);
@@ -166,6 +167,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
             });
         }
+
 
         if (T.t) {
             T.info("done");

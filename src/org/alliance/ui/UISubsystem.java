@@ -103,19 +103,14 @@ public class UISubsystem implements UINexus, Subsystem {
                 SubstanceThemeHelper.setSubstanceTheme(core.getSettings().getInternal().getGuiskin());
             }
 
+            if (core.getSettings().getInternal().getGlobalfont() != null
+                    && !core.getSettings().getInternal().getGlobalfont().isEmpty()) {
+                setGlobalFont(core.getSettings().getInternal().getGlobalfont(), core.getSettings().getInternal().getGlobalsize());
+            }
+
             if (core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() != null
                     && core.getSettings().getInternal().getEnablesupportfornonenglishcharacters() == 1) {
-                Enumeration<Object> keys = UIManager.getDefaults().keys();
-                FontUIResource f = new FontUIResource("Dialog", Font.TRUETYPE_FONT, 12);
-                while (keys.hasMoreElements()) {
-                    Object key = keys.nextElement();
-                    Object value = UIManager.get(key);
-                    if (value instanceof FontUIResource) {
-                        FontUIResource orig = (FontUIResource) value;
-                        Font font = new Font(f.getFontName(), orig.getStyle(), orig.getSize());
-                        UIManager.put(key, new FontUIResource(font));
-                    }
-                }
+                setGlobalFont("Dialog", 12);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -136,6 +131,20 @@ public class UISubsystem implements UINexus, Subsystem {
         }
 
         core.setUICallback(new UIBridge(this, core.getUICallback()));
+    }
+
+    private void setGlobalFont(String fontName, int size) {
+        Enumeration<Object> keys = UIManager.getDefaults().keys();
+        FontUIResource f = new FontUIResource(fontName, Font.PLAIN, size);
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof FontUIResource) {
+                FontUIResource orig = (FontUIResource) value;
+                Font font = new Font(f.getFontName(), orig.getStyle(), size);
+                UIManager.put(key, new FontUIResource(font));
+            }
+        }
     }
 
     @Override

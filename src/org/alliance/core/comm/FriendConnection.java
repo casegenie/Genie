@@ -3,7 +3,6 @@ package org.alliance.core.comm;
 import org.alliance.core.comm.rpc.Broadcast;
 import org.alliance.core.comm.rpc.GetMyExternalIp;
 import org.alliance.core.comm.rpc.GetUserInfo;
-import org.alliance.core.comm.rpc.GetUserInfoV2;
 import org.alliance.core.comm.rpc.GetUserList;
 import org.alliance.core.comm.rpc.Route;
 import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
@@ -38,7 +37,6 @@ public class FriendConnection extends AuthenticatedConnection {
         super.init();
         send(new GetUserList());
         send(new GetUserInfo());
-        send(new GetUserInfoV2());
         send(new GetMyExternalIp());
         if (direction == Direction.OUT && getRemoteFriend().isNewlyDiscoveredFriend()) {
             core.queNeedsUserInteraction(new NewFriendConnectedUserInteraction(remoteUserGUID));

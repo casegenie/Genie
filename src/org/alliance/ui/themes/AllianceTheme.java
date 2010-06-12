@@ -1,20 +1,20 @@
 package org.alliance.ui.themes;
 
-import org.jvnet.substance.api.ComponentState;
-import org.jvnet.substance.api.SubstanceColorScheme;
-import org.jvnet.substance.api.SubstanceColorSchemeBundle;
-import org.jvnet.substance.api.SubstanceSkin;
-import org.jvnet.substance.api.painter.overlay.BottomShadowOverlayPainter;
-import org.jvnet.substance.api.painter.overlay.TopShadowOverlayPainter;
-import org.jvnet.substance.painter.border.ClassicBorderPainter;
-import org.jvnet.substance.painter.decoration.ArcDecorationPainter;
-import org.jvnet.substance.painter.decoration.BrushedMetalDecorationPainter;
-import org.jvnet.substance.painter.decoration.DecorationAreaType;
-import org.jvnet.substance.painter.gradient.GlassGradientPainter;
-import org.jvnet.substance.painter.highlight.ClassicHighlightPainter;
-import org.jvnet.substance.shaper.ClassicButtonShaper;
+import org.pushingpixels.substance.api.ComponentState;
+import org.pushingpixels.substance.api.DecorationAreaType;
+import org.pushingpixels.substance.api.SubstanceColorScheme;
+import org.pushingpixels.substance.api.SubstanceColorSchemeBundle;
+import org.pushingpixels.substance.api.SubstanceSkin;
+import org.pushingpixels.substance.api.painter.border.ClassicBorderPainter;
+import org.pushingpixels.substance.api.painter.decoration.ArcDecorationPainter;
+import org.pushingpixels.substance.api.painter.decoration.BrushedMetalDecorationPainter;
+import org.pushingpixels.substance.api.painter.highlight.ClassicHighlightPainter;
+import org.pushingpixels.substance.api.painter.overlay.BottomShadowOverlayPainter;
+import org.pushingpixels.substance.api.painter.overlay.TopShadowOverlayPainter;
+import org.pushingpixels.substance.api.shaper.ClassicButtonShaper;
 
 import java.io.File;
+import org.pushingpixels.substance.api.painter.fill.GlassFillPainter;
 
 /**
  *
@@ -92,7 +92,7 @@ public class AllianceTheme extends SubstanceSkin {
         this.addOverlayPainter(BottomShadowOverlayPainter.getInstance(), DecorationAreaType.PRIMARY_TITLE_PANE);
 
         this.buttonShaper = new ClassicButtonShaper();
-        this.gradientPainter = new GlassGradientPainter();
+        this.fillPainter = new GlassFillPainter();
         this.borderPainter = new ClassicBorderPainter();
 
         BrushedMetalDecorationPainter decorationPainter = new BrushedMetalDecorationPainter();

@@ -5,8 +5,8 @@ import org.alliance.core.LanguageResource;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.ui.UISubsystem;
-import org.alliance.ui.themes.util.SubstanceListCellRendererHelper;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
+import org.alliance.ui.themes.AllianceListCellRenderer;
 import static org.alliance.ui.windows.mdi.friends.FriendListMDIWindow.LEVEL_ICONS;
 
 import java.awt.Color;
@@ -24,7 +24,7 @@ import javax.swing.border.EmptyBorder;
  *
  * @author Bastvera
  */
-public class FriendListCellRenderer {
+public class FriendListCellRenderer extends AllianceListCellRenderer {
 
     private ImageIcon groupIcon;
     private ImageIcon iconFriendDimmed, iconFriendOld;
@@ -32,12 +32,12 @@ public class FriendListCellRenderer {
     private ImageIcon[] friendIconsAway;
     private FriendListMDIWindow friendWindow;
     private UISubsystem ui;
-    private DefaultListCellRenderer renderer;
     private static Color GROUPS_BG;
     private static Font GROUPS_FONT;
     private static Border MARGIN_BORDER;
 
     FriendListCellRenderer(FriendListMDIWindow friendWindow, UISubsystem ui) throws IOException {
+        super(SubstanceThemeHelper.isSubstanceInUse());
         this.friendWindow = friendWindow;
         this.ui = ui;
         groupIcon = new ImageIcon(ui.getRl().getResource("gfx/icons/editgroup.png"));
@@ -49,12 +49,6 @@ public class FriendListCellRenderer {
             friendIcons[i] = new ImageIcon(ui.getRl().getResource("gfx/icons/" + LEVEL_ICONS[i] + ".png"));
             friendIconsAway[i] = new ImageIcon(ui.getRl().getResource("gfx/icons/" + LEVEL_ICONS[i] + "_away.png"));
         }
-
-        if (SubstanceThemeHelper.isSubstanceInUse()) {
-            renderer = new SubstanceListCellRenderer();
-        } else {
-            renderer = new NormalListCellRenderer();
-        }
         GROUPS_FONT = new Font(renderer.getFont().getFontName(), Font.BOLD, renderer.getFont().getSize());
         GROUPS_BG = createGroupBackground(renderer.getBackground().getRed(), renderer.getBackground().getGreen(), renderer.getBackground().getBlue(), 0.85);
         if (renderer.getBorder() instanceof EmptyBorder) {
@@ -63,10 +57,6 @@ public class FriendListCellRenderer {
         } else {
             MARGIN_BORDER = renderer.getBorder();
         }
-    }
-
-    public DefaultListCellRenderer getRenderer() {
-        return renderer;
     }
 
     private Color createGroupBackground(int r, int g, int b, double factor) {
@@ -158,45 +148,21 @@ public class FriendListCellRenderer {
         return sb.toString();
     }
 
-    private class NormalListCellRenderer extends DefaultListCellRenderer {
+    @Override
+    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-            if (value instanceof String) {
-                paintGroup(this, value.toString());
-                return this;
-            }
-
-            Node n = (Node) value;
-            paintFriend(this, n, isSelected);
-            setToolTipText(setupTooltip(n));
-            if (n instanceof Friend) {
-                setBorder(MARGIN_BORDER);
-            }
-            return this;
+        if (value instanceof String) {
+            paintGroup(renderer, value.toString());
+            return renderer;
         }
-    }
 
-    private class SubstanceListCellRenderer extends SubstanceListCellRendererHelper {
-
-        @Override
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-            if (value instanceof String) {
-                paintGroup(this, value.toString());
-                return this;
-            }
-
-            Node n = (Node) value;
-            paintFriend(this, n, isSelected);
-            setToolTipText(setupTooltip(n));
-            if (n instanceof Friend) {
-                setBorder(MARGIN_BORDER);
-            }
-            return this;
+        Node n = (Node) value;
+        paintFriend(renderer, n, isSelected);
+        renderer.setToolTipText(setupTooltip(n));
+        if (n instanceof Friend) {
+            renderer.setBorder(MARGIN_BORDER);
         }
+        return renderer;
     }
 }

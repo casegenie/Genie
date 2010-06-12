@@ -20,6 +20,7 @@ public class GetUserInfo extends RPC {
     @Override
     public void execute(Packet data) throws IOException {
         send(new UserInfo());
+        send(new AwayStatus(core.getAwayManager().isAway()));
     }
 
     @Override

@@ -10,13 +10,17 @@ import org.alliance.ui.themes.util.SubstanceThemeHelper;
 import org.alliance.ui.windows.EditGroupWindow;
 
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
 import javax.swing.DefaultListModel;
+import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.JTree;
@@ -47,18 +51,15 @@ public class SharesWindow extends XUIDialog {
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
 
-        setupPopupMenu();
+        popupList = (JPopupMenu) xui.getComponent("popupList");
+        popupTree = (JPopupMenu) xui.getComponent("popupTree");
         setupShareTree();
         setupShareList();
+        setupQuickJump();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         display();
-    }
-
-    private void setupPopupMenu() {
-        popupList = (JPopupMenu) xui.getComponent("popupList");
-        popupTree = (JPopupMenu) xui.getComponent("popupTree");
     }
 
     private void setupShareTree() {
@@ -126,10 +127,6 @@ public class SharesWindow extends XUIDialog {
                 maybeShowPopup(e);
             }
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
             private void maybeShowPopup(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     int row = sharesTree.getClosestRowForLocation(e.getX(), e.getY());
@@ -146,7 +143,7 @@ public class SharesWindow extends XUIDialog {
     private void setupShareList() {
         shareList = (JList) xui.getComponent("sharesListSelected");
         shareListModel = new DefaultListModel();
-        shareList.setCellRenderer(new SharesListCellRenderer(LanguageResource.getLocalizedString(getClass(), "group")).getRenderer());
+        shareList.setCellRenderer(new SharesListCellRenderer(LanguageResource.getLocalizedString(getClass(), "group")));
         shareList.setModel(shareListModel);
         for (Share share : ui.getCore().getSettings().getSharelist()) {
             shareListModel.addElement(share.getPath());
@@ -163,10 +160,6 @@ public class SharesWindow extends XUIDialog {
             @Override
             public void mousePressed(MouseEvent e) {
                 maybeShowPopup(e);
-            }
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
             }
 
             private int selectionHelper(MouseEvent e) {
@@ -189,6 +182,20 @@ public class SharesWindow extends XUIDialog {
         });
     }
 
+    private void setupQuickJump() {
+        ((JTextField) xui.getComponent("quick")).addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) sharesTreeModel.getRoot();
+                    browseTreeNodes(rootNode, ((JTextField) e.getSource()).getText().toLowerCase(), true);
+                }
+            }
+        });
+
+    }
+
     public void EVENT_addshare(ActionEvent a) throws Exception {
         Object[] pathParts = sharesTree.getSelectionPath().getPath();
         StringBuilder path = new StringBuilder();
@@ -198,16 +205,18 @@ public class SharesWindow extends XUIDialog {
             path.append("/");
         }
         path.deleteCharAt(path.length() - 1);
-        File selectedDir = new File(TextUtils.makeSurePathIsMultiplatform(path.toString()));
+        addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path.toString())));
+    }
 
-        for (int i = 0; i < shareListModel.getSize(); i += 2) {
-            if (shareListModel.getElementAt(i).toString().equalsIgnoreCase(path.toString())) {
-                return;
+    private void addNewSharePath(File selectedDir) {
+        if (selectedDir.exists() && selectedDir.isDirectory()) {
+            String path = selectedDir.getAbsolutePath();
+            for (int i = 0; i < shareListModel.getSize(); i += 2) {
+                if (shareListModel.getElementAt(i).toString().equalsIgnoreCase(path)) {
+                    return;
+                }
             }
-        }
-
-        if (selectedDir.exists() || selectedDir.isDirectory()) {
-            shareListModel.addElement(selectedDir.getAbsolutePath());
+            shareListModel.addElement(path);
             shareListModel.addElement(PUBLIC_GROUP);
         }
         while (removeDuplicateShare()) {
@@ -270,15 +279,16 @@ public class SharesWindow extends XUIDialog {
     public void EVENT_locate(ActionEvent a) throws Exception {
         String sharePath = shareList.getSelectedValue().toString();
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) sharesTreeModel.getRoot();
-        browseTreeNodes(rootNode, sharePath, true);
+        browseTreeNodes(rootNode, sharePath.toLowerCase(), true);
     }
 
     private void browseTreeNodes(DefaultMutableTreeNode node, String sharePath, boolean isRoot) {
         for (int i = 1; i <= node.getChildCount(); i++) {
             //Browse from last child to first
             DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(node.getChildCount() - i);
-            if (sharePath.startsWith(childNode.toString())) {
-                sharePath = sharePath.substring(childNode.toString().length());
+            String childName = childNode.toString().toLowerCase();
+            if (sharePath.startsWith(childName)) {
+                sharePath = sharePath.substring(childName.length());
                 TreePath nodePath = new TreePath(childNode.getPath());
                 if (sharePath.isEmpty()) {
                     //We have found target dir
@@ -310,16 +320,41 @@ public class SharesWindow extends XUIDialog {
         shareListModel.setElementAt(PUBLIC_GROUP, groupRowId);
     }
 
-    public void EVENT_ok(ActionEvent a) throws Exception {
+    public void EVENT_addbrowse(ActionEvent a) throws Exception {
+        JFileChooser fc = new JFileChooser(shareListModel.getSize() > 0
+                ? shareListModel.getElementAt(shareListModel.getSize() - 2).toString()
+                : ".");
+        fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int returnVal = fc.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getAbsolutePath();
+            if (!new File(path).exists()) {
+                path = new File(new File(path).getParent()).getAbsolutePath();
+                 addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path)));
+                 return;
+            }
+            addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path)));
+        }
+    }
+
+    private void saveShares() throws Exception {
         ui.getCore().getSettings().getSharelist().clear();
         for (int i = 0; i < shareListModel.size(); i += 2) {
             ui.getCore().getSettings().getSharelist().add(new Share(shareListModel.getElementAt(i).toString(), shareListModel.getElementAt(i + 1).toString()));
         }
         ui.getCore().getShareManager().updateShareBases();
+    }
+
+    public void EVENT_ok(ActionEvent a) throws Exception {
+        saveShares();
         if (shareListHasBeenModified) {
             ui.getCore().getShareManager().getShareScanner().startScan(true);
         }
         dispose();
+    }
+
+    public void EVENT_apply(ActionEvent a) throws Exception {
+        saveShares();
     }
 
     public void EVENT_cancel(ActionEvent a) throws Exception {
