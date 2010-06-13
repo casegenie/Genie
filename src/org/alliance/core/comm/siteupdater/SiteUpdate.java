@@ -11,6 +11,7 @@ import static org.alliance.launchers.ui.DirectoryCheck.STARTED_JAR_NAME;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +19,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
-import java.util.jar.JarFile;
+import java.security.MessageDigest;
 
 /**
  *
@@ -37,6 +35,7 @@ public class SiteUpdate implements Runnable {
     private String orginalFilePath;
     private String siteVersion = Version.VERSION;
     private int siteBuild = Version.BUILD_NUMBER;
+    private String md5;
     private boolean updateAttemptHasBeenMade = false;
 
     public SiteUpdate(CoreSubsystem core) throws IOException {
@@ -85,10 +84,12 @@ public class SiteUpdate implements Runnable {
         BufferedReader in = new BufferedReader(new InputStreamReader(http.getInputStream(), "UTF8"));
         String line;
         while ((line = in.readLine()) != null) {
-            if (line.startsWith("version:")) {
+            if (line.startsWith("version=")) {
                 siteVersion = line.substring(8);
-            } else if (line.startsWith("build:")) {
+            } else if (line.startsWith("build=")) {
                 siteBuild = Integer.parseInt(line.substring(6));
+            } else if (line.startsWith("md5=")) {
+                md5 = line.substring(4);
             }
         }
         in.close();
@@ -111,7 +112,7 @@ public class SiteUpdate implements Runnable {
                     http.setReadTimeout(1000 * 15);
                     InputStream in = http.getInputStream();
                     OutputStream out = new FileOutputStream(updateFilePath);
-                    byte[] buf = new byte[32 * KB];
+                    byte[] buf = new byte[256 * KB];
                     int read;
                     int readed = 0;
                     while ((read = in.read(buf)) > 0) {
@@ -123,44 +124,43 @@ public class SiteUpdate implements Runnable {
                     }
                     out.close();
                     in.close();
-                    checkJarFile();
+                    checkDownloadFile();
                     core.updateDownloaded();
                     core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadok"), true);
                 } catch (IOException ex) {
                     core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadfailed"), true);
-                } catch (CertificateException ex) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 } catch (SecurityException ex) {
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
+                } catch (Exception ex) {
                     core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 }
             }
         });
     }
 
-    private void checkJarFile() throws IOException, CertificateException {
-        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadverify"), true);
-
-        if (T.t) {
-            T.info("Loading certificate");
+    public void checkDownloadFile() throws Exception {
+        InputStream fis = new FileInputStream(updateFilePath);
+        byte[] buffer = new byte[1024];
+        MessageDigest complete = MessageDigest.getInstance("MD5");
+        int numRead;
+        do {
+            numRead = fis.read(buffer);
+            if (numRead > 0) {
+                complete.update(buffer, 0, numRead);
+            }
+        } while (numRead != -1);
+        fis.close();
+        byte[] raw = complete.digest();
+        String hexes = "0123456789ABCDEF";
+        final StringBuilder hex = new StringBuilder(2 * raw.length);
+        for (final byte b : raw) {
+            hex.append(hexes.charAt((b & 0xF0) >> 4)).append(hexes.charAt((b & 0x0F)));
         }
-        InputStream inStream = core.getRl().getResourceStream("alliance.cer");
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        X509Certificate cert = (X509Certificate) cf.generateCertificate(inStream);
-        inStream.close();
-
-        if (T.t) {
-            T.info("Verifying jar");
-        }
-        JarVerifier jv = new JarVerifier(new X509Certificate[]{cert});
-        jv.verify(new JarFile(updateFilePath, true));
-
-        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadverifyok"));
-
-        if (T.t) {
-            T.info("Jar verified! Updating...");
+        if (!hex.toString().equals(md5)) {
+            throw new Exception();
         }
     }
-
+    
     public void prepareUpdate() {
         try {
             if (updateAttemptHasBeenMade) {
