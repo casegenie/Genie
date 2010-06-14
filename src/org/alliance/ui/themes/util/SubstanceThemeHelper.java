@@ -112,8 +112,8 @@ public class SubstanceThemeHelper {
             InfoDefaultTheme.setBorderColor(new Color(250, 250, 250));
         } else {
             theme = theme.replace(" ", "") + "Skin";
-            Class.forName("org.jvnet.substance.skin." + theme);
-            SubstanceLookAndFeel.setSkin("org.jvnet.substance.skin." + theme);
+            Class.forName("org.pushingpixels.substance.api.skin." + theme);
+            SubstanceLookAndFeel.setSkin("org.pushingpixels.substance.api.skin." + theme);
         }
         SUBSTANCE_IN_USE = true;
     }

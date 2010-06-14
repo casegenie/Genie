@@ -13,7 +13,7 @@
                                     </panel>
                                 </cell>
                                 <cell>
-                                    <panel border="0" axis="x">                 
+                                    <panel border="0" axis="x">
                                         <textfield expand="horiz" width="250" minwidth="250" maxwidth="500" id="my.nickname"/>
                                     </panel>
                                 </cell>
@@ -34,7 +34,7 @@
                                     </panel>
                                 </cell>
                                 <cell>
-                                    <panel border="0" axis="x">                                        
+                                    <panel border="0" axis="x">
                                         <dropdown expand="horiz" width="250" minwidth="250" maxwidth="500" id="internal.language"/>
                                     </panel>
                                 </cell>
@@ -47,17 +47,25 @@
                                     </panel>
                                 </cell>
                                 <cell>
-                                    <panel border="0" axis="x">                                        
+                                    <panel border="0" axis="x">
                                         <dropdown expand="horiz" width="250" minwidth="250" maxwidth="500" id="internal.guiskin">
                                             <option text="Alliance"/>
                                             <option text="OS Native"/>
+                                            <option text="Autumn"/>
                                             <option text="Business"/>
                                             <option text="Business Black Steel"/>
                                             <option text="Business Blue Steel"/>
+                                            <option text="Challenger Deep"/>
                                             <option text="Creme"/>
                                             <option text="Creme Coffee"/>
                                             <option text="Dust"/>
                                             <option text="Dust Coffee"/>
+                                            <option text="Emerald Dusk"/>
+                                            <option text="Gemini"/>
+                                            <option text="Graphite"/>
+                                            <option text="Graphite Aqua"/>
+                                            <option text="Graphite Glass"/>
+                                            <option text="Magellan"/>
                                             <option text="Mist Aqua"/>
                                             <option text="Mist Silver"/>
                                             <option text="Moderate"/>
@@ -66,10 +74,7 @@
                                             <option text="Office Blue 2007"/>
                                             <option text="Office Silver 2007"/>
                                             <option text="Raven"/>
-                                            <option text="Raven Graphite"/>
-                                            <option text="Raven Graphite Glass"/>
-                                            <option text="Sahara"/>
-                                            <option text="Streetlights"/>
+                                            <option text="Sahara"/>      
                                             <option text="Twilight"/>
                                         </dropdown>
                                     </panel>
@@ -83,7 +88,7 @@
                                     </panel>
                                 </cell>
                                 <cell>
-                                    <panel border="0" axis="x">                                        
+                                    <panel border="0" axis="x">
                                         <dropdown expand="horiz" width="175" minwidth="175" maxwidth="500" id="internal.globalfont">
                                         </dropdown>
                                         <strut width="5"/>
@@ -102,7 +107,7 @@
                                     </panel>
                                 </cell>
                                 <cell>
-                                    <panel border="0" axis="x">                                       
+                                    <panel border="0" axis="x">
                                         <dropdown expand="horiz" width="175" minwidth="175" maxwidth="500" id="internal.chatfont">
                                         </dropdown>
                                         <strut width="5"/>
