@@ -80,7 +80,7 @@
         <jar jarfile="dist/alliance.dat">
             <zipfileset src="${dist.jar}" excludes="META-INF/*.MF" />
             <zipfileset src="lib/clink.jar" excludes="META-INF/*.MF" />
-            <zipfileset src="lib/h2-1.2.132.jar" excludes="META-INF/*.MF" />
+            <zipfileset src="lib/h2-1.2.136.jar" excludes="META-INF/*.MF" />
             <zipfileset src="lib/idw-gpl.jar" excludes="META-INF/*.MF" />
             <zipfileset src="lib/jdic.jar" excludes="META-INF/*.MF" />
             <zipfileset src="lib/jnotify-0.93.jar" excludes="META-INF/*.MF" />

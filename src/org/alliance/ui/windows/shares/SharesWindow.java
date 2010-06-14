@@ -175,6 +175,14 @@ public class SharesWindow extends XUIDialog {
                 shareList.setSelectedIndices(indicates);
                 if (e.isPopupTrigger()) {
                     if (shareList.getSelectedIndex() != -1) {
+                        for (int i = 1; i < popupList.getComponentCount(); i++) {
+                            popupList.getComponent(i).setEnabled(true);
+                        }
+                        popupList.show(e.getComponent(), e.getX(), e.getY());
+                    } else if (shareListModel.isEmpty()) {
+                        for (int i = 1; i < popupList.getComponentCount(); i++) {
+                            popupList.getComponent(i).setEnabled(false);
+                        }
                         popupList.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
@@ -330,8 +338,8 @@ public class SharesWindow extends XUIDialog {
             String path = fc.getSelectedFile().getAbsolutePath();
             if (!new File(path).exists()) {
                 path = new File(new File(path).getParent()).getAbsolutePath();
-                 addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path)));
-                 return;
+                addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path)));
+                return;
             }
             addNewSharePath(new File(TextUtils.makeSurePathIsMultiplatform(path)));
         }
@@ -343,6 +351,7 @@ public class SharesWindow extends XUIDialog {
             ui.getCore().getSettings().getSharelist().add(new Share(shareListModel.getElementAt(i).toString(), shareListModel.getElementAt(i + 1).toString()));
         }
         ui.getCore().getShareManager().updateShareBases();
+        ui.getCore().saveSettings();
     }
 
     public void EVENT_ok(ActionEvent a) throws Exception {
