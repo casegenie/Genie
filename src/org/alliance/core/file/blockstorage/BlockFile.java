@@ -334,10 +334,10 @@ public final class BlockFile {
             T.ass(isComplete(), "File not complete and we're going for a move!");
         }
 
-        File file = new File(directory + "/" + fd.getSubpath());
+        File file = new File(directory + "/" + fd.getSubPath());
         if (file.exists()) {
             file = createUniqueFilename(file);
-            fd.setSubpath(fd.createSubpath(file.toString()));
+            fd.setSubPath(fd.createSubPath(file.toString()));
         }
         file.getParentFile().mkdirs();
 

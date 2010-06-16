@@ -57,6 +57,24 @@
                             <filler/>
                         </panel>
                     </panel>
+                    <panel id="backup" axis="y" bordertype="etched" bordertitle="%text%">
+                        <form expand="horiz" border="5">
+                            <row>
+                                <cell>
+                                    <panel border="0" axis="y">
+                                        <filler/>
+                                        <label id="restore" text="%text%"/>
+                                    </panel>
+                                </cell>
+                                <cell>
+                                    <panel border="0" axis="x">
+                                        <filler axis="x"/>
+                                        <button eventid="browse" text="%text%"/>
+                                    </panel>
+                                </cell>
+                            </row>
+                        </form>
+                    </panel>
                 </panel>
             </scrollpanel>
         </panel>

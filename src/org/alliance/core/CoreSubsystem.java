@@ -90,13 +90,14 @@ public class CoreSubsystem implements Subsystem {
     private String settingsFile;
     private Log errorLog, traceLog;
     ArrayList<NeedsUserInteraction> userInternactionQue = new ArrayList<NeedsUserInteraction>();
+    private StartupProgressListener progress;
 
     public CoreSubsystem() {
     }
 
     @Override
     public void init(ResourceLoader rl, Object... params) throws Exception {
-        StartupProgressListener progress = new StartupProgressListener() {
+        progress = new StartupProgressListener() {
 
             @Override
             public void updateProgress(String message) {
@@ -191,6 +192,7 @@ public class CoreSubsystem implements Subsystem {
         if (T.t) {
             T.info("CoreSubsystem stated.");
         }
+        progress = null;
     }
 
     private void setupLog() throws Exception {
@@ -756,5 +758,9 @@ public class CoreSubsystem implements Subsystem {
 
     public PluginManager getPluginManager() {
         return pluginManager;
+    }
+
+    public StartupProgressListener getProgress() {
+        return progress;
     }
 }

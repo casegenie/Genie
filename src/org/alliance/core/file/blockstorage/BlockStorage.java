@@ -83,7 +83,7 @@ public abstract class BlockStorage extends Thread {
                     if (T.t) {
                         T.info("Took from BlockStorage finishing que: " + bf);
                     }
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "verify", bf.getFd().getSubpath()));
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "verify", bf.getFd().getSubPath()));
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
 
@@ -98,7 +98,7 @@ public abstract class BlockStorage extends Thread {
                             signalFileComplete(bf);
                         }
                     });
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecomplete", bf.getFd().getSubpath()));
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecomplete", bf.getFd().getSubPath()));
                 } catch (Exception e) {
                     core.reportError(e, bf.getFd() == null ? bf : bf);
                 }

@@ -325,7 +325,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     }
                     size = "?";
                 } else {
-                    name = download.getFd().getSubpath();
+                    name = download.getFd().getSubPath();
                     size = TextUtils.formatByteSize(download.getFd().getSize());
                 }
                 percentComplete = download.getPercentComplete();

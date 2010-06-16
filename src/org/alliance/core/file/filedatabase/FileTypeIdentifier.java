@@ -10,7 +10,7 @@ package org.alliance.core.file.filedatabase;
 public abstract class FileTypeIdentifier {
 
     public boolean matches(FileDescriptor fd) {
-        return matches(fd.getSubpath());
+        return matches(fd.getSubPath());
     }
 
     public abstract boolean matches(String path);

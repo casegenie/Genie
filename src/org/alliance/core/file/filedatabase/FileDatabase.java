@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.TreeMap;
 
 /**
@@ -61,7 +62,7 @@ public class FileDatabase {
             return;
         }
         changeInUseQueue(true);
-        FileIndex fileIndex = new FileIndex(fd.getBasePath(), mergePathParts(fd.getBasePath(), fd.getSubpath(), null));
+        FileIndex fileIndex = new FileIndex(fd.getBasePath(), mergePathParts(fd.getBasePath(), fd.getSubPath(), null));
         byte fileType = FileType.getByFileName(fileIndex.getFilename()).id();
         core.getFileManager().getDbCore().getDbSharesBases().addEntry(fileIndex.getBasePath());
         if (core.getFileManager().getDbCore().getDbShares().addEntry(fileIndex.getBasePath(), fileIndex.getSubPath(), fileIndex.getFilename(), fileType, fd.getSize(), fd.getRootHash().array(), fd.getModifiedAt())) {
@@ -73,7 +74,7 @@ public class FileDatabase {
                 blockNumber++;
             }
         } else {
-            core.getFileManager().getDbCore().getDbDuplicates().addEntry(mergePathParts(fd.getBasePath(), fd.getSubpath(), null), fd.getRootHash().array(), fd.getModifiedAt());
+            core.getFileManager().getDbCore().getDbDuplicates().addEntry(mergePathParts(fd.getBasePath(), fd.getSubPath(), null), fd.getRootHash().array(), fd.getModifiedAt());
         }
         changeInUseQueue(false);
     }
@@ -96,7 +97,52 @@ public class FileDatabase {
         changeInUseQueue(false);
     }
 
-    public void removeObsoleteEntries() {
+    public void removeNonExistedEntries(File dir, File[] files, String basePath) {
+        if (!core.getFileManager().getDbCore().isConnected()) {
+            return;
+        }
+        changeInUseQueue(true);
+        try {
+            String subPath = TextUtils.makeSurePathIsMultiplatform(dir.getAbsolutePath());
+            if (basePath.equals(subPath)) {
+                subPath = "";
+            } else {
+                subPath = subPath.substring(basePath.length() + 1) + "/";
+            }
+            if (files.length == 0) {
+                //Dir is empty, remove all sub-entries of this dir
+                //Leftovers (>8196) will be removed in next cycle
+                ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(basePath, subPath, true, 8196);
+                while (results.next()) {
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch", results.getString(ID_FILENAME)));
+                    removeEntry(results.getBytes(ID_ROOT_HASH));
+                }
+                changeInUseQueue(false);
+                return;
+            }
+            HashSet<String> onlyFiles = new HashSet<String>();
+            for (int i = 0; i < files.length; i++) {
+                if (!files[i].isDirectory()) {
+                    if (!files[i].getName().isEmpty()) {
+                        onlyFiles.add(files[i].getName());
+                    }
+                }
+            }
+
+            ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(basePath, subPath, false, 8196);
+            while (results.next()) {
+                if (!onlyFiles.contains(mergePathParts(null, null, results.getString(ID_FILENAME)))) {
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch", results.getString(ID_FILENAME)));
+                    removeEntry(results.getBytes(ID_ROOT_HASH));
+                }
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        changeInUseQueue(false);
+    }
+
+    public void removeOldShares() {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return;
         }
@@ -110,32 +156,9 @@ public class FileDatabase {
             ResultSet results = core.getFileManager().getDbCore().getDbSharesBases().getBasePaths();
             while (results.next()) {
                 if (!shares.contains(results.getString(ID_BASE_PATH))) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)));
+                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)), true);
                     core.getFileManager().getDbCore().getDbSharesBases().deleteEntryBy(results.getString(ID_BASE_PATH));
-                }
-            }
-            //Clean by removed files
-            if (!core.getFileManager().getDbCore().isConnected()) {
-                return;
-            }
-            int scannedFiles = 0;
-            ArrayList<String> subPaths = new ArrayList<String>();
-            results = core.getFileManager().getDbCore().getDbShares().getSubPaths();
-            while (results.next()) {
-                subPaths.add(results.getString(ID_SUB_PATH));
-            }
-            int snapshotNumberOfShares = numberOfShares;
-            for (String subPath : subPaths) {
-                if (!core.getFileManager().getDbCore().isConnected()) {
-                    return;
-                }
-                results = core.getFileManager().getDbCore().getDbShares().getEntriesBy(subPath);
-                while (results.next()) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removesearch", Integer.toString(scannedFiles * 100 / snapshotNumberOfShares)));
-                    scannedFiles++;
-                    if (!(new File(mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME))).exists())) {
-                        removeEntry(results.getBytes(ID_ROOT_HASH));
-                    }
+                    updateCacheCounters();
                 }
             }
         } catch (SQLException ex) {
@@ -202,10 +225,10 @@ public class FileDatabase {
         return null;
     }
 
-    public HashMap<Hash, String> getRootHashWithPath(String path, String basePath) {
-        HashMap<Hash, String> hashPath = new HashMap<Hash, String>();
+    public ArrayList<FileDescriptor> getHashesForPath(String path, String basePath) {
+        ArrayList<FileDescriptor> fdList = new ArrayList<FileDescriptor>();
         if (!core.getFileManager().getDbCore().isConnected()) {
-            return hashPath;
+            return fdList;
         }
         changeInUseQueue(true);
         try {
@@ -217,7 +240,10 @@ public class FileDatabase {
                     if (f.lastModified() != result.getLong(ID_MODIFIED)) {
                         removeEntry(result.getBytes(ID_ROOT_HASH));
                     } else {
-                        hashPath.put(new Hash(result.getBytes(ID_ROOT_HASH)), mergePathParts(null, null, result.getString(ID_FILENAME)));
+                        FileDescriptor fd = new FileDescriptor();
+                        fd.setRootHash(new Hash(result.getBytes(ID_ROOT_HASH)));
+                        fd.setSubPath(mergePathParts(null, null, result.getString(ID_FILENAME)));
+                        fdList.add(fd);
                     }
                 }
             } else {
@@ -230,7 +256,10 @@ public class FileDatabase {
                     if (f.lastModified() != results.getLong(ID_MODIFIED)) {
                         removeEntry(results.getBytes(ID_ROOT_HASH));
                     } else {
-                        hashPath.put(new Hash(results.getBytes(ID_ROOT_HASH)), mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME)).replace(path, ""));
+                        FileDescriptor fd = new FileDescriptor();
+                        fd.setRootHash(new Hash(results.getBytes(ID_ROOT_HASH)));
+                        fd.setSubPath(mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME)).replace(path, ""));
+                        fdList.add(fd);
                     }
                 }
             }
@@ -238,7 +267,7 @@ public class FileDatabase {
             ex.printStackTrace();
         }
         changeInUseQueue(false);
-        return hashPath;
+        return fdList;
     }
 
     public HashMap<Hash, Long> getRootHashWithSize(String basePath, String path) {

@@ -204,7 +204,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
     private Thread messageFadeThread;
 
-    public synchronized void setStatusMessage(final String s, final boolean important) {
+    public synchronized void setStatusMessage(final String s, final boolean permanent) {
         if (statusMessage.getText().trim().equals(s.trim())) {
             return;
         }
@@ -223,49 +223,51 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (messageFadeThread != null) {
             messageFadeThread.interrupt();
         }
-        messageFadeThread = new Thread(new Runnable() {
+        if (!permanent) {
+            messageFadeThread = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                Thread myThread = messageFadeThread;
-                try {
-                    if (myThread != messageFadeThread) {
-                        return;
-                    }
-                    changeStatusMessageColor(0);
-                    if (myThread != messageFadeThread) {
-                        return;
-                    }
-                    Thread.sleep(5500);
-                    if (myThread != messageFadeThread) {
-                        return;
-                    }
-                    int c = 0;
-                    for (int i = 0; i < 23 && messageFadeThread == myThread; i++) {
-                        changeStatusMessageColor(c | c << 8 | c << 16);
-                        c += 10;
-                        Thread.sleep(80);
-                    }
-                    if (myThread != messageFadeThread) {
-                        return;
-                    }
-                    SwingUtilities.invokeLater(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            statusMessage.setText(" ");
+                @Override
+                public void run() {
+                    Thread myThread = messageFadeThread;
+                    try {
+                        if (myThread != messageFadeThread) {
+                            return;
                         }
-                    });
-                } catch (InterruptedException e) {
-                } catch (Exception e) {
-                    if (T.t) {
-                        T.error("Problem in progressMessage fade loop: " + e);
+                        changeStatusMessageColor(0);
+                        if (myThread != messageFadeThread) {
+                            return;
+                        }
+                        Thread.sleep(5500);
+                        if (myThread != messageFadeThread) {
+                            return;
+                        }
+                        int c = 0;
+                        for (int i = 0; i < 23 && messageFadeThread == myThread; i++) {
+                            changeStatusMessageColor(c | c << 8 | c << 16);
+                            c += 10;
+                            Thread.sleep(80);
+                        }
+                        if (myThread != messageFadeThread) {
+                            return;
+                        }
+                        SwingUtilities.invokeLater(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                statusMessage.setText(" ");
+                            }
+                        });
+                    } catch (InterruptedException e) {
+                    } catch (Exception e) {
+                        if (T.t) {
+                            T.error("Problem in progressMessage fade loop: " + e);
+                        }
                     }
                 }
-            }
-        });
-        messageFadeThread.setName("MessageFadeThread");
-        messageFadeThread.start();
+            });
+            messageFadeThread.setName("MessageFadeThread");
+            messageFadeThread.start();
+        }
     }
 
     private synchronized void changeStatusMessageColor(final int color) {

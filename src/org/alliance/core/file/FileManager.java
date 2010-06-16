@@ -1,6 +1,5 @@
 package org.alliance.core.file;
 
-import com.stendahls.util.TextUtils;
 import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.KB;
 import org.alliance.core.Manager;
@@ -15,11 +14,13 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.h2database.DatabaseCore;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
+import org.alliance.core.LanguageResource;
 
 import java.io.IOException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.TreeSet;
 
 /**
  * Keeps track of all files used in Alliance. Contains the ShareManager, DownloadStorage and AutomaticUpgrade. Should
@@ -57,15 +58,8 @@ public class FileManager extends Manager {
 
     @Override
     public void init() throws IOException, Exception {
-        try {
-            dbCore = new DatabaseCore(core);
-            dbCore.connect();
-            core.getFileManager().manageBackup(MAKE_BACKUP);
-        } catch (Exception ex) {
-            core.getFileManager().manageBackup(RESTORE_BACKUP);
-            dbCore.connect();
-        }
-
+        dbCore = new DatabaseCore(core);
+        dbCore.connect(null);
         cache = new CacheStorage(settings.getInternal().getCachefolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getCachefolder(), core);
         downloads = new DownloadStorage(settings.getInternal().getDownloadfolder() + "/" + FileManager.INCOMPLETE_FOLDER_NAME, settings.getInternal().getDownloadfolder(), core);
         shareManager = new ShareManager(core, settings);
@@ -174,45 +168,6 @@ public class FileManager extends Manager {
         return cache.isRecentlyDownloaded(rootHash);
     }
 
-    public void manageBackup(int mode) throws Exception {
-        String firstDirectory = core.getSettings().getInternal().getDatabasefile();
-        firstDirectory = TextUtils.makeSurePathIsMultiplatform(firstDirectory.substring(0, firstDirectory.lastIndexOf("/") + 1));
-        String secondDirectory = TextUtils.makeSurePathIsMultiplatform(firstDirectory + "backup/");
-        if (mode == MAKE_BACKUP) {
-            try {
-                copyBackup(firstDirectory, secondDirectory);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        } else if (mode == RESTORE_BACKUP) {
-            try {
-                copyBackup(secondDirectory, firstDirectory);
-            } catch (IOException ex) {
-                throw new Exception("Failed to restore database from backup.", ex);
-            }
-        }
-    }
-
-    public void copyBackup(String source, String target) throws IOException {
-        File sourceDirectory = new File(source);
-        File targetDirectory = new File(target);
-        if (!targetDirectory.exists()) {
-            targetDirectory.mkdir();
-        } else {
-            File[] files = targetDirectory.listFiles();
-            for (File file : files) {
-                file.delete();
-            }
-        }
-        File[] files = sourceDirectory.listFiles();
-        for (File sourceFile : files) {
-            if (sourceFile.isFile() && !sourceFile.getName().contains(".lock") && !sourceFile.getName().contains(".trace")) {
-                File targetFile = new File(target, sourceFile.getName());
-                copyFile(sourceFile, targetFile);
-            }
-        }
-    }
-
     public static void copyFile(File src, File dst) throws IOException {
         FileInputStream in = new FileInputStream(src);
         FileOutputStream out = new FileOutputStream(dst);
@@ -224,5 +179,43 @@ public class FileManager extends Manager {
         out.flush();
         out.close();
         in.close();
+    }
+
+    public void createBackup() {
+        core.getFileManager().getDbCore().backup();
+        TreeSet<File> backupFiles = getBackups();
+        while (backupFiles.size() > 3) {
+            File f = backupFiles.pollFirst();
+            if (f != null) {
+                f.delete();
+            }
+        }
+    }
+
+    public String prepareToRestore(String backup) {
+        if (core.getProgress() != null) {
+            core.getProgress().updateProgress(LanguageResource.getLocalizedString(getClass(), "backup"));
+        }
+        dbCore.shutdown();
+        File dbFile = new File(core.getSettings().getInternal().getDatabasefile() + ".h2.db");
+        dbFile.renameTo(new File(dbFile.getAbsolutePath() + "-" + System.currentTimeMillis() + ".old"));
+        if (backup != null) {
+            return backup;
+        }
+        TreeSet<File> backupFiles = getBackups();
+        return backupFiles.last().getAbsolutePath();
+    }
+
+    private TreeSet<File> getBackups() {
+        String dbPath = core.getSettings().getInternal().getDatabasefile();
+        dbPath = dbPath.substring(0, dbPath.lastIndexOf("/"));
+        File dbDir = new File(dbPath);
+        TreeSet<File> backupFiles = new TreeSet<File>();
+        for (File f : dbDir.listFiles()) {
+            if (f.getName().startsWith("alliance-script-") && f.getName().endsWith(".zip")) {
+                backupFiles.add(f);
+            }
+        }
+        return backupFiles;
     }
 }

@@ -99,9 +99,12 @@ public class ShareScanner extends Thread {
 
             if (System.currentTimeMillis() - lastFullScanCompletedAt > getShareManagerCycle() || shouldBeFastScan) {
 
+                manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "backup"), true);
+                manager.getCore().getFileManager().createBackup();
+
                 //Scan shares for removed files
                 manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
-                manager.getFileDatabase().removeObsoleteEntries();
+                manager.getFileDatabase().removeOldShares();
 
                 long time = System.currentTimeMillis();
                 filesScanned = 0;
@@ -179,10 +182,11 @@ public class ShareScanner extends Thread {
         }
 
         if (file.isDirectory()) {
-            File[] children = file.listFiles();
-            if (children != null) {
-                for (int i = 0; i < children.length; i++) {
-                    visitAllFiles(children[i], basePath);
+            File[] childrens = file.listFiles();
+            if (childrens != null) {
+                manager.getFileDatabase().removeNonExistedEntries(file, childrens, basePath);
+                for (int i = 0; i < childrens.length; i++) {
+                    visitAllFiles(childrens[i], basePath);
                 }
             }
         } else {

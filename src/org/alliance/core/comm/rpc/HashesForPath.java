@@ -5,12 +5,14 @@ import org.alliance.core.comm.T;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.LanguageResource;
+import org.alliance.core.file.filedatabase.FileDescriptor;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by IntelliJ IDEA.
@@ -21,26 +23,26 @@ import java.util.HashMap;
  */
 public class HashesForPath extends CompressedRPC {
 
-    private HashMap<Hash, String> hashPath = new HashMap<Hash, String>();
+    private ArrayList<FileDescriptor> fdList = new ArrayList<FileDescriptor>();
 
     public HashesForPath() {
     }
 
     public HashesForPath(String path, String basePath, CoreSubsystem core) {
         if (core != null) {
-            hashPath = core.getShareManager().getFileDatabase().getRootHashWithPath(path, basePath);
+            fdList = core.getShareManager().getFileDatabase().getHashesForPath(path, basePath);
         }
     }
 
     @Override
     public void serializeCompressed(DataOutputStream out) throws IOException {
         out.writeUTF(""); //Compatibility<1.0.9
-        out.writeInt(hashPath.size());
-        for (Hash hash : hashPath.keySet()) {
-            out.write(hash.array());
-            out.writeUTF(hashPath.get(hash));
+        out.writeInt(fdList.size());
+        for (FileDescriptor fd : fdList) {
+            out.write(fd.getRootHash().array());
+            out.writeUTF(fd.getSubPath());
         }
-        hashPath.clear();
+        fdList.clear();
     }
 
     @Override
@@ -51,8 +53,21 @@ public class HashesForPath extends CompressedRPC {
         for (int i = 0; i < numberOfFiles; i++) {
             Hash hash = new Hash();
             in.readFully(hash.array());
-            hashPath.put(hash, in.readUTF());
+            FileDescriptor fd = new FileDescriptor();
+            fd.setRootHash(hash);
+            fd.setSubPath(in.readUTF());
+            fdList.add(fd);
         }
+
+        Collections.sort(fdList, new Comparator<FileDescriptor>() {
+
+            @Override
+            public int compare(FileDescriptor fd1, FileDescriptor fd2) {
+                String s1 = fd1.getSubPath();
+                String s2 = fd2.getSubPath();
+                return s1.compareToIgnoreCase(s2);
+            }
+        });
 
         if (T.t) {
             T.info("Loaded " + numberOfFiles);
@@ -64,8 +79,9 @@ public class HashesForPath extends CompressedRPC {
 
         String subPath = "";
         String downloadDir = "";
-        for (Hash hash : hashPath.keySet()) {
-            String commonPath = TextUtils.makeSurePathIsMultiplatform(hashPath.get(hash));
+
+        for (FileDescriptor fd : fdList) {
+            String commonPath = TextUtils.makeSurePathIsMultiplatform(fd.getSubPath());
 
             //Compatibility<1.0.9
             if (!path.isEmpty()) {
@@ -86,14 +102,14 @@ public class HashesForPath extends CompressedRPC {
                 downloadDir = core.getFileManager().getDownloadStorage().getCustomDownloadDir(con.getRemoteUserGUID(), commonPath);
             }
 
-            if (core.getFileManager().containsComplete(hash)) {
+            if (core.getFileManager().containsComplete(fd.getRootHash())) {
                 core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "samefile", commonPath));
-            } else if (core.getNetworkManager().getDownloadManager().getDownload(hash) != null) {
+            } else if (core.getNetworkManager().getDownloadManager().getDownload(fd.getRootHash()) != null) {
                 core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadinprogress", commonPath));
             } else {
-                core.getNetworkManager().getDownloadManager().queDownload(hash, commonPath, guid, downloadDir);
+                core.getNetworkManager().getDownloadManager().queDownload(fd.getRootHash(), commonPath, guid, downloadDir);
             }
         }
-        hashPath.clear();
+        fdList.clear();
     }
 }

@@ -23,7 +23,7 @@ public class DatabaseSharesBases {
         Statement statement = conn.createStatement();
         StringBuilder sql = new StringBuilder();
         sql.append("CREATE TABLE IF NOT EXISTS sharesbases(");
-        sql.append("base_path character varying(32767) NOT NULL, ");
+        sql.append("base_path character varying(4096) NOT NULL, ");
         sql.append("CONSTRAINT pk_sharesbases PRIMARY KEY (base_path));");
         statement.executeUpdate(sql.toString());
     }

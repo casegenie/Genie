@@ -76,7 +76,7 @@ public class FileDescriptorConsumer implements DataConsumer {
             }, download.getManager().getCore());
             //todo: not pretty but will have to do for now
             if (download.getAuxInfoFilename().trim().length() > 0 && !"Link from chat".equals(download.getAuxInfoFilename())) {
-                fd.setSubpath(download.getAuxInfoFilename());
+                fd.setSubPath(download.getAuxInfoFilename());
             } else {
                 fd.simplifySubpath();
             }

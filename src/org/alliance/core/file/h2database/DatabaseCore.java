@@ -31,11 +31,14 @@ public class DatabaseCore {
         this.core = core;
     }
 
-    public void connect() throws Exception {
+    public void connect(String backup) throws Exception {
         try {
             Class.forName(DRIVER);
             String path = core.getSettings().getInternal().getDatabasefile();
             conn = DriverManager.getConnection(DRIVERURL + TYPE + path + OPTIONS, USER, PASSWORD);
+            if (backup != null) {
+                restoreFromBackup(backup);
+            }
             changeCache(8 * 1024);
             dbSharesBases = new DatabaseSharesBases(conn);
             dbShares = new DatabaseShares(conn);
@@ -45,11 +48,18 @@ public class DatabaseCore {
         } catch (ClassNotFoundException ex) {
             throw new Exception("Failed to initalize database.", ex);
         } catch (SQLException ex) {
-            throw new Exception("Failed to load database from backup.", ex);
+            if (backup == null) {
+                connect(core.getFileManager().prepareToRestore(null));
+            } else {
+                throw new Exception("Failed to load database from backup.", ex);
+            }
         }
     }
 
     public void shutdown() {
+        if (!connected) {
+            return;
+        }
         connected = false;
         long time = System.currentTimeMillis();
         //Wait max 10 seconds
@@ -75,6 +85,30 @@ public class DatabaseCore {
             statement.append("SET CACHE_SIZE ?;");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
             ps.setInt(1, cache);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void backup() {
+        try {
+            StringBuilder statement = new StringBuilder();
+            statement.append("SCRIPT TO ? COMPRESSION ZIP;");
+            PreparedStatement ps = conn.prepareStatement(statement.toString());
+            ps.setString(1, core.getSettings().getInternal().getDatabasefile() + "-script-" + System.currentTimeMillis() + ".zip");
+            ps.executeQuery();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void restoreFromBackup(String backup) {
+        try {
+            StringBuilder statement = new StringBuilder();
+            statement.append("RUNSCRIPT FROM ? COMPRESSION ZIP;");
+            PreparedStatement ps = conn.prepareStatement(statement.toString());
+            ps.setString(1, backup);
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();

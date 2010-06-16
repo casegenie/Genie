@@ -24,9 +24,9 @@ public class DatabaseShares {
         Statement statement = conn.createStatement();
         StringBuilder sql = new StringBuilder();
         sql.append("CREATE TABLE IF NOT EXISTS shares(");
-        sql.append("base_path character varying(32767) NOT NULL, ");
-        sql.append("sub_path character varying(32767) NOT NULL, ");
-        sql.append("filename character varying(32767) NOT NULL, ");
+        sql.append("base_path character varying(4096) NOT NULL, ");
+        sql.append("sub_path character varying(4096) NOT NULL, ");
+        sql.append("filename character varying(4096) NOT NULL, ");
         sql.append("type tinyint NOT NULL, ");
         sql.append("size bigint NOT NULL, ");
         sql.append("root_hash binary NOT NULL, ");
@@ -117,12 +117,14 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntriesBy(String subPath) {
+    public ResultSet getEntriesBy(String basePath, int limit) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("SELECT * FROM shares WHERE sub_path=?;");
+            statement.append("SELECT * FROM shares WHERE base_path=? ");
+            statement.append("LIMIT ?;");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
-            ps.setString(1, subPath);
+            ps.setString(1, basePath);
+            ps.setInt(2, limit);
             return ps.executeQuery();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -195,18 +197,6 @@ public class DatabaseShares {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT SUM(size) FROM shares;");
-            PreparedStatement ps = conn.prepareStatement(statement.toString());
-            return ps.executeQuery();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
-    public ResultSet getSubPaths() {
-        try {
-            StringBuilder statement = new StringBuilder();
-            statement.append("SELECT sub_path FROM shares GROUP BY sub_path;");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
             return ps.executeQuery();
         } catch (SQLException ex) {

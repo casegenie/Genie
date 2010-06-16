@@ -2,12 +2,17 @@ package org.alliance.ui.windows.options;
 
 import com.stendahls.XUI.XUI;
 import com.stendahls.XUI.XUIDialog;
-import javax.swing.JLabel;
+import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
+import java.awt.event.ActionEvent;
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileFilter;
 
 /**
  *
@@ -37,6 +42,37 @@ public class DatabaseTab extends XUIDialog implements TabHelper {
         tab = (JPanel) xui.getComponent("databasetab");
         tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
         tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+    }
+
+    public void EVENT_browse(ActionEvent e) throws Exception {
+        JFileChooser fc = new JFileChooser();
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setAcceptAllFileFilterUsed(false);
+
+        fc.addChoosableFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File pathname) {
+                if ((pathname.toString().contains("alliance-script-") && pathname.toString().endsWith(".zip")) || pathname.isDirectory()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public String getDescription() {
+                return ("DB Script");
+            }
+        });
+
+        int returnVal = fc.showOpenDialog(this);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getPath();
+            ui.getCore().getFileManager().getDbCore().connect(ui.getCore().getFileManager().prepareToRestore(path));
+            ui.getCore().getFileManager().getFileDatabase().updateCacheCounters();
+            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "restoreok"));
+        }
     }
 
     @Override

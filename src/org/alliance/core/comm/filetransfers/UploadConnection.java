@@ -63,7 +63,7 @@ public class UploadConnection extends TransferConnection {
         }
         root = new Hash();
         p.readArray(root.array());
-        setStatusString(core.getFileManager().getFd(root).getSubpath());
+        setStatusString(core.getFileManager().getFd(root).getSubPath());
         if (T.t) {
             T.info("Remote wants to download " + root + " from me.");
         }

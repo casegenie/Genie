@@ -23,7 +23,7 @@ public class DatabaseDuplicates {
         Statement statement = conn.createStatement();
         StringBuilder sql = new StringBuilder();
         sql.append("CREATE TABLE IF NOT EXISTS duplicates(");
-        sql.append("path character varying(32767) NOT NULL, ");
+        sql.append("path character varying(4096) NOT NULL, ");
         sql.append("root_hash binary NOT NULL, ");
         sql.append("modified bigint NOT NULL, ");
         sql.append("CONSTRAINT fk_duplicates_root_hash FOREIGN KEY (root_hash) REFERENCES shares(root_hash) ON DELETE CASCADE, ");

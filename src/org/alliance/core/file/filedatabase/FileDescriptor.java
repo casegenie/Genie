@@ -40,7 +40,7 @@ public class FileDescriptor {
     }
     private final static byte VERSION = 1;
     private String basePath;
-    private String subpath;
+    private String subPath;
     private long size;
     private Hash rootHash;
     private Hash[] hashList;
@@ -49,17 +49,13 @@ public class FileDescriptor {
     public FileDescriptor() {
     }
 
-    public FileDescriptor(String basePath, String subpath, long size, Hash rootHash, Hash[] hashList, long modifiedAt) {
+    public FileDescriptor(String basePath, String subPath, long size, Hash rootHash, Hash[] hashList, long modifiedAt) {
         this.basePath = basePath;
-        this.subpath = subpath;
+        this.subPath = subPath;
         this.size = size;
         this.rootHash = rootHash;
         this.hashList = hashList;
         this.modifiedAt = modifiedAt;
-    }
-
-    public FileDescriptor(String basePath, File file, int hashSpeedInMbPerSecond) throws IOException {
-        this(basePath, file, hashSpeedInMbPerSecond, null);
     }
 
     /**
@@ -153,7 +149,7 @@ public class FileDescriptor {
         hashList = hashes.toArray(new Hash[hashes.size()]);
         this.basePath = basePath;
         size = file.length();
-        subpath = createSubpath(file.getPath());
+        subPath = createSubPath(file.getPath());
         modifiedAt = file.lastModified();
         in.close();
 
@@ -162,7 +158,7 @@ public class FileDescriptor {
         }
     }
 
-    public String createSubpath(String path) throws IOException {
+    public String createSubPath(String path) throws IOException {
         path = TextUtils.makeSurePathIsMultiplatform(path);
         if (!path.startsWith(basePath)) {
             if (T.t) {
@@ -173,8 +169,8 @@ public class FileDescriptor {
         return path.substring(basePath.length() + 1);
     }
 
-    public String getSubpath() {
-        return subpath;
+    public String getSubPath() {
+        return subPath;
     }
 
     public long getSize() {
@@ -183,6 +179,10 @@ public class FileDescriptor {
 
     public Hash getRootHash() {
         return rootHash;
+    }
+
+    public void setRootHash(Hash rootHash) {
+        this.rootHash = rootHash;
     }
 
     public Hash[] getHashList() {
@@ -204,10 +204,10 @@ public class FileDescriptor {
         } else {
             out = new DataOutputStream(o);
         }
-        subpath = TextUtils.makeSurePathIsMultiplatform(subpath);
+        subPath = TextUtils.makeSurePathIsMultiplatform(subPath);
 
         out.writeByte(VERSION);
-        out.writeUTF(subpath);
+        out.writeUTF(subPath);
         out.writeLong(size);
         out.write(rootHash.array());
         out.writeShort(hashList.length);
@@ -223,14 +223,6 @@ public class FileDescriptor {
     }
 
     public static FileDescriptor createFrom(InputStream is, CoreSubsystem core) throws IOException {
-        try {
-            return createFrom(is, false, core);
-        } catch (FileHasBeenRemovedOrChanged fileHasBeenRemoved) {
-            return null;
-        }
-    }
-
-    public static FileDescriptor createFrom(InputStream is, boolean shouldExist, CoreSubsystem core) throws IOException, FileHasBeenRemovedOrChanged {
         if (is == null) {
             return null;
         }
@@ -244,7 +236,7 @@ public class FileDescriptor {
             }
             return null;
         }
-        fd.subpath = TextUtils.makeSurePathIsMultiplatform(in.readUTF());
+        fd.subPath = TextUtils.makeSurePathIsMultiplatform(in.readUTF());
         fd.size = in.readLong();
         fd.rootHash = Hash.createFrom(in);
 
@@ -260,40 +252,22 @@ public class FileDescriptor {
 
         if (fd.basePath.length() > 0 && !new File(fd.basePath).exists()) {
             if (T.t) {
-                T.warn("Base path " + fd.basePath + " is not existant. For File " + fd.subpath + " - have to throw it way.");
+                T.warn("Base path " + fd.basePath + " is not existant. For File " + fd.subPath + " - have to throw it way.");
             }
-            if (shouldExist) {
-                throw new FileHasBeenRemovedOrChanged(fd);
-            }
+         
             return null;
         }
-
-        if (shouldExist && core.getShareManager().getBaseByPath(fd.basePath) == null) {
-            if (T.t) {
-                T.warn("Base path " + fd.basePath + " is no longer part of shared files. For File " + fd.subpath + " - have to throw it way.");
-            }
-            throw new FileHasBeenRemovedOrChanged(fd);
-        }
-
-        if (shouldExist && !fd.existsAndSeemsEqual()) {
-            throw new FileHasBeenRemovedOrChanged(fd);
-        }
-
+      
         return fd;
-    }
-
-    public boolean existsAndSeemsEqual() {
-        File f = new File(getFullPath());
-        return f.exists() && f.length() == getSize() && f.lastModified() == getModifiedAt();
     }
 
     @Override
     public String toString() {
-        return "FileDescriptor [" + basePath + ", " + subpath + ", " + size + ", " + rootHash + "]";
+        return "FileDescriptor [" + basePath + ", " + subPath + ", " + size + ", " + rootHash + "]";
     }
 
     public String getFullPath() {
-        return basePath + "/" + subpath;
+        return basePath + "/" + subPath;
     }
 
     public Object getSubHash(int blockNumber) {
@@ -309,7 +283,7 @@ public class FileDescriptor {
     }
 
     public String getFilename() {
-        String s = getSubpath();
+        String s = getSubPath();
         int i = s.lastIndexOf('/');
         if (i != -1) {
             return s.substring(i + 1);
@@ -318,8 +292,8 @@ public class FileDescriptor {
         }
     }
 
-    public void setSubpath(String subpath) {
-        this.subpath = subpath;
+    public void setSubPath(String subPath) {
+        this.subPath = subPath;
     }
 
     public long getModifiedAt() {
@@ -330,10 +304,6 @@ public class FileDescriptor {
         this.modifiedAt = modifiedAt;
     }
 
-    public String getCanonicalPath() throws IOException {
-        return new File(getFullPath()).getCanonicalPath();
-    }
-
     public void updateModifiedAt() {
         setModifiedAt(new File(getFullPath()).lastModified());
     }
@@ -342,8 +312,8 @@ public class FileDescriptor {
      * When a file is downloaded there's no point in having the entire subpath (for example apps/free/waste/waste.zip) it's better to simplify it to waste/waste.zip - one direcroty and then the file
      */
     public void simplifySubpath() {
-        while (countSeparators(subpath) > 1) {
-            subpath = subpath.substring(TextUtils.makeSurePathIsMultiplatform(subpath).indexOf('/') + 1);
+        while (countSeparators(subPath) > 1) {
+            subPath = subPath.substring(TextUtils.makeSurePathIsMultiplatform(subPath).indexOf('/') + 1);
         }
     }
 
