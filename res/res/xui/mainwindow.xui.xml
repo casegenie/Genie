@@ -1,5 +1,5 @@
 <xui>
-    <title value="Alliance" image="gfx/icons/alliance.png"/>
+    <title value="Alliance"/>
     <menubar>
         <menu id="filemenu" text="%text%" mnemonic="f">
             <menuitem eventid="hide" text="%text%"/>

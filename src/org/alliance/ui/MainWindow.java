@@ -55,6 +55,7 @@ import org.alliance.ui.windows.shares.SharesWindow;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -68,6 +69,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -100,6 +102,13 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void init(final UISubsystem ui, StartupProgressListener pml) throws Exception {
         this.ui = ui;
+
+        int[] imageSizes = {16, 24, 32, 48, 64, 128};
+        ArrayList<Image> images = new ArrayList<Image>();
+        for (int size : imageSizes) {
+            images.add((new ImageIcon(getClass().getResource("/res/gfx/icons/alliance" + size + ".png")).getImage()));
+        }
+        this.setIconImages(images);
 
         pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
         init(ui.getRl(), "xui/mainwindow.xui.xml");

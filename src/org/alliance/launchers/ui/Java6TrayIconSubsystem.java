@@ -214,8 +214,16 @@ public class Java6TrayIconSubsystem implements Subsystem, Runnable {
 
         Toolkit.getDefaultToolkit().getSystemEventQueue().push(new PopupFixQueue(m));
 
-        ti = new TrayIcon(Toolkit.getDefaultToolkit().getImage(rl.getResource("gfx/icons/alliancetray.png")),
-                "Alliance", m);
+        int[] imageSizes = {16, 24, 32, 48, 64, 128};
+        for (int size : imageSizes) {
+            if (size - tray.getTrayIconSize().getWidth() < 0) {
+                continue;
+            } else {
+                ti = new TrayIcon(Toolkit.getDefaultToolkit().getImage(rl.getResource("gfx/icons/alliance" + size + ".png")), "Alliance", m);
+                break;
+            }
+        }
+
         ti.setImageAutoSize(true);
 
         ti.addActionListener(new ActionListener() {
