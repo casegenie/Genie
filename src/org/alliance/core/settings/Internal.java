@@ -48,6 +48,7 @@ public class Internal extends SettingClass {
     private String databasefile = USER_DIRECTORY + "data/db/alliance";
     private String downloadquefile = USER_DIRECTORY + "data/downloads.dat";
     private String corestatefile = USER_DIRECTORY + "data/core.dat";
+    private String historyfile = USER_DIRECTORY + "data/history.dat";
     private String windowstatefile = USER_DIRECTORY + "data/mainwindow.state";
     private String pmsound = "sounds/chatpm.wav";
     private String publicsound = "sounds/chatpublic.wav";
@@ -304,6 +305,14 @@ public class Internal extends SettingClass {
 
     public void setCorestatefile(String corestatefile) {
         this.corestatefile = corestatefile;
+    }
+
+    public String getHistoryfile() {
+        return historyfile;
+    }
+
+    public void setHistoryfile(String historyfile) {
+        this.historyfile = historyfile;
     }
 
     public String getWindowstatefile() {

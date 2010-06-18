@@ -102,6 +102,19 @@
             toolbarimage="gfx/icons/cleanall.png"/>
         <action filler="true"/>
     </group>
+    <group id="historychat">
+        <action
+            id="cleanup"
+            name="%NAME%"
+            description="%DES%"
+            toolbarimage="gfx/icons/cleanall.png"/>
+        <action filler="true"/>
+        <action
+            id="close"
+            name="%NAME%"
+            description="%DES%"
+            toolbarimage="gfx/icons/close.png"/>
+    </group>
     <group id="viewshare">
         <action
             id="revert"

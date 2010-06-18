@@ -12,6 +12,7 @@
                 <menuitem eventid="dups" text="%text%" mnemonic="d" accelerator="ctrl-d"/>
             </menu>
             <menuitem eventid="changelog" text="%text%"/>
+            <menuitem eventid="chathistory" text="%text%"/>
             <menu id="debugmenu" text="%text%">
                 <menuitem eventid="trace" mnemonic="t" accelerator="ctrl-t" text="%text%"/>
                 <menuitem eventid="console" mnemonic="d" accelerator="ctrl-y" text="%text%"/>

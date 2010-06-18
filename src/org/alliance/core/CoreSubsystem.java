@@ -37,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
@@ -70,6 +72,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class CoreSubsystem implements Subsystem {
 
     private static final int STATE_FILE_VERSION = 5;
+    private final static int HISTORY_FILE_VERSION = 1;
     public final static int KB = 1024;
     public final static int MB = 1024 * KB;
     public final static long GB = 1024 * MB;
@@ -134,6 +137,7 @@ public class CoreSubsystem implements Subsystem {
         Thread.currentThread().setName("Booting Core");
         progress.updateProgress("...");
         loadSettings();
+        checkHistoryVersion();
         new LanguageResource(settings.getInternal().getLanguage());
         progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingcore"));
 
@@ -360,6 +364,75 @@ public class CoreSubsystem implements Subsystem {
         out.write(SXML.toString(doc));
         out.flush();
         out.close();
+    }
+
+    private void checkHistoryVersion() {
+        DataInputStream in = null;
+        DataOutputStream out = null;
+        try {
+            if (T.t) {
+                T.info("Loading history file");
+            }
+            File history = new File(settings.getInternal().getHistoryfile());
+            if (history.exists()) {
+                in = new DataInputStream(new FileInputStream(history));
+                int ver = in.readInt();
+                if (ver != HISTORY_FILE_VERSION) {
+                    if (T.t) {
+                        T.error("Incorrect history file version. Rename to old.");
+                    }
+                    in.close();
+                    history.renameTo(new File(settings.getInternal().getHistoryfile() + ".old"));
+                } else {
+                    in.close();
+                    return;
+                }
+            }
+            history = new File(settings.getInternal().getHistoryfile());
+            if (history.getParentFile() != null) {
+                history.getParentFile().mkdirs();
+            }
+            out = new DataOutputStream(new FileOutputStream(history));
+            out.writeInt(HISTORY_FILE_VERSION);
+            out.flush();
+            out.close();
+        } catch (IOException e) {
+            if (T.t) {
+                T.error("Could not load history file: " + e);
+            }
+        } finally {
+            try {
+                in.close();
+                out.close();
+            } catch (Exception ex) {
+            }
+        }
+    }
+
+    public void addToHistory(String chatType, String from, String message, long tick) {
+        DataOutputStream out = null;
+        try {
+            if (T.t) {
+                T.info("Adding to history.");
+            }
+            File file = new File(settings.getInternal().getHistoryfile());
+            out = new DataOutputStream(new FileOutputStream(file, true));
+            out.writeUTF(chatType);
+            out.writeUTF(from);
+            out.writeUTF(message);
+            out.writeLong(tick);
+            out.flush();
+            out.close();
+        } catch (IOException ex) {
+            if (T.t) {
+                T.error("Could not save to history: " + ex);
+            }
+        } finally {
+            try {
+                out.close();
+            } catch (IOException ex) {
+            }
+        }
     }
 
     public ResourceLoader getRl() {

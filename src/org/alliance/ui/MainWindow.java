@@ -42,6 +42,7 @@ import org.alliance.ui.windows.ForwardInvitationDialog;
 import org.alliance.ui.windows.mdi.friends.FriendListMDIWindow;
 import org.alliance.ui.windows.mdi.FriendsTreeMDIWindow;
 import org.alliance.ui.windows.options.OptionsWindow;
+import org.alliance.ui.windows.mdi.chat.HistoryChatMessageMDIWindow;
 import org.alliance.ui.windows.mdi.chat.PrivateChatMessageMDIWindow;
 import org.alliance.ui.windows.mdi.chat.PublicChatMessageMDIWindow;
 import org.alliance.ui.windows.mdi.trace.TraceMDIWindow;
@@ -137,7 +138,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
         for (PublicChatHistory.Entry e : ui.getCore().getPublicChatHistory().allMessages()) {
-            publicChat.addMessage(ui.getCore().getFriendManager().nickname(e.fromGuid), e.message, e.tick, true);
+            publicChat.addMessage(ui.getCore().getFriendManager().nickname(e.fromGuid), e.message, e.tick, true, false);
         }
 
         mdiManager.selectWindow(publicChat);
@@ -818,6 +819,15 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_plugins(ActionEvent e) throws Exception {
         new AddPluginWindow(ui);
+    }
+
+    public void EVENT_chathistory(ActionEvent e) throws Exception {
+        HistoryChatMessageMDIWindow w = (HistoryChatMessageMDIWindow) mdiManager.getWindow("historychat");
+        if (w == null) {
+            w = new HistoryChatMessageMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_trace(ActionEvent e) throws Exception {

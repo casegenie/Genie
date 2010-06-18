@@ -38,6 +38,7 @@ import javax.swing.event.HyperlinkListener;
  */
 public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow implements Runnable {
 
+    private static final int MAXIMUM_NUMBER_OF_CHAT_LINES = 50;
     protected final static DateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
     protected final static DateFormat SHORT_FORMAT = new SimpleDateFormat("HH:mm");
     protected final static Color COLORS[] = {
@@ -53,11 +54,10 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     protected JEditorPane textarea;
     protected JTextField chat;
     protected String html = "";
-    private TreeSet<ChatLine> chatLines;
-    private static final int MAXIMUM_NUMBER_OF_CHAT_LINES = 50;
-    private boolean needToUpdateHtml;
+    protected TreeSet<ChatLine> chatLines;
+    protected boolean needToUpdateHtml;
+    protected ChatLine previousChatLine = null;
     private boolean alive = true;
-    private ChatLine previousChatLine = null;
 
     protected AbstractChatMessageMDIWindow(MDIManager manager, String mdiWindowIdentifier, UISubsystem ui) throws Exception {
         super(manager, mdiWindowIdentifier, ui);
@@ -230,6 +230,10 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
     }
 
     public void addMessage(String from, String message, long tick, boolean messageHasBeenQueuedAwayForAWhile) {
+        addMessage(from, message, tick, messageHasBeenQueuedAwayForAWhile, true);
+    }
+
+    public void addMessage(String from, String message, long tick, boolean messageHasBeenQueuedAwayForAWhile, boolean saveToHistory) {
         if (chatLines != null && chatLines.size() > 0) {
             ChatLine l = chatLines.last();
             if (!messageHasBeenQueuedAwayForAWhile) {
@@ -262,12 +266,17 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
             chatLines.remove(chatLines.first());
         }
         if (chatLines.last() == cl && !removeFirstLine) {
-            html += creattHtmlChatLine(cl);
+            html += createHtmlChatLine(cl);
         } else {
             regenerateHtml();
         }
 
         needToUpdateHtml = true;
+
+        if (saveToHistory) {
+            String chatID = this.toString().replaceAll(".*\\{|\\}.*|Private chat with ", "");
+            ui.getCore().addToHistory(chatID, from, message, tick);
+        }
     }
 
     private boolean chatLinesContainTick(long tick) {
@@ -279,13 +288,13 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         return false;
     }
 
-    private void regenerateHtml() {
+    protected void regenerateHtml() {
         if (T.t) {
             T.info("Regenerating entire html for chat");
         }
         html = "";
         for (ChatLine chatLine : chatLines) {
-            html += creattHtmlChatLine(chatLine);
+            html += createHtmlChatLine(chatLine);
         }
     }
 
@@ -309,7 +318,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         }
     }
 
-    private String creattHtmlChatLine(ChatLine cl) {
+    private String createHtmlChatLine(ChatLine cl) {
         String s;
         DateFormat f = new SimpleDateFormat("yyyy-MM-dd");
         if (previousChatLine != null
@@ -329,7 +338,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         return "#" + Integer.toHexString(color.getRGB() & 0xffffff);
     }
 
-    private class ChatLine {
+    protected class ChatLine {
 
         String from, message;
         long tick;
