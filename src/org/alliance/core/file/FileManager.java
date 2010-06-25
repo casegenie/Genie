@@ -93,6 +93,7 @@ public class FileManager extends Manager {
         shareManager.shutdown();
         cache.shutdown();
         downloads.shutdown();
+        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "compacting"), true);
         dbCore.shutdown();
     }
 

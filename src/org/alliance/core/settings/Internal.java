@@ -145,6 +145,10 @@ public class Internal extends SettingClass {
     }
 
     public String getDownloadfolder() {
+        if (!(new File(downloadfolder).exists())) {
+            downloadfolder = CURRENT_DIRECTORY + "downloads";
+            (new File(downloadfolder)).mkdirs();
+        }
         return downloadfolder;
     }
 

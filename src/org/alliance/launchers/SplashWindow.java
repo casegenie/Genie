@@ -13,6 +13,7 @@ import java.awt.MediaTracker;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.image.BufferedImage;
 
 /**
  * User: maciek
@@ -22,21 +23,24 @@ import java.awt.Window;
 public class SplashWindow extends Window implements Runnable, StartupProgressListener {
 
     private Image image;
-    private String statusMessage = "";    
+    private BufferedImage bufferedImage;
+    private String statusMessage = "";
+    private Color borderColor = new Color(0f, 0f, 0f, 0.5f);
+    private Font font = new Font("Dialog", 0, 10);
 
     public SplashWindow() throws Exception {
         super(new Frame());
         image = Toolkit.getDefaultToolkit().getImage(ResourceSingelton.getRl().getResource("gfx/splash.jpg"));
+
         MediaTracker mt = new MediaTracker(SplashWindow.this);
         mt.addImage(image, 0);
-        try {
-            mt.waitForAll();
-        } catch (InterruptedException e) {
-        }
-        Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+        mt.waitForAll();
 
-        setLocation(ss.width / 2 - image.getWidth(null) / 2,
-                ss.height / 2 - image.getHeight(null) / 2);
+        bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_RGB);
+        bufferedImage.createGraphics();
+
+        Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(ss.width / 2 - image.getWidth(null) / 2, ss.height / 2 - image.getHeight(null) / 2);
         setSize(new Dimension(image.getWidth(null), image.getHeight(null)));
 
         setVisible(true);
@@ -46,19 +50,42 @@ public class SplashWindow extends Window implements Runnable, StartupProgressLis
 
     @Override
     public void paint(Graphics frontG) {
-        Graphics2D g = (Graphics2D) frontG;
+        Graphics2D gBuffered = (Graphics2D) bufferedImage.getGraphics();
+        Graphics2D gSplash = (Graphics2D) frontG;
 
-        g.drawImage(image, 0, 0, null);
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        gBuffered.drawImage(image, 0, 0, null);
+        gBuffered.setFont(font);
 
-        g.setFont(new Font("Arial Black, Arial", 0, 10));
+        gBuffered.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        gBuffered.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-        g.setColor(Color.white);
-        int texty = image.getHeight(null) - 10;
-        g.drawString(statusMessage, 10, texty);
+        int texty = bufferedImage.getHeight(null) - 4;
+        drawBorderedStrings(gBuffered, statusMessage, 5, texty, Color.white, borderColor);
         String s = "Version " + Version.VERSION + " build (" + Version.BUILD_NUMBER + ")";
-        g.drawString(s, image.getWidth(null) - 10 - g.getFontMetrics().stringWidth(s), texty);     
-        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        drawBorderedStrings(gBuffered, s, bufferedImage.getWidth(null) - 5 - gBuffered.getFontMetrics().stringWidth(s), texty, Color.white, borderColor);
+
+        gBuffered.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+        gBuffered.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+
+        gSplash.drawImage(bufferedImage, 0, 0, null);
+    }
+
+    private void drawBorderedStrings(Graphics2D g, String s, int x, int y, Color color, Color bcolor) {
+        //Border
+        g.setColor(bcolor);
+        for (int i = 1; i < 2; i++) {
+            g.drawString(s, x - i, y - i);
+            g.drawString(s, x, y - i);
+            g.drawString(s, x + i, y - i);
+            g.drawString(s, x - i, y + i);
+            g.drawString(s, x, y + i);
+            g.drawString(s, x + i, y + i);
+            g.drawString(s, x - i, y);
+            g.drawString(s, x + i, y);
+        }
+        //String
+        g.setColor(color);
+        g.drawString(s, x, y);
     }
 
     @Override

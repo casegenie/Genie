@@ -80,6 +80,8 @@ public abstract class ViewShareTreeNode implements ViewShareIdentifiableTreeNode
                                 }
                             });
                         }
+                    } catch (IndexOutOfBoundsException e) {
+                        //Skip probably we have removed share but friend has old share view
                     } catch (Exception e) {
                         root.getModel().getCore().reportError(e, this);
                     }

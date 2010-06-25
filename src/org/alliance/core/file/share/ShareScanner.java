@@ -102,27 +102,23 @@ public class ShareScanner extends Thread {
                 manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "backup"), true);
                 manager.getCore().getFileManager().createBackup();
 
-                //Scan shares for removed files
                 manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
                 manager.getFileDatabase().removeOldShares();
 
-                long time = System.currentTimeMillis();
                 filesScanned = 0;
                 ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
                 for (ShareBase base : al) {
                     if (!alive) {
                         break;
                     }
-                    try {
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", base.toString()), true);
-                        scanPath(base);
-                    } catch (Exception e) {
-                        if (T.t) {
-                            T.error("Could not scan " + base + ": " + e);
-                        }
+                    String basePath = base.getPath();
+                    manager.getFileDatabase().removeOldDirs(basePath, false);
+                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", basePath), true);
+                    if (T.t) {
+                        T.info("Scanning " + basePath + "...");
                     }
+                    scanPath(new File(basePath), basePath);
                 }
-                System.out.println("Scanned time - " + (System.currentTimeMillis() - time));
                 manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanok"), true);
                 lastFullScanCompletedAt = System.currentTimeMillis();
             }
@@ -173,41 +169,27 @@ public class ShareScanner extends Thread {
         }
     }
 
-    public void visitAllFiles(File file, String basePath) {
+    private void scanPath(File file, String basePath) {
         if (!alive) {
             return;
         }
         if (shouldSkip(file.getName())) {
             return;
         }
-
         if (file.isDirectory()) {
             File[] childrens = file.listFiles();
             if (childrens != null) {
-                manager.getFileDatabase().removeNonExistedEntries(file, childrens, basePath);
+                manager.getFileDatabase().removeOldFiles(basePath, file.getAbsolutePath(), childrens.length);
                 for (int i = 0; i < childrens.length; i++) {
-                    visitAllFiles(childrens[i], basePath);
+                    scanPath(childrens[i], basePath);
                 }
             }
-        } else {
-            if (!file.isHidden() && file.length() != 0) {
-                scanFiles(basePath, file.getPath());
-            }
-        }
-    }
-
-    private void scanPath(ShareBase base) {
-        String basePath = base.getPath();
-        if (T.t) {
-            T.info("Scanning " + basePath + "...");
-        }
-        visitAllFiles(new File(basePath), basePath);
-    }
-
-    private void scanFiles(String basePath, String path) {
-        if (!alive) {
             return;
         }
+        if (file.isHidden() || file.length() == 0) {
+            return;
+        }
+        String path = file.getPath();
         try {
             if (!shouldBeFastScan && filesScanned == 100) {
                 filesScanned = 0;

@@ -67,7 +67,7 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntryBy(String basePath, String subPath, String filename) {
+    public ResultSet getEntry(String basePath, String subPath, String filename) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT * FROM shares WHERE filename=? ");
@@ -83,7 +83,7 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntryBy(byte[] rootHash) {
+    public ResultSet getEntry(byte[] rootHash) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT * FROM shares WHERE root_hash=?;");
@@ -96,7 +96,7 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntriesBy(String basePath, String subPath, boolean withSubPaths, int limit) {
+    public ResultSet getEntries(String basePath, String subPath, boolean withSubPaths, int limit) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT * FROM shares WHERE sub_path LIKE ? ");
@@ -117,14 +117,19 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntriesBy(String basePath, int limit) {
+    public ResultSet getEntries(String filename, byte type) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("SELECT * FROM shares WHERE base_path=? ");
-            statement.append("LIMIT ?;");
+            statement.append("SELECT * FROM shares WHERE filename=?");
+            if (type != 0) {
+                statement.append(" AND TYPE=?");
+            }
+            statement.append(";");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
-            ps.setString(1, basePath);
-            ps.setInt(2, limit);
+            ps.setString(1, filename);
+            if (type != 0) {
+                ps.setByte(2, type);
+            }
             return ps.executeQuery();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -132,7 +137,7 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getFilenamesBy(String query, int limit) {
+    public ResultSet getFilenames(String query, int limit) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("SELECT filename FROM shares GROUP BY filename HAVING LOWER(filename) LIKE ? LIMIT ?;");
@@ -146,19 +151,12 @@ public class DatabaseShares {
         }
     }
 
-    public ResultSet getEntryBy(String filename, byte type) {
+    public ResultSet getSubPaths(String basePath) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("SELECT * FROM shares WHERE filename=?");
-            if (type != 0) {
-                statement.append(" AND TYPE=?");
-            }
-            statement.append(";");
-            PreparedStatement ps = conn.prepareStatement(statement.toString());
-            ps.setString(1, filename);
-            if (type != 0) {
-                ps.setByte(2, type);
-            }
+            statement.append("SELECT sub_path FROM SHARES GROUP BY base_path, sub_path HAVING base_path=?");
+            PreparedStatement ps = conn.prepareStatement(statement.toString());       
+            ps.setString(1, basePath);
             return ps.executeQuery();
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -205,12 +203,28 @@ public class DatabaseShares {
         }
     }
 
-    public void deleteEntryBy(byte[] rootHash) {
+    public void deleteEntry(byte[] rootHash) {
         try {
             StringBuilder statement = new StringBuilder();
             statement.append("DELETE FROM shares WHERE root_hash=?;");
             PreparedStatement ps = conn.prepareStatement(statement.toString());
             ps.setBytes(1, rootHash);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public void deleteEntries(String basePath, String subPath, int limit) {
+        try {
+            StringBuilder statement = new StringBuilder();
+            statement.append("DELETE FROM shares WHERE root_hash IN ");
+            statement.append("(SELECT root_hash FROM shares WHERE sub_path LIKE ? ");
+            statement.append("GROUP BY root_hash HAVING base_path=? LIMIT ?);");
+            PreparedStatement ps = conn.prepareStatement(statement.toString());
+            ps.setString(1, subPath + "%");
+            ps.setString(2, basePath);
+            ps.setInt(3, limit);
             ps.executeUpdate();
         } catch (SQLException ex) {
             ex.printStackTrace();
