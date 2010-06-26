@@ -666,7 +666,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                                 LanguageResource.getLocalizedString(getClass(), "newupdate",
                                 ui.getCore().getFileManager().getSiteUpdater().getSiteVersion(),
                                 Integer.toString(ui.getCore().getFileManager().getSiteUpdater().getSiteBuild()))
-                                + "[a href='.']" + LanguageResource.getLocalizedString(getClass(), "newupdateinfo") + "[/a]", 1, 1);
+                                + "[a href='.']" + LanguageResource.getLocalizedString(getClass(), "newupdateinfo") + "[/a]", 1, 1, true);
                         JLayeredPane lp = (JLayeredPane) updateDialog.getRootPane().getComponent(1);
                         JPanel p = (JPanel) ((JPanel) lp.getComponent(0)).getComponent(0);
                         for (Component c : p.getComponents()) {

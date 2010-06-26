@@ -50,16 +50,30 @@ public class OptionDialog extends JDialog implements ActionListener {
 
     public OptionDialog(JFrame parent, String title, String message, int dialogType, int buttonType) throws Exception {
         super(parent, title, true);
-        init(title, message, dialogType, buttonType);
+        init(title, message, dialogType, buttonType, false);
     }
 
     public OptionDialog(JDialog parent, String title, String message, int dialogType, int buttonType) throws Exception {
         super(parent, title, true);
-        init(title, message, dialogType, buttonType);
+        init(title, message, dialogType, buttonType, false);
     }
 
-    private void init(String title, String message, int dialogType, int buttonType) throws Exception {
-        setTitle(LanguageResource.getLocalizedString(getClass(), title));
+    public OptionDialog(JFrame parent, String title, String message, int dialogType, int buttonType, boolean customTitle) throws Exception {
+        super(parent, title, true);
+        init(title, message, dialogType, buttonType, customTitle);
+    }
+
+    public OptionDialog(JDialog parent, String title, String message, int dialogType, int buttonType, boolean customTitle) throws Exception {
+        super(parent, title, true);
+        init(title, message, dialogType, buttonType, customTitle);
+    }
+
+    private void init(String title, String message, int dialogType, int buttonType, boolean customTitle) throws Exception {
+        if (customTitle) {
+            setTitle(title);
+        } else {
+            setTitle(LanguageResource.getLocalizedString(getClass(), title));
+        }
         setLayout(new BorderLayout());
 
         JPanel panel = new JPanel();
