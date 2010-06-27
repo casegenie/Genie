@@ -69,7 +69,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -96,6 +98,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     private AddFriendWizard lastAddFriendWizard;
     private int userInteractionsInProgress = 0;
     private PublicChatMessageMDIWindow publicChat;
+    private JButton rescan;
+    private Icon[] refreshIconStates = new Icon[2];
 
     public MainWindow() throws Exception {
     }
@@ -115,7 +119,12 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         SubstanceThemeHelper.setComponentToToolbarArea((JComponent) xui.getComponent("fakeShadow"));
-        SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("rescan"));
+
+        rescan = (JButton) xui.getComponent("rescan");
+        rescan.setFocusPainted(false);
+        refreshIconStates[0] = rescan.getIcon();
+        refreshIconStates[1] = new ImageIcon(getClass().getResource("/res/gfx/icons/icon.png"));
+        SubstanceThemeHelper.flatButton(rescan);
 
         bandwidthIn = (JProgressBar) xui.getComponent("bandwidthin");
         bandwidthOut = (JProgressBar) xui.getComponent("bandwidthout");
@@ -524,6 +533,17 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         updateBandwidth("in", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
                         updateBandwidth("out", bandwidthOut, ui.getCore().getNetworkManager().getBandwidthOut());
                         displayNagAboutInvitingFriendsIfNeeded();
+                        if (ui.getCore().getShareManager().getShareScanner().isScanInProgress()) {
+                            if (!rescan.getIcon().equals(refreshIconStates[1])) {
+                                rescan.setToolTipText(LanguageResource.getLocalizedString(getClass(), "break"));
+                                rescan.setIcon(refreshIconStates[1]);
+                            }
+                        } else {
+                            if (!rescan.getIcon().equals(refreshIconStates[0])) {
+                                rescan.setToolTipText(LanguageResource.getLocalizedString(getClass(), "rescan"));
+                                rescan.setIcon(refreshIconStates[0]);
+                            }
+                        }
                     }
 
                     private void displayNagAboutInvitingFriendsIfNeeded() {

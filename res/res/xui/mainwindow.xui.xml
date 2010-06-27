@@ -72,7 +72,7 @@
                         <label text="%text%" id="sharing" tooltip="%text%"/>
                     </panel>
                     <strut width="4"/>
-                    <button id="rescan" image="gfx/icons/refresh.png" type="flat" eventid="rescan" border="0" tooltip="%text%"/>
+                    <button id="rescan" image="gfx/icons/refresh.png" type="flat" eventid="rescan" border="0"/>
                     <strut width="2"/>
                 </panel>
             </panel>

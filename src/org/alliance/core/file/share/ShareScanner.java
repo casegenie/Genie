@@ -25,6 +25,7 @@ import java.util.ArrayList;
 public class ShareScanner extends Thread {
 
     private boolean alive = true;
+    private boolean breakScan = false;
     private ShareManager manager;
     private long bytesScanned;
     private int filesScanned;
@@ -68,72 +69,29 @@ public class ShareScanner extends Thread {
         }
         while (alive) {
             scanInProgress = true;
+            breakScan = false;
             if (filesQueuedForHashing.size() > 0) {
-                ArrayList<String> al = new ArrayList<String>(filesQueuedForHashing);
-                filesQueuedForHashing.clear();
-                for (String file : al) {
-                    try {
-                        //TODO hash check
-                        /* if (manager.getFileDatabase().contains(file.toString())) {
-                        if (T.t) {
-                        T.trace("File already is hashed: " + file);
-                        }
-                        continue;
-                        }*/
-                        File f = new File(file);
-                        if (!f.isDirectory() && f.canRead()) {
-                            hash(file);
-                        }
-                    } catch (FileNotFoundException e) {
-                        if (T.t) {
-                            T.error("Problem while hashing file " + file + ": " + e + ", trying again later");
-                        }
-                        queFileForHashing(file, true);
-                    } catch (IOException e) {
-                        if (T.t) {
-                            T.error("Could not hash file " + file + ": " + e);
-                        }
-                    }
-                }
+                processQueuedFiles();
             }
-
             if (System.currentTimeMillis() - lastFullScanCompletedAt > getShareManagerCycle() || shouldBeFastScan) {
-
-                manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "backup"), true);
-                manager.getCore().getFileManager().createBackup();
-
-                manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
-                manager.getFileDatabase().removeOldShares();
-
-                filesScanned = 0;
-                ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
-                for (ShareBase base : al) {
-                    if (!alive) {
-                        break;
-                    }
-                    String basePath = base.getPath();
-                    manager.getFileDatabase().removeOldDirs(basePath, false);
-                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", basePath), true);
-                    if (T.t) {
-                        T.info("Scanning " + basePath + "...");
-                    }
-                    scanPath(new File(basePath), basePath);
+                startScanCycle();
+                if (isBreakScan()) {
+                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "break"), true);
+                } else {
+                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanok"), true);
                 }
-                manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanok"), true);
                 lastFullScanCompletedAt = System.currentTimeMillis();
             }
-
-            try {
-                //flush fairly often when user is away - the UI locks when you flush so we want to avoid doing that while the user is by the computer
-                if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20)
-                        || System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
+            //flush fairly often when user is away - the UI locks when you flush so we want to avoid doing that while the user is by the computer
+            if (((core.getAwayManager().isAway() || !core.getUICallback().isUIVisible()) && System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 20)
+                    || System.currentTimeMillis() - lastFlushCompletedAt > 1000 * 60 * 60 * 2) { //if user insists on constantly beeing by the computer with alliance visible then forcefully flush every second hour - note that a flush will be made as soon as the user is away because of the awaystatuslistener
+                try {
                     core.saveState();
                     lastFlushCompletedAt = System.currentTimeMillis();
+                } catch (IOException e) {
+                    core.reportError(e, this);
                 }
-            } catch (IOException e) {
-                core.reportError(e, this);
             }
-
             shouldBeFastScan = false;
             scanInProgress = false;
             if (!alive) {
@@ -142,6 +100,70 @@ public class ShareScanner extends Thread {
             core.getShareManager().getFileDatabase().updateCacheCounters();
             waitForNextScan();
         }
+    }
+
+    private void processQueuedFiles() {
+        ArrayList<String> al = new ArrayList<String>(filesQueuedForHashing);
+        filesQueuedForHashing.clear();
+        for (String file : al) {
+            try {
+                //TODO hash check
+                /* if (manager.getFileDatabase().contains(file.toString())) {
+                if (T.t) {
+                T.trace("File already is hashed: " + file);
+                }
+                continue;
+                }*/
+                File f = new File(file);
+                if (!f.isDirectory() && f.canRead()) {
+                    hash(file);
+                }
+            } catch (FileNotFoundException e) {
+                if (T.t) {
+                    T.error("Problem while hashing file " + file + ": " + e + ", trying again later");
+                }
+                queFileForHashing(file, true);
+            } catch (IOException e) {
+                if (T.t) {
+                    T.error("Could not hash file " + file + ": " + e);
+                }
+            }
+        }
+
+    }
+
+    private void startScanCycle() {
+        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "backup"), true);
+        manager.getCore().getFileManager().createBackup();
+        if (isBreakScan()) {
+            return;
+        }
+        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
+        manager.getFileDatabase().removeOldShares();
+        if (isBreakScan()) {
+            return;
+        }
+        filesScanned = 0;
+        ArrayList<ShareBase> al = new ArrayList<ShareBase>(manager.shareBases());
+        for (ShareBase base : al) {
+            if (!alive) {
+                break;
+            }
+            String basePath = base.getPath();
+            manager.getFileDatabase().removeOldDirs(basePath, false);
+            if (isBreakScan()) {
+                return;
+            }
+            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", basePath), true);
+            if (T.t) {
+                T.info("Scanning " + basePath + "...");
+            }
+            scanPath(new File(basePath), basePath);
+        }
+    }
+
+    public boolean isBreakScan() {
+        return breakScan;
     }
 
     private void waitForNextScan() {
@@ -171,6 +193,9 @@ public class ShareScanner extends Thread {
 
     private void scanPath(File file, String basePath) {
         if (!alive) {
+            return;
+        }
+        if (isBreakScan()) {
             return;
         }
         if (shouldSkip(file.getName())) {
@@ -303,8 +328,16 @@ public class ShareScanner extends Thread {
     }
 
     public void startScan(boolean fastScan) {
+        if (scanInProgress) {
+            breakScan = true;
+            return;
+        }
         shouldBeFastScan = fastScan;
         interrupt();
+    }
+
+    public boolean isScanInProgress() {
+        return scanInProgress;
     }
 
     public ShareManager getManager() {

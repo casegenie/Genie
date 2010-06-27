@@ -103,6 +103,9 @@ public class FileDatabase {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return false;
         }
+        if (core.getShareManager().getShareScanner().isBreakScan()) {
+            return false;
+        }
         changeInUseQueue(true);
         boolean moreEntries = false;
         core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedir", basePath + "/" + subPath));
@@ -159,6 +162,9 @@ public class FileDatabase {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return;
         }
+        if (core.getShareManager().getShareScanner().isBreakScan()) {
+            return;
+        }
         changeInUseQueue(true);
         ResultSet resultsDir = core.getFileManager().getDbCore().getDbShares().getSubPaths(basePath);
         try {
@@ -183,6 +189,9 @@ public class FileDatabase {
         if (!core.getFileManager().getDbCore().isConnected()) {
             return;
         }
+        if (core.getShareManager().getShareScanner().isBreakScan()) {
+            return;
+        }
         changeInUseQueue(true);
         try {
             ArrayList<String> shares = new ArrayList<String>();
@@ -196,6 +205,9 @@ public class FileDatabase {
                     core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)), true);
                     removeOldDirs(basePath, true);
                     if (!core.getFileManager().getDbCore().isConnected()) {
+                        break;
+                    }
+                    if (core.getShareManager().getShareScanner().isBreakScan()) {
                         break;
                     }
                     core.getFileManager().getDbCore().getDbSharesBases().deleteEntryBy(basePath);
