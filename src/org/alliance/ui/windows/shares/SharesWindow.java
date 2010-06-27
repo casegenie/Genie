@@ -357,7 +357,7 @@ public class SharesWindow extends XUIDialog {
     public void EVENT_ok(ActionEvent a) throws Exception {
         saveShares();
         if (shareListHasBeenModified) {
-            ui.getCore().getShareManager().getShareScanner().startScan(true);
+            ui.getCore().getShareManager().getShareScanner().startScan(true, true);
         }
         dispose();
     }

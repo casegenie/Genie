@@ -26,6 +26,7 @@ public class ShareScanner extends Thread {
 
     private boolean alive = true;
     private boolean breakScan = false;
+    private boolean restartImmediately = false;
     private ShareManager manager;
     private long bytesScanned;
     private int filesScanned;
@@ -70,6 +71,7 @@ public class ShareScanner extends Thread {
         while (alive) {
             scanInProgress = true;
             breakScan = false;
+            restartImmediately = false;
             if (filesQueuedForHashing.size() > 0) {
                 processQueuedFiles();
             }
@@ -98,7 +100,11 @@ public class ShareScanner extends Thread {
                 break;
             }
             core.getShareManager().getFileDatabase().updateCacheCounters();
-            waitForNextScan();
+            if (!restartImmediately) {
+                waitForNextScan();
+            } else {
+                shouldBeFastScan = true;
+            }
         }
     }
 
@@ -328,8 +334,13 @@ public class ShareScanner extends Thread {
     }
 
     public void startScan(boolean fastScan) {
+        startScan(fastScan, false);
+    }
+
+    public void startScan(boolean fastScan, boolean restart) {
         if (scanInProgress) {
             breakScan = true;
+            restartImmediately = restart;
             return;
         }
         shouldBeFastScan = fastScan;
