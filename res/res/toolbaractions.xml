@@ -171,22 +171,22 @@
     </group>
     <group id="downloads">
         <action
-            id="moveUp"
+            id="moveup"
             name="%NAME%"
             description="%DES%"
             toolbarimage="gfx/icons/up.png"/>
         <action
-            id="moveDown"
+            id="movedown"
             name="%NAME%"
             description="%DES%"
             toolbarimage="gfx/icons/down.png"/>
         <action
-            id="moveTop"
+            id="movetop"
             name="%NAME%"
             description="%DES%"
             toolbarimage="gfx/icons/top.png"/>
         <action
-            id="moveBottom"
+            id="movebottom"
             name="%NAME%"
             description="%DES%"
             toolbarimage="gfx/icons/bottom.png"/>

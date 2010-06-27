@@ -59,7 +59,7 @@ public class Download {
         this.storage = storage;
         this.auxInfoFilename = filename;
         this.auxInfoGuids = guids;
-        this.downloadDir = downloadDir;
+        this.downloadDir = downloadDir == null ? "" : downloadDir;
 
         setFd(manager.getCore().getFileManager().getFd(root)); //not sure there is one, but when resuming there is
 

@@ -214,10 +214,12 @@ public abstract class BlockStorage extends Thread {
                     }
                     bf.save();
                     String dir = completeFilePath.toString();
-                    if (downDir != null) {
-                        bf.getFd().setBasePath(downDir);
-                    } else {
-                        bf.getFd().setBasePath(dir);
+                    bf.getFd().setBasePath(dir);
+                    if (downDir != null && !downDir.isEmpty()) {
+                        File dirCheck = new File(downDir);
+                        if (dirCheck.exists()) {
+                            bf.getFd().setBasePath(downDir);
+                        }
                     }
                     recentlyDownloaded.add(root);
                     queForCompletion(bf);
