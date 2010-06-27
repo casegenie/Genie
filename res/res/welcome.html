@@ -1,9 +1,52 @@
 <b>Changelog</b>
 <br><br>
 <p>
-    <b>1.1.1</b> - ????-??-??
+    <b>1.2.0</b> - 2010-06-26
 <dl>
-    <dd>+
+    <dd><b>+ Added: Site auto-update.</b> (Bastvera, Kratos)
+    <dd>+ Added: External updater program to support admin elevation. (Bastvera, Kratos)
+    <dd>+ Added: Friend List -> Expand/Collapse support for groups. (Bastvera)
+    <dd>+ Added: Friend List -> Online/Total Counter in groups. (Bastvera)
+    <dd><b>+ Added: Ability to translate Alliance trough external files.</b> (Bastvera)
+    <dd>+ Added: Default GUI color scheme can be changed trough external file. (Bastvera)
+    <dd>+ Added: Share Window -> Shares adding through old method (Dialogs). (Bastvera)
+    <dd>+ Added: Share Window -> Quick Jump. (Bastvera)
+    <dd><b>+ Added: New Share Window. Shares management moved from old Options Window.</b> (Bastvera)
+    <dd><b>+ Added: Chat History -> Public/Private, Chat Filter (Text/Links).</b> (Bastvera)
+    <dd>+ Added: Options Window (DatabaseTab) -> Manual DB restore. (Bastvera)
+    <dd>+ Added: Options Window (NetworkTab) -> Ability to bind Alliance to specific NIC. (Bastvera)
+    <dd>+ Added: Options Window (GeneralTab) -> Global/Chat font can be changed. (Bastvera)
+    <dd>+ Added: Share View -> Download to... (Selectable download directory). (Bastvera)
+    <dd>+ Changed: All windows should be adjusted to 'netbooks' resolution. (Bastvera)
+    <dd>+ Changed: Splash uses double buffering, should reduce text flickering. (Bastvera)
+    <dd>+ Changed: New Splash. (iPierre)
+    <dd>+ Changed: New Tray/Window icons. (iPierre)
+    <dd>+ Changed: Some performance improvements in scanning. (Bastvera)
+    <dd><b>+ Changed: Autobackup/Restore uses H2 native feature.</b> Autobackup moved to 'before scanning'. (Bastvera)
+    <dd>+ Changed: Increased External IP check sites from 1 to 4, delayed refresh. (Bastvera)
+    <dd>+ Changed: UPnP -> Uses local IP from binded NIC. (Bastvera)
+    <dd>+ Changed: Friend List -> Selected friends remains selected after list refresh. (Bastvera)
+    <dd>+ Changed: Friend list -> Updates are less CPU intensive. (Bastvera)
+    <dd>+ Changed: Search function -> More polite CPU usage for big DB (25k+ files). (Bastvera)
+    <dd>+ Changed: Updated H2 library. (Bastvera)
+    <dd><b>+ Changed: GUI from Synthetica to Substance.</b> (Bastvera)
+    <dd>+ Changed: Group management -> GUI for easier adding/removing of groups. (Bastvera)
+    <dd>+ Changed: Updated JNotify library, support for 64bit. (Bastvera)
+    <dd><b>+ Changed: New Options Window, dynamic loaded pages.</b> (Bastvera)
+    <dd>+ Changed: Fixes/Cleaning of internal Alliance library for better performance. (Bastvera)
+    <dd>+ Fixed bug: IndexOutOfBounds in share view when friend removed share but we still have old view. (Bastvera)
+    <dd>+ Fixed bug: Non existent download folder prevents downloading without warning. Alliance will use default folder. (Bastvera)
+    <dd>+ Fixed bug: Not sorted download order. (Bastvera)
+    <dd>+ Fixed bug: Sometimes DNS from friends were overwritten by IP. (Bastvera)
+    <dd>+ Fixed bug: Search function -> Ignore case, 'All' shows all. (Bastvera)
+    <dd>+ Fixed bug: Unable to start 'testsuite' on Windows (for devs). (Bastvera)
+    <dd>+ Fixed bug: Right click for Non-Windows OSes. (Bastvera)
+    <dd>+ Fixed bug: No more "ghost" friends on Friend List after removing. (Bastvera)
+    <dd>+ Fixed bug: Sometimes Alliance has been started in incorrect 'current directory'. (Kratos, Bastvera)
+    <dd>+ Fixed bug: Misspelling, minor bugs . (Bastvera)
+    <dd>+ Removed: Old, unused libraries. (Bastvera)
+    <dd>+ Removed: Old auto-update. (Bastvera)
+    <dd>+ Removed: rDNS (temporary). (Bastvera)
 </dl>
 <p>
     <b>1.1.0d</b> - 2010-02-15
@@ -30,15 +73,15 @@
     <dd>+ Fixed bug: DB bug -> The download doesn't end and shows corrupted file message.
     <dd>+ Changed: Tray icon size behaviour.
     <dd>+ Fixed bug: Support for Non-English characters doesn't work with Alliance theme.
-    <dd>+ Removed: Alliance on windows will no longer automatically restart itself. (thanks Kratos)
+    <dd>+ Removed: Alliance on windows will no longer automatically restart itself. (Kratos)
 </dl>
 <p>
     <b>1.1.0</b> - 2010-01-11
 <dl>
-    <dd>+ Fixed bug: Auto detection of external IP in LAN mode. (thanks Kratos)
-    <dd>+ Added: Portable mode to linux. (thanks Kratos)
-    <dd>+ Changed: "Always automatically connect to new friends of friends" to "Always automatically connect to all friends of friends". (thanks Kratos)
-    <dd>+ Added: Ability for plugins to insert a callback to the debug console. This allows plugins to add their own commands to the console. (thanks Kratos)
+    <dd>+ Fixed bug: Auto detection of external IP in LAN mode. (Kratos)
+    <dd>+ Added: Portable mode to linux. (Kratos)
+    <dd>+ Changed: "Always automatically connect to new friends of friends" to "Always automatically connect to all friends of friends". (Kratos)
+    <dd>+ Added: Ability for plugins to insert a callback to the debug console. This allows plugins to add their own commands to the console. (Kratos)
     <dd>+ Fixed bug: Removing files when scanning is in progress no longer break communication.
     <dd>+ Changed: View duplicates works again.
     <dd>+ Changed: Display of filesizes in ShareView moved to tooltip.
@@ -77,44 +120,44 @@
 <p>
     <b>1.0.7</b> - 2009-06-17
 <dl>
-    <dd>+ Added: Search friend. (thanks Bastvera)
-    <dd>+ Fixed bug: DNS names sometimes resets to IP. (thanks Bastvera)
-    <dd>+ Windows Vista Solution. (thanks Bastvera)
-    <dd>+ Added: Sound options tab. (thanks Bastvera)
-    <dd>+ Groups view on friend list changes. (thanks Bastvera)
-    <dd>+ Added: rDNS support. (thanks Kratos)
-    <dd>+ Added: Found via window. (thanks Bastvera)
-    <dd>+ Fixed bug: SSL should work again on most PCs. (thanks Bastvera)
-    <dd>+ Fixed bug: Update of own shared size on Friend List. (thanks Bastvera)
-    <dd>+ Fixed bug: Some ConcurrentModificationExceptions. (thanks Bastvera)
-    <dd>+ Added: <b>Friends of Trusted Friend</b> system. (thanks Bastvera)
-    <dd>+ Friend of Friends changes (removing of unwanted people should be much easier). (thanks Bastvera)
-    <dd>+ Opening of downloaded files and download folder on download tab. (thanks Bastvera)
-    <dd>+ Opening of own folders and files on My Share view. (thanks Bastvera)
-    <dd>+ Sound notification on private message. (thanks Bastvera)
-    <dd>+ New user message notification disable option. (thanks Bastvera)
-    <dd>+ DNS Support. (thanks Bastvera)
-    <dd>+ Fixed bug: send file to chat sometimes had wrong html format. (thanks Bastvera)
-    <dd>+ Selected friends don't lose focus when friends come online/offline. (thanks Bastvera)
-    <dd>+ Fixed bug: where people could download from you even though you didn't give them permission to. (thanks Bastvera)
-    <dd>+ Changed chat behavior ("HTML no longer allowed in chat" still was possible and could bring crashes). (thanks Bastvera)
-    <dd>+ Fixed bug: Edit -> Cancel crash when editing a firewall rule. (thanks Kratos)
-    <dd>+ RouteRule is serializable. (thanks Kratos)
-    <dd>+ Fixed bug: where Firewall traffic was denied when allow rule was present. (thanks Kratos)
-    <dd>+ Lots of changes to how plugins are loaded, including GUI support. (thanks Kratos)
-    <dd>+ Added Https:// and Ftp:// links support in chat. (thanks Bastvera)
-    <dd>+ Added 2 icons (with /clearlog and /clear functionality) to chat window. (thanks Bastvera)
-    <dd>+ Added /clearlog command. Clears the chat log file. (thanks Bastvera)
-    <dd>+ Added <b>groups (Networks)</b> feature. (thanks Bastvera)
-    <dd>+ Fixed bug: double folder adding. People can't add the same folder twice in Alliance's share list anymore. (thanks Bastvera)
-    <dd>+ Fixed bug: problem with autohash after adding new folders. (thanks Bastvera)
-    <dd>+ Fixed bug: counter of shared files. Alliance should show the correct number of files your sharing at the bottom right now. (thanks Bastvera)
-    <dd>+ Minor bug fixes and improvements. (thanks Bastvera)
+    <dd>+ Added: Search friend. (Bastvera)
+    <dd>+ Fixed bug: DNS names sometimes resets to IP. (Bastvera)
+    <dd>+ Windows Vista Solution. (Bastvera)
+    <dd>+ Added: Sound options tab. (Bastvera)
+    <dd>+ Groups view on friend list changes. (Bastvera)
+    <dd>+ Added: rDNS support. (Kratos)
+    <dd>+ Added: Found via window. (Bastvera)
+    <dd>+ Fixed bug: SSL should work again on most PCs. (Bastvera)
+    <dd>+ Fixed bug: Update of own shared size on Friend List. (Bastvera)
+    <dd>+ Fixed bug: Some ConcurrentModificationExceptions. (Bastvera)
+    <dd>+ Added: <b>Friends of Trusted Friend</b> system. (Bastvera)
+    <dd>+ Friend of Friends changes (removing of unwanted people should be much easier). (Bastvera)
+    <dd>+ Opening of downloaded files and download folder on download tab. (Bastvera)
+    <dd>+ Opening of own folders and files on My Share view. (Bastvera)
+    <dd>+ Sound notification on private message. (Bastvera)
+    <dd>+ New user message notification disable option. (Bastvera)
+    <dd>+ DNS Support. (Bastvera)
+    <dd>+ Fixed bug: send file to chat sometimes had wrong html format. (Bastvera)
+    <dd>+ Selected friends don't lose focus when friends come online/offline. (Bastvera)
+    <dd>+ Fixed bug: where people could download from you even though you didn't give them permission to. (Bastvera)
+    <dd>+ Changed chat behavior ("HTML no longer allowed in chat" still was possible and could bring crashes). (Bastvera)
+    <dd>+ Fixed bug: Edit -> Cancel crash when editing a firewall rule. (Kratos)
+    <dd>+ RouteRule is serializable. (Kratos)
+    <dd>+ Fixed bug: where Firewall traffic was denied when allow rule was present. (Kratos)
+    <dd>+ Lots of changes to how plugins are loaded, including GUI support. (Kratos)
+    <dd>+ Added Https:// and Ftp:// links support in chat. (Bastvera)
+    <dd>+ Added 2 icons (with /clearlog and /clear functionality) to chat window. (Bastvera)
+    <dd>+ Added /clearlog command. Clears the chat log file. (Bastvera)
+    <dd>+ Added <b>groups (Networks)</b> feature. (Bastvera)
+    <dd>+ Fixed bug: double folder adding. People can't add the same folder twice in Alliance's share list anymore. (Bastvera)
+    <dd>+ Fixed bug: problem with autohash after adding new folders. (Bastvera)
+    <dd>+ Fixed bug: counter of shared files. Alliance should show the correct number of files your sharing at the bottom right now. (Bastvera)
+    <dd>+ Minor bug fixes and improvements. (Bastvera)
     <dd>+ Improved scalability of Alliance: uses even less memory when connected to many users
-    <dd>+ Move to top/bottom in download que (thanks bucketsort)
-    <dd>+ Better handling of Alliance settings folder in Linux - ends up in user home (thanks bucketsort)
-    <dd>+ Chat log history is more often saved  (thanks bucketsort)
-    <dd>+ Older chat messages are shown with time AND date (thanks bucketsort)
+    <dd>+ Move to top/bottom in download que (bucketsort)
+    <dd>+ Better handling of Alliance settings folder in Linux - ends up in user home (bucketsort)
+    <dd>+ Chat log history is more often saved  (bucketsort)
+    <dd>+ Older chat messages are shown with time AND date (bucketsort)
 </dl>
 <br>
 <p>
@@ -133,21 +176,21 @@
     <dd>+ Fixed bug: OutOfMemoryError: out of direct memory buffer space
     <dd>+ Fixed bug: several ConcurrentModificationExceptions fixed
     <dd>+ Fixed bug: a bug introduced in version 1.0.5 where when joining a large network problems occured if you are firewalled
-    <dd>+ Fixed bug: automatic hashing of files that are added/moved/deleted in shares now works again (thanks deathfired)
+    <dd>+ Fixed bug: automatic hashing of files that are added/moved/deleted in shares now works again (deathfired)
 </dl>
 <br>
 <p>
     <b>1.0.5</b> - 2008-09-20
 <dl>
-    <dd>+ Fixed subfolder downloading: when a folder is downloaded with subfolders, the folder hierarchy is now preserved to the least common path (thanks Kratos)
-    <dd>+ Much better Linux support - added support for the Java 6 system tray - no more need for native libraries to run Alliance on Linux (thanks Kratos)
-    <dd>+ Alliance is now allowed to start if system tray is not supported (thanks Kratos)
+    <dd>+ Fixed subfolder downloading: when a folder is downloaded with subfolders, the folder hierarchy is now preserved to the least common path (Kratos)
+    <dd>+ Much better Linux support - added support for the Java 6 system tray - no more need for native libraries to run Alliance on Linux (Kratos)
+    <dd>+ Alliance is now allowed to start if system tray is not supported (Kratos)
     <dd>+ Generally better management of the system tray on various operating systems
-    <dd>+ Alliance firewall: IP Rules (Access Control Lists) You are now able to setup ip address ranges to specifically allow or deny alliance to connect to, or accept connections from (thanks Kratos)
+    <dd>+ Alliance firewall: IP Rules (Access Control Lists) You are now able to setup ip address ranges to specifically allow or deny alliance to connect to, or accept connections from (Kratos)
     <dd>+ Added support for Plugins - will be useful for people that want to create bots for an Alliance network
     <dd>+ Friends that have not been online for 100 days are automatically removed from friend list
     <dd>+ Fixed wordarounds for top three most reported bugs (using the "send error" function)
-    <dd>+ Fixed bug: when writing to a file into a alliance shared directory alliance continually tries to hash the file (thanks Kratos)
+    <dd>+ Fixed bug: when writing to a file into a alliance shared directory alliance continually tries to hash the file (Kratos)
 </dl>
 <br>
 <p>
@@ -178,12 +221,12 @@
 <p>
     <b>1.0.1</b> - 2008-05-11
 <dl>
-    <dd>+ Possibility to autmatically hide the "You have successfully connected to ..." popups
+    <dd>+ Possibility to automatically hide the "You have successfully connected to ..." popups
     <dd>+ Better support for OS X including real icon on dock, nicer UI and real installation package
-    <dd>+ Possibility to change the dns name for a friend. Right-click on the friend and select "Edit hostname" (thanks jpluebbert)
+    <dd>+ Possibility to change the DNS name for a friend. Right-click on the friend and select "Edit hostname" (jpluebbert)
     <dd>+ Fixed bug: chat messages should now be displayed in correct order
-    <dd>+ Fixed bug: nickname may no longer contain html
-    <dd>+ Fixed bug: Alliance does not crash when an inaccessable folder is shared
+    <dd>+ Fixed bug: nickname may no longer contain HTML
+    <dd>+ Fixed bug: Alliance does not crash when an inaccessible folder is shared
     <dd>+ Fixed bug: several concurrent modification errors
     <dd>+ Maybe fixed bug: Alliance locks up and uses 100% CPU
 </dl>
@@ -193,7 +236,7 @@
 <dl>
     <dd>+ File system events implemented on Windows: when a file is added/moved/deleted the share is updated instantaneously
     <dd>+ Before creating invitation codes Alliance makes sure your port is open and accessible from the Internet
-    <dd>+ When scanning the share: files that have been removed are actually removed from the shared files list (thanks pontusm)
+    <dd>+ When scanning the share: files that have been removed are actually removed from the shared files list (pontusm)
     <dd>+ Chat messages in public chat are now guaranteed to be displayed in correct order
     <dd>+ Alliance is now easier to use: did some usability testing and updated certain UI details
     <dd>+ Added new, fancy, speed diagram in main window

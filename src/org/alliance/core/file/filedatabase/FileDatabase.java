@@ -106,7 +106,7 @@ public class FileDatabase {
         changeInUseQueue(true);
         boolean moreEntries = false;
         core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedir", basePath + "/" + subPath));
-        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntries(basePath, subPath, false, GROUP_REMOVE_LIMIT);
+        ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntries(basePath, subPath, true, GROUP_REMOVE_LIMIT);
         try {
             while (results.next()) {
                 shareSize -= results.getLong(ID_SIZE);
@@ -195,6 +195,9 @@ public class FileDatabase {
                 if (!shares.contains(basePath)) {
                     core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)), true);
                     removeOldDirs(basePath, true);
+                    if (!core.getFileManager().getDbCore().isConnected()) {
+                        break;
+                    }
                     core.getFileManager().getDbCore().getDbSharesBases().deleteEntryBy(basePath);
                     updateCacheCounters();
                 }

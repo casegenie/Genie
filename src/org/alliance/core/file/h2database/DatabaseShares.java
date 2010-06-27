@@ -154,7 +154,7 @@ public class DatabaseShares {
     public ResultSet getSubPaths(String basePath) {
         try {
             StringBuilder statement = new StringBuilder();
-            statement.append("SELECT sub_path FROM SHARES GROUP BY base_path, sub_path HAVING base_path=?");
+            statement.append("SELECT sub_path FROM SHARES GROUP BY base_path, sub_path HAVING base_path=? ORDER BY sub_path DESC");
             PreparedStatement ps = conn.prepareStatement(statement.toString());       
             ps.setString(1, basePath);
             return ps.executeQuery();
