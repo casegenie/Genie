@@ -33,6 +33,10 @@ public class EditGroupWindow extends XUIDialog {
     private final static String GROUP_SEPARATOR = ",";
 
     public EditGroupWindow(UISubsystem ui, String groupsOfItem) throws Exception {
+        this(ui, groupsOfItem, null);
+    }
+
+    public EditGroupWindow(UISubsystem ui, String groupsOfItem, ArrayList<String> customGroups) throws Exception {
         super(ui.getMainWindow());
         this.ui = ui;
         this.groupsOfItem = groupsOfItem;
@@ -71,6 +75,13 @@ public class EditGroupWindow extends XUIDialog {
                 }
             }
         }
+
+        if (customGroups != null) {
+            for (String group : customGroups) {
+                groupsTree.add(group);
+            }
+        }
+
         for (String group : groupsTree) {
             groupListModel.addElement(group);
         }
@@ -171,6 +182,14 @@ public class EditGroupWindow extends XUIDialog {
 
     public String getGroupString() {
         return groupString;
+    }
+
+    public ArrayList<String> getAllGroups() {
+        ArrayList<String> allGroups = new ArrayList<String>();
+        for (String group : groupsTree) {
+            allGroups.add(group);
+        }
+        return allGroups;
     }
 
     public void EVENT_addnew(ActionEvent e) throws Exception {

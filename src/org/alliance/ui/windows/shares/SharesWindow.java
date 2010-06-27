@@ -41,6 +41,7 @@ public class SharesWindow extends XUIDialog {
     private JPopupMenu popupTree;
     private boolean shareListHasBeenModified = false;
     private final static String PUBLIC_GROUP = "Public";
+    private ArrayList<String> fixedGroups;
 
     public SharesWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow());
@@ -272,8 +273,9 @@ public class SharesWindow extends XUIDialog {
 
     public void EVENT_changegroup(ActionEvent a) throws Exception {
         int groupRowId = shareList.getSelectedIndex() + 1;
-        EditGroupWindow editWindow = new EditGroupWindow(ui, shareListModel.elementAt(groupRowId).toString());
+        EditGroupWindow editWindow = new EditGroupWindow(ui, shareListModel.elementAt(groupRowId).toString(), fixedGroups);
         String groupString = editWindow.getGroupString();
+        fixedGroups = editWindow.getAllGroups();
         if (groupString == null) {
             return;
         }
