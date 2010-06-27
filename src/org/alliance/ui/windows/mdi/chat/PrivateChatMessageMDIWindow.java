@@ -7,7 +7,6 @@ import org.alliance.ui.UISound;
 
 import java.io.File;
 import java.io.IOException;
-import javax.swing.SwingUtilities;
 
 /**
  * Created by IntelliJ IDEA.
@@ -27,14 +26,7 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         setTitle(LanguageResource.getLocalizedString(getClass(), "title", ui.getCore().getFriendManager().nickname(guid)));
 
         postInit();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                chat.setText(LanguageResource.getLocalizedString(getClass(), "info"));
-                chat.selectAll();
-            }
-        });
+        chat.setText(LanguageResource.getLocalizedString(getClass(), "info"));    
     }
 
     @Override

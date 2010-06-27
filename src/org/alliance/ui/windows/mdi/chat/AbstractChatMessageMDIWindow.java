@@ -13,6 +13,8 @@ import org.alliance.ui.windows.mdi.AllianceMDIWindow;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -96,6 +98,14 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
         sp.setViewportView(textarea);
 
         chat = (JTextField) xui.getComponent("chat");
+        chat.addFocusListener(new FocusAdapter() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                chat.selectAll();
+            }
+        });
+
         new CutCopyPastePopup(chat);
 
         textarea.setEditable(false);
