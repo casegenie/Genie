@@ -73,6 +73,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
@@ -350,28 +351,69 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             return true;
         }
         shuttingDown = true;
-
-        saveWindowState();
+        saveWindowState(getTitle(), getLocation(), getSize(), getExtendedState());
         setVisible(false);
         dispose();
         ui.shutdown();
         return true;
     }
 
-    public void saveWindowState() {
+    private void writeStateBlock(ObjectOutputStream outObj, String title, Point point, Dimension dimension, int extendedState) throws Exception {
+        outObj.writeUTF(title);
+        outObj.writeObject(point);
+        outObj.writeObject(dimension);
+        outObj.writeInt(extendedState);
+    }
+
+    public void saveWindowState(String title, Point point, Dimension dimension, int extendedState) {
         try {
             if (T.t) {
                 T.info("Serializing window state");
             }
-            FileOutputStream out = new FileOutputStream(ui.getCore().getSettings().getInternal().getWindowstatefile());
-            ObjectOutputStream obj = new ObjectOutputStream(out);
+            File states = new File(ui.getCore().getSettings().getInternal().getWindowstatefile());
+            File oldStates = new File(ui.getCore().getSettings().getInternal().getWindowstatefile() + ".bak");
+            boolean stateFileExist = states.exists();
+            if (stateFileExist) {
+                oldStates.delete();
+                states.renameTo(oldStates);
+            }
 
-            obj.writeObject(getLocation());
-            obj.writeObject(getSize());
-            obj.writeInt(getExtendedState());
+            FileOutputStream out = new FileOutputStream(states);
+            ObjectOutputStream outObj = new ObjectOutputStream(out);
 
-            obj.flush();
-            obj.close();
+            if (!stateFileExist) {
+                //Create state file with source object's data
+                writeStateBlock(outObj, title, point, dimension, extendedState);
+            } else {
+                FileInputStream in = new FileInputStream(oldStates);
+                ObjectInputStream inObj = new ObjectInputStream(in);
+                boolean blockWriten = false;
+                try {
+                    while (true) {
+                        String inTitle = inObj.readUTF();
+                        Point inPoint = (Point) inObj.readObject();
+                        Dimension inDimension = (Dimension) inObj.readObject();
+                        int inExtendedState = inObj.readInt();
+                        if (!inTitle.equals(title)) {
+                            //Rewrite non-source object's data
+                            writeStateBlock(outObj, inTitle, inPoint, inDimension, inExtendedState);
+                        } else {
+                            //Replace source object's data
+                            writeStateBlock(outObj, title, point, dimension, extendedState);
+                            blockWriten = true;
+                        }
+                    }
+                } catch (Exception e) {
+                    //EOF reached
+                }
+                if (!blockWriten) {
+                    //Source object's data not replaced, probably new data
+                    writeStateBlock(outObj, title, point, dimension, extendedState);
+                }
+                inObj.close();
+            }
+            outObj.flush();
+            outObj.close();
         } catch (Exception e) {
             if (T.t) {
                 T.error("Could not save window state " + e);
@@ -379,24 +421,50 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
     }
 
-    public void showWindow() {
+    public boolean loadWindowState(String title, Component component) {
         if (T.t) {
             T.info("Deserializing window state");
         }
         try {
             FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile());
-            ObjectInputStream obj = new ObjectInputStream(in);
-            setLocation((Point) obj.readObject());
-            setSize((Dimension) obj.readObject());
-            setExtendedState(obj.readInt());
-            obj.close();
-            setVisible(true);
-        } catch (Exception e) {
-            display();
-            Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
-            if (ss.width <= 1024) {
-                setExtendedState(MAXIMIZED_BOTH);
+            ObjectInputStream inObj = new ObjectInputStream(in);
+            try {
+                while (true) {
+                    String inTitle = inObj.readUTF();
+                    Point inPoint = (Point) inObj.readObject();
+                    Dimension inDimension = (Dimension) inObj.readObject();
+                    int inExtendedState = inObj.readInt();
+                    if (inTitle.equals(title)) {
+                        component.setLocation(inPoint);
+                        component.setSize(inDimension);
+                        component.setPreferredSize(inDimension);
+                        if (component instanceof JFrame) {
+                            ((JFrame) component).setExtendedState(inExtendedState);
+                        }
+                        return true;
+                    }
+
+                }
+            } catch (Exception e) {
+                //EOF reached
             }
+            inObj.close();
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public void showWindow() {
+        if (loadWindowState(getTitle(), this)) {
+            setVisible(true);
+            toFront();
+            return;
+        }
+        display();
+        Dimension ss = Toolkit.getDefaultToolkit().getScreenSize();
+        if (ss.width <= 1024) {
+            setExtendedState(MAXIMIZED_BOTH);
         }
         toFront();
     }

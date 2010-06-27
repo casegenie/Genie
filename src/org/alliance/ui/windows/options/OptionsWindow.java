@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import org.alliance.core.settings.SettingClass;
 import org.alliance.ui.dialogs.OptionDialog;
 
@@ -52,18 +53,26 @@ public class OptionsWindow extends XUIDialog {
             public void mouseReleased(MouseEvent e) {
                 try {
                     if (((JPanel) tabPane.getSelectedComponent()).getComponent(0) instanceof JLabel) {
+                        setPreferredSize(getSize());
                         createTab(tabPane.getSelectedIndex() + 1, tabPane, false);
                     }
                 } catch (Exception ex) {
-                    ex.printStackTrace();
+                   // ex.printStackTrace();
                 }
             }
         });
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        showWindow();
+    }
 
-        pack();
-        display();
+    private void showWindow() {
+        if (ui.getMainWindow().loadWindowState(getTitle(), this)) {
+            setVisible(true);
+            toFront();
+        } else {
+            display();
+        }
     }
 
     private void createTab(int tabNumber, JTabbedPane tabPane, boolean dummy) throws Exception {
@@ -94,8 +103,8 @@ public class OptionsWindow extends XUIDialog {
         }
     }
 
-    private void addTab(JTabbedPane tabPane, TabHelper tab, boolean dummy, int tabNumber) throws Exception {
-        JPanel panel = tab.getTab();
+    private void addTab(final JTabbedPane tabPane, TabHelper tab, boolean dummy, final int tabNumber) throws Exception {
+        final JPanel panel = tab.getTab();
         if (dummy) {
             tabPane.add(panel);
             tabPane.setToolTipTextAt(tabPane.getTabCount() - 1, panel.getToolTipText());
@@ -104,7 +113,13 @@ public class OptionsWindow extends XUIDialog {
         }
         tabPane.setToolTipTextAt(tabNumber - 1, panel.getToolTipText());
         panel.setToolTipText(null);
-        tabPane.setComponentAt(tabNumber - 1, panel);
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                tabPane.setComponentAt(tabNumber - 1, panel);
+            }
+        });
         for (String option : tab.getOptions()) {
             JComponent c = (JComponent) tab.getXUI().getComponent(option);
             if (c != null) {
@@ -168,7 +183,7 @@ public class OptionsWindow extends XUIDialog {
     private void setSettingValue(String option, Object val) throws Exception {
         String className = option.substring(0, option.indexOf('.'));
         option = option.substring(option.indexOf('.') + 1);
-        SettingClass setting = getSettingClass(className);     
+        SettingClass setting = getSettingClass(className);
         setting.setValue(option, val);
     }
 
@@ -190,6 +205,7 @@ public class OptionsWindow extends XUIDialog {
 
     public void EVENT_ok(ActionEvent a) throws Exception {
         if (apply()) {
+            ui.getMainWindow().saveWindowState(getTitle(), getLocation(), getSize(), -1);
             dispose();
         }
     }

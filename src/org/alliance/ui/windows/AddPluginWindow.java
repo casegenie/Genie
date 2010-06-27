@@ -2,7 +2,6 @@ package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
-import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
 import org.alliance.core.settings.Settings;
 import org.alliance.core.LanguageResource;
@@ -20,15 +19,15 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 public class AddPluginWindow extends XUIDialog {
 
     private Settings settings;
-    private CoreSubsystem core;
     private DefaultListModel pluginListModel;
     private JList pluginList;
     private boolean addedOrRemovedSomething = false;
+    private UISubsystem ui;
 
     public AddPluginWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow());
+        this.ui = ui;
         this.settings = ui.getCore().getSettings();
-        this.core = ui.getCore();
         init(ui.getRl(), ui.getRl().getResourceStream("xui/pluginwindow.xui.xml"));
         LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
@@ -41,8 +40,16 @@ public class AddPluginWindow extends XUIDialog {
         }
         pluginList.setModel(pluginListModel);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        pack();
-        display();
+        showWindow();
+    }
+
+    private void showWindow() {
+        if (ui.getMainWindow().loadWindowState(getTitle(), this)) {
+            setVisible(true);
+            toFront();
+        } else {
+            display();
+        }
     }
 
     public void EVENT_cancel(ActionEvent a) throws Exception {
@@ -54,12 +61,13 @@ public class AddPluginWindow extends XUIDialog {
         for (Plugin plugin : EnumerationIteratorConverter.iterable(pluginListModel.elements(), Plugin.class)) {
             settings.getPluginlist().add(plugin);
         }
-        core.saveSettings();
+        ui.getCore().saveSettings();
         if (this.addedOrRemovedSomething) {
             //restart the plugin subsystem
-            core.getPluginManager().shutdown();
-            core.getPluginManager().init();
+            ui.getCore().getPluginManager().shutdown();
+            ui.getCore().getPluginManager().init();
         }
+        ui.getMainWindow().saveWindowState(getTitle(), getLocation(), getSize(), -1);
         dispose();
     }
 

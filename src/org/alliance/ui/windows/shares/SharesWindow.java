@@ -59,8 +59,16 @@ public class SharesWindow extends XUIDialog {
         setupQuickJump();
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        pack();
-        display();
+        showWindow();
+    }
+
+    private void showWindow() {
+        if (ui.getMainWindow().loadWindowState(getTitle(), this)) {
+            setVisible(true);
+            toFront();
+        } else {
+            display();
+        }
     }
 
     private void setupShareTree() {
@@ -361,6 +369,7 @@ public class SharesWindow extends XUIDialog {
         if (shareListHasBeenModified) {
             ui.getCore().getShareManager().getShareScanner().startScan(true, true);
         }
+        ui.getMainWindow().saveWindowState(getTitle(), getLocation(), getSize(), -1);
         dispose();
     }
 
