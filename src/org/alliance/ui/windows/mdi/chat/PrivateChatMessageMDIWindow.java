@@ -1,6 +1,6 @@
 package org.alliance.ui.windows.mdi.chat;
 
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.rpc.ChatMessage;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.UISound;
@@ -22,11 +22,11 @@ public class PrivateChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
     public PrivateChatMessageMDIWindow(UISubsystem ui, int guid) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "chatmessage", ui);
         this.guid = guid;
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title", ui.getCore().getFriendManager().nickname(guid)));
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
+        setTitle(Language.getLocalizedString(getClass(), "title", ui.getCore().getFriendManager().nickname(guid)));
 
         postInit();
-        chat.setText(LanguageResource.getLocalizedString(getClass(), "info"));    
+        chat.setText(Language.getLocalizedString(getClass(), "info"));
     }
 
     @Override

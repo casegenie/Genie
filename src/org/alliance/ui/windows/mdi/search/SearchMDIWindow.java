@@ -3,7 +3,7 @@ package org.alliance.ui.windows.mdi.search;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.PacedRunner;
@@ -65,7 +65,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
     public SearchMDIWindow(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "search", ui);
         this.ui = ui;
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         fileTypeIcons = new ImageIcon[8];
         for (int i = 0; i < fileTypeIcons.length; i++) {
@@ -80,7 +80,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         pacedRunner = new PacedRunner(500);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(LanguageResource.getLocalizedString(getClass(), "look")).append(" &#160; ");
+        sb.append(Language.getLocalizedString(getClass(), "look")).append(" &#160; ");
         sb.append("[a href=\"http://").append(FileType.VIDEO.id()).append("\"]").append(FileType.VIDEO.description()).append("[/a] &#160; ");
         sb.append("[a href=\"http://").append(FileType.AUDIO.id()).append("\"]").append(FileType.AUDIO.description()).append("[/a] &#160; ");
         sb.append("[a href=\"http://").append(FileType.CDDVD.id()).append("\"]").append(FileType.CDDVD.description()).append("[/a] &#160; ");
@@ -88,7 +88,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         sb.append("[a href=\"http://").append(FileType.DOCUMENT.id()).append("\"]").append(FileType.DOCUMENT.description()).append("[/a] &#160; ");
         sb.append("[a href=\"http://").append(FileType.ARCHIVE.id()).append("\"]").append(FileType.ARCHIVE.description()).append("[/a] &#160; ");
         sb.append("[a href=\"http://").append(FileType.PRESENTATION.id()).append("\"]").append(FileType.PRESENTATION.description()).append("[/a][br]");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "tip"));
+        sb.append(Language.getLocalizedString(getClass(), "tip"));
 
         JHtmlLabel label = (JHtmlLabel) xui.getComponent("label");
         label.setText(sb.toString());
@@ -108,7 +108,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                         ui.handleErrorInEventLoop(e1);
                     }
                 } else if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
-                    ui.getMainWindow().setStatusMessage(LanguageResource.getLocalizedString(getClass(), "search", ft.description()));
+                    ui.getMainWindow().setStatusMessage(Language.getLocalizedString(getClass(), "search", ft.description()));
                 }
             }
         });
@@ -163,8 +163,8 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                             double r = ui.getCore().getSettings().getInternal().getRecordinspeed();
                             StringBuilder sb = new StringBuilder("<html>");
                             sb.append(fn.getListOfUsers(ui.getCore()));
-                            sb.append(" (").append(LanguageResource.getLocalizedString(getClass(), "speed")).append(" <b>").append(TextUtils.formatByteSize((long) d)).append("/s</b>, ");
-                            sb.append(LanguageResource.getLocalizedString(getClass(), "eta")).append(" ").append(formatETA((int) Math.round(fn.getSize() / (d > r ? r : d)))).append("</font>)</html>");
+                            sb.append(" (").append(Language.getLocalizedString(getClass(), "speed")).append(" <b>").append(TextUtils.formatByteSize((long) d)).append("/s</b>, ");
+                            sb.append(Language.getLocalizedString(getClass(), "eta")).append(" ").append(formatETA((int) Math.round(fn.getSize() / (d > r ? r : d)))).append("</font>)</html>");
                             left.setText(sb.toString());
                             right.setText("<html><b>" + simplifyPath(fn) + "</b></html>");
                         }
@@ -246,7 +246,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         for (FileType v : FileType.values()) {
             type.addItem(v.description());
         }
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         postInit();
     }
 
@@ -283,9 +283,9 @@ public class SearchMDIWindow extends AllianceMDIWindow {
                 final String path = getPathIfPathSelected(i);
                 for (final FileNode n : getFileNodesByRow(i)) {
                     if (ui.getCore().getFileManager().containsComplete(n.getSh().getRoot())) {
-                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "have", n.getName()));
+                        ui.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "have", n.getName()));
                     } else if (ui.getCore().getNetworkManager().getDownloadManager().getDownload(n.getSh().getRoot()) != null) {
-                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "download", n.getName()));
+                        ui.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "download", n.getName()));
                     } else {
                         ui.getCore().invokeLater(new Runnable() {
 
@@ -374,9 +374,9 @@ public class SearchMDIWindow extends AllianceMDIWindow {
         String s;
         if (t.trim().length() == 0) {
 
-            s = LanguageResource.getLocalizedString(getClass(), "searchall", ft.description());
+            s = Language.getLocalizedString(getClass(), "searchall", ft.description());
         } else {
-            s = LanguageResource.getLocalizedString(getClass(), "searchtype", t, ft.description());
+            s = Language.getLocalizedString(getClass(), "searchtype", t, ft.description());
         }
         left.setText(s);
         table.setTreeTableModel(model = new SearchTreeTableModel(ui.getCore(), pacedRunner));
@@ -484,7 +484,7 @@ public class SearchMDIWindow extends AllianceMDIWindow {
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, vColIndex);
             int val = (Integer) value;
             if (val == 255) {
-                setText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "dayold"));
+                setText(Language.getLocalizedString(getClass().getEnclosingClass(), "dayold"));
             } else {
                 setText(String.valueOf(val));
             }

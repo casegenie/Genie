@@ -3,7 +3,7 @@ package org.alliance.core.plugins;
 import org.alliance.core.Manager;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.settings.Plugin;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,7 +46,7 @@ public class PluginManager extends Manager {
                     plugInConsoleExtensions.add(pi.getConsoleExtensions());
                     plugIns.add(pi);
                 } catch (Exception e) {
-                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "classerror", p.getJar()));
+                    JOptionPane.showMessageDialog(null, Language.getLocalizedString(getClass(), "classerror", p.getJar()));
                 }
             }
         }
@@ -64,8 +64,8 @@ public class PluginManager extends Manager {
             if (f.exists()) {
                 l.add(f.toURI().toURL());
             } else {
-                int response = JOptionPane.showConfirmDialog(null, LanguageResource.getLocalizedString(getClass(), "loadingerror", f.getName()),
-                        LanguageResource.getLocalizedString(getClass(), "loadingerrorheader"), JOptionPane.YES_NO_OPTION);
+                int response = JOptionPane.showConfirmDialog(null, Language.getLocalizedString(getClass(), "loadingerror", f.getName()),
+                        Language.getLocalizedString(getClass(), "loadingerrorheader"), JOptionPane.YES_NO_OPTION);
                 if (response == JOptionPane.YES_OPTION) {
                     JFileChooser file = new JFileChooser();
                     FileNameExtensionFilter filter = new FileNameExtensionFilter("JAR files", "JAR", "jar", "Jar");
@@ -78,7 +78,7 @@ public class PluginManager extends Manager {
                             l.add(file.getSelectedFile().toURI().toURL());
                             itr.add(newPlugin);
                         } catch (FileNotFoundException e) {
-                            JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "launchererror", file.getSelectedFile().getName()));
+                            JOptionPane.showMessageDialog(null, Language.getLocalizedString(getClass(), "launchererror", file.getSelectedFile().getName()));
                         }
                     }
                 } else {

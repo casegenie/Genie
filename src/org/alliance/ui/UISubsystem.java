@@ -9,7 +9,7 @@ import com.stendahls.util.resourceloader.ResourceLoader;
 import org.alliance.ui.dialogs.ErrorDialog;
 import org.alliance.Subsystem;
 import org.alliance.core.CoreSubsystem;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import static org.alliance.core.CoreSubsystem.ERROR_URL;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.macos.OSXAdaptation;
@@ -64,7 +64,7 @@ public class UISubsystem implements UINexus, Subsystem {
         if (params != null && params.length >= 2 && params[1] != null) {
             progress = (StartupProgressListener) params[1];
         }
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "uiloading"));
+        progress.updateProgress(Language.getLocalizedString(getClass(), "uiloading"));
 
         if (SwingUtilities.isEventDispatchThread()) {
             realInit(params);
@@ -254,7 +254,7 @@ public class UISubsystem implements UINexus, Subsystem {
                 }
             }
         } catch (Exception e) {
-            OptionDialog.showErrorDialog(getMainWindow(), LanguageResource.getLocalizedString(getClass(), "browsererror", e.toString()));
+            OptionDialog.showErrorDialog(getMainWindow(), Language.getLocalizedString(getClass(), "browsererror", e.toString()));
         }
     }
 

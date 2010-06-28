@@ -3,7 +3,7 @@ package org.alliance.ui.windows.mdi.friends;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.MyNode;
 import org.alliance.core.node.Node;
@@ -56,25 +56,25 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
     public FriendListMDIWindow(MDIManager manager, UISubsystem ui) throws Exception {
         super(manager, "friendlist", ui);
         this.ui = ui;
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
-        LEVEL_NAMES = new String[]{LanguageResource.getLocalizedString(getClass(), "rookie"),
-                    LanguageResource.getLocalizedString(getClass(), "true"),
-                    LanguageResource.getLocalizedString(getClass(), "exp"),
-                    LanguageResource.getLocalizedString(getClass(), "king")};
+        LEVEL_NAMES = new String[]{Language.getLocalizedString(getClass(), "rookie"),
+                    Language.getLocalizedString(getClass(), "true"),
+                    Language.getLocalizedString(getClass(), "exp"),
+                    Language.getLocalizedString(getClass(), "king")};
 
         setWindowType(WINDOWTYPE_NAVIGATION);
 
         statusright = (JLabel) xui.getComponent("statusright");
 
         createUI();
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         ui.getFriendListModel().signalFriendChanged();
     }
 
     public void update() {
         StringBuilder sb = new StringBuilder();
-        sb.append(LanguageResource.getLocalizedString(getClass(), "online")).append(" ");
+        sb.append(Language.getLocalizedString(getClass(), "online")).append(" ");
         sb.append(ui.getCore().getFriendManager().getNFriendsConnected()).append("/").append(ui.getCore().getFriendManager().getNFriends());
         sb.append(" (").append(TextUtils.formatByteSize(ui.getCore().getFriendManager().getTotalBytesShared())).append(")");
         statusright.setText(sb.toString());
@@ -221,16 +221,16 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         String s = "";
         switch (getMyNumberOfInvites()) {
             case 0:
-                s = LanguageResource.getLocalizedString(getClass(), "invite1");
+                s = Language.getLocalizedString(getClass(), "invite1");
                 break;
             case 1:
-                s = LanguageResource.getLocalizedString(getClass(), "invite2");
+                s = Language.getLocalizedString(getClass(), "invite2");
                 break;
             case 2:
-                s = LanguageResource.getLocalizedString(getClass(), "invite1");
+                s = Language.getLocalizedString(getClass(), "invite1");
                 break;
             default:
-                s = LanguageResource.getLocalizedString(getClass(), "invite", Integer.toString(ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing() - getMyNumberOfInvites()));
+                s = Language.getLocalizedString(getClass(), "invite", Integer.toString(ui.getCore().getFriendManager().getNumberOfInvitesNeededToBeKing() - getMyNumberOfInvites()));
                 break;
         }
         if (getMyLevel() < LEVEL_NAMES.length - 1) {
@@ -331,11 +331,11 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
 
     public void EVENT_editname(ActionEvent e) {
         if (list.getSelectedValue() instanceof MyNode) {
-            OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "ownname"));
+            OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "ownname"));
         } else if (list.getSelectedValue() instanceof Friend) {
             Friend f = (Friend) list.getSelectedValue();
             if (f != null) {
-                String pi = JOptionPane.showInputDialog(LanguageResource.getLocalizedString(getClass(), "editname", getNickname(f.getGuid())), getNickname(f.getGuid()));
+                String pi = JOptionPane.showInputDialog(Language.getLocalizedString(getClass(), "editname", getNickname(f.getGuid())), getNickname(f.getGuid()));
                 if (pi != null) {
                     f.setNicknameToShowInUI(pi);
                 }
@@ -392,7 +392,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         if (list.getSelectedValue() instanceof Friend) {
             Object[] friends = list.getSelectedValues();
             if (friends != null && friends.length > 0) {
-                Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "delete", Integer.toString(friends.length)));
+                Boolean delete = OptionDialog.showQuestionDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "delete", Integer.toString(friends.length)));
                 if (delete == null) {
                     return;
                 }
@@ -430,7 +430,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
                     hostname = "";
                 }
 
-                String input = JOptionPane.showInputDialog(LanguageResource.getLocalizedString(getClass(), "edithost", getNickname(friend.getGuid())), hostname);
+                String input = JOptionPane.showInputDialog(Language.getLocalizedString(getClass(), "edithost", getNickname(friend.getGuid())), hostname);
                 if (input != null && !hostname.equalsIgnoreCase(input)) {
                     friend.setFixedHost(input.trim());
                     try {

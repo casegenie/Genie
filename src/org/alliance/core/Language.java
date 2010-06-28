@@ -26,7 +26,7 @@ import javax.swing.border.TitledBorder;
  *
  * @author Bastvera
  */
-public class LanguageResource {
+public class Language {
 
     private static TreeSet<String> AVAILABLE_LANGUAGES;
     private static ResourceBundle LANGUAGE_BUNDLE;
@@ -35,7 +35,7 @@ public class LanguageResource {
     private static final String BUNDLE_FILE = "alliance_";
     private static final String MISSING_TEXT = "%Missing translation!%";
 
-    public LanguageResource(String language) throws MalformedURLException {
+    public Language(String language) throws MalformedURLException {
         URL[] url = {new File(LANGUAGE_PATH).toURI().toURL()};
         Locale locale = null;
         for (Locale l : Locale.getAvailableLocales()) {

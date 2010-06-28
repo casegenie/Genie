@@ -1,7 +1,7 @@
 package org.alliance.ui.dialogs;
 
 import com.stendahls.XUI.XUIDialog;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -19,11 +19,11 @@ public class AddGroupDialog extends XUIDialog {
 
     public AddGroupDialog(UISubsystem ui, JFrame f) throws Exception {
         super(ui.getRl(), ui.getRl().getResourceStream("xui/groupdialog.xui.xml"), ui.getMainWindow(), true);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         ((JTextField) xui.getComponent("customtext")).selectAll();
         ((JTextField) xui.getComponent("customtext")).requestFocus();
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         pack();
         display();

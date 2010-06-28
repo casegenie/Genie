@@ -16,7 +16,7 @@ import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.jdesktop.jdic.tray.SystemTray;
 import org.jdesktop.jdic.tray.TrayIcon;
 
@@ -133,16 +133,16 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
                     String msg = pmi.getMessage().replaceAll("\\<.*?\\>", "");      // Strip html
                     if (pmi instanceof PostMessageToAllInteraction) {
                         if (core.getSettings().getInternal().getShowpublicchatmessagesintray() != 0) {
-                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "chatnew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
+                            ti.displayMessage(Language.getLocalizedString(getClass(), "chatnew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     } else {
                         if (core.getSettings().getInternal().getShowprivatechatmessagesintray() != 0) {
-                            ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "privatenew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
+                            ti.displayMessage(Language.getLocalizedString(getClass(), "privatenew"), core.getFriendManager().nickname(pmi.getFromGuid()) + ": " + msg, TrayIcon.INFO_MESSAGE_TYPE);
                         }
                     }
                 } else {
                     if (core.getSettings().getInternal().getShowsystemmessagesintray() != 0) {
-                        ti.displayMessage(LanguageResource.getLocalizedString(getClass(), "attentionheader"), LanguageResource.getLocalizedString(getClass(), "attention"), TrayIcon.INFO_MESSAGE_TYPE);
+                        ti.displayMessage(Language.getLocalizedString(getClass(), "attentionheader"), Language.getLocalizedString(getClass(), "attention"), TrayIcon.INFO_MESSAGE_TYPE);
                     }
                 }
                 balloonClickHandler = new Runnable() {
@@ -156,7 +156,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
             @Override
             public void handleError(final Throwable e, final Object source) {
-                ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\n" + LanguageResource.getLocalizedString(getClass(), "error"), TrayIcon.ERROR_MESSAGE_TYPE);
+                ti.displayMessage(e.getClass().getName(), e + "\n" + source + "\n\n" + Language.getLocalizedString(getClass(), "error"), TrayIcon.ERROR_MESSAGE_TYPE);
                 e.printStackTrace();
                 balloonClickHandler = new Runnable() {
 
@@ -212,7 +212,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
         Font f = new Font("Tahoma", 0, 11);
         m.setFont(f);
 
-        JMenuItem mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "menuopen"));
+        JMenuItem mi = new JMenuItem(Language.getLocalizedString(getClass(), "menuopen"));
         mi.setFont(f);
         mi.setFont(new Font(mi.getFont().getName(), mi.getFont().getStyle() | Font.BOLD, mi.getFont().getSize()));
         mi.addActionListener(new ActionListener() {
@@ -226,7 +226,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
 
         m.addSeparator();
 
-        mi = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "menuexit"));
+        mi = new JMenuItem(Language.getLocalizedString(getClass(), "menuexit"));
         mi.setFont(f);
         mi.addActionListener(new ActionListener() {
 
@@ -310,7 +310,7 @@ public class JDesktopTrayIconSubsystem implements Subsystem, Runnable {
     @Override
     public synchronized void shutdown() {
         if (tray != null && ti != null) {
-            ti.displayMessage("", LanguageResource.getLocalizedString(getClass(), "shutting"), TrayIcon.NONE_MESSAGE_TYPE);
+            ti.displayMessage("", Language.getLocalizedString(getClass(), "shutting"), TrayIcon.NONE_MESSAGE_TYPE);
             balloonClickHandler = null;
         }
 

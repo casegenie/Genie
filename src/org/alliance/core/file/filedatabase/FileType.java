@@ -1,6 +1,6 @@
 package org.alliance.core.file.filedatabase;
 
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,7 +42,7 @@ public boolean matches(String s) {
     private final FileTypeIdentifier fileTypeIdentifier;
 
     FileType(String description, int id, FileTypeIdentifier fileTypeIdentifier) {
-        this.description = LanguageResource.getLocalizedString(getClass(), description);
+        this.description = Language.getLocalizedString(getClass(), description);
         this.id = (byte) id;
         this.fileTypeIdentifier = fileTypeIdentifier;
     }

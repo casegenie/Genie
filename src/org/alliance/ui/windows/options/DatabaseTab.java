@@ -3,7 +3,7 @@ package org.alliance.ui.windows.options;
 import com.stendahls.XUI.XUI;
 import com.stendahls.XUI.XUIDialog;
 import org.alliance.ui.dialogs.OptionDialog;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -29,19 +29,19 @@ public class DatabaseTab extends XUIDialog implements TabHelper {
     public DatabaseTab(String loading) {
         tab = new JPanel();
         tab.add(new JLabel(loading));
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public DatabaseTab(final UISubsystem ui) throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionstabs/databasetab.xui.xml"));
         this.ui = ui;
 
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         tab = (JPanel) xui.getComponent("databasetab");
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public void EVENT_browse(ActionEvent e) throws Exception {
@@ -71,7 +71,7 @@ public class DatabaseTab extends XUIDialog implements TabHelper {
             String path = fc.getSelectedFile().getPath();
             ui.getCore().getFileManager().getDbCore().connect(ui.getCore().getFileManager().prepareToRestore(path));
             ui.getCore().getFileManager().getFileDatabase().updateCacheCounters();
-            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "restoreok"));
+            OptionDialog.showInformationDialog(this, Language.getLocalizedString(getClass(), "restoreok"));
         }
     }
 

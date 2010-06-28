@@ -138,8 +138,8 @@ public class CoreSubsystem implements Subsystem {
         progress.updateProgress("...");
         loadSettings();
         checkHistoryVersion();
-        new LanguageResource(settings.getInternal().getLanguage());
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingcore"));
+        new Language(settings.getInternal().getLanguage());
+        progress.updateProgress(Language.getLocalizedString(getClass(), "loadingcore"));
 
         fileManager = new FileManager(this, settings);
         friendManager = new FriendManager(this, settings);
@@ -154,13 +154,13 @@ public class CoreSubsystem implements Subsystem {
 
         loadState();
         cryptoManager.init();
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingdatabase"));
+        progress.updateProgress(Language.getLocalizedString(getClass(), "loadingdatabase"));
         fileManager.init();
         friendManager.init();
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingnetwork"));
+        progress.updateProgress(Language.getLocalizedString(getClass(), "loadingnetwork"));
         networkManager.init();
         awayManager.init();
-        progress.updateProgress(LanguageResource.getLocalizedString(getClass(), "loadingplugin"));
+        progress.updateProgress(Language.getLocalizedString(getClass(), "loadingplugin"));
         pluginManager.init();
 
         if (!isRunningAsTestSuite()) {
@@ -207,7 +207,7 @@ public class CoreSubsystem implements Subsystem {
             traceLog = new Log(logpath + "logs/trace.log");
         } catch (FileNotFoundException e) {
             if (OSInfo.isMac()) {
-                OptionDialog.showErrorDialog(new JFrame(), LanguageResource.getLocalizedString(getClass(), "setuplogmacerror"));
+                OptionDialog.showErrorDialog(new JFrame(), Language.getLocalizedString(getClass(), "setuplogmacerror"));
                 System.exit(1);
             } else {
                 throw new Exception("Permission problem. Can't write to files in Alliance application folder.");

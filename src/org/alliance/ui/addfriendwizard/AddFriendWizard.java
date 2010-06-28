@@ -4,7 +4,7 @@ import com.stendahls.XUI.XUIDialog;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.ui.JWizard;
 import org.alliance.core.node.Invitation;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
@@ -63,7 +63,7 @@ public class AddFriendWizard extends JWizard {
     private static final String PORT_OPEN_TEST_URL = "http://maciek.tv/porttest?port=";
 
     public AddFriendWizard() throws Exception {
-        setSuperTitle(LanguageResource.getLocalizedString(getClass(), "windowheader"));
+        setSuperTitle(Language.getLocalizedString(getClass(), "windowheader"));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class AddFriendWizard extends JWizard {
         innerXUI.setEventHandler(this);
         next.setEnabled(false);
 
-        LanguageResource.translateXUIElements(getClass(), innerXUI.getXUIComponents());
+        Language.translateXUIElements(getClass(), innerXUI.getXUIComponents());
         invitationCode = (JTextArea) innerXUI.getComponent("code");
         new CutCopyPastePopup(invitationCode);
         codeinput = (JTextField) innerXUI.getComponent("codeinput");
@@ -94,7 +94,7 @@ public class AddFriendWizard extends JWizard {
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_3"));
 
         JHtmlLabel portclosed = (JHtmlLabel) innerXUI.getComponent("portclosed");
-        portclosed.setText(LanguageResource.getLocalizedString(getClass(), "xui.portclosed",
+        portclosed.setText(Language.getLocalizedString(getClass(), "xui.portclosed",
                 Integer.toString(ui.getCore().getSettings().getServer().getPort()),
                 "[a href=http://www.portforward.com]http://www.portforward.com[/a]"));
         portclosed.addHyperlinkListener(new HyperlinkListener() {
@@ -115,8 +115,8 @@ public class AddFriendWizard extends JWizard {
         }
 
         final JHtmlLabel newcode = (JHtmlLabel) innerXUI.getComponent("newcode");
-        newcode.setText(LanguageResource.getLocalizedString(getClass(), "xui.newcode",
-                "[a href=.]" + LanguageResource.getLocalizedString(getClass(), "xui.newcodegen") + "[/a]"));
+        newcode.setText(Language.getLocalizedString(getClass(), "xui.newcode",
+                "[a href=.]" + Language.getLocalizedString(getClass(), "xui.newcodegen") + "[/a]"));
         newcode.addHyperlinkListener(new HyperlinkListener() {
 
             @Override
@@ -155,7 +155,7 @@ public class AddFriendWizard extends JWizard {
         prev.setEnabled(true);
         next.setEnabled(false);
         cancel.setEnabled(true);
-        cancel.setText(LanguageResource.getLocalizedString(getClass(), "finish"));
+        cancel.setText(Language.getLocalizedString(getClass(), "finish"));
     }
 
     public void goToPortTest() {
@@ -194,7 +194,7 @@ public class AddFriendWizard extends JWizard {
                                 prev.setEnabled(true);
                                 next.setEnabled(false);
                                 cancel.setEnabled(true);
-                                cancel.setText(LanguageResource.getLocalizedString(getClass(), "finish"));
+                                cancel.setText(Language.getLocalizedString(getClass(), "finish"));
                                 setStep(STEP_PORT_NOT_OPEN);
                             }
                         });
@@ -243,7 +243,7 @@ public class AddFriendWizard extends JWizard {
             setStep(STEP_CONNECTION_FAILED_FOR_FORWARD);
             next.setEnabled(false);
             prev.setEnabled(false);
-            cancel.setText(LanguageResource.getLocalizedString(getClass(), "finish"));
+            cancel.setText(Language.getLocalizedString(getClass(), "finish"));
         } else {
             setStep(STEP_CONNECTION_FAILED);
         }
@@ -259,7 +259,7 @@ public class AddFriendWizard extends JWizard {
     public void setStep(int i) {
         super.setStep(i);
         if (getSteptitle() != null && !getSteptitle().isEmpty()) {
-            super.changeTitle(LanguageResource.getLocalizedString(getClass(), "xui." + getSteptitle().replace("%", "")));
+            super.changeTitle(Language.getLocalizedString(getClass(), "xui." + getSteptitle().replace("%", "")));
         }
         resetAllRadioButtons();
     }
@@ -292,7 +292,7 @@ public class AddFriendWizard extends JWizard {
             }
             setStep(STEP_FORWARD_INVITATIONS_COMPLETE);
             next.setEnabled(false);
-            cancel.setText(LanguageResource.getLocalizedString(getClass(), "finish"));
+            cancel.setText(Language.getLocalizedString(getClass(), "finish"));
         } else {
             if (T.t) {
                 T.ass(false, "Reached step in wizard that was unexcpected (" + getStep() + ")");
@@ -319,13 +319,13 @@ public class AddFriendWizard extends JWizard {
     private void handleInvitationCode() {
         String invitation = codeinput.getText().trim();
         if (invitation.length() == 0) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "nocode"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "nocode"));
         } else {
             try {
                 ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(invitation.trim(), null);
                 goToAttemptConnect();
             } catch (EOFException ex) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "shortcode"));
+                OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "shortcode"));
                 goToEnterInvitation();
             } catch (Exception e) {
                 ui.handleErrorInEventLoop(e);
@@ -413,7 +413,7 @@ public class AddFriendWizard extends JWizard {
     }
 
     public void EVENT_createnew(ActionEvent e) {
-        invitationCode.setText(LanguageResource.getLocalizedString(getClass(), "generatecode"));
+        invitationCode.setText(Language.getLocalizedString(getClass(), "generatecode"));
         invitationCode.revalidate();
         Thread t = new Thread(new Runnable() {
 
@@ -426,12 +426,12 @@ public class AddFriendWizard extends JWizard {
                         @Override
                         public void run() {
                             invitationCode.setText("");
-                            invitationCode.append(LanguageResource.getLocalizedString(getClass(), "invline1"));
+                            invitationCode.append(Language.getLocalizedString(getClass(), "invline1"));
                             invitationCode.append("\n\n");
-                            invitationCode.append(LanguageResource.getLocalizedString(getClass(), "invline2"));
+                            invitationCode.append(Language.getLocalizedString(getClass(), "invline2"));
                             invitationCode.append("\n");
                             invitationCode.append("http://www.alliancep2p.com/download\n\n");
-                            invitationCode.append(LanguageResource.getLocalizedString(getClass(), "invline3"));
+                            invitationCode.append(Language.getLocalizedString(getClass(), "invline3"));
                             invitationCode.append("\n");
                             invitationCode.append(i.getCompleteInvitaitonString());
                             invitationCode.requestFocus();

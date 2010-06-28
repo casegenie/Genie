@@ -1,7 +1,7 @@
 package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.OptionDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
@@ -61,9 +61,9 @@ public class AddRuleWindow extends XUIDialog {
 
     private void init() throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/rulewindow.xui.xml"));
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         radioButtons.add((JRadioButton) xui.getComponent("radioallow"));
         radioButtons.add((JRadioButton) xui.getComponent("radiodeny"));
 
@@ -105,15 +105,15 @@ public class AddRuleWindow extends XUIDialog {
             try {
                 temp = Integer.parseInt(FIELDS.get(i).getText().trim());
                 if (temp < 0 || temp > 255) {
-                    JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "invalid", Integer.toString(temp)));
+                    JOptionPane.showMessageDialog(null, Language.getLocalizedString(getClass(), "invalid", Integer.toString(temp)));
                     return;
                 }
                 human += temp + ".";
             } catch (NumberFormatException e) {
                 if (FIELDS.get(i).getText().trim().length() == 0) {
-                    OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "ipfill"));
+                    OptionDialog.showErrorDialog(this, Language.getLocalizedString(getClass(), "ipfill"));
                 } else {
-                    OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "badblock", FIELDS.get(i).getText().trim()));
+                    OptionDialog.showErrorDialog(this, Language.getLocalizedString(getClass(), "badblock", FIELDS.get(i).getText().trim()));
                 }
                 return;
             }
@@ -122,15 +122,15 @@ public class AddRuleWindow extends XUIDialog {
         try {
             Integer mask = new Integer(FIELDS.get(OPTIONS.length - 1).getText());
             if (mask < 0 || mask > 32) {
-                JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "maskrange"));
+                JOptionPane.showMessageDialog(null, Language.getLocalizedString(getClass(), "maskrange"));
                 return;
             }
             human = human.subSequence(0, human.length() - 1) + "/" + mask;
         } catch (NumberFormatException e) {
             if (FIELDS.get(OPTIONS.length - 1).getText().trim().length() == 0) {
-                OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "entermask"));
+                OptionDialog.showErrorDialog(this, Language.getLocalizedString(getClass(), "entermask"));
             } else {
-                OptionDialog.showErrorDialog(this, LanguageResource.getLocalizedString(getClass(), "invalidmask"));
+                OptionDialog.showErrorDialog(this, Language.getLocalizedString(getClass(), "invalidmask"));
             }
             return;
         }

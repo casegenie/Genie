@@ -3,7 +3,7 @@ package org.alliance.core.comm.siteupdater;
 import org.alliance.Version;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.file.FileManager;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.T;
 import org.alliance.launchers.OSInfo;
 import static org.alliance.core.CoreSubsystem.KB;
@@ -64,10 +64,10 @@ public class SiteUpdate implements Runnable {
                 if (isNewVersionAvailable()) {
                     core.siteUpdateAvailable();
                 } else {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "noupdates"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "noupdates"), true);
                 }
             } catch (IOException ex) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatecheckfailed"), true);
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "updatecheckfailed"), true);
             }
             try {
                 Thread.sleep(4 * 60 * 60 * 1000);//4h
@@ -77,7 +77,7 @@ public class SiteUpdate implements Runnable {
     }
 
     public boolean isNewVersionAvailable() throws IOException {
-        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "checking"), true);
+        core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "checking"), true);
         URLConnection http = new URL(INFO_URL).openConnection();
         http.setConnectTimeout(1000 * 15);
         http.setReadTimeout(1000 * 15);
@@ -106,7 +106,7 @@ public class SiteUpdate implements Runnable {
             @Override
             public void run() {
                 try {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadingstart"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadingstart"), true);
                     URLConnection http = new URL(JAR_URL).openConnection();
                     http.setConnectTimeout(1000 * 15);
                     http.setReadTimeout(1000 * 15);
@@ -117,7 +117,7 @@ public class SiteUpdate implements Runnable {
                     int readed = 0;
                     while ((read = in.read(buf)) > 0) {
                         readed += read;
-                        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloading",
+                        core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloading",
                                 Integer.toString(readed), Integer.toString(http.getContentLength())),
                                 true);
                         out.write(buf, 0, read);
@@ -126,13 +126,13 @@ public class SiteUpdate implements Runnable {
                     in.close();
                     checkDownloadFile();
                     core.updateDownloaded();
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadok"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadok"), true);
                 } catch (IOException ex) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadfailed"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadfailed"), true);
                 } catch (SecurityException ex) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 } catch (Exception ex) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadcorrupt"), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadcorrupt"), true);
                 }
             }
         });
@@ -171,9 +171,9 @@ public class SiteUpdate implements Runnable {
             updateAttemptHasBeenMade = true;
             core.runUpdater(updateFilePath, orginalFilePath, siteVersion, siteBuild);
         } catch (Exception e) {
-            core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatefailed"), true);
+            core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "updatefailed"), true);
             if (!OSInfo.isWindows()) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "updatemanual"), true);
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "updatemanual"), true);
             }
         }
     }

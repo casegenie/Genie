@@ -3,7 +3,7 @@ package org.alliance.ui;
 import org.alliance.core.CoreSubsystem;
 import org.alliance.core.PacedRunner;
 import org.alliance.core.node.Friend;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -101,7 +101,7 @@ public class FriendListModel extends DefaultListModel {
         }
         groupsSorted.clear();
         //Draw no groups
-        drawGroups(LanguageResource.getLocalizedString(getClass(), "nogroup"), true);
+        drawGroups(Language.getLocalizedString(getClass(), "nogroup"), true);
 
         friends.clear();
         ignoreFires = false;

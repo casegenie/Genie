@@ -10,7 +10,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -33,15 +33,15 @@ public class FirewallTab extends XUIDialog implements TabHelper {
     public FirewallTab(String loading) {
         tab = new JPanel();
         tab.add(new JLabel(loading));
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public FirewallTab(final UISubsystem ui) throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionstabs/firewalltab.xui.xml"));
         this.ui = ui;
 
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("addrule"));
         SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("removerule"));
@@ -49,8 +49,8 @@ public class FirewallTab extends XUIDialog implements TabHelper {
         SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("moveruledown"));
         SubstanceThemeHelper.flatButton((JComponent) xui.getComponent("editrule"));
         tab = (JPanel) xui.getComponent("firewalltab");
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
 
         ruleList = (JList) xui.getComponent("rulelist");
         ruleListModel = new DefaultListModel();

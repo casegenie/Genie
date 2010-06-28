@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -47,24 +47,24 @@ public class NetworkTab extends XUIDialog implements TabHelper {
     public NetworkTab(String loading) {
         tab = new JPanel();
         tab.add(new JLabel(loading));
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public NetworkTab(final UISubsystem ui) throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionstabs/networktab.xui.xml"));
         this.ui = ui;
 
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         tab = (JPanel) xui.getComponent("networktab");
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
 
         if (ui.getCore().getUpnpManager().isPortForwardSuccedeed()) {
-            ((JHtmlLabel) xui.getComponent("portforward")).setText(LanguageResource.getLocalizedString(getClass(), "portupnp"));
+            ((JHtmlLabel) xui.getComponent("portforward")).setText(Language.getLocalizedString(getClass(), "portupnp"));
         } else {
-            ((JHtmlLabel) xui.getComponent("portforward")).setText(LanguageResource.getLocalizedString(getClass(), "xui.portforward",
+            ((JHtmlLabel) xui.getComponent("portforward")).setText(Language.getLocalizedString(getClass(), "xui.portforward",
                     "[a href='.']http://www.portforward.com/[/a]"));
             ((JHtmlLabel) xui.getComponent("portforward")).addHyperlinkListener(new HyperlinkListener() {
 
@@ -169,13 +169,13 @@ public class NetworkTab extends XUIDialog implements TabHelper {
             //Skip
         }
         if (localField.getText().isEmpty()) {
-            localField.setText(LanguageResource.getLocalizedString(getClass(), "noobtain"));
-            externalField.setText(LanguageResource.getLocalizedString(getClass(), "noobtain"));
+            localField.setText(Language.getLocalizedString(getClass(), "noobtain"));
+            externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
             return;
         }
         if (isLanMode) {
             //ipv6.setSelected(!isLanMode);
-            externalField.setText(LanguageResource.getLocalizedString(getClass(), "unused"));
+            externalField.setText(Language.getLocalizedString(getClass(), "unused"));
             return;
         } else {
             try {
@@ -191,7 +191,7 @@ public class NetworkTab extends XUIDialog implements TabHelper {
             }
         }
         if (externalField.getText().isEmpty()) {
-            externalField.setText(LanguageResource.getLocalizedString(getClass(), "noobtain"));
+            externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
         }
     }
 

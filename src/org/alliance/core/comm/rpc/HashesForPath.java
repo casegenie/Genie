@@ -4,7 +4,7 @@ import com.stendahls.util.TextUtils;
 import org.alliance.core.comm.T;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.CoreSubsystem;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 
 import java.io.DataInputStream;
@@ -103,9 +103,9 @@ public class HashesForPath extends CompressedRPC {
             }
 
             if (core.getFileManager().containsComplete(fd.getRootHash())) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "samefile", commonPath));
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "samefile", commonPath));
             } else if (core.getNetworkManager().getDownloadManager().getDownload(fd.getRootHash()) != null) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "downloadinprogress", commonPath));
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "downloadinprogress", commonPath));
             } else {
                 core.getNetworkManager().getDownloadManager().queDownload(fd.getRootHash(), commonPath, guid, downloadDir);
             }

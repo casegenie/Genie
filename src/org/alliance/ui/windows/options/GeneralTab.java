@@ -2,7 +2,7 @@ package org.alliance.ui.windows.options;
 
 import com.stendahls.XUI.XUI;
 import com.stendahls.XUI.XUIDialog;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -37,19 +37,19 @@ public class GeneralTab extends XUIDialog implements TabHelper {
     public GeneralTab(String loading) {
         tab = new JPanel();
         tab.add(new JLabel(loading));
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public GeneralTab(final UISubsystem ui) throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionstabs/generaltab.xui.xml"));
         this.ui = ui;
 
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         tab = (JPanel) xui.getComponent("generaltab");
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
 
         PopupMenuListener fontPopup = new PopupMenuListener() {
 
@@ -79,7 +79,7 @@ public class GeneralTab extends XUIDialog implements TabHelper {
     }
 
     private void fillLanguage() {
-        for (String lang : LanguageResource.getAllLanguages()) {
+        for (String lang : Language.getAllLanguages()) {
             language.addItem(lang);
             if (lang.endsWith("en")) {
                 language.setSelectedItem(lang);
@@ -90,7 +90,7 @@ public class GeneralTab extends XUIDialog implements TabHelper {
     private void fillFonts(Object source) {
         final JComboBox fontBox = (JComboBox) source;
         if (fontBox.getItemCount() == 1) {
-            fontBox.addItem(LanguageResource.getLocalizedString(getClass(), "fontload"));
+            fontBox.addItem(Language.getLocalizedString(getClass(), "fontload"));
             final Object selectedGlobal = globalfont.getSelectedItem();
             final Object selectedChat = chatfont.getSelectedItem();
             fontBox.removeItemAt(0);

@@ -3,7 +3,7 @@ package org.alliance.ui.windows.mdi.viewshare;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.rpc.GetHashesForPath;
 import org.alliance.core.file.filedatabase.FileType;
 import org.alliance.core.file.hash.Hash;
@@ -70,7 +70,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
     public ViewShareMDIWindow(final UISubsystem ui, Node remote) throws Exception {
         super(ui.getMainWindow().getMDIManager(), (remote instanceof MyNode) ? "viewmyshare" : "viewshare", ui);
         this.remote = remote;
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         setTitle(remote.getNickname());
 
         iconLoading = new ImageIcon(ui.getRl().getResource("gfx/icons/loadingsharenode.png"));
@@ -132,7 +132,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                             downToMenu.remove(downToMenu.getMenuComponentCount() - 1);
                         } else {
                             downToMenu.addSeparator();
-                            JMenuItem item = new JMenuItem(LanguageResource.getLocalizedString(getClass(), "lastused"));
+                            JMenuItem item = new JMenuItem(Language.getLocalizedString(getClass(), "lastused"));
                             item.setEnabled(false);
                             item.setFont(new Font(item.getFont().getFamily(), Font.ITALIC, item.getFont().getSize()));
                             downToMenu.add(item);
@@ -169,8 +169,8 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         if (!(remote instanceof MyNode)) {
             JHtmlLabel l = (JHtmlLabel) xui.getComponent("chatmessage");
             StringBuilder sb = new StringBuilder();
-            sb.append(LanguageResource.getLocalizedString(getClass(), "tip")).append(" ");
-            sb.append("[a href=c]").append(LanguageResource.getLocalizedString(getClass(), "chat")).append("[/a]");
+            sb.append(Language.getLocalizedString(getClass(), "tip")).append(" ");
+            sb.append("[a href=c]").append(Language.getLocalizedString(getClass(), "chat")).append("[/a]");
             l.setText(sb.toString());
             l.addHyperlinkListener(new HyperlinkListener() {
 
@@ -188,19 +188,19 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         }
 
         JLabel status = (JLabel) xui.getComponent("status");
-        status.setText(LanguageResource.getLocalizedString(getClass(), "shares", TextUtils.formatByteSize(remote.getShareSize()),
+        status.setText(Language.getLocalizedString(getClass(), "shares", TextUtils.formatByteSize(remote.getShareSize()),
                 Integer.toString(remote.getNumberOfFilesShared())));
 
         status = (JLabel) xui.getComponent("status2");
-        status.setText(LanguageResource.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(remote.getTotalBytesSent()),
+        status.setText(Language.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(remote.getTotalBytesSent()),
                 TextUtils.formatByteSize((long) remote.getHighestOutgoingCPS())));
 
         status = (JLabel) xui.getComponent("status3");
-        status.setText(LanguageResource.getLocalizedString(getClass(), "downtotal", TextUtils.formatByteSize(remote.getTotalBytesReceived()),
+        status.setText(Language.getLocalizedString(getClass(), "downtotal", TextUtils.formatByteSize(remote.getTotalBytesReceived()),
                 TextUtils.formatByteSize((long) remote.getHighestIncomingCPS())));
 
         status = (JLabel) xui.getComponent("status4");
-        status.setText(LanguageResource.getLocalizedString(getClass(), "invites", Integer.toString(remote.getNumberOfInvitedFriends())));
+        status.setText(Language.getLocalizedString(getClass(), "invites", Integer.toString(remote.getNumberOfInvitedFriends())));
 
         postInit();
     }
@@ -234,7 +234,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onlyone"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "onlyone"));
             return;
         }
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
@@ -242,7 +242,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         try {
             Desktop.getDesktop().open(new File(path));
         } catch (Exception ex) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "openerror"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "openerror"));
         }
     }
 
@@ -254,13 +254,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onesend"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "onesend"));
             return;
         }
 
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
         if (!(node instanceof ViewShareFileNode)) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "senderror"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "senderror"));
             return;
         }
 
@@ -308,13 +308,13 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (tree.getSelectionPaths().length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onehdd"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "onehdd"));
             return;
         }
 
         ViewShareTreeNode node = (ViewShareTreeNode) tree.getSelectionPath().getLastPathComponent();
         if (!(node instanceof ViewShareFileNode)) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "hdderror"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "hdderror"));
             return;
         }
 
@@ -371,7 +371,7 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
         for (TreePath p : tree.getSelectionPaths()) {
             ViewShareTreeNode n = (ViewShareTreeNode) p.getLastPathComponent();
             if (!(n instanceof ViewShareFileNode)) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notroot"));
+                OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "notroot"));
                 return;
             }
         }
@@ -470,9 +470,9 @@ public class ViewShareMDIWindow extends AllianceMDIWindow {
                     setIcon(fileTypeIcons[FileType.getByFileName(n.getName()).id()]);
                     long size = n.getSize();
                     if (size > 0) {
-                        setToolTipText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "filesize", TextUtils.formatByteSize(n.getSize())));
+                        setToolTipText(Language.getLocalizedString(getClass().getEnclosingClass(), "filesize", TextUtils.formatByteSize(n.getSize())));
                     } else {
-                        setToolTipText(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "filesizena"));
+                        setToolTipText(Language.getLocalizedString(getClass().getEnclosingClass(), "filesizena"));
                     }
                 } else {
                     if (expanded) {

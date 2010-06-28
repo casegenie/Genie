@@ -9,7 +9,7 @@ import org.alliance.core.file.blockstorage.BlockFile;
 import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.hash.Tiger;
 import org.alliance.core.file.share.T;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -87,7 +87,7 @@ public class FileDescriptor {
         int read;
         long startedLastReadAt = System.currentTimeMillis();
         if (callback != null) {
-            callback.statusMessage(LanguageResource.getLocalizedString(getClass(), "hashing", file.getName()));
+            callback.statusMessage(Language.getLocalizedString(getClass(), "hashing", file.getName()));
         }
         long updateHashMessageTick = System.currentTimeMillis() + 1500; //delay first update with 1500ms
         long startTick = System.currentTimeMillis();
@@ -114,9 +114,9 @@ public class FileDescriptor {
             if (callback != null && System.currentTimeMillis() - updateHashMessageTick > 500) {
                 String hashLimit = "";
                 if (hashSpeedInMbPerSecond > 0) {
-                    hashLimit = " " + LanguageResource.getLocalizedString(getClass(), "hashlimit", Integer.toString(hashSpeedInMbPerSecond));
+                    hashLimit = " " + Language.getLocalizedString(getClass(), "hashlimit", Integer.toString(hashSpeedInMbPerSecond));
                 }
-                String s = LanguageResource.getLocalizedString(getClass(), "hashprogress", file.getName(),
+                String s = Language.getLocalizedString(getClass(), "hashprogress", file.getName(),
                         Long.toString(totalRead * 100 / file.length()),
                         TextUtils.formatByteSize(totalRead / ((System.currentTimeMillis() - startTick) / 1000)), hashLimit);
                 callback.statusMessage(s);

@@ -3,7 +3,7 @@ package org.alliance.ui.windows.mdi.chat;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import org.alliance.core.file.hash.Hash;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.T;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.util.CutCopyPastePopup;
@@ -123,7 +123,7 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                             String allowedChars = "abcdefghijklmnopqrstuvwxyz\u00e5\u00e4\u00f60123456789-%.;/?:@&=+$_.!~*'()#";
                             for (int i = 0; i < link.length(); i++) {
                                 if (allowedChars.indexOf(link.toLowerCase().charAt(i)) == -1) {
-                                    OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "invalid", Character.toString(link.charAt(i))));
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "invalid", Character.toString(link.charAt(i))));
                                     return;
                                 }
                             }
@@ -135,12 +135,12 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                     T.trace("Part: " + s);
                                 }
                                 if (s.length() < 2) {
-                                    OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
+                                    OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "notallowed"));
                                     return;
                                 }
                             }
                             int guid = Integer.parseInt(hashes[0]);
-                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
+                            if (OptionDialog.showQuestionDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
                                 ArrayList<Integer> al = new ArrayList<Integer>();
                                 al.add(guid);
                                 for (int i = 1; i < hashes.length; i++) {
@@ -149,13 +149,13 @@ public abstract class AbstractChatMessageMDIWindow extends AllianceMDIWindow imp
                                 ui.getMainWindow().getMDIManager().selectWindow(ui.getMainWindow().getDownloadsWindow());
                             }
                         } else {
-                            OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
+                            OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "notallowed"));
                             return;
                         }
                     } catch (IOException e1) {
                         ui.getCore().reportError(e1, this);
                     } catch (NumberFormatException e1) {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "notallowed"));
                         return;
                     }
                 }

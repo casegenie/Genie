@@ -2,7 +2,7 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 
 import java.awt.Component;
@@ -32,7 +32,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
 
     public DuplicatesMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "duplicates", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         ui.getToolbarActionManager().getButtonBy("delete", this).setEnabled(false);
 
@@ -46,13 +46,13 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         table.getColumnModel().getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setColumnSelectionAllowed(false);
 
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         HashMap<String, String> duplicates = ui.getCore().getFileManager().getFileDatabase().getDuplicates(8196);
         for (String path : duplicates.keySet()) {
             dups.add(new Dup(path, duplicates.get(path)));
         }
         duplicates.clear();
-        ((JLabel) xui.getComponent("status")).setText(LanguageResource.getLocalizedString(getClass(), "size", (dups.size() < 8196 ? Integer.toString(dups.size()) : dups.size() + "+")));
+        ((JLabel) xui.getComponent("status")).setText(Language.getLocalizedString(getClass(), "size", (dups.size() < 8196 ? Integer.toString(dups.size()) : dups.size() + "+")));
         postInit();
     }
 
@@ -132,11 +132,11 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "share");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "share");
                 case 1:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "duplicate");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "duplicate");
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -148,7 +148,7 @@ public class DuplicatesMDIWindow extends AllianceMDIWindow {
                 case 1:
                     return dups.get(rowIndex).duplicate;
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }

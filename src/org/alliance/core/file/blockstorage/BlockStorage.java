@@ -4,7 +4,7 @@ import org.alliance.core.CoreSubsystem;
 import static org.alliance.core.CoreSubsystem.BLOCK_SIZE;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.core.file.hash.Hash;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -83,7 +83,7 @@ public abstract class BlockStorage extends Thread {
                     if (T.t) {
                         T.info("Took from BlockStorage finishing que: " + bf);
                     }
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "verify", bf.getFd().getSubPath()));
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "verify", bf.getFd().getSubPath()));
                     bf.moveToComplete(bf.getFd().getBasePath());
                     core.invokeLater(new Runnable() {
 
@@ -98,7 +98,7 @@ public abstract class BlockStorage extends Thread {
                             signalFileComplete(bf);
                         }
                     });
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecomplete", bf.getFd().getSubPath()));
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "filecomplete", bf.getFd().getSubPath()));
                 } catch (Exception e) {
                     core.reportError(e, bf.getFd() == null ? bf : bf);
                 }
@@ -196,7 +196,7 @@ public abstract class BlockStorage extends Thread {
             Hash h = bf.calculateHash(blockNumber);
             if (!h.equals(bf.getFd().getSubHash(blockNumber))) {
                 bf.blockCorrupted(blockNumber);
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "filecorrupt"));
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "filecorrupt"));
                 if (T.t) {
                     T.error("Tiger hash incorrect for block " + blockNumber + " when saved to disk!!!");
                 }

@@ -6,7 +6,7 @@ import com.stendahls.util.resourceloader.GeneralResourceLoader;
 import com.stendahls.util.resourceloader.ResourceLoader;
 import com.stendahls.ui.JHtmlLabel;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
 import java.awt.Component;
@@ -122,13 +122,13 @@ public class ErrorDialog extends XUIDialog {
             error.printStackTrace();
 
             init(rl, rl.getResourceStream("res/xui/template/errordialog.xui.xml"));
-            LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+            Language.translateXUIElements(getClass(), xui.getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
 
-            setTitle(LanguageResource.getLocalizedString(getClass(), "titleerror"));
+            setTitle(Language.getLocalizedString(getClass(), "titleerror"));
             if (!(fatal)) {
                 ((JLabel) this.xui.getComponent("image")).setIcon(new ImageIcon(rl.getResource("res/gfx/icons/warning.png")));
-                setTitle(LanguageResource.getLocalizedString(getClass(), "titlewarning"));
+                setTitle(Language.getLocalizedString(getClass(), "titlewarning"));
             }
             Component remove;
             Component keep;
@@ -155,9 +155,9 @@ public class ErrorDialog extends XUIDialog {
                 dispose();
             } else {
                 if (!(fatal)) {
-                    label.setText(LanguageResource.getLocalizedString(getClass(), "xui.nonfatal", TextUtils.cutOffWithDots(errorMessage, 130)));
+                    label.setText(Language.getLocalizedString(getClass(), "xui.nonfatal", TextUtils.cutOffWithDots(errorMessage, 130)));
                 } else {
-                    label.setText(LanguageResource.getLocalizedString(getClass(), "xui.fatal", TextUtils.cutOffWithDots(errorMessage, 130)));
+                    label.setText(Language.getLocalizedString(getClass(), "xui.fatal", TextUtils.cutOffWithDots(errorMessage, 130)));
                 }
                 display();
             }
@@ -191,10 +191,10 @@ public class ErrorDialog extends XUIDialog {
     public void EVENT_view(ActionEvent e) {
         try {
             XUIDialog xd = new XUIDialog(this.xui.getResourceLoader(), this.xui.getResourceLoader().getResourceStream("res/xui/template/viewerror.xui.xml"), this);
-            LanguageResource.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
+            Language.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xd.getXUI().getXUIComponents());
             xui.setEventHandler(this);
-            xd.setTitle(LanguageResource.getLocalizedString(getClass(), "titlereport"));
+            xd.setTitle(Language.getLocalizedString(getClass(), "titlereport"));
             JTextArea ta = (JTextArea) xd.getXUI().getComponent("reportarea");
             ta.setFont(new Font("Tahoma", 0, 11));
             ta.setLineWrap(true);
@@ -208,9 +208,9 @@ public class ErrorDialog extends XUIDialog {
     public void EVENT_send(ActionEvent e) {
         try {
             XUIDialog xd = new XUIDialog(this.xui.getResourceLoader(), this.xui.getResourceLoader().getResourceStream("res/xui/template/usercomment.xui.xml"), this);
-            LanguageResource.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
+            Language.translateXUIElements(getClass(), xd.getXUI().getXUIComponents());
             SubstanceThemeHelper.setButtonsToGeneralArea(xd.getXUI().getXUIComponents());
-            xd.setTitle(LanguageResource.getLocalizedString(getClass(), "titlereport"));
+            xd.setTitle(Language.getLocalizedString(getClass(), "titlereport"));
             JTextArea ta = (JTextArea) xd.getXUI().getComponent("commentarea");
             xd.display();
             String userComment = ta.getText();
@@ -230,9 +230,9 @@ public class ErrorDialog extends XUIDialog {
             wr.close();
             rd.close();
 
-            String s = LanguageResource.getLocalizedString(getClass(), "sendok");
+            String s = Language.getLocalizedString(getClass(), "sendok");
             if (this.fatal) {
-                s = s + "\n" + LanguageResource.getLocalizedString(getClass(), "shutdown");
+                s = s + "\n" + Language.getLocalizedString(getClass(), "shutdown");
             }
             OptionDialog.showInformationDialog(this, s);
         } catch (Exception e1) {

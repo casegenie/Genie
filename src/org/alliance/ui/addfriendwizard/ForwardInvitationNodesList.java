@@ -4,7 +4,7 @@ import org.alliance.core.CoreSubsystem;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.UntrustedNode;
 import org.alliance.core.node.Invitation;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 
 import java.awt.Component;
@@ -118,7 +118,7 @@ public class ForwardInvitationNodesList extends JList {
             this.connectedThrough = connectedThrough;
             this.guid = guid;
             this.trusted = trusted;
-            toString = "<html>" + LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "friend", nickname + " <font color=gray>", connectedThrough) + "</font></html>";
+            toString = "<html>" + Language.getLocalizedString(getClass().getEnclosingClass(), "friend", nickname + " <font color=gray>", connectedThrough) + "</font></html>";
         }
 
         @Override

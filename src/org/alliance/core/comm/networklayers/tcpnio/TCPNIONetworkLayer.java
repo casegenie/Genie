@@ -7,7 +7,7 @@ import org.alliance.core.comm.HandshakeConnection;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.PacketConnection;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -81,7 +81,7 @@ public class TCPNIONetworkLayer implements Runnable {
                 if (netMan.getCore().getSettings().getRulelist().checkConnection(host)) {
                     //Connect, continue
                 } else {
-                    netMan.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "conblocked", host));
+                    netMan.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "conblocked", host));
                     return;
                 }
             } else {

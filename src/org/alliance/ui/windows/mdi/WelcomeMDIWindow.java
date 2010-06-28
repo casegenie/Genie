@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +29,7 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
     public WelcomeMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "welcome", ui);
         this.ui = ui;
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         BufferedReader r = new BufferedReader(new InputStreamReader(ui.getRl().getResourceStream("welcome.html")));
         StringBuffer data = new StringBuffer();
@@ -37,7 +37,7 @@ public class WelcomeMDIWindow extends AllianceMDIWindow {
         while ((line = r.readLine()) != null) {
             data.append(line);
         }
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         label = (JHtmlLabel) xui.getComponent("label");
         label.setText(data.toString());
         postInit();

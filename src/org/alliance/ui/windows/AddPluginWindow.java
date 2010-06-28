@@ -4,7 +4,7 @@ import com.stendahls.XUI.XUIDialog;
 import com.stendahls.nif.util.EnumerationIteratorConverter;
 import org.alliance.core.settings.Plugin;
 import org.alliance.core.settings.Settings;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -29,9 +29,9 @@ public class AddPluginWindow extends XUIDialog {
         this.ui = ui;
         this.settings = ui.getCore().getSettings();
         init(ui.getRl(), ui.getRl().getResourceStream("xui/pluginwindow.xui.xml"));
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         pluginList = (JList) xui.getComponent("pluginList");
         pluginListModel = new DefaultListModel();
 
@@ -73,7 +73,7 @@ public class AddPluginWindow extends XUIDialog {
 
     public void EVENT_addplugin(ActionEvent a) throws Exception {
         JFileChooser file = new JFileChooser();
-        FileNameExtensionFilter filter = new FileNameExtensionFilter(LanguageResource.getLocalizedString(getClass(), "files"), "JAR", "jar", "Jar");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter(Language.getLocalizedString(getClass(), "files"), "JAR", "jar", "Jar");
         file.setFileFilter(filter);
         int returnVal = file.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -83,7 +83,7 @@ public class AddPluginWindow extends XUIDialog {
                 pluginListModel.add(pluginListModel.size(), newPlugin);
                 this.addedOrRemovedSomething = true;
             } catch (IOException e) {
-                JOptionPane.showMessageDialog(null, LanguageResource.getLocalizedString(getClass(), "error"));
+                JOptionPane.showMessageDialog(null, Language.getLocalizedString(getClass(), "error"));
             }
         }
     }

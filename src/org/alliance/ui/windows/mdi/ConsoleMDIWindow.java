@@ -1,7 +1,7 @@
 package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.launchers.console.Console;
 import org.alliance.ui.UISubsystem;
 
@@ -28,13 +28,13 @@ public class ConsoleMDIWindow extends AllianceMDIWindow implements Console.Print
 
     public ConsoleMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "console", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         console = new Console(ui.getCore(), ui.getCore().getPluginManager().getPluginConsoleExtensions());
         console.setPrinter(this);
 
         textarea = (JTextArea) xui.getComponent("textarea");
         chat = (JTextField) xui.getComponent("chat");
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         postInit();
     }
 

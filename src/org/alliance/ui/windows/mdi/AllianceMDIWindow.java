@@ -4,7 +4,7 @@ import com.stendahls.XUI.XUI;
 import com.stendahls.nif.ui.mdi.MDIManager;
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.nif.ui.mdi.infonodemdi.InfoNodeMDIManager;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -72,7 +72,7 @@ public abstract class AllianceMDIWindow extends MDIWindow {
 
         this.toolbar = ((JToolBar) this.xui.getComponent("toolbar"));
         ui.getToolbarActionManager().fillToolbar(this.toolbar, toolbarName, this);
-        LanguageResource.getLocalizedXUIToolbar(getClass(), ui.getToolbarActionManager().getButtonsBy(this));
+        Language.getLocalizedXUIToolbar(getClass(), ui.getToolbarActionManager().getButtonsBy(this));
 
         setIcon(new ImageIcon(ui.getRl().getResource("gfx/icons/" + mdiWindowIdentifier + ".png")));
     }

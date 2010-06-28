@@ -2,7 +2,7 @@ package org.alliance.ui.windows;
 
 import com.stendahls.XUI.XUIDialog;
 import org.alliance.core.node.Friend;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -22,9 +22,9 @@ public class ViewFoundVia extends XUIDialog {
         super(ui.getMainWindow());
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/viewfoundvia.xui.xml"));
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         fofList = (JList) xui.getComponent("fofList");
         fofListModel = new DefaultListModel();
 

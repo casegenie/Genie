@@ -25,7 +25,7 @@ import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
 import org.alliance.core.interactions.PostMessageInteraction;
 import org.alliance.core.interactions.PostMessageToAllInteraction;
 import org.alliance.core.interactions.NewVersionAvailableInteraction;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.launchers.OSInfo;
 import org.alliance.launchers.StartupProgressListener;
 import org.alliance.ui.addfriendwizard.AddFriendWizard;
@@ -115,9 +115,9 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         }
         this.setIconImages(images);
 
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "mainloading"));
         init(ui.getRl(), "xui/mainwindow.xui.xml");
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         SubstanceThemeHelper.setComponentToToolbarArea((JComponent) xui.getComponent("fakeShadow"));
 
@@ -144,18 +144,18 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
         setupMDIManager();
 
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "friendloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "friendloading"));
         mdiManager.addWindow(new FriendListMDIWindow(mdiManager, ui));
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "chatloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "chatloading"));
         mdiManager.addWindow(publicChat = new PublicChatMessageMDIWindow(ui));
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "searchloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "searchloading"));
         mdiManager.addWindow(new SearchMDIWindow(ui));
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "downloadsloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "downloadsloading"));
         mdiManager.addWindow(new DownloadsMDIWindow(ui));
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "uploadsloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "uploadsloading"));
         EVENT_uploads(null);
 
-        pml.updateProgress(LanguageResource.getLocalizedString(getClass(), "mainloading"));
+        pml.updateProgress(Language.getLocalizedString(getClass(), "mainloading"));
         for (PublicChatHistory.Entry e : ui.getCore().getPublicChatHistory().allMessages()) {
             publicChat.addMessage(ui.getCore().getFriendManager().nickname(e.fromGuid), e.message, e.tick, true, false);
         }
@@ -177,7 +177,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
                 @Override
                 public void run() {
-                    OptionDialog.showInformationDialog(MainWindow.this, LanguageResource.getLocalizedString(getClass(), "welcomeinfo"));
+                    OptionDialog.showInformationDialog(MainWindow.this, Language.getLocalizedString(getClass(), "welcomeinfo"));
                     try {
                         ui.getCore().getSettings().getInternal().setFirststart(0);
                         EVENT_options(null);
@@ -306,7 +306,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (OSInfo.supportsTrayIcon() || OSInfo.isMac()) {
             setVisible(false);
         } else {
-            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "hideinfo"));
+            OptionDialog.showInformationDialog(this, Language.getLocalizedString(getClass(), "hideinfo"));
         }
     }
 
@@ -611,7 +611,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         if (mdiManager != null && getFriendListMDIWindow() != null) {
                             getFriendListMDIWindow().update();
                         }
-                        shareMessage.setText(LanguageResource.getLocalizedString(getClass(), "sharesinfo",
+                        shareMessage.setText(Language.getLocalizedString(getClass(), "sharesinfo",
                                 TextUtils.formatByteSize(ui.getCore().getShareManager().getFileDatabase().getShareSize()),
                                 Integer.toString(ui.getCore().getShareManager().getFileDatabase().getNumberOfShares())));
                         updateBandwidth("in", bandwidthIn, ui.getCore().getNetworkManager().getBandwidthIn());
@@ -619,12 +619,12 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         displayNagAboutInvitingFriendsIfNeeded();
                         if (ui.getCore().getShareManager().getShareScanner().isScanInProgress()) {
                             if (!rescan.getIcon().equals(refreshIconStates[1])) {
-                                rescan.setToolTipText(LanguageResource.getLocalizedString(getClass(), "break"));
+                                rescan.setToolTipText(Language.getLocalizedString(getClass(), "break"));
                                 rescan.setIcon(refreshIconStates[1]);
                             }
                         } else {
                             if (!rescan.getIcon().equals(refreshIconStates[0])) {
-                                rescan.setToolTipText(LanguageResource.getLocalizedString(getClass(), "rescan"));
+                                rescan.setToolTipText(Language.getLocalizedString(getClass(), "rescan"));
                                 rescan.setIcon(refreshIconStates[0]);
                             }
                         }
@@ -647,7 +647,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                                         if (ui.getCore().getNetworkManager().getBandwidthIn().getCPS() > ui.getCore().getNetworkManager().getBandwidthIn().getHighestCPS() / 3) {
                                             //downloading at fairly high speed - let's show the infomration dialog
                                             ui.getCore().getSettings().getInternal().setLastnaggedaboutinvitingafriend(System.currentTimeMillis());
-                                            if (OptionDialog.showQuestionDialog(MainWindow.this, LanguageResource.getLocalizedString(getClass(), "invitenag"))) {
+                                            if (OptionDialog.showQuestionDialog(MainWindow.this, Language.getLocalizedString(getClass(), "invitenag"))) {
                                                 ui.getCore().getSettings().getInternal().setHastriedtoinviteafriend(1);
                                                 openWizardAt(AddFriendWizard.STEP_PORT_OPEN_TEST);
                                             }
@@ -675,17 +675,17 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         StringBuilder sb = new StringBuilder();
                         sb.append("<html>");
                         if (type.equals("in")) {
-                            sb.append(LanguageResource.getLocalizedString(getClass(), "downloading", a.getCPSHumanReadable()));
+                            sb.append(Language.getLocalizedString(getClass(), "downloading", a.getCPSHumanReadable()));
                         } else {
-                            sb.append(LanguageResource.getLocalizedString(getClass(), "uploading", a.getCPSHumanReadable()));
+                            sb.append(Language.getLocalizedString(getClass(), "uploading", a.getCPSHumanReadable()));
                         }
                         sb.append("<br>");
-                        sb.append(LanguageResource.getLocalizedString(getClass(), "speedrecord", a.getHighestCPSHumanReadable()));
+                        sb.append(Language.getLocalizedString(getClass(), "speedrecord", a.getHighestCPSHumanReadable()));
                         sb.append("<br>");
                         if (type.equals("in")) {
-                            sb.append(LanguageResource.getLocalizedString(getClass(), "downtotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
+                            sb.append(Language.getLocalizedString(getClass(), "downtotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
                         } else {
-                            sb.append(LanguageResource.getLocalizedString(getClass(), "uptotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
+                            sb.append(Language.getLocalizedString(getClass(), "uptotalbytes", TextUtils.formatByteSize(a.getTotalBytes())));
                         }
                         sb.append("</html>");
                         pb.setToolTipText(sb.toString());
@@ -760,17 +760,17 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 }
             } else if (nui instanceof NeedsToRestartBecauseOfUpgradeInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
-                    OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "newupdateok"));
+                    OptionDialog.showInformationDialog(this, Language.getLocalizedString(getClass(), "newupdateok"));
                     ui.getCore().getFileManager().getSiteUpdater().prepareUpdate();
                 }
             } else if (nui instanceof NewVersionAvailableInteraction) {
                 if (!ui.getCore().getAwayManager().isAway()) {
                     try {
-                        OptionDialog updateDialog = new OptionDialog(this, LanguageResource.getLocalizedString(getClass(), "newupdateheader"),
-                                LanguageResource.getLocalizedString(getClass(), "newupdate",
+                        OptionDialog updateDialog = new OptionDialog(this, Language.getLocalizedString(getClass(), "newupdateheader"),
+                                Language.getLocalizedString(getClass(), "newupdate",
                                 ui.getCore().getFileManager().getSiteUpdater().getSiteVersion(),
                                 Integer.toString(ui.getCore().getFileManager().getSiteUpdater().getSiteBuild()))
-                                + "[a href='.']" + LanguageResource.getLocalizedString(getClass(), "newupdateinfo") + "[/a]", 1, 1, true);
+                                + "[a href='.']" + Language.getLocalizedString(getClass(), "newupdateinfo") + "[/a]", 1, 1, true);
                         JLayeredPane lp = (JLayeredPane) updateDialog.getRootPane().getComponent(1);
                         JPanel p = (JPanel) ((JPanel) lp.getComponent(0)).getComponent(0);
                         for (Component c : p.getComponents()) {
@@ -791,7 +791,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                             ui.getCore().getFileManager().getSiteUpdater().beginDownload();
                         }
                     } catch (Exception ex) {
-                        ui.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "newupdateerror"), true);
+                        ui.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "newupdateerror"), true);
                     }
                 }
             } else if (nui instanceof ForwardedInvitationInteraction) {
@@ -802,7 +802,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     }
                 } else {
                     if (ui.getCore().getSettings().getInternal().getAutomaticallydenyallinvitations() == 0
-                            && OptionDialog.showQuestionDialog(this, LanguageResource.getLocalizedString(getClass(), "friendattempt", fii.getRemoteName(), fii.getRemoteName(), fii.getMiddleman(ui.getCore()).getNickname(), fii.getRemoteName()))) {
+                            && OptionDialog.showQuestionDialog(this, Language.getLocalizedString(getClass(), "friendattempt", fii.getRemoteName(), fii.getRemoteName(), fii.getMiddleman(ui.getCore()).getNickname(), fii.getRemoteName()))) {
                         try {
                             ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(ui.getCore()));
                             openWizardAt(AddFriendWizard.STEP_ATTEMPT_CONNECT, fii.getFromGuid());
@@ -946,14 +946,14 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     public void EVENT_trace(ActionEvent e) throws Exception {
         if (!org.alliance.T.t) {
             ((JComponent) e.getSource()).setEnabled(false);
-            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "menudisabled"));
+            OptionDialog.showInformationDialog(this, Language.getLocalizedString(getClass(), "menudisabled"));
         } else {
             createTraceWindow();
         }
     }
 
     public void EVENT_exitapp(ActionEvent e) throws Exception {
-        if (OptionDialog.showQuestionDialog(this, LanguageResource.getLocalizedString(getClass(), "exit"))) {
+        if (OptionDialog.showQuestionDialog(this, Language.getLocalizedString(getClass(), "exit"))) {
             if (ui.getCore() != null) {
                 ui.getCore().shutdown();
             }
@@ -993,7 +993,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     public void EVENT_friendtree(ActionEvent e) throws Exception {
         if (UISubsystem.NODE_TREE_MODEL_DISABLED) {
             ((JComponent) e.getSource()).setEnabled(false);
-            OptionDialog.showInformationDialog(this, LanguageResource.getLocalizedString(getClass(), "menudisabled"));
+            OptionDialog.showInformationDialog(this, Language.getLocalizedString(getClass(), "menudisabled"));
         } else {
             mdiManager.addWindow(new FriendsTreeMDIWindow(mdiManager, ui));
         }

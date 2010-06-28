@@ -3,7 +3,7 @@ package org.alliance.ui.windows;
 import com.stendahls.XUI.XUIDialog;
 import org.alliance.core.settings.Friend;
 import org.alliance.core.settings.Share;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.dialogs.AddGroupDialog;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
@@ -42,9 +42,9 @@ public class EditGroupWindow extends XUIDialog {
         this.groupsOfItem = groupsOfItem;
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/editgroupwindow.xui.xml"));
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         groupList = (JList) xui.getComponent("groupList");
 
         groupListModel = new DefaultListModel();

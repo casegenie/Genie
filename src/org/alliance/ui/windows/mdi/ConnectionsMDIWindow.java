@@ -2,7 +2,7 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.Connection;
 import org.alliance.ui.UISubsystem;
 
@@ -29,14 +29,14 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
 
     public ConnectionsMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "connections", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         table = (JTable) xui.getComponent("table");
         table.setModel(model = new ConnectionsTableModel());
 
         updateConnectionData();
 
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         postInit();
     }
 
@@ -134,17 +134,17 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "connected");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "connected");
                 case 1:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "status");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "status");
                 case 2:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "sent");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "sent");
                 case 3:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "received");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "received");
                 case 4:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "direction");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "direction");
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -162,7 +162,7 @@ public class ConnectionsMDIWindow extends AllianceMDIWindow {
                 case 4:
                     return rows.get(rowIndex).dir;
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }

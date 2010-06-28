@@ -14,7 +14,7 @@ import org.alliance.core.file.hash.Hash;
 import org.alliance.core.file.h2database.DatabaseCore;
 import org.alliance.core.file.share.ShareManager;
 import org.alliance.core.settings.Settings;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.IOException;
 import java.io.File;
@@ -93,7 +93,7 @@ public class FileManager extends Manager {
         shareManager.shutdown();
         cache.shutdown();
         downloads.shutdown();
-        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "compacting"), true);
+        core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "compacting"), true);
         dbCore.shutdown();
     }
 
@@ -195,7 +195,7 @@ public class FileManager extends Manager {
 
     public String prepareToRestore(String backup) {
         if (core.getProgress() != null) {
-            core.getProgress().updateProgress(LanguageResource.getLocalizedString(getClass(), "backup"));
+            core.getProgress().updateProgress(Language.getLocalizedString(getClass(), "backup"));
         }
         dbCore.shutdown();
         File dbFile = new File(core.getSettings().getInternal().getDatabasefile() + ".h2.db");

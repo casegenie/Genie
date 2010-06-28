@@ -2,7 +2,7 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.filetransfers.UploadConnection;
 import org.alliance.core.file.filedatabase.FileDescriptor;
@@ -32,7 +32,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
 
     public UploadsMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "uploads", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         table = (JTable) xui.getComponent("table");
         table.setModel(model = new UploadsMDIWindow.UploadsTableModel());
@@ -43,7 +43,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         table.getColumnModel().getColumn(3).setPreferredWidth(50);
 
         update();
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         postInit();
     }
 
@@ -51,7 +51,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         boolean structureChanged = false;
 
         for (UploadWrapper w : rows) {
-            w.speed = LanguageResource.getLocalizedString(getClass(), "complete");
+            w.speed = Language.getLocalizedString(getClass(), "complete");
         }
 
         ArrayList<Connection> al = new ArrayList<Connection>(ui.getCore().getNetworkManager().connections());
@@ -74,7 +74,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
             model.fireTableRowsUpdated(0, rows.size());
         }
 
-        ((JLabel) xui.getComponent("status")).setText(LanguageResource.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes())));
+        ((JLabel) xui.getComponent("status")).setText(Language.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthOut().getTotalBytes())));
     }
 
     private UploadWrapper getWrapperFor(UploadConnection u) {
@@ -151,15 +151,15 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "upload");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "upload");
                 case 1:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "file");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "file");
                 case 2:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "speed");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "speed");
                 case 3:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "sent");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "sent");
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -175,7 +175,7 @@ public class UploadsMDIWindow extends AllianceMDIWindow {
                 case 3:
                     return rows.get(rowIndex).sent;
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }

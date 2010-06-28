@@ -1,7 +1,7 @@
 package org.alliance.ui.windows.mdi.friends;
 
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
 import org.alliance.ui.UISubsystem;
@@ -98,7 +98,7 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             if (n instanceof Friend) {
                 nodeString = trusted + friendWindow.getNickname(n.getGuid());
             } else {
-                nodeString = LanguageResource.getLocalizedString(getClass(), "myself") + " - ";
+                nodeString = Language.getLocalizedString(getClass(), "myself") + " - ";
                 nodeString += n.getNickname();
             }
             nodeString += " (" + TextUtils.formatByteSize(n.getShareSize()) + ")";
@@ -107,7 +107,7 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             renderer.setIcon(iconFriendOld);
             renderer.setForeground(Color.GRAY);
             if (n.getLastSeenOnlineAt() != 0) {
-                renderer.setText(trusted + LanguageResource.getLocalizedString(getClass(), "myself",
+                renderer.setText(trusted + Language.getLocalizedString(getClass(), "myself",
                         friendWindow.getNickname(n.getGuid()), Long.toString((System.currentTimeMillis() - n.getLastSeenOnlineAt()) / 1000 / 60 / 60 / 24)));
             } else {
                 renderer.setText(trusted + friendWindow.getNickname(n.getGuid()));
@@ -125,26 +125,26 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             Friend f = (Friend) n;
             groupname = f.getUGroupName();
             if (groupname.isEmpty()) {
-                groupname = LanguageResource.getLocalizedString(getClass(), "nogroup");
+                groupname = Language.getLocalizedString(getClass(), "nogroup");
             }
         } else {
-            groupname = LanguageResource.getLocalizedString(getClass(), "wronggroup");
+            groupname = Language.getLocalizedString(getClass(), "wronggroup");
         }
 
         String cp = ui.getCore().getFriendManager().contactPath(n.getGuid());
         StringBuilder sb = new StringBuilder("<html>");
         if (cp.trim().length() > 0) {
-            sb.append(LanguageResource.getLocalizedString(getClass(), "subfriends", cp)).append("<br>");
+            sb.append(Language.getLocalizedString(getClass(), "subfriends", cp)).append("<br>");
         }
-        sb.append(LanguageResource.getLocalizedString(getClass(), "share", TextUtils.formatByteSize(n.getShareSize()),
+        sb.append(Language.getLocalizedString(getClass(), "share", TextUtils.formatByteSize(n.getShareSize()),
                 Integer.toString(n.getNumberOfFilesShared()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "invites", Integer.toString(n.getNumberOfInvitedFriends()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "upspeed", TextUtils.formatByteSize((long) n.getHighestOutgoingCPS()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "downspeed", TextUtils.formatByteSize((long) n.getHighestIncomingCPS()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(n.getTotalBytesSent()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "downtotal", TextUtils.formatByteSize(n.getTotalBytesReceived()))).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "ratio", n.calculateRatio())).append("<br>");
-        sb.append(LanguageResource.getLocalizedString(getClass(), "group", groupname)).append("</html>");
+        sb.append(Language.getLocalizedString(getClass(), "invites", Integer.toString(n.getNumberOfInvitedFriends()))).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "upspeed", TextUtils.formatByteSize((long) n.getHighestOutgoingCPS()))).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "downspeed", TextUtils.formatByteSize((long) n.getHighestIncomingCPS()))).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "uptotal", TextUtils.formatByteSize(n.getTotalBytesSent()))).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "downtotal", TextUtils.formatByteSize(n.getTotalBytesReceived()))).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "ratio", n.calculateRatio())).append("<br>");
+        sb.append(Language.getLocalizedString(getClass(), "group", groupname)).append("</html>");
         return sb.toString();
     }
 

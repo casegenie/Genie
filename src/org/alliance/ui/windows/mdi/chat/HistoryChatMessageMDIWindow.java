@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 
 /**
@@ -27,14 +27,14 @@ public class HistoryChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
 
     public HistoryChatMessageMDIWindow(UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "historychat", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
+        setTitle(Language.getLocalizedString(getClass(), "title"));
 
 
         links = ((JCheckBox) xui.getComponent("links"));
         chatCombo = ((JComboBox) xui.getComponent("type"));
         chatCombo.setMaximumRowCount(4);
-        chatCombo.addItem(LanguageResource.getLocalizedString(getClass(), "public"));
+        chatCombo.addItem(Language.getLocalizedString(getClass(), "public"));
 
         chatCombo.addActionListener(new ActionListener() {
 

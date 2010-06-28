@@ -5,7 +5,7 @@ import org.alliance.core.UICallback;
 import org.alliance.core.comm.SearchHit;
 import org.alliance.core.node.Friend;
 import org.alliance.core.node.Node;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.launchers.OSInfo;
 import org.alliance.ui.dialogs.OptionDialog;
 
@@ -114,7 +114,7 @@ public class UIBridge implements UICallback {
 
                     @Override
                     public void run() {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "firstdownload"));
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "firstdownload"));
                     }
                 });
             }

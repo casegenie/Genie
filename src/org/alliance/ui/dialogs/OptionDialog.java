@@ -27,7 +27,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 public class OptionDialog extends JDialog implements ActionListener {
 
@@ -72,7 +72,7 @@ public class OptionDialog extends JDialog implements ActionListener {
         if (customTitle) {
             setTitle(title);
         } else {
-            setTitle(LanguageResource.getLocalizedString(getClass(), title));
+            setTitle(Language.getLocalizedString(getClass(), title));
         }
         setLayout(new BorderLayout());
 
@@ -119,20 +119,20 @@ public class OptionDialog extends JDialog implements ActionListener {
         panel.setLayout(new FlowLayout(1, 5, 5));
         switch (buttonType) {
             case 0:
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "ok"), "ok", "o", true));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "ok"), "ok", "o", true));
                 break;
             case 1:
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "yes"), "yes", "y", true));
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "no"), "no", "n", false));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "yes"), "yes", "y", true));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "no"), "no", "n", false));
                 break;
             case 2:
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "yes"), "yes", "y", true));
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "no"), "no", "n", false));
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "yes"), "yes", "y", true));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "no"), "no", "n", false));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
                 break;
             case 3:
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "ok"), "ok", "o", true));
-                panel.add(createButton(LanguageResource.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "ok"), "ok", "o", true));
+                panel.add(createButton(Language.getLocalizedString(getClass(), "cancel"), "cancel", "c", false));
         }
 
         add(panel, "South");

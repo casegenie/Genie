@@ -6,7 +6,7 @@ import static org.alliance.core.CoreSubsystem.KB;
 import java.awt.event.ActionEvent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -27,19 +27,19 @@ public class TransferTab extends XUIDialog implements TabHelper {
     public TransferTab(String loading) {
         tab = new JPanel();
         tab.add(new JLabel(loading));
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public TransferTab(final UISubsystem ui) throws Exception {
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionstabs/transfertab.xui.xml"));
         this.ui = ui;
 
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         tab = (JPanel) xui.getComponent("transfertab");
-        tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
-        tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
+        tab.setName(Language.getLocalizedString(getClass(), "title"));
+        tab.setToolTipText(Language.getLocalizedString(getClass(), "tooltip"));
     }
 
     public void EVENT_browse(ActionEvent e) {

@@ -2,7 +2,7 @@ package org.alliance.ui.windows.mdi;
 
 import com.stendahls.nif.ui.mdi.MDIWindow;
 import com.stendahls.util.TextUtils;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.filetransfers.Download;
 import org.alliance.core.comm.filetransfers.DownloadConnection;
@@ -60,7 +60,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
     public DownloadsMDIWindow(final UISubsystem ui) throws Exception {
         super(ui.getMainWindow().getMDIManager(), "downloads", ui);
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
 
         table = (JTable) xui.getComponent("tableDownload");
         table.setModel(model = new DownloadsTableModel());
@@ -132,7 +132,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         popup = (JPopupMenu) xui.getComponent("popup");
 
         update();
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
         listenExternalLinks();
         postInit();
     }
@@ -165,7 +165,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
     }
 
     private void showTotalBytesReceived() {
-        status.setText(LanguageResource.getLocalizedString(getClass(), "bytetotal", TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes())));
+        status.setText(Language.getLocalizedString(getClass(), "bytetotal", TextUtils.formatByteSize(ui.getCore().getNetworkManager().getBandwidthIn().getTotalBytes())));
     }
 
     private String getDownloadingFromText(DownloadWrapper w) {
@@ -173,12 +173,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         final String s;
         for (DownloadConnection c : w.download.connections()) {
             if (text == null) {
-                text = LanguageResource.getLocalizedString(getClass(), "from") + " ";
+                text = Language.getLocalizedString(getClass(), "from") + " ";
             }
             if (c.getRemoteFriend() != null) {
                 text += c.getRemoteFriend().getNickname() + " (" + c.getBandwidthIn().getCPSHumanReadable() + "), ";
             } else {
-                text += LanguageResource.getLocalizedString(getClass(), "unknown") + ", ";
+                text += Language.getLocalizedString(getClass(), "unknown") + ", ";
             }
         }
         if (text != null) {
@@ -199,12 +199,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 UploadConnection uc = (UploadConnection) c;
                 if (uc.getRoot() != null && uc.getRoot().equals(w.download.getRoot())) {
                     if (text == null) {
-                        text = LanguageResource.getLocalizedString(getClass(), "to") + " ";
+                        text = Language.getLocalizedString(getClass(), "to") + " ";
                     }
                     if (uc.getRemoteFriend() != null) {
                         text += uc.getRemoteFriend().getNickname() + " (" + c.getBandwidthOut().getCPSHumanReadable() + "), ";
                     } else {
-                        text += LanguageResource.getLocalizedString(getClass(), "unknown") + ", ";
+                        text += Language.getLocalizedString(getClass(), "unknown") + ", ";
                     }
                 }
             }
@@ -321,7 +321,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     if (download.getNConnections() == 0) {
                         name = download.getAuxInfoFilename();
                     } else {
-                        name = LanguageResource.getLocalizedString(getClass(), "starting", download.getAuxInfoFilename());
+                        name = Language.getLocalizedString(getClass(), "starting", download.getAuxInfoFilename());
                     }
                     size = "?";
                 } else {
@@ -377,19 +377,19 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
         public String getColumnName(int columnIndex) {
             switch (columnIndex) {
                 case 0:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "name");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "name");
                 case 1:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "progress");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "progress");
                 case 2:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "size");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "size");
                 case 3:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "eta");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "eta");
                 case 4:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "speed");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "speed");
                 case 5:
                     return "#";
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
 
@@ -409,7 +409,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 case 5:
                     return rows.get(rowIndex).numberOfConnections;
                 default:
-                    return LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "undefined");
+                    return Language.getLocalizedString(getClass().getEnclosingClass(), "undefined");
             }
         }
     }
@@ -573,7 +573,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             return;
         }
         if (selection.length > 1) {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "onlyone"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "onlyone"));
             return;
         }
 
@@ -583,10 +583,10 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             try {
                 Desktop.getDesktop().open(new File(path));
             } catch (Exception ex) {
-                OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "openerror"));
+                OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "openerror"));
             }
         } else {
-            OptionDialog.showErrorDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "nodownload"));
+            OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "nodownload"));
         }
     }
 
@@ -614,7 +614,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
 
             @Override
             public String getDescription() {
-                return LanguageResource.getLocalizedString(getClass(), "alliancefile");
+                return Language.getLocalizedString(getClass(), "alliancefile");
             }
         });
         int returnVal = fc.showOpenDialog(this);
@@ -642,12 +642,12 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 String[] hashes = link.split("\\|");
                 for (String s : hashes) {
                     if (s.length() < 2) {
-                        OptionDialog.showInformationDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "notallowed"));
+                        OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "notallowed"));
                         return;
                     }
                 }
                 int guid = Integer.parseInt(hashes[0]);
-                if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
+                if (OptionDialog.showQuestionDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "addlink", Integer.toString(hashes.length - 1)))) {
                     ArrayList<Integer> al = new ArrayList<Integer>();
                     al.add(guid);
                     for (int i = 1; i < hashes.length; i++) {
@@ -667,7 +667,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
             for (int i : selection) {
                 Download d = rows.get(i).download;
                 if (!d.isComplete()) {
-                    if (OptionDialog.showQuestionDialog(ui.getMainWindow(), LanguageResource.getLocalizedString(getClass(), "remove"))) {
+                    if (OptionDialog.showQuestionDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "remove"))) {
                         break;
                     } else {
                         return;
@@ -721,10 +721,10 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                 int v = (Integer) value;
                 DownloadWrapper w = rows.get(rowIndex);
                 if (w.state == Download.State.WAITING_TO_START) {
-                    setString(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "queue"));
+                    setString(Language.getLocalizedString(getClass().getEnclosingClass(), "queue"));
                     setValue(0);
                 } else if (w.state == Download.State.COMPLETED) {
-                    setString(LanguageResource.getLocalizedString(getClass().getEnclosingClass(), "complete"));
+                    setString(Language.getLocalizedString(getClass().getEnclosingClass(), "complete"));
                     setValue(100);
                 } else {
                     setValue(v);

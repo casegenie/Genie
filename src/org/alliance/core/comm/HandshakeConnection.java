@@ -3,7 +3,7 @@ package org.alliance.core.comm;
 import org.alliance.Version;
 import org.alliance.core.interactions.NewFriendConnectedUserInteraction;
 import org.alliance.core.node.Friend;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
@@ -38,7 +38,7 @@ public class HandshakeConnection extends PacketConnection {
         }
         if (netMan.getCore().getSettings().getInternal().getEnableiprules() == 1) {
             if (!core.getSettings().getRulelist().checkConnection(netMan.getSocketFor(this).getInetAddress().getAddress())) {
-                core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "conblocked"));
+                core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "conblocked"));
                 close();
                 netMan.getSocketFor(this).close();
                 return;
@@ -75,7 +75,7 @@ public class HandshakeConnection extends PacketConnection {
 
                     return;
                 } else {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "codeexpired"));
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "codeexpired"));
                     core.getInvitaitonManager().consume(guid);
                 }
             } else {

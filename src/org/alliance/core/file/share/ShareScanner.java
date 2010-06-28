@@ -8,7 +8,7 @@ import static org.alliance.core.CoreSubsystem.GB;
 import org.alliance.core.file.FileManager;
 import org.alliance.core.file.filedatabase.FileDescriptor;
 import org.alliance.launchers.OSInfo;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -78,9 +78,9 @@ public class ShareScanner extends Thread {
             if (System.currentTimeMillis() - lastFullScanCompletedAt > getShareManagerCycle() || shouldBeFastScan) {
                 startScanCycle();
                 if (isBreakScan()) {
-                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "break"), true);
+                    manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "break"), true);
                 } else {
-                    manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanok"), true);
+                    manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "scanok"), true);
                 }
                 lastFullScanCompletedAt = System.currentTimeMillis();
             }
@@ -139,12 +139,12 @@ public class ShareScanner extends Thread {
     }
 
     private void startScanCycle() {
-        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "backup"), true);
+        manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "backup"), true);
         manager.getCore().getFileManager().createBackup();
         if (isBreakScan()) {
             return;
         }
-        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removecheck"), true);
+        manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removecheck"), true);
         manager.getFileDatabase().removeOldShares();
         if (isBreakScan()) {
             return;
@@ -160,7 +160,7 @@ public class ShareScanner extends Thread {
             if (isBreakScan()) {
                 return;
             }
-            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "scanning", basePath), true);
+            manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "scanning", basePath), true);
             if (T.t) {
                 T.info("Scanning " + basePath + "...");
             }
@@ -233,7 +233,7 @@ public class ShareScanner extends Thread {
         }
         try {
             filesScanned++;
-            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "searchnew", path));
+            manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "searchnew", path));
             if (!manager.getFileDatabase().contains(basePath, path, true)) {
                 hash(basePath, new File(path));
             }
@@ -267,11 +267,11 @@ public class ShareScanner extends Thread {
         try {
             fd = new FileDescriptor(basePath, file, shouldBeFastScan ? 0 : core.getSettings().getInternal().getHashspeedinmbpersecond(), manager.getCore().getUICallback());
         } catch (FileDescriptor.FileModifiedWhileHashingException e) {
-            manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashmodified", file.getName()));
+            manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "hashmodified", file.getName()));
             queFileForHashing(file.toString(), true);
             return;
         }
-        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "hashok",
+        manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "hashok",
                 file.getName(), st.getTime(), TextUtils.formatByteSize((long) (fd.getSize() / (st.getTimeInMs() / 1000.)))));
         manager.getFileDatabase().addEntry(fd);
 
@@ -367,7 +367,7 @@ public class ShareScanner extends Thread {
                     if (manager.getFileDatabase().contains(basePath, oldFile, false)) {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, oldFile);
                         manager.getFileDatabase().removeEntry(rootHash);
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile", oldFile), true);
+                        manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removedfile", oldFile), true);
                         queFileForHashing(newFile, false);
                     }
                 } catch (IOException e) {
@@ -389,7 +389,7 @@ public class ShareScanner extends Thread {
                     if (manager.getFileDatabase().contains(basePath, file, false)) {
                         byte[] rootHash = manager.getFileDatabase().getRootHash(basePath, file);
                         manager.getFileDatabase().removeEntry(rootHash);
-                        manager.getCore().getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedfile", file), true);
+                        manager.getCore().getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removedfile", file), true);
                     }
                 } catch (IOException e) {
                     core.reportError(e, this);

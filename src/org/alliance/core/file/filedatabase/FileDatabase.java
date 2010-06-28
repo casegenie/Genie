@@ -8,7 +8,7 @@ import org.alliance.core.file.share.ShareBase;
 import org.alliance.core.file.FileManager;
 import org.alliance.launchers.console.Console;
 import static org.alliance.core.CoreSubsystem.KB;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class FileDatabase {
         }
         changeInUseQueue(true);
         boolean moreEntries = false;
-        core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removedir", basePath + "/" + subPath));
+        core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removedir", basePath + "/" + subPath));
         ResultSet results = core.getFileManager().getDbCore().getDbShares().getEntries(basePath, subPath, true, GROUP_REMOVE_LIMIT);
         try {
             while (results.next()) {
@@ -148,7 +148,7 @@ public class FileDatabase {
             while (results.next()) {
                 File f = new File((mergePathParts(results.getString(ID_BASE_PATH), results.getString(ID_SUB_PATH), results.getString(ID_FILENAME))));
                 if (!f.exists()) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removefile", results.getString(ID_FILENAME)));
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removefile", results.getString(ID_FILENAME)));
                     removeEntry(results.getBytes(ID_ROOT_HASH));
                 }
             }
@@ -202,7 +202,7 @@ public class FileDatabase {
             while (results.next()) {
                 String basePath = results.getString(ID_BASE_PATH);
                 if (!shares.contains(basePath)) {
-                    core.getUICallback().statusMessage(LanguageResource.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)), true);
+                    core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "removeshare", results.getString(ID_BASE_PATH)), true);
                     removeOldDirs(basePath, true);
                     if (!core.getFileManager().getDbCore().isConnected()) {
                         break;

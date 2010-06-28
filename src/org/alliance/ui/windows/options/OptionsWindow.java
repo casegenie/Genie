@@ -1,7 +1,7 @@
 package org.alliance.ui.windows.options;
 
 import com.stendahls.XUI.XUIDialog;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
@@ -34,9 +34,9 @@ public class OptionsWindow extends XUIDialog {
         this.ui = ui;
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionswindow.xui.xml"));
-        LanguageResource.translateXUIElements(getClass(), xui.getXUIComponents());
+        Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
-        setTitle(LanguageResource.getLocalizedString(getClass(), "title"));
+        setTitle(Language.getLocalizedString(getClass(), "title"));
 
         final JTabbedPane tabPane = (JTabbedPane) xui.getComponent("tab");
 
@@ -76,7 +76,7 @@ public class OptionsWindow extends XUIDialog {
     }
 
     private void createTab(int tabNumber, JTabbedPane tabPane, boolean dummy) throws Exception {
-        String loading = LanguageResource.getLocalizedString(getClass(), "loading");
+        String loading = Language.getLocalizedString(getClass(), "loading");
         switch (tabNumber) {
             case 1:
                 addTab(tabPane, dummy ? new GeneralTab(loading) : new GeneralTab(ui), dummy, tabNumber);

@@ -3,7 +3,7 @@ package org.alliance.core.comm.filetransfers;
 import org.alliance.core.comm.NetworkManager;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.file.hash.Hash;
-import org.alliance.core.LanguageResource;
+import org.alliance.core.Language;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -26,7 +26,7 @@ public class UploadConnection extends TransferConnection {
     public UploadConnection(NetworkManager netMan, Object key, Direction direction, int userGUID) {
         super(netMan, key, direction, userGUID);
         buffer = netMan.getCore().allocateBuffer(netMan.getCore().getSettings().getInternal().getSocketsendbuffer());
-        setStatusString(LanguageResource.getLocalizedString(getClass(), "waiting"));
+        setStatusString(Language.getLocalizedString(getClass(), "waiting"));
     }
 
     @Override
