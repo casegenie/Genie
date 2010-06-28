@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.TreeSet;
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -27,9 +28,11 @@ import javax.swing.border.TitledBorder;
  */
 public class LanguageResource {
 
-    public static final String LANGUAGE_PATH = "language/";
+    private static TreeSet<String> AVAILABLE_LANGUAGES;
     private static ResourceBundle LANGUAGE_BUNDLE;
+    private static final String LANGUAGE_PATH = "language/";
     private static final String PACKAGES_HEAD = "org.alliance.";
+    private static final String BUNDLE_FILE = "alliance_";
     private static final String MISSING_TEXT = "%Missing translation!%";
 
     public LanguageResource(String language) throws MalformedURLException {
@@ -45,6 +48,26 @@ public class LanguageResource {
             locale = Locale.ENGLISH;
         }
         LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", locale, new URLClassLoader(url));
+
+        loadAvailableLanguages();
+    }
+
+    public static void loadAvailableLanguages() {
+        AVAILABLE_LANGUAGES = new TreeSet<String>();
+        File languageDir = new File(LANGUAGE_PATH);
+        for (String filename : languageDir.list()) {
+            if (filename.startsWith(BUNDLE_FILE) && filename.contains("_")) {
+                String id = filename.substring(filename.indexOf("_") + 1, filename.lastIndexOf("."));
+                Locale l = new Locale(id);
+                if (!l.getDisplayLanguage().equalsIgnoreCase(id)) {
+                    AVAILABLE_LANGUAGES.add(l.getDisplayLanguage() + " - " + id);
+                }
+            }
+        }
+    }
+
+    public static TreeSet<String> getAllLanguages() {
+        return AVAILABLE_LANGUAGES;
     }
 
     public static String getLocalizedString(Class<?> c, String key) {

@@ -14,11 +14,11 @@
         </popupmenu>
         <panel axis="y" width="640" height="480" minwidth="640" minheight="480" border="0">
             <panel axis="x" border="0">
-                <scrollpanel id="shared" width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
+                <scrollpanel id="shared" width="450" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
                     <list expand="both" id="sharesListSelected"/>
                 </scrollpanel>
                 <panel axis="y" border="0">
-                    <scrollpanel id="selection" width = "310" minwidth = "310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
+                    <scrollpanel id="selection" width="310" minwidth="310" scrollbars="optional" bordertype="etched" bordertitle="%text%">
                         <tree expand="both" id="sharesTreeBrowse"/>
                     </scrollpanel>
                     <panel id="jump" axis="x" expand="horiz" bordertype="etched" bordertitle="%text%">

@@ -2,17 +2,18 @@ package org.alliance.ui.windows.options;
 
 import com.stendahls.XUI.XUI;
 import com.stendahls.XUI.XUIDialog;
-import java.awt.Font;
-import java.awt.GraphicsEnvironment;
-import java.io.File;
-import java.util.Locale;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import org.alliance.core.LanguageResource;
 import org.alliance.ui.UISubsystem;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.event.PopupMenuEvent;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.PopupMenuListener;
 
 /**
  *
@@ -22,6 +23,9 @@ public class GeneralTab extends XUIDialog implements TabHelper {
 
     private JPanel tab;
     private UISubsystem ui;
+    private JComboBox language;
+    private JComboBox globalfont;
+    private JComboBox chatfont;
     private final static String FONT_SIZES[] = {"9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "20",
         "22", "24", "26", "28", "30", "32", "34", "36", "38", "40", "44", "48", "56", "64", "72"};
     private final static String[] OPTIONS = {
@@ -47,41 +51,77 @@ public class GeneralTab extends XUIDialog implements TabHelper {
         tab.setName(LanguageResource.getLocalizedString(getClass(), "title"));
         tab.setToolTipText(LanguageResource.getLocalizedString(getClass(), "tooltip"));
 
+        PopupMenuListener fontPopup = new PopupMenuListener() {
+
+            @Override
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                fillFonts(e.getSource());
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
+            }
+        };
+
+        globalfont = (JComboBox) xui.getComponent("internal.globalfont");
+        chatfont = (JComboBox) xui.getComponent("internal.chatfont");
+        globalfont.addPopupMenuListener(fontPopup);
+        chatfont.addPopupMenuListener(fontPopup);
+
+        language = (JComboBox) xui.getComponent("internal.language");
+
         fillLanguage();
-        fillFonts();
+        fillFontSizes();
     }
 
     private void fillLanguage() {
-        JComboBox language = (JComboBox) xui.getComponent("internal.language");
-        File languageDir = new File(LanguageResource.LANGUAGE_PATH);
-        for (String filename : languageDir.list()) {
-            if (filename.startsWith("alliance_")) {
-                String id = filename.substring(filename.indexOf("_") + 1, filename.lastIndexOf("."));
-                Locale l = new Locale(id);
-                if (!l.getDisplayLanguage().equalsIgnoreCase(id)) {
-                    language.addItem(l.getDisplayLanguage() + " - " + id);
-                    if (id.equals("en")) {
-                        language.setSelectedItem(l.getDisplayLanguage() + " - " + id);
-                    }
-                }
+        for (String lang : LanguageResource.getAllLanguages()) {
+            language.addItem(lang);
+            if (lang.endsWith("en")) {
+                language.setSelectedItem(lang);
             }
         }
     }
 
-    private void fillFonts() {
+    private void fillFonts(Object source) {
+        final JComboBox fontBox = (JComboBox) source;
+        if (fontBox.getItemCount() == 1) {
+            fontBox.addItem(LanguageResource.getLocalizedString(getClass(), "fontload"));
+            final Object selectedGlobal = globalfont.getSelectedItem();
+            final Object selectedChat = chatfont.getSelectedItem();
+            fontBox.removeItemAt(0);
+            fontBox.setSelectedIndex(0);
+            SwingUtilities.invokeLater(new Runnable() {
+
+                @Override
+                public void run() {
+                    chatfont.removeAllItems();
+                    globalfont.removeAllItems();
+                    GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                    Font[] fonts = e.getAllFonts();
+                    for (Font font : fonts) {
+                        globalfont.addItem(font.getFontName());
+                        chatfont.addItem(font.getFontName());
+                    }
+                    globalfont.setSelectedItem(selectedGlobal);
+                    chatfont.setSelectedItem(selectedChat);
+                    fontBox.hidePopup();
+                    fontBox.showPopup();
+                }
+            });
+        }
+    }
+
+    private void fillFontSizes() {
         JComboBox globalsize = (JComboBox) xui.getComponent("internal.globalsize");
         JComboBox chatsize = (JComboBox) xui.getComponent("internal.chatsize");
-        JComboBox globalfont = (JComboBox) xui.getComponent("internal.globalfont");
-        JComboBox chatfont = (JComboBox) xui.getComponent("internal.chatfont");
         for (int i = 0; i < FONT_SIZES.length; i++) {
             globalsize.addItem(FONT_SIZES[i]);
             chatsize.addItem(FONT_SIZES[i]);
-        }
-        GraphicsEnvironment e = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        Font[] fonts = e.getAllFonts();
-        for (Font font : fonts) {
-            globalfont.addItem(font.getFontName());
-            chatfont.addItem(font.getFontName());
         }
     }
 
@@ -107,10 +147,26 @@ public class GeneralTab extends XUIDialog implements TabHelper {
 
     @Override
     public String getOverridedSettingValue(String option, String value) {
-        if (option.equals("internal.globalfont") || option.equals("internal.chatfont")) {
+        if (option.equals("internal.language")) {
+            for (int i = 0; i < language.getItemCount(); i++) {
+                if (language.getItemAt(i).toString().endsWith(value)) {
+                    return Integer.toString(i);
+                }
+            }
+        }
+        if (option.equals("internal.globalfont")) {
             if (value.isEmpty()) {
+                globalfont.addItem(tab.getFont().getFontName());
                 return tab.getFont().getFontName();
             }
+            globalfont.addItem(value);
+        }
+        if (option.equals("internal.chatfont")) {
+            if (value.isEmpty()) {
+                chatfont.addItem(tab.getFont().getFontName());
+                return tab.getFont().getFontName();
+            }
+            chatfont.addItem(value);
         }
         if (option.equals("internal.globalsize") || option.equals("internal.chatsize")) {
             int i = 0;
@@ -131,8 +187,12 @@ public class GeneralTab extends XUIDialog implements TabHelper {
                 return null;
             }
         }
-        if (option.equals("internal.guiskin") || option.equals("internal.language")
-                || option.equals("internal.globalfont") || option.equals("internal.chatfont")) {
+        if (option.equals("internal.language")) {
+            String lang = ((JComboBox) xui.getXUIComponent(option).getComponent()).getSelectedItem().toString();
+            lang = lang.substring(lang.lastIndexOf("-") + 2);
+            return lang;
+        }
+        if (option.equals("internal.guiskin") || option.equals("internal.globalfont") || option.equals("internal.chatfont")) {
             return (((JComboBox) xui.getXUIComponent(option).getComponent()).getSelectedItem());
         }
         if (option.equals("internal.globalsize") || option.equals("internal.chatsize")) {

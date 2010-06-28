@@ -366,6 +366,8 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void saveWindowState(String title, Point point, Dimension dimension, int extendedState) {
+        ObjectOutputStream outObj = null;
+        ObjectInputStream inObj = null;
         try {
             if (T.t) {
                 T.info("Serializing window state");
@@ -374,19 +376,18 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             File oldStates = new File(ui.getCore().getSettings().getInternal().getWindowstatefile() + ".bak");
             boolean stateFileExist = states.exists();
             if (stateFileExist) {
-                oldStates.delete();
                 states.renameTo(oldStates);
             }
 
             FileOutputStream out = new FileOutputStream(states);
-            ObjectOutputStream outObj = new ObjectOutputStream(out);
+            outObj = new ObjectOutputStream(out);
 
             if (!stateFileExist) {
                 //Create state file with source object's data
                 writeStateBlock(outObj, title, point, dimension, extendedState);
             } else {
                 FileInputStream in = new FileInputStream(oldStates);
-                ObjectInputStream inObj = new ObjectInputStream(in);
+                inObj = new ObjectInputStream(in);
                 boolean blockWriten = false;
                 try {
                     while (true) {
@@ -414,9 +415,17 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             }
             outObj.flush();
             outObj.close();
+            oldStates.delete();
         } catch (Exception e) {
             if (T.t) {
                 T.error("Could not save window state " + e);
+            }
+        } finally {
+            try {
+                inObj.close();
+                outObj.close();
+            } catch (Exception e) {
+                //Ignore
             }
         }
     }
@@ -425,9 +434,10 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         if (T.t) {
             T.info("Deserializing window state");
         }
+        ObjectInputStream inObj = null;
         try {
             FileInputStream in = new FileInputStream(ui.getCore().getSettings().getInternal().getWindowstatefile());
-            ObjectInputStream inObj = new ObjectInputStream(in);
+            inObj = new ObjectInputStream(in);
             try {
                 while (true) {
                     String inTitle = inObj.readUTF();
@@ -443,7 +453,6 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                         }
                         return true;
                     }
-
                 }
             } catch (Exception e) {
                 //EOF reached
@@ -452,6 +461,12 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
             return false;
         } catch (Exception e) {
             return false;
+        } finally {
+            try {
+                inObj.close();
+            } catch (Exception e) {
+                //Ignore
+            }
         }
     }
 
