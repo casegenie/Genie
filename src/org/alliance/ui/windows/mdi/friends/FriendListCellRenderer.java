@@ -107,7 +107,7 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             renderer.setIcon(iconFriendOld);
             renderer.setForeground(Color.GRAY);
             if (n.getLastSeenOnlineAt() != 0) {
-                renderer.setText(trusted + Language.getLocalizedString(getClass(), "myself",
+                renderer.setText(trusted + Language.getLocalizedString(getClass(), "seen",
                         friendWindow.getNickname(n.getGuid()), Long.toString((System.currentTimeMillis() - n.getLastSeenOnlineAt()) / 1000 / 60 / 60 / 24)));
             } else {
                 renderer.setText(trusted + friendWindow.getNickname(n.getGuid()));
