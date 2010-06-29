@@ -34,7 +34,7 @@ public class IpDetection implements Runnable {
     public IpDetection(NetworkManager netMan) throws IOException {
         this.netMan = netMan;
         if (!updateLocalIp(netMan.getCore().getSettings().getServer().getBindnic(), netMan.getCore().getSettings().getServer().getIpv6())) {
-            lastLocalIp = InetAddress.getLocalHost().getHostAddress();
+            lastLocalIp = InetAddress.getLocalHost().getHostAddress();         
             lastByteLocalIp = InetAddress.getLocalHost().getAddress();
         }
     }
@@ -117,7 +117,6 @@ public class IpDetection implements Runnable {
                     }
                     siteNumber++;
                 } catch (IOException ex) {
-                    System.out.println(ex);
                     siteNumber++;
                     retry = true;
                 }

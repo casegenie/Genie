@@ -40,6 +40,7 @@ public class NetworkTab extends XUIDialog implements TabHelper {
     private JTextField localField;
     private JTextField externalField;
     private UISubsystem ui;
+    private String lastSelectedNic;
     private final static String[] OPTIONS = new String[]{
         "server.port", "internal.allnic", "server.ipv6", "server.lanmode", "server.bindnic",
         "server.dnsmode", "server.dnsname", "server.staticip"};
@@ -179,7 +180,10 @@ public class NetworkTab extends XUIDialog implements TabHelper {
             return;
         } else {
             try {
-                if (!nicName.equals(ui.getCore().getSettings().getServer().getBindnic())) {
+                if (lastSelectedNic == null) {
+                    ui.getCore().getSettings().getServer().getBindnic();
+                }
+                if (!nicName.equals(lastSelectedNic)) {
                     if (ui.getCore().getNetworkManager().getIpDetection().updateExternalIp(0)) {
                         externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
                     }
@@ -193,6 +197,7 @@ public class NetworkTab extends XUIDialog implements TabHelper {
         if (externalField.getText().isEmpty()) {
             externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
         }
+        lastSelectedNic = nicName;
     }
 
     /*    ((JCheckBox) components.get("internal.rdnsname")).addActionListener(new ActionListener() {

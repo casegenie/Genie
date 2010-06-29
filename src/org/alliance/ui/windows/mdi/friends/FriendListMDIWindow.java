@@ -424,15 +424,25 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         if (list.getSelectedValue() instanceof Friend) {
             Friend friend = (Friend) list.getSelectedValue();
             if (friend != null) {
-                String hostname = friend.getFixedHost();
-
-                if (hostname == null) {
-                    hostname = "";
+                String ip = friend.getLastKnownHost();
+                String dns = friend.getLastKnownDns();
+                String fixed = friend.getFixedHost();
+                if (dns != null && !dns.isEmpty()) {
+                    dns = Language.getLocalizedString(getClass(), "dnshost", getNickname(friend.getGuid()), dns);
+                } else {
+                    dns = "";
                 }
 
-                String input = JOptionPane.showInputDialog(Language.getLocalizedString(getClass(), "edithost", getNickname(friend.getGuid())), hostname);
-                if (input != null && !hostname.equalsIgnoreCase(input)) {
-                    friend.setFixedHost(input.trim());
+                String input = JOptionPane.showInputDialog(Language.getLocalizedString(getClass(), "iphost", getNickname(friend.getGuid()), ip)
+                        + "\n" + dns
+                        + "\n" + Language.getLocalizedString(getClass(), "infohost")
+                        + "\n" + Language.getLocalizedString(getClass(), "edithost"), fixed);
+                if (input == null) {
+                    return;
+                }
+                input = input.trim();
+                if (input != null && !fixed.equalsIgnoreCase(input)) {
+                    friend.setFixedHost(input);
                     try {
                         if (friend.isConnected()) {
                             friend.reconnect();

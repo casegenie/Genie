@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.TreeNode;
 import org.alliance.core.comm.SearchHit;
@@ -49,7 +50,7 @@ public class RootNode extends SearchTreeNode {
         });
     }
 
-    public void addSearchHits(int sourceGuid, int hops, java.util.List<SearchHit> hits) {
+    public void addSearchHits(int sourceGuid, int hops, List<SearchHit> hits) {
         for (SearchHit h : hits) {
                    
             String fn = TextUtils.makeSurePathIsMultiplatform(h.getPath());
@@ -125,6 +126,11 @@ public class RootNode extends SearchTreeNode {
     }
 
     private void resortTable() {
+        for(SearchTreeNode t : children ){
+
+   
+        }
+
         if (secondaryComparator != null) {
             Collections.sort(children, secondaryComparator);
         }

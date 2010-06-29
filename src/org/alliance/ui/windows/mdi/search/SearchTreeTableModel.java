@@ -7,6 +7,7 @@ import org.alliance.core.comm.SearchHit;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -29,7 +30,7 @@ public class SearchTreeTableModel extends DefaultTreeTableModel {
         return (RootNode) super.getRoot();
     }
 
-    public void addSearchHits(int sourceGuid, int hops, java.util.List<SearchHit> hits) {
+    public void addSearchHits(int sourceGuid, int hops, List<SearchHit> hits) {
         getRoot().addSearchHits(sourceGuid, hops, hits);
     }
 
