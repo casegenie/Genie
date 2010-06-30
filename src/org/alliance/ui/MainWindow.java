@@ -927,7 +927,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_addshare(ActionEvent e) throws Exception {
-        new SharesWindow(ui);
+        EVENT_shares(e);
     }
 
     public void EVENT_plugins(ActionEvent e) throws Exception {
@@ -971,11 +971,21 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_console(ActionEvent e) throws Exception {
-        mdiManager.addWindow(new ConsoleMDIWindow(ui));
+        ConsoleMDIWindow w = (ConsoleMDIWindow) mdiManager.getWindow("console");
+        if (w == null) {
+            w = new ConsoleMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_connections(ActionEvent e) throws Exception {
-        mdiManager.addWindow(new ConnectionsMDIWindow(ui));
+        ConnectionsMDIWindow w = (ConnectionsMDIWindow) mdiManager.getWindow("connections");
+        if (w == null) {
+            w = new ConnectionsMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_changelog(ActionEvent e) throws Exception {
@@ -983,11 +993,21 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     }
 
     public void EVENT_uploads(ActionEvent e) throws Exception {
-        mdiManager.addWindow(new UploadsMDIWindow(ui));
+        UploadsMDIWindow w = (UploadsMDIWindow) mdiManager.getWindow("uploads");
+        if (w == null) {
+            w = new UploadsMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_dups(ActionEvent e) throws Exception {
-        mdiManager.addWindow(new DuplicatesMDIWindow(ui));
+        DuplicatesMDIWindow w = (DuplicatesMDIWindow) mdiManager.getWindow("duplicates");
+        if (w == null) {
+            w = new DuplicatesMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_friendtree(ActionEvent e) throws Exception {
