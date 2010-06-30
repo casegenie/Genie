@@ -34,8 +34,21 @@ public class IpDetection implements Runnable {
     public IpDetection(NetworkManager netMan) throws IOException {
         this.netMan = netMan;
         if (!updateLocalIp(netMan.getCore().getSettings().getServer().getBindnic(), netMan.getCore().getSettings().getServer().getIpv6())) {
-            lastLocalIp = InetAddress.getLocalHost().getHostAddress();         
-            lastByteLocalIp = InetAddress.getLocalHost().getAddress();
+            InetAddress in = InetAddress.getLocalHost();
+            if (in.isLoopbackAddress()) {
+                //Local host is loopback, search first online nic
+                Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+                for (NetworkInterface netIf : Collections.list(nets)) {
+                    if (netIf.isUp() && !netIf.isLoopback() && !netIf.isPointToPoint()) {
+                        if (updateLocalIp(netIf.getName(), netMan.getCore().getSettings().getServer().getIpv6())) {
+                            break;
+                        }
+                    }
+                }
+            } else {
+                lastLocalIp = in.getHostAddress();
+                lastByteLocalIp = in.getAddress();
+            }
         }
     }
 

@@ -3,23 +3,26 @@ package org.alliance.ui.windows.options;
 import com.stendahls.XUI.XUI;
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.ui.JHtmlLabel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import org.alliance.core.Language;
+import org.alliance.ui.UISubsystem;
+import org.alliance.ui.themes.util.SubstanceThemeHelper;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.Collections;
 import java.util.Enumeration;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import org.alliance.core.Language;
-import org.alliance.ui.UISubsystem;
-import org.alliance.ui.themes.util.SubstanceThemeHelper;
-
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 /**
  *
@@ -29,21 +32,22 @@ public class NetworkTab extends XUIDialog implements TabHelper {
 
     private JPanel tab;
     private JComboBox nicBox;
-    private JCheckBox showAll;
     private JCheckBox ipv6;
     private JCheckBox lanMode;
     private JCheckBox dnsMode;
+    private JCheckBox bindToAll;
     private JCheckBox rdnsMode;
     private JLabel externalText;
     private JLabel dnsText;
+    private JLabel inter;
     private JTextField dnsField;
     private JTextField localField;
     private JTextField externalField;
     private UISubsystem ui;
     private String lastSelectedNic;
     private final static String[] OPTIONS = new String[]{
-        "server.port", "internal.allnic", "server.ipv6", "server.lanmode", "server.bindnic",
-        "server.dnsmode", "server.dnsname", "server.staticip"};
+        "server.port", "server.ipv6", "server.lanmode", "server.bindnic",
+        "server.dnsmode", "server.dnsname", "server.staticip", "server.bindtoall"};
 
     public NetworkTab(String loading) {
         tab = new JPanel();
@@ -78,52 +82,51 @@ public class NetworkTab extends XUIDialog implements TabHelper {
             });
         }
 
-        showAll = (JCheckBox) xui.getComponent("internal.allnic");
+        bindToAll = (JCheckBox) xui.getComponent("server.bindtoall");
         ipv6 = (JCheckBox) xui.getComponent("server.ipv6");
         lanMode = (JCheckBox) xui.getComponent("server.lanmode");
         dnsMode = (JCheckBox) xui.getComponent("server.dnsmode");
         rdnsMode = (JCheckBox) xui.getComponent("internal.rdnsname");
         nicBox = (JComboBox) xui.getComponent("server.bindnic");
+        inter = (JLabel) xui.getComponent("interface");
 
-        ActionListener al = new ActionListener() {
-
-            private boolean actionInProgress = false;
+        PopupMenuListener nicPopup = new PopupMenuListener() {
 
             @Override
-            public void actionPerformed(final ActionEvent e) {
-                if (actionInProgress) {
-                    return;
-                }
-                actionInProgress = true;
-                try {
-                    if (e != null && e.getSource().equals(showAll)) {
-                        fillInterfaces();
-                    }
-                    fillIp(lanMode.isSelected());
-                } catch (Exception ex) {
-                }
-                actionInProgress = false;
+            public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+            }
+
+            @Override
+            public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                fillIp(lanMode.isSelected());
+            }
+
+            @Override
+            public void popupMenuCanceled(PopupMenuEvent e) {
             }
         };
 
-        showAll.addActionListener(al);
-        ipv6.addActionListener(al);
-        lanMode.addActionListener(al);
-        nicBox.addActionListener(al);
+        nicBox.addPopupMenuListener(nicPopup);
 
-        dnsMode.addActionListener(new ActionListener() {
+        MouseAdapter il = new MouseAdapter() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (dnsMode.isSelected()) {
-                    dnsField.setEnabled(true);
-                    dnsText.setEnabled(true);
-                } else {
-                    dnsField.setEnabled(false);
-                    dnsText.setEnabled(false);
+            public void mouseClicked(MouseEvent e) {
+                if (e.getSource().equals(dnsMode)) {
+                    changeDnsState();
+                    return;
                 }
+                if (e.getSource().equals(bindToAll)) {
+                    changeBinsState();
+                }
+                fillIp(lanMode.isSelected());
             }
-        });
+        };
+
+        ipv6.addMouseListener(il);
+        lanMode.addMouseListener(il);
+        dnsMode.addMouseListener(il);
+        bindToAll.addMouseListener(il);
 
         localField = (JTextField) xui.getComponent("localfield");
         localField.setEditable(false);
@@ -133,71 +136,117 @@ public class NetworkTab extends XUIDialog implements TabHelper {
         dnsField = (JTextField) xui.getComponent("server.dnsname");
         dnsText = (JLabel) xui.getComponent("dnsname");
         ((JTextField) xui.getComponent("server.port")).setEditable(false);
-        if (ui.getCore().getSettings().getInternal().getAllnic() == 1) {
-            showAll.setSelected(true);
+    }
+
+    private void changeDnsState() {
+        if (dnsMode.isSelected()) {
+            dnsField.setEnabled(true);
+            dnsText.setEnabled(true);
+        } else {
+            dnsField.setEnabled(false);
+            dnsText.setEnabled(false);
+        }
+    }
+
+    private void changeBinsState() {
+        if (bindToAll.isSelected()) {
+            nicBox.setEnabled(false);
+            inter.setEnabled(false);
+        } else {
+            nicBox.setEnabled(true);
+            inter.setEnabled(true);
         }
         fillInterfaces();
     }
 
-    private void fillInterfaces() throws Exception {
+    private void notSupported() {
         nicBox.removeAllItems();
-        Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
-        for (NetworkInterface netIf : Collections.list(nets)) {
-            if (showAll.isSelected()) {
-                nicBox.addItem("(" + netIf.getName() + ") " + netIf.getDisplayName());
-            } else if (!netIf.isVirtual() && !netIf.isLoopback() && !netIf.isPointToPoint() && netIf.isUp()) {
-                Enumeration<InetAddress> inetAddresses = netIf.getInetAddresses();
-                if (inetAddresses.hasMoreElements()) {
-                    nicBox.addItem("(" + netIf.getName() + ") " + netIf.getDisplayName());
+        try {
+            NetworkInterface net = NetworkInterface.getByInetAddress(InetAddress.getLocalHost());
+            if (net != null) {
+                nicBox.addItem("(" + net.getName() + ") " + net.getDisplayName());
+            } else {
+                nicBox.addItem(Language.getLocalizedString(getClass(), "support"));
+            }
+        } catch (Exception e) {
+            nicBox.addItem(Language.getLocalizedString(getClass(), "support"));
+        }
+        nicBox.setEnabled(false);
+        inter.setEnabled(false);
+        bindToAll.setEnabled(false);
+        bindToAll.setSelected(true);
+        externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
+        localField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastLocalIp());
+    }
+
+    private void fillInterfaces() {
+        try {
+            Object selected = nicBox.getSelectedItem();
+            nicBox.removeAllItems();
+            Enumeration<NetworkInterface> nets = NetworkInterface.getNetworkInterfaces();
+            for (NetworkInterface netIf : Collections.list(nets)) {
+                if (netIf.isUp() && !netIf.isLoopback() && !netIf.isPointToPoint()) {
+                    Enumeration<InetAddress> inetAddresses = netIf.getInetAddresses();
+                    if (inetAddresses.hasMoreElements()) {
+                        nicBox.addItem("(" + netIf.getName() + ") " + netIf.getDisplayName());
+                    }
                 }
             }
+            nicBox.setSelectedItem(selected);
+        } catch (Exception ex) {
+            notSupported();
         }
     }
 
     private void fillIp(final boolean isLanMode) {
-        localField.setText(null);
-        externalField.setText(null);
-        externalField.setEnabled(!isLanMode);
-        externalText.setEnabled(!isLanMode);
-        //ipv6.setEnabled(!isLanMode);
-        String nicName = nicBox.getSelectedItem().toString();
-        nicName = nicName.substring(1, nicName.indexOf(")"));
         try {
-            if (ui.getCore().getNetworkManager().getIpDetection().updateLocalIp(nicName, ipv6.isSelected() ? 1 : 0)) {
-                localField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastLocalIp());
-            }
-        } catch (Exception ex) {
-            //Skip
-        }
-        if (localField.getText().isEmpty()) {
-            localField.setText(Language.getLocalizedString(getClass(), "noobtain"));
-            externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
-            return;
-        }
-        if (isLanMode) {
-            //ipv6.setSelected(!isLanMode);
-            externalField.setText(Language.getLocalizedString(getClass(), "unused"));
-            return;
-        } else {
+            externalField.setText(null);
+            localField.setText(null);
+            externalField.setEnabled(!isLanMode);
+            externalText.setEnabled(!isLanMode);
+            //ipv6.setEnabled(!isLanMode);
+
+            String nicName = nicBox.getSelectedItem().toString();
+            nicName = nicName.substring(1, nicName.indexOf(")"));
             try {
-                if (lastSelectedNic == null) {
-                    ui.getCore().getSettings().getServer().getBindnic();
-                }
-                if (!nicName.equals(lastSelectedNic)) {
-                    if (ui.getCore().getNetworkManager().getIpDetection().updateExternalIp(0)) {
-                        externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
-                    }
-                } else {
-                    externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
+                if (ui.getCore().getNetworkManager().getIpDetection().updateLocalIp(nicName, ipv6.isSelected() ? 1 : 0)) {
+                    localField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastLocalIp());
                 }
             } catch (Exception ex) {
                 //Skip
             }
+            if (localField.getText().isEmpty()) {
+                localField.setText(Language.getLocalizedString(getClass(), "noobtain"));
+                externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
+                return;
+            }
+            if (isLanMode) {
+                //ipv6.setSelected(!isLanMode);
+                externalField.setText(Language.getLocalizedString(getClass(), "unused"));
+                return;
+            } else {
+                try {
+                    if (lastSelectedNic == null) {
+                        lastSelectedNic = ui.getCore().getSettings().getServer().getBindnic();
+                    }
+                    if (!nicName.equals(lastSelectedNic)) {
+                        if (ui.getCore().getNetworkManager().getIpDetection().updateExternalIp(0)) {
+                            externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
+                        }
+                    } else {
+                        externalField.setText(ui.getCore().getNetworkManager().getIpDetection().getLastExternalIp());
+                    }
+                } catch (Exception ex) {
+                    //Skip
+                }
+            }
+            if (externalField.getText().isEmpty()) {
+                externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
+            }
+            lastSelectedNic = nicName;
+        } catch (Exception ex) {
+            notSupported();
         }
-        if (externalField.getText().isEmpty()) {
-            externalField.setText(Language.getLocalizedString(getClass(), "noobtain"));
-        }
-        lastSelectedNic = nicName;
     }
 
     /*    ((JCheckBox) components.get("internal.rdnsname")).addActionListener(new ActionListener() {
@@ -264,10 +313,19 @@ public class NetworkTab extends XUIDialog implements TabHelper {
     @Override
     public String getOverridedSettingValue(String option, String value) {
         if (option.equals("server.bindnic")) {
-            for (int i = 0; i < nicBox.getItemCount(); i++) {
-                if (nicBox.getItemAt(i).toString().startsWith("(" + value + ")")) {
-                    return nicBox.getItemAt(i).toString();
+            try {
+                NetworkInterface net = NetworkInterface.getByName(value);
+                if (net != null) {
+                    nicBox.addItem("(" + net.getName() + ") " + net.getDisplayName());
+                    nicBox.setSelectedIndex(0);
+                    return nicBox.getItemAt(0).toString();
                 }
+            } catch (SocketException ex) {
+            }
+        }
+        if (option.equals("server.dnsname")) {
+            if (!dnsMode.isSelected()) {
+                value = "";
             }
         }
         return value;
@@ -281,8 +339,12 @@ public class NetworkTab extends XUIDialog implements TabHelper {
             }
         }
         if (option.equals("server.bindnic")) {
-            String nic = nicBox.getSelectedItem().toString();
-            return nic.substring(1, nic.indexOf(")"));
+            try {
+                String nic = nicBox.getSelectedItem().toString();
+                return nic.substring(1, nic.indexOf(")"));
+            } catch (Exception ex) {
+                value = "";
+            }
         }
         return value;
     }
@@ -290,8 +352,9 @@ public class NetworkTab extends XUIDialog implements TabHelper {
     @Override
     public void postOperation() {
         ipv6.setEnabled(false); // Disabled
-        rdnsMode.setEnabled(false); // Disabled
-        (showAll.getActionListeners())[0].actionPerformed(null);
-        (dnsMode.getActionListeners())[0].actionPerformed(null);
+        rdnsMode.setEnabled(false); // Disabled    
+        changeDnsState();
+        changeBinsState();
+        fillIp(lanMode.isSelected());
     }
 }

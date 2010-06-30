@@ -11,6 +11,7 @@ import java.util.Arrays;
 public class Server extends SettingClass {
 
     private Integer port;
+    private Integer bindtoall = 1;
     private Integer staticip = 0;
     private Integer dnsmode = 0;
     private Integer lanmode = 0;
@@ -39,6 +40,14 @@ public class Server extends SettingClass {
 
     public void setStaticip(Integer staticip) {
         this.staticip = staticip;
+    }
+
+    public Integer getBindtoall() {
+        return bindtoall;
+    }
+
+    public void setBindtoall(Integer bindtoall) {
+        this.bindtoall = bindtoall;
     }
 
     public Integer getIpv6() {

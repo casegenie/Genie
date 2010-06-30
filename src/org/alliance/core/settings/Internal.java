@@ -104,7 +104,6 @@ public class Internal extends SettingClass {
     //an empry file. This makes XP grind to a halt. 100 means expand 100mb per block at most
     private Integer uploadthrottle = 0; //zero to disable
     private Integer enableiprules = 0;
-    private Integer allnic = 0;
     private String guiskin = "Alliance";
     private String language = "en";
     private String globalfont = "";
@@ -613,14 +612,6 @@ public class Internal extends SettingClass {
 
     public void setLanguage(String language) {
         this.language = language;
-    }
-
-    public Integer getAllnic() {
-        return allnic;
-    }
-
-    public void setAllnic(Integer allnic) {
-        this.allnic = allnic;
     }
 
     public String getChatfont() {
