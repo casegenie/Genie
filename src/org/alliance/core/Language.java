@@ -48,7 +48,7 @@ public class Language {
             locale = Locale.ENGLISH;
         }
         LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", locale, new URLClassLoader(url));
-
+        
         loadAvailableLanguages();
     }
 

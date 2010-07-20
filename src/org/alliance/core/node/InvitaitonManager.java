@@ -34,13 +34,13 @@ public class InvitaitonManager {
     public InvitaitonManager(CoreSubsystem core, Settings settings) {
         this.core = core;
     }
-
-    public Invitation createInvitation() throws Exception {
-        return createInvitation(null, null);
+  
+    public Invitation createInvitation(boolean forLan) throws Exception {
+        return createInvitation(null, null, forLan);
     }
 
-    public Invitation createInvitation(Integer destinationGuid, Integer middlemanGuid) throws Exception {
-        Invitation i = new Invitation(core, destinationGuid, middlemanGuid);
+    public Invitation createInvitation(Integer destinationGuid, Integer middlemanGuid, boolean forLan) throws Exception {
+        Invitation i = new Invitation(core, destinationGuid, middlemanGuid, forLan);
         invitations.put(i.getInvitationPassKey(), i);
         return i;
     }

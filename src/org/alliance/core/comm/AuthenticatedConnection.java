@@ -48,7 +48,7 @@ public abstract class AuthenticatedConnection extends PacketConnection {
     }
 
     public String getRemoteGroupName() {
-        return getRemoteFriend().getUGroupName(); //Bastvera (Friend Group Names)
+        return getRemoteFriend().getUGroupName();
     }
 
     public void setRemoteUserGUID(int guid) {

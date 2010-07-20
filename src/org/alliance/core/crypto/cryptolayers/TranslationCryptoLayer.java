@@ -34,7 +34,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         }
         byte arr[] = dst.array();
         for (int i = start; i < end; i++) {
-            arr[i] = arr[i] += 33;
+            arr[i] += 33;
         }
         return end - start;
 
@@ -50,7 +50,7 @@ public class TranslationCryptoLayer extends BufferedCryptoLayer {
         }
         byte arr[] = dst.array();
         for (int i = start; i < end; i++) {
-            arr[i] = arr[i] -= 33;
+            arr[i] -= 33;
         }
     }
 }

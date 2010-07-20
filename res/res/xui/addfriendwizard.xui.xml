@@ -1,3 +1,4 @@
+
 <xui>
     <body>
         <wizard id="wizard" implementation="org.alliance.ui.addfriendwizard.AddFriendWizard" image="gfx/wizardimage.jpg">
@@ -13,6 +14,11 @@
                 <panel axis="x" border="0" expand="horiz">
                     <strut width="10"/>
                     <radiobutton eventid="radio1_2" group="a" text="%text%"/>
+                    <filler/>
+                </panel>
+                <panel axis="x" border="0" expand="horiz">
+                    <strut width="10"/>
+                    <radiobutton eventid="radio1_4" group="a" text="%text%"/>
                     <filler/>
                 </panel>
                 <panel axis="x" border="0" expand="horiz">

@@ -4,7 +4,7 @@ import org.alliance.core.comm.FriendConnection;
 import org.alliance.core.comm.Packet;
 import org.alliance.core.comm.RPC;
 import org.alliance.core.interactions.PleaseForwardInvitationInteraction;
-import org.alliance.core.node.Node;
+import org.alliance.core.node.UntrustedNode;
 
 import java.io.IOException;
 
@@ -19,19 +19,21 @@ public class PleaseForwardInvitation extends PersistantRPC {
 
     private String invitationCode;
     private int toGuid;
+    private boolean forLan;
 
     public PleaseForwardInvitation() {
     }
 
-    public PleaseForwardInvitation(Node toNode) throws Exception {
+    public PleaseForwardInvitation(UntrustedNode toNode) throws Exception {
         toGuid = toNode.getGuid();
+        forLan = toNode.getInternal();
     }
 
     @Override
     public RPC init(FriendConnection rpcc) {
         super.init(rpcc);
         try {
-            invitationCode = core.getInvitaitonManager().createInvitation(toGuid, con.getRemoteUserGUID()).getCompleteInvitaitonString();
+            invitationCode = core.getInvitaitonManager().createInvitation(toGuid, con.getRemoteUserGUID(), forLan).getCompleteInvitaitonString();
         } catch (Exception e) {
             core.reportError(e, this);
         }

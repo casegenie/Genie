@@ -5,6 +5,7 @@ import org.alliance.core.T;
 import org.alliance.core.comm.AuthenticatedConnection;
 import org.alliance.core.comm.Connection;
 import org.alliance.core.comm.FriendConnection;
+import org.alliance.core.comm.IpDetection;
 import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.settings.Settings;
 
@@ -39,6 +40,7 @@ public class Friend extends Node {
     private String nicknameToShowInUI;
     private String ugroupname;
     private int trusted;
+    private boolean internal;
 
     public Friend(FriendManager manager, org.alliance.core.settings.Friend f) {
         this.manager = manager;
@@ -52,6 +54,7 @@ public class Friend extends Node {
         middlemanGuid = f.getMiddlemanguid() == null ? 0 : f.getMiddlemanguid();
         ugroupname = f.getUgroupname();
         trusted = f.getTrusted();
+        changeInternal();
     }
 
     public Friend(FriendManager manager, String nickname, int guid) {
@@ -77,29 +80,21 @@ public class Friend extends Node {
                 || !lastKnownHost.equals(host)
                 || lastKnownPort != port
                 || !lastKnownDns.equals(dnsName);
-        if (!hostInfoChanged) {
+        if (!hostInfoChanged || !TextUtils.isIpNumber(host)) {
             return false;
         }
         if (T.t) {
             T.info("Updating host info for " + this + ": " + host + ":" + port + ":" + dnsName);
         }
         Settings s = manager.getSettings();
-        if (TextUtils.isIpNumber(host)) {
-            lastKnownHost = host;
-            lastKnownPort = port;
-            lastKnownDns = dnsName;
-            s.getFriend(guid).setHost(lastKnownHost);
-            s.getFriend(guid).setPort(lastKnownPort);
-            s.getFriend(guid).setDns(lastKnownDns);
-            return true;
-        } else if (!TextUtils.isIpNumber(host)) {
-            lastKnownDns = host;
-            lastKnownPort = port;
-            s.getFriend(guid).setDns(lastKnownDns);
-            s.getFriend(guid).setPort(lastKnownPort);
-            return true;
-        }
-        return false;
+        lastKnownHost = host;
+        lastKnownPort = port;
+        lastKnownDns = dnsName;
+        s.getFriend(guid).setHost(lastKnownHost);
+        s.getFriend(guid).setPort(lastKnownPort);
+        s.getFriend(guid).setDns(lastKnownDns);
+        changeInternal();
+        return true;
     }
 
     public String rDNSConvert(String host, org.alliance.core.settings.Friend f) {
@@ -195,21 +190,21 @@ public class Friend extends Node {
         }
     }
 
-    public String getLastKnownHost() {           
+    public String getLastKnownHost() {
         if (!fixedHost.isEmpty()) {
             try {
-                InetAddress inetAdd = InetAddress.getByName(fixedHost);             
+                InetAddress inetAdd = InetAddress.getByName(fixedHost);
                 return inetAdd.getHostAddress();
             } catch (UnknownHostException ex) {
             }
         }
         if (!lastKnownDns.isEmpty()) {
             try {
-                InetAddress inetAdd = InetAddress.getByName(lastKnownDns);             
+                InetAddress inetAdd = InetAddress.getByName(lastKnownDns);
                 return inetAdd.getHostAddress();
             } catch (UnknownHostException ex) {
             }
-        }      
+        }
         return lastKnownHost;
     }
 
@@ -399,6 +394,18 @@ public class Friend extends Node {
 
     public void setAway(boolean away) {
         isAway = away;
+    }
+
+    private void changeInternal() {
+        internal = IpDetection.isLan(lastKnownHost, false);
+    }
+
+    public boolean getInternal() {
+        return internal;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
     }
 
     //Kratos

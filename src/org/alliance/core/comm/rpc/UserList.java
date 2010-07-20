@@ -9,6 +9,7 @@ import org.alliance.core.node.UntrustedNode;
 
 import java.io.IOException;
 import java.util.Collection;
+import org.alliance.core.comm.IpDetection;
 
 /**
  *
@@ -41,16 +42,16 @@ public class UserList extends RPC {
             int guid = in.readInt();
             String nickname = in.readUTF();
             boolean connected = in.readBoolean();
-            long share = in.readLong();
-            UntrustedNode rf = UntrustedNode.loadOrCreate(manager, nickname, guid, connected);
-            //rf.setShareSize(share);
+            boolean internal = in.readBoolean();
+            UntrustedNode unNode = UntrustedNode.loadOrCreate(manager, nickname, guid, connected);
+            unNode.setInternal(internal);
 
-            n.addFriendsFriend(rf);
+            n.addFriendsFriend(unNode);
 
             manager.getNetMan().getPackageRouter().updateRouteTable(con.getRemoteFriend(), guid, hops + 1);
 
-            Friend connectee = manager.getFriend(rf.getGuid());
-            if (connectee != null && connectee.isConnected() && !rf.isConnected() && remoteGUID == con.getRemoteFriend().getGuid()) {
+            Friend connectee = manager.getFriend(unNode.getGuid());
+            if (connectee != null && connectee.isConnected() && !unNode.isConnected() && remoteGUID == con.getRemoteFriend().getGuid()) {
                 //lets help this friend out. He's not connected to our common trusted friend but we are
                 if (T.t) {
                     T.info("Sending connection help to " + connectee);
@@ -65,6 +66,8 @@ public class UserList extends RPC {
     public Packet serializeTo(Packet p) {
         p.writeInt(manager.getMyGUID());
 
+        boolean internalFriend = IpDetection.isLan(manager.getNetMan().getSocketFor(con).getInetAddress().getHostAddress(), false);
+
         Collection<Friend> c = manager.friends();
         int n = 0;
         for (Friend f : c) {
@@ -78,7 +81,11 @@ public class UserList extends RPC {
                 p.writeInt(f.getGuid());
                 p.writeUTF(f.getNickname());
                 p.writeBoolean(f.isConnected());
-                p.writeLong(f.getShareSize());
+                if (internalFriend) {
+                    p.writeBoolean(f.getInternal());
+                } else {
+                    p.writeBoolean(false);
+                }
             }
         }
         return p;
@@ -99,7 +106,7 @@ public class UserList extends RPC {
             int guid = in.readInt();
             String nickname = in.readUTF();
             boolean connected = in.readBoolean();
-            in.readLong(); //sharesize
+            in.readBoolean(); //internal
             if (T.netTrace) {
                 T.trace("  " + nickname + " " + guid + " " + connected);
             }

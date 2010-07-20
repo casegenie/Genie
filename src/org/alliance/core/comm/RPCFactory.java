@@ -19,6 +19,7 @@ import org.alliance.core.comm.rpc.GetUserList;
 import org.alliance.core.comm.rpc.GracefulClose;
 import org.alliance.core.comm.rpc.HashesForPath;
 import org.alliance.core.comm.rpc.IsFriend;
+import org.alliance.core.comm.rpc.MyExternalIp;
 import org.alliance.core.comm.rpc.NoRouteToHost;
 import org.alliance.core.comm.rpc.Ping;
 import org.alliance.core.comm.rpc.PleaseForwardInvitation;
@@ -55,7 +56,7 @@ public class RPCFactory { //Old RPC can be reused after increasing PROTOCOL_VERS
                 rpc = new GetIsFriend();
                 break;
             case 6:
-                //Old RPC GetUserInfo; v1.0.6
+                rpc = new MyExternalIp();
                 break;
             case 7:
                 rpc = new GetUserList();
@@ -172,7 +173,9 @@ public class RPCFactory { //Old RPC can be reused after increasing PROTOCOL_VERS
         if (rpc instanceof GetIsFriend) {
             return 5;
         }
-        //Old RPC GetUserInfo return 6; v1.0.6
+        if (rpc instanceof MyExternalIp) {
+            return 6;
+        }
         if (rpc instanceof GetUserList) {
             return 7;
         }

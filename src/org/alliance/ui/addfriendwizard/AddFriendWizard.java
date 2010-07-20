@@ -92,6 +92,7 @@ public class AddFriendWizard extends JWizard {
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_1"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_2"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_3"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_4"));
 
         JHtmlLabel portclosed = (JHtmlLabel) innerXUI.getComponent("portclosed");
         portclosed.setText(Language.getLocalizedString(getClass(), "xui.portclosed",
@@ -110,7 +111,7 @@ public class AddFriendWizard extends JWizard {
         //disable looking for friends in secondary connections if we have no friends
         //or if we have no friends to forward invitations to  
         if (new ForwardInvitationNodesList.ForwardInvitationListModel(ui.getCore()).getSize() == 0
-                || ui.getCore().getFriendManager().friends().size() == 0) {
+                || ui.getCore().getFriendManager().friends().isEmpty()) {
             innerXUI.getComponent("radio1_3").setEnabled(false);
         }
 
@@ -159,8 +160,8 @@ public class AddFriendWizard extends JWizard {
     }
 
     public void goToPortTest() {
-        if (ui.getCore().getSettings().getServer().getLanmode() != null && ui.getCore().getSettings().getServer().getLanmode() == 1) {
-            //alliance is to be run on an internal LAN - don't do port test
+        if (radioButtonSelected == 3 || ui.getCore().getSettings().getInternal().getSkipportcheck() > 0) {
+            //Invitation will be made for LAN or user don't want to check port
             goToCreateInvitation();
             return;
         }
@@ -221,7 +222,7 @@ public class AddFriendWizard extends JWizard {
     private String getResponseFromURL(String url) throws IOException {
         URLConnection c = new URL(url).openConnection();
         InputStream in = c.getInputStream();
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         BufferedReader r = new BufferedReader(new InputStreamReader(in));
         String line;
         while ((line = r.readLine()) != null) {
@@ -277,7 +278,7 @@ public class AddFriendWizard extends JWizard {
         if (getStep() == STEP_INTRO) {
             if (radioButtonSelected == 0) {
                 goToEnterInvitation();
-            } else if (radioButtonSelected == 1) {
+            } else if (radioButtonSelected == 1 || radioButtonSelected == 3) {
                 goToPortTest();
             } else {
                 goToForwardInvitations();
@@ -402,6 +403,11 @@ public class AddFriendWizard extends JWizard {
         next.setEnabled(true);
     }
 
+    public void EVENT_radio1_4(ActionEvent e) {
+        radioButtonSelected = 3;
+        next.setEnabled(true);
+    }
+
     public void EVENT_radio2_1(ActionEvent e) {
         radioButtonSelected = 0;
         next.setEnabled(true);
@@ -420,7 +426,8 @@ public class AddFriendWizard extends JWizard {
             @Override
             public void run() {
                 try {
-                    final Invitation i = ui.getCore().getInvitaitonManager().createInvitation();
+                    boolean forLan = radioButtonSelected == 3 ? true : false;
+                    final Invitation i = ui.getCore().getInvitaitonManager().createInvitation(forLan);
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override

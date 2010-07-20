@@ -1,5 +1,5 @@
 <xui>
-    <title value="Alliance Test Suite" image="res/gfx/icons/alliance.png"/>
+    <title value="Alliance Test Suite" image="res/gfx/icons/alliance128.png"/>
     <body>
         <panel axis="x" >
             <image src="testsuite/testsuite.jpg"/>

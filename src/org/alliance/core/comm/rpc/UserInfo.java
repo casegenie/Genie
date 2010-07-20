@@ -8,7 +8,6 @@ import org.alliance.core.comm.RPC;
 import org.alliance.core.node.Friend;
 
 import java.io.IOException;
-import java.nio.BufferUnderflowException;
 
 /**
  *
@@ -49,12 +48,7 @@ public class UserInfo extends RPC {
         f.setHighestOutgoingCPS(in.readInt());
         f.setNumberOfFilesShared(in.readInt());
         f.setNumberOfInvitedFriends(in.readInt());
-        String dnsName = "";
-        try {
-            dnsName = in.readUTF();
-        } catch (BufferUnderflowException ex) {
-            //No DNS info = Packet from old Alliance version
-        }
+        String dnsName = in.readUTF();
         f.updateLastKnownHostInfo(host, port, dnsName);
 
         //now that we have a good connection to friend: verify that we only have ONE connection

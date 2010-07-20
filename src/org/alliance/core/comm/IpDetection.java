@@ -76,7 +76,7 @@ public class IpDetection implements Runnable {
         wr.close();
         rd.close();
 
-        Pattern pattern = Pattern.compile("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+        Pattern pattern = Pattern.compile("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b");
         Matcher matcher = pattern.matcher(result.toString());
         if (matcher.find()) {
             lastExternalIp = matcher.group().trim();
@@ -156,5 +156,32 @@ public class IpDetection implements Runnable {
 
     public String getLastLocalIp() {
         return lastLocalIp;
+    }
+
+    public void setLastExternalIp(String lastExternalIp) {
+        this.lastExternalIp = lastExternalIp;
+    }
+
+    public static boolean isLan(String ip, boolean ipv6) {
+        if (ipv6) {
+            return false;
+        }
+        //192.168.0.0 - 192.168.255.255
+        if (ip.matches("\\b198\\.168\\.\\d{1,3}\\.\\d{1,3}\\b")) {
+            return true;
+        }
+        //10.0.0.0 - 10.255.255.255
+        if (ip.matches("\\b10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b")) {
+            return true;
+        }
+        //169.254.0.0 -169.254.255.255
+        if (ip.matches("\\b169\\.254\\.\\d{1,3}\\.\\d{1,3}\\b")) {
+            return true;
+        }
+        //172.16.0.0 - 172.31.255.255
+        if (ip.matches("\\b172\\.(1[6-9]|2[0-9]|3[0-1])\\.\\d{1,3}\\.\\d{1,3}\\b")) {
+            return true;
+        }
+        return false;
     }
 }

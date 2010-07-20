@@ -131,7 +131,7 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             groupname = Language.getLocalizedString(getClass(), "wronggroup");
         }
 
-        String cp = ui.getCore().getFriendManager().contactPath(n.getGuid());
+        String cp = ui.getCore().getFriendManager().contactPath(n.getGuid());//TODO Cache This and delay refresh
         StringBuilder sb = new StringBuilder("<html>");
         if (cp.trim().length() > 0) {
             sb.append(Language.getLocalizedString(getClass(), "subfriends", cp)).append("<br>");

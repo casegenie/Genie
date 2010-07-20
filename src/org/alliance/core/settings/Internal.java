@@ -111,6 +111,7 @@ public class Internal extends SettingClass {
     private String chatfont = "";
     private Integer chatsize = 12;
     private Integer firststart = 1;
+    private Integer skipportcheck = 0;
 
     public Internal() {
     }
@@ -604,6 +605,14 @@ public class Internal extends SettingClass {
 
     public void setGuiskin(String guiskin) {
         this.guiskin = guiskin;
+    }
+
+    public Integer getSkipportcheck() {
+        return skipportcheck;
+    }
+
+    public void setSkipportcheck(Integer skipportcheck) {
+        this.skipportcheck = skipportcheck;
     }
 
     public String getLanguage() {

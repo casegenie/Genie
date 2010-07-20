@@ -24,15 +24,16 @@ public class Invitation implements Serializable {
     private Integer destinationGuid;
     private int middlemanGuid;
 
-    public Invitation() {
-    }
-
-    public Invitation(CoreSubsystem core, Integer destinationGuid, Integer middlemanGuid) throws Exception {
+    public Invitation(CoreSubsystem core, Integer destinationGuid, Integer middlemanGuid, boolean forLan) throws Exception {
         this.destinationGuid = destinationGuid;
         this.middlemanGuid = middlemanGuid == null ? 0 : middlemanGuid;
 
         String myhost;
-        myhost = core.getFriendManager().getMe().getExternalIp(core);
+        if (forLan) {
+            myhost = core.getNetworkManager().getIpDetection().getLastLocalIp();
+        } else {
+            myhost = core.getNetworkManager().getIpDetection().getLastExternalIp();
+        }
 
         if (T.t) {
             T.trace("Creating invitation for host: " + myhost);

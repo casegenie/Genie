@@ -47,7 +47,8 @@ public class NetworkTab extends XUIDialog implements TabHelper {
     private String lastSelectedNic;
     private final static String[] OPTIONS = new String[]{
         "server.port", "server.ipv6", "server.lanmode", "server.bindnic",
-        "server.dnsmode", "server.dnsname", "server.staticip", "server.bindtoall"};
+        "server.dnsmode", "server.dnsname", "server.staticip", "server.bindtoall",
+        "internal.skipportcheck"};
 
     public NetworkTab(String loading) {
         tab = new JPanel();

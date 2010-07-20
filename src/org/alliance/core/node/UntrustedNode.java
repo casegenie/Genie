@@ -13,6 +13,7 @@ package org.alliance.core.node;
 public class UntrustedNode extends Node {
 
     private boolean connected;
+    private boolean internal;
 
     private UntrustedNode(String nickname, int guid, boolean connected) {
         super(nickname, guid);
@@ -54,5 +55,13 @@ public class UntrustedNode extends Node {
 
     public void setConnected(boolean connected) {
         this.connected = connected;
+    }
+
+    public boolean getInternal() {
+        return internal;
+    }
+
+    public void setInternal(boolean internal) {
+        this.internal = internal;
     }
 }

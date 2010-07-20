@@ -39,14 +39,6 @@ public class MyNode extends Node {
         return System.currentTimeMillis();
     }
 
-    //TODO Move to IpDetection and get from there
-    public String getExternalIp(CoreSubsystem core) {
-        if (core.getSettings().getServer().getLanmode() != null && core.getSettings().getServer().getLanmode() > 0) {
-            return core.getNetworkManager().getIpDetection().getLastLocalIp();
-        }
-        return core.getNetworkManager().getIpDetection().getLastExternalIp();
-    }
-
     @Override
     public int getAllianceBuildNumber() {
         return Version.BUILD_NUMBER;

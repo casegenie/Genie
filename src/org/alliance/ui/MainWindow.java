@@ -846,9 +846,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 } catch (IOException e) {
                     ui.handleErrorInEventLoop(e);
                 }
-            } else if (nui instanceof FriendAlreadyInListUserInteraction) {
-                // FriendAlreadyInListUserInteraction i = (FriendAlreadyInListUserInteraction)nui;
-                // String name = ui.getCore().getFriendManager().nickname(i.getGuid());
+            } else if (nui instanceof FriendAlreadyInListUserInteraction) {              
                 if (T.t) {
                     T.trace("Last wizard: " + lastAddFriendWizard);
                 }
@@ -857,9 +855,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     if (T.t) {
                         T.trace("Wizard disposed");
                     }
-                }
-                // no need to display the below. The user should not mind about this.
-                //OptionDialog.showInformationDialog(this, "You already have a connection to "+name+". IP-Adress information was updated for this connection.");
+                }              
             } else {
                 System.out.println("unknown: " + nui);
             }

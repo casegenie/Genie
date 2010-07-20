@@ -19,7 +19,7 @@ public class GetMyExternalIp extends RPC {
 
     @Override
     public void execute(Packet data) throws IOException {
-        send(new ConnectionInfo(con.getRemoteFriend()));
+        send(new MyExternalIp());
     }
 
     @Override

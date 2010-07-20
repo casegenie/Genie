@@ -35,8 +35,7 @@ public class HashesForPath extends CompressedRPC {
     }
 
     @Override
-    public void serializeCompressed(DataOutputStream out) throws IOException {
-        out.writeUTF(""); //Compatibility<1.0.9
+    public void serializeCompressed(DataOutputStream out) throws IOException {     
         out.writeInt(fdList.size());
         for (FileDescriptor fd : fdList) {
             out.write(fd.getRootHash().array());
@@ -47,7 +46,6 @@ public class HashesForPath extends CompressedRPC {
 
     @Override
     public void executeCompressed(DataInputStream in) throws IOException {
-        String path = TextUtils.makeSurePathIsMultiplatform(in.readUTF());
         int numberOfFiles = in.readInt();
 
         for (int i = 0; i < numberOfFiles; i++) {
@@ -77,27 +75,11 @@ public class HashesForPath extends CompressedRPC {
         ArrayList<Integer> guid = new ArrayList<Integer>();
         guid.add(con.getRemoteUserGUID());
 
-        String subPath = "";
         String downloadDir = "";
 
         for (FileDescriptor fd : fdList) {
             String commonPath = TextUtils.makeSurePathIsMultiplatform(fd.getSubPath());
-
-            //Compatibility<1.0.9
-            if (!path.isEmpty()) {
-                if (subPath.isEmpty()) {
-                    subPath = path;
-                    while (!commonPath.startsWith(subPath)) {
-                        subPath = subPath.substring(subPath.indexOf("/") + 1, subPath.length());
-                    }
-                    if (subPath.endsWith("/")) {
-                        subPath = subPath.substring(0, subPath.length() - 1);
-                    }
-                    subPath = subPath.substring(0, subPath.lastIndexOf("/") + 1);
-                }
-                commonPath = commonPath.replace(subPath, "");
-            }
-
+          
             if (downloadDir != null && downloadDir.isEmpty()) {
                 downloadDir = core.getFileManager().getDownloadStorage().getCustomDownloadDir(con.getRemoteUserGUID(), commonPath);
             }

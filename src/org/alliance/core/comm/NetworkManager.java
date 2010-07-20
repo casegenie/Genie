@@ -243,8 +243,7 @@ public class NetworkManager extends Manager {
     public void virtualConnect(int dstGuid, AuthenticatedConnection connection) throws IOException {
         Friend f = router.findClosestFriend(dstGuid);
 
-        if (f.getFriendConnection() != null && f.getFriendConnection().getDirection() == Connection.Direction.IN && core.getSettings().getInternal().getEncryption() == 0) {
-//        if (f.getFriendConnection() != null && true) {
+        if (f.getFriendConnection() != null && f.getFriendConnection().getDirection() == Connection.Direction.IN) {
             if (T.t) {
                 T.info("Attemting reverse connect to circument firewall");
             }

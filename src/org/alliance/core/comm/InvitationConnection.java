@@ -7,7 +7,6 @@ import org.alliance.core.node.MyNode;
 import org.alliance.core.settings.Server;
 
 import java.io.IOException;
-import java.nio.BufferUnderflowException;
 
 /**
  * This connection swings both ways - it's used by invitor and invited
@@ -87,8 +86,6 @@ public class InvitationConnection extends AuthenticatedConnection {
 
         Server server = core.getSettings().getServer();
         MyNode me = core.getFriendManager().getMe();
-
-        p.writeUTF(me.getExternalIp(core));
         p.writeInt(server.getPort());
         p.writeUTF(me.getNickname());
         p.writeUTF(server.getDnsname());
@@ -110,42 +107,39 @@ public class InvitationConnection extends AuthenticatedConnection {
             }
             friendInfoReceived = true;
             int guid = p.readInt();
-            String host = p.readUTF();
             int port = p.readInt();
             String name = p.readUTF();
-            String dnsName = "";
-            try {
-                dnsName = p.readUTF();
-            } catch (BufferUnderflowException ex) {
-                //No DNS info = Packet from old Alliance version
-            }
+            String dnsName = p.readUTF();
+            String host = netMan.getSocketFor(this).getInetAddress().getHostAddress();
 
             org.alliance.core.settings.Friend newFriend = new org.alliance.core.settings.Friend(name, host, guid, port, middleman == null ? null : middleman.getGuid());
             for (org.alliance.core.settings.Friend f : core.getSettings().getFriendlist()) {
                 if (f.getGuid() == guid) {
                     //friend already my friend, update ip number
                     org.alliance.core.node.Friend friend = core.getFriendManager().getFriend(f.getGuid());
-                    if (friend != null && !friend.isConnected()) {
+                    if (friend != null) {
                         if (friend.updateLastKnownHostInfo(host, port, dnsName)) {
-                            core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
+                            if (!friend.isConnected()) {
+                                core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(friend);
+                            } else {
+                                friend.reconnect();
+                            }
                         }
                     }
                     core.queNeedsUserInteraction(new FriendAlreadyInListUserInteraction(newFriend.getGuid()));
+                    send(netMan.createPacketForSend()); //send an empty packet to trigger packetReceived on other end again.
                     return;
                 }
             }
-
             //new friend connected!
             core.getSettings().getFriendlist().add(newFriend);
             try {
                 core.saveSettings();
                 Friend f = core.getFriendManager().addFriend(newFriend, true, middleman != null);
                 core.getFriendManager().getFriendConnector().queHighPriorityConnectTo(f, (int) (Math.random() * 1000 + 1000));
-
             } catch (Exception e) {
                 core.reportError(e, this);
             }
-
             send(netMan.createPacketForSend()); //send an empty packet to trigger packetReceived on other end again.
         }
     }

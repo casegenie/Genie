@@ -409,9 +409,8 @@ public class FriendManager extends Manager {
             if (T.t) {
                 T.error("Could not find friend that is connected to guid " + guid + "!");
             }
-            //throw new Exception("Could not find friend that is connected to guid "+guid+"!");
-        } else {
-            core.getNetworkManager().sendPersistantly(new PleaseForwardInvitation(getNode(guid)), route);
+        } else if (getUntrustedNode(guid) != null) {
+            core.getNetworkManager().sendPersistantly(new PleaseForwardInvitation(getUntrustedNode(guid)), route);
         }
     }
 

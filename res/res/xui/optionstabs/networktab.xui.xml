@@ -66,9 +66,17 @@
                                 </cell>
                             </row>
                         </form>
-                        <panel border="0" expand="horiz" axis="x">
-                            <mlabel html="true" id="portforward">%text%
-                            </mlabel>
+                        <panel bordertype="etched" border="0" axis="y">
+                            <panel border="0" axis="x">
+                                <checkbox id="internal.skipportcheck" tooltip="%text%" text="%text%"/>
+                                <filler axis="x"/>
+                            </panel>
+                            <panel border="0" expand="horiz" axis="x">
+                                <strut width="5"/>
+                                <mlabel html="true" id="portforward">%text%
+                                </mlabel>
+                                <strut width="5"/>
+                            </panel>
                         </panel>
                     </panel>
                     <panel id="advnet" axis="y" bordertype="etched" bordertitle="%text%">
@@ -120,7 +128,7 @@
                                         </panel>
                                     </cell>
                                 </row>
-                            </form>                            
+                            </form>
                         </panel>
                     </panel>
                 </panel>
