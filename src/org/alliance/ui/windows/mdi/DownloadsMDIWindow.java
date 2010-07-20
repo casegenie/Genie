@@ -321,7 +321,7 @@ public class DownloadsMDIWindow extends AllianceMDIWindow {
                     if (download.getNConnections() == 0) {
                         name = download.getAuxInfoFilename();
                     } else {
-                        name = Language.getLocalizedString(getClass(), "starting", download.getAuxInfoFilename());
+                        name = Language.getLocalizedString(getClass().getEnclosingClass(), "starting", download.getAuxInfoFilename());
                     }
                     size = "?";
                 } else {
