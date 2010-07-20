@@ -69,7 +69,7 @@ public class Internal extends SettingClass {
     private Long lastnaggedaboutinvitingafriend;
     private Integer hastriedtoinviteafriend;
     private Integer hasneverdownloadedafile = 1;
-    private Integer enablesupportfornonenglishcharacters = 0;
+    private Integer enablesupportfornonenglishcharacters = 1;
     private Integer alwaysautomaticallyconnecttoallfriendsoffriend = 0;
     private Integer alwaysdenyuntrustedinvitations = 1;
     private Integer alwaysallowfriendsoftrustedfriendstoconnecttome = 1;
