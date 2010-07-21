@@ -1,3 +1,4 @@
+
 <toolbaractions>
     <group id="friendlist">
         <action
@@ -276,6 +277,25 @@
             toolbarimage="gfx/icons/close.png"/>
     </group>
     <group id="console">
+        <action filler="true"/>
+        <action
+            id="close"
+            name="%NAME%"
+            description="%DES%"
+            toolbarimage="gfx/icons/close.png"/>
+    </group>
+    <group id="invitations">
+        <action
+            id="refresh"
+            name="%NAME%"
+            description="%DES%"
+            toolbarimage="gfx/icons/refresh.png"/>
+        <action separator="yes"/>
+        <action
+            id="delete"
+            name="%NAME%"
+            description="%DES%"
+            toolbarimage="gfx/icons/delete.png"/>
         <action filler="true"/>
         <action
             id="close"

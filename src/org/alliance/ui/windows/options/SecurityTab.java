@@ -24,7 +24,7 @@ public class SecurityTab extends XUIDialog implements TabHelper {
     private JCheckBox denyNonTrusted;
     private JPanel tab;
     private UISubsystem ui;
-    private final static String[] OPTIONS = new String[]{"internal.invitationmayonlybeusedonce",
+    private final static String[] OPTIONS = new String[]{
         "internal.disablenewuserpopup", "internal.alwaysallowfriendstoconnect",
         "internal.alwaysallowfriendsoffriendstoconnecttome", "internal.automaticallydenyallinvitations",
         "internal.alwaysallowfriendsoftrustedfriendstoconnecttome", "internal.alwaysdenyuntrustedinvitations",

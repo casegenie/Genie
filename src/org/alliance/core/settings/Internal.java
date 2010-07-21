@@ -75,7 +75,6 @@ public class Internal extends SettingClass {
     private Integer alwaysallowfriendsoftrustedfriendstoconnecttome = 1;
     private Integer disablenewuserpopup = 0;
     private Integer rdnsname = 0;
-    private Integer invitationmayonlybeusedonce = 1;
     private Integer secondstoaway = 60 * 5;
     private String chipersuite = ""; //user defined chipher suite, none by default
     private Integer encryption = 0; // 0: TranslationCryptoLayer 1: SSLCryptoLayer
@@ -509,14 +508,6 @@ public class Internal extends SettingClass {
 
     public void setSecondstoaway(Integer secondstoaway) {
         this.secondstoaway = secondstoaway;
-    }
-
-    public Integer getInvitationmayonlybeusedonce() {
-        return invitationmayonlybeusedonce;
-    }
-
-    public void setInvitationmayonlybeusedonce(Integer invitationmayonlybeusedonce) {
-        this.invitationmayonlybeusedonce = invitationmayonlybeusedonce;
     }
 
     public Integer getSharemanagercyclewithfilesystemeventsactive() {

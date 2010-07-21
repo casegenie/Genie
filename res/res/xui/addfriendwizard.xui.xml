@@ -28,6 +28,31 @@
                 </panel>
                 <strut height="5"/>
             </step>
+            <step text="%stepinvitation%">
+                <mlabel id="inviationlimit" html="yes">%text%
+                </mlabel>
+                <strut height="5"/>
+                <panel axis="x" border="0" expand="horiz">
+                    <strut width="10"/>
+                    <radiobutton eventid="radio2_1" group="b" text="%text%"/>
+                    <filler/>
+                </panel>
+                <strut height="3"/>
+                <panel axis="x" border="0" expand="horiz">
+                    <strut width="10"/>
+                    <radiobutton eventid="radio2_2" group="b" text="%text%"/>
+                    <filler/>
+                </panel>
+                <panel axis="x" border="0" expand="horiz">
+                    <strut width="10"/>
+                    <radiobutton eventid="radio2_3" group="b" text="%text%"/>
+                    <textfield text="7" width="50" maxwidth="50" minwidth="50" id="daylimit"/>
+                    <strut width="5"/>
+                    <label id="day" text="%text%"/>
+                    <filler/>
+                </panel>
+                <strut height="5"/>
+            </step>
             <step text="%stepcode%">
                 <mlabel id="entercode" html="yes">%text%
                 </mlabel>

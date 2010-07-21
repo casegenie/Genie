@@ -23,24 +23,21 @@ import java.io.ObjectOutputStream;
  * Date: 2006-mar-16
  * Time: 14:20:39
  */
-public class InvitaitonManager {
+public class InvitationManager {
 
-    public static final long INVITATION_TIMEOUT_IN_MINUTES = 60 * 24 * 31;
-    public static final long INVITATION_TIMEOUT = 1000 * 60 * INVITATION_TIMEOUT_IN_MINUTES;
-    public static final long INVITATION_TIMEOUT_FORWARDED = 1000 * 60 * 15;
     private CoreSubsystem core;
     private HashMap<Integer, Invitation> invitations = new HashMap<Integer, Invitation>();
 
-    public InvitaitonManager(CoreSubsystem core, Settings settings) {
+    public InvitationManager(CoreSubsystem core, Settings settings) {
         this.core = core;
     }
-  
-    public Invitation createInvitation(boolean forLan) throws Exception {
-        return createInvitation(null, null, forLan);
+
+    public Invitation createInvitation(boolean forLan, long validTime) throws Exception {
+        return createInvitation(null, null, forLan, validTime);
     }
 
-    public Invitation createInvitation(Integer destinationGuid, Integer middlemanGuid, boolean forLan) throws Exception {
-        Invitation i = new Invitation(core, destinationGuid, middlemanGuid, forLan);
+    public Invitation createInvitation(Integer destinationGuid, Integer middlemanGuid, boolean forLan, long validTime) throws Exception {
+        Invitation i = new Invitation(core, destinationGuid, middlemanGuid, forLan, validTime);
         invitations.put(i.getInvitationPassKey(), i);
         return i;
     }
@@ -50,11 +47,11 @@ public class InvitaitonManager {
     }
 
     public boolean isValid(int key) {
-        if (invitations.get(key).isForwardedInvitation()) {
-            return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT_FORWARDED;
-        } else {
-            return System.currentTimeMillis() - invitations.get(key).getCreatedAt() < INVITATION_TIMEOUT;
+        Invitation invit = invitations.get(key);
+        if (invit.isValidOnlyOnce()) {
+            return true;
         }
+        return System.currentTimeMillis() - invit.getCreatedAt() < invit.getValidTime();
     }
 
     public void attemptToBecomeFriendWith(String invitation, Friend middleman) throws IOException {

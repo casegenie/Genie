@@ -11,6 +11,7 @@
                 <menuitem eventid="myshare" text="%text%" mnemonic="m" accelerator="ctrl-m"/>
                 <menuitem eventid="dups" text="%text%" mnemonic="d" accelerator="ctrl-d"/>
             </menu>
+            <menuitem eventid="invitations" text="%text%"/>
             <menuitem eventid="changelog" text="%text%"/>
             <menuitem eventid="chathistory" text="%text%"/>
             <menu id="debugmenu" text="%text%">

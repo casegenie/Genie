@@ -21,12 +21,14 @@ public class Invitation implements Serializable {
     private int invitationPassKey;
     private String completeInvitaitonString;
     private long createdAt;
+    private long validTime;
     private Integer destinationGuid;
     private int middlemanGuid;
 
-    public Invitation(CoreSubsystem core, Integer destinationGuid, Integer middlemanGuid, boolean forLan) throws Exception {
+    public Invitation(CoreSubsystem core, Integer destinationGuid, Integer middlemanGuid, boolean forLan, long validTime) throws Exception {
         this.destinationGuid = destinationGuid;
         this.middlemanGuid = middlemanGuid == null ? 0 : middlemanGuid;
+        this.validTime = validTime;
 
         String myhost;
         if (forLan) {
@@ -90,6 +92,10 @@ public class Invitation implements Serializable {
         return createdAt;
     }
 
+    public long getValidTime() {
+        return validTime;
+    }
+
     public Integer getDestinationGuid() {
         return destinationGuid;
     }
@@ -100,5 +106,9 @@ public class Invitation implements Serializable {
 
     public boolean isForwardedInvitation() {
         return middlemanGuid != 0;
+    }
+
+    public boolean isValidOnlyOnce() {
+        return validTime == -1;
     }
 }

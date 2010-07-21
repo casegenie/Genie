@@ -3,11 +3,7 @@
         <panel axis="y" id="securitytab">
             <scrollpanel border="0" scrollbars="optional">
                 <panel border="0" axis="y">
-                    <panel id="expansion" axis="y" bordertype="etched" bordertitle="%text%">
-                        <panel axis="x" border="0" expand="horiz">
-                            <checkbox id="internal.invitationmayonlybeusedonce" text="%text%"/>
-                            <filler/>
-                        </panel>
+                    <panel id="expansion" axis="y" bordertype="etched" bordertitle="%text%">                      
                         <panel axis="x" border="0" expand="horiz">
                             <checkbox id="internal.disablenewuserpopup" text="%text%"/>
                             <filler/>

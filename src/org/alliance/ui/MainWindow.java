@@ -82,6 +82,7 @@ import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import org.alliance.ui.windows.mdi.InvitationsMDIWindow;
 
 /**
  * Created by IntelliJ IDEA.
@@ -804,7 +805,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     if (ui.getCore().getSettings().getInternal().getAutomaticallydenyallinvitations() == 0
                             && OptionDialog.showQuestionDialog(this, Language.getLocalizedString(getClass(), "friendattempt", fii.getRemoteName(), fii.getRemoteName(), fii.getMiddleman(ui.getCore()).getNickname(), fii.getRemoteName()))) {
                         try {
-                            ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(ui.getCore()));
+                            ui.getCore().getInvitationManager().attemptToBecomeFriendWith(fii.getInvitationCode(), fii.getMiddleman(ui.getCore()));
                             openWizardAt(AddFriendWizard.STEP_ATTEMPT_CONNECT, fii.getFromGuid());
                         } catch (Exception e) {
                             ui.handleErrorInEventLoop(e);
@@ -846,7 +847,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                 } catch (IOException e) {
                     ui.handleErrorInEventLoop(e);
                 }
-            } else if (nui instanceof FriendAlreadyInListUserInteraction) {              
+            } else if (nui instanceof FriendAlreadyInListUserInteraction) {
                 if (T.t) {
                     T.trace("Last wizard: " + lastAddFriendWizard);
                 }
@@ -855,7 +856,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     if (T.t) {
                         T.trace("Wizard disposed");
                     }
-                }              
+                }
             } else {
                 System.out.println("unknown: " + nui);
             }
@@ -916,6 +917,15 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
     public void EVENT_options(ActionEvent e) throws Exception {
         new OptionsWindow(ui);
+    }
+
+    public void EVENT_invitations(ActionEvent e) throws Exception {
+        InvitationsMDIWindow w = (InvitationsMDIWindow) mdiManager.getWindow("historychat");
+        if (w == null) {
+            w = new InvitationsMDIWindow(ui);
+            mdiManager.addWindow(w);
+        }
+        mdiManager.selectWindow(w);
     }
 
     public void EVENT_shares(ActionEvent e) throws Exception {

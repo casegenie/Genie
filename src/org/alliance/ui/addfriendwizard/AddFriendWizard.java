@@ -21,6 +21,8 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.BufferedReader;
 import java.io.EOFException;
 import java.io.IOException;
@@ -39,20 +41,23 @@ import java.net.URLConnection;
 public class AddFriendWizard extends JWizard {
 
     public static final int STEP_INTRO = 0;
-    public static final int STEP_ENTER_INVITATION = 1;
-    public static final int STEP_INCORRECT_INVITATION_CODE = 2;
-    public static final int STEP_ATTEMPT_CONNECT = 3;
-    public static final int STEP_CONNECTION_FAILED = 4;
-    public static final int STEP_FORWARD_INVITATIONS = 5;
-    public static final int STEP_FORWARD_INVITATIONS_COMPLETE = 6;
-    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD = 7;
-    public static final int STEP_MANUAL_INVITE = 8;
-    public static final int STEP_PORT_OPEN_TEST = 9;
-    public static final int STEP_PORT_NOT_OPEN = 10;
-    public static final int STEP_MANUAL_CONNECTION_OK = 11;
-    private int radioButtonSelected;
+    public static final int STEP_INVITATION_LIMIT = 1;
+    public static final int STEP_ENTER_INVITATION = 2;
+    public static final int STEP_INCORRECT_INVITATION_CODE = 3;
+    public static final int STEP_ATTEMPT_CONNECT = 4;
+    public static final int STEP_CONNECTION_FAILED = 5;
+    public static final int STEP_FORWARD_INVITATIONS = 6;
+    public static final int STEP_FORWARD_INVITATIONS_COMPLETE = 7;
+    public static final int STEP_CONNECTION_FAILED_FOR_FORWARD = 8;
+    public static final int STEP_MANUAL_INVITE = 9;
+    public static final int STEP_PORT_OPEN_TEST = 10;
+    public static final int STEP_PORT_NOT_OPEN = 11;
+    public static final int STEP_MANUAL_CONNECTION_OK = 12;
+    private int selectedIntroButton;
+    private int selectedLimitButton;
     private UISubsystem ui;
     private XUIDialog outerDialog;
+    private JTextField dayLimit;
     private JTextField codeinput;
     private JTextArea invitationCode;
     private JScrollPane listScrollPane;
@@ -85,14 +90,37 @@ public class AddFriendWizard extends JWizard {
         Language.translateXUIElements(getClass(), innerXUI.getXUIComponents());
         invitationCode = (JTextArea) innerXUI.getComponent("code");
         new CutCopyPastePopup(invitationCode);
+
         codeinput = (JTextField) innerXUI.getComponent("codeinput");
         new CutCopyPastePopup(codeinput);
+
+        dayLimit = (JTextField) innerXUI.getComponent("daylimit");
+        dayLimit.addKeyListener(new KeyAdapter() {
+
+            String lastText;
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (dayLimit.getText().isEmpty()) {
+                    return;
+                }
+                try {
+                    Integer.parseInt(dayLimit.getText());
+                } catch (NumberFormatException ex) {
+                    dayLimit.setText("7");
+                }
+            }
+        });
+
         listScrollPane = (JScrollPane) innerXUI.getComponent("scrollpanel");
 
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_1"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_2"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_3"));
         radioButtons.add((JRadioButton) innerXUI.getComponent("radio1_4"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio2_1"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio2_2"));
+        radioButtons.add((JRadioButton) innerXUI.getComponent("radio2_3"));
 
         JHtmlLabel portclosed = (JHtmlLabel) innerXUI.getComponent("portclosed");
         portclosed.setText(Language.getLocalizedString(getClass(), "xui.portclosed",
@@ -151,6 +179,13 @@ public class AddFriendWizard extends JWizard {
         codeinput.requestFocus();
     }
 
+    private void goToInvitationLimit() {
+        setStep(STEP_INVITATION_LIMIT);
+        prev.setEnabled(true);
+        next.setEnabled(false);
+        cancel.setEnabled(true);
+    }
+
     private void goToManualInvite() {
         setStep(STEP_MANUAL_INVITE);
         prev.setEnabled(true);
@@ -160,7 +195,7 @@ public class AddFriendWizard extends JWizard {
     }
 
     public void goToPortTest() {
-        if (radioButtonSelected == 3 || ui.getCore().getSettings().getInternal().getSkipportcheck() > 0) {
+        if (selectedIntroButton == 3 || ui.getCore().getSettings().getInternal().getSkipportcheck() > 0) {
             //Invitation will be made for LAN or user don't want to check port
             goToCreateInvitation();
             return;
@@ -276,13 +311,15 @@ public class AddFriendWizard extends JWizard {
     @Override
     public void nextStep() {
         if (getStep() == STEP_INTRO) {
-            if (radioButtonSelected == 0) {
+            if (selectedIntroButton == 0) {
                 goToEnterInvitation();
-            } else if (radioButtonSelected == 1 || radioButtonSelected == 3) {
-                goToPortTest();
+            } else if (selectedIntroButton == 1 || selectedIntroButton == 3) {
+                goToInvitationLimit();
             } else {
                 goToForwardInvitations();
             }
+        } else if (getStep() == STEP_INVITATION_LIMIT) {
+            goToPortTest();
         } else if (getStep() == STEP_ENTER_INVITATION) {
             handleInvitationCode();
         } else if (getStep() == STEP_CONNECTION_FAILED) {
@@ -323,7 +360,7 @@ public class AddFriendWizard extends JWizard {
             OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "nocode"));
         } else {
             try {
-                ui.getCore().getInvitaitonManager().attemptToBecomeFriendWith(invitation.trim(), null);
+                ui.getCore().getInvitationManager().attemptToBecomeFriendWith(invitation.trim(), null);
                 goToAttemptConnect();
             } catch (EOFException ex) {
                 OptionDialog.showErrorDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(), "shortcode"));
@@ -389,32 +426,37 @@ public class AddFriendWizard extends JWizard {
     }
 
     public void EVENT_radio1_1(ActionEvent e) {
-        radioButtonSelected = 0;
+        selectedIntroButton = 0;
         next.setEnabled(true);
     }
 
     public void EVENT_radio1_2(ActionEvent e) {
-        radioButtonSelected = 1;
+        selectedIntroButton = 1;
         next.setEnabled(true);
     }
 
     public void EVENT_radio1_3(ActionEvent e) {
-        radioButtonSelected = 2;
+        selectedIntroButton = 2;
         next.setEnabled(true);
     }
 
     public void EVENT_radio1_4(ActionEvent e) {
-        radioButtonSelected = 3;
+        selectedIntroButton = 3;
         next.setEnabled(true);
     }
 
     public void EVENT_radio2_1(ActionEvent e) {
-        radioButtonSelected = 0;
+        selectedLimitButton = 1;
         next.setEnabled(true);
     }
 
     public void EVENT_radio2_2(ActionEvent e) {
-        radioButtonSelected = 1;
+        selectedLimitButton = 2;
+        next.setEnabled(true);
+    }
+
+    public void EVENT_radio2_3(ActionEvent e) {
+        selectedLimitButton = 3;
         next.setEnabled(true);
     }
 
@@ -426,8 +468,22 @@ public class AddFriendWizard extends JWizard {
             @Override
             public void run() {
                 try {
-                    boolean forLan = radioButtonSelected == 3 ? true : false;
-                    final Invitation i = ui.getCore().getInvitaitonManager().createInvitation(forLan);
+                    boolean forLan = selectedIntroButton == 3 ? true : false;
+                    long timeValid = 0;
+                    if (selectedLimitButton == 1) {
+                        timeValid = -1;
+                    } else if (selectedLimitButton == 2) {
+                        timeValid = Integer.MAX_VALUE;
+                        timeValid *= 1000;
+                    } else if (selectedLimitButton == 3) {
+                        if (dayLimit.getText().isEmpty()) {
+                            timeValid = 7 * 24 * 60 * 60 * 1000;
+                        } else {
+                            timeValid = Long.parseLong(dayLimit.getText()) * 24 * 60 * 60 * 1000;
+                        }
+                    }
+
+                    final Invitation i = ui.getCore().getInvitationManager().createInvitation(forLan, timeValid);
                     SwingUtilities.invokeLater(new Runnable() {
 
                         @Override

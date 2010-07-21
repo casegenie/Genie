@@ -7,6 +7,7 @@ import org.alliance.core.Language;
 
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
+import org.alliance.core.node.Invitation;
 
 /**
  * Created by IntelliJ IDEA.
@@ -56,27 +57,28 @@ public class HandshakeConnection extends PacketConnection {
         int guid = p.readInt();
 
         if (netMan.getFriendManager().getFriend(guid) == null) {
-            if (core.getInvitaitonManager().containsKey(guid)) {
+            if (core.getInvitationManager().containsKey(guid)) {
                 if (T.t) {
                     T.info("Aha! Some I invited is trying to connect!");
                 }
-                if (core.getInvitaitonManager().isValid(guid)) {
+                if (core.getInvitationManager().isValid(guid)) {
                     if (T.t) {
                         T.info("And the key is valid! Let's go!");
                     }
+                    Invitation invi =  core.getInvitationManager().getInvitation(guid);
                     InvitationConnection c = new InvitationConnection(netMan, Connection.Direction.IN, key, guid,
-                            core.getInvitaitonManager().getInvitation(guid).getMiddlemanGuid());
+                            invi.getMiddlemanGuid());
                     netMan.replaceConnection(key, c);
                     c.init();
 
-                    if (core.getSettings().getInternal().getInvitationmayonlybeusedonce() != 0 || core.getInvitaitonManager().getInvitation(guid).isForwardedInvitation()) {
-                        core.getInvitaitonManager().consume(guid);
+                    if (invi.isForwardedInvitation() || invi.isValidOnlyOnce()) {
+                        //Consume FoF invitations and onetime
+                        core.getInvitationManager().consume(guid);
                     }
-
                     return;
                 } else {
                     core.getUICallback().statusMessage(Language.getLocalizedString(getClass(), "codeexpired"));
-                    core.getInvitaitonManager().consume(guid);
+                    core.getInvitationManager().consume(guid);
                 }
             } else {
                 if (T.t) {

@@ -20,6 +20,7 @@ public class PleaseForwardInvitation extends PersistantRPC {
     private String invitationCode;
     private int toGuid;
     private boolean forLan;
+    public static final long INVITATION_TIMEOUT_FORWARDED = 24 * 60 * 60 * 1000;
 
     public PleaseForwardInvitation() {
     }
@@ -33,7 +34,7 @@ public class PleaseForwardInvitation extends PersistantRPC {
     public RPC init(FriendConnection rpcc) {
         super.init(rpcc);
         try {
-            invitationCode = core.getInvitaitonManager().createInvitation(toGuid, con.getRemoteUserGUID(), forLan).getCompleteInvitaitonString();
+            invitationCode = core.getInvitationManager().createInvitation(toGuid, con.getRemoteUserGUID(), forLan, INVITATION_TIMEOUT_FORWARDED).getCompleteInvitaitonString();
         } catch (Exception e) {
             core.reportError(e, this);
         }
