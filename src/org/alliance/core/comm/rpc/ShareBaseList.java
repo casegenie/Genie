@@ -47,7 +47,7 @@ public class ShareBaseList extends RPC {
 
         p.writeInt(c.size());
         for (ShareBase sb : c) {
-            String sbgroupname = sb.getSBGroupName(); //Group names for specific folder
+            String sbgroupname = sb.getGroupName(); //Group names for specific folder
             boolean positive = false;
             if (sbgroupname.equalsIgnoreCase("public")) {
                 positive = true;

@@ -96,7 +96,7 @@ public class DirectoryListing extends CompressedRPC {
         String usergroupname = con.getRemoteGroupName();
 
         //Bastvera (Group names for specific shared folder)
-        String sbgroupname = manager.getCore().getShareManager().getBaseByIndex(shareBaseIndex).getSBGroupName();
+        String sbgroupname = manager.getCore().getShareManager().getBaseByIndex(shareBaseIndex).getGroupName();
         if (sbgroupname.equalsIgnoreCase("public")) {
             positive = true;
         } else {

@@ -45,13 +45,13 @@ public class ShareManager {
         shareBases.clear();
         shareBaseOrder.clear();
         for (Share s : settings.getSharelist()) {
-            add(new ShareBase(s.getPath(), s.getSgroupname()));
+            add(new ShareBase(s.getPath(), s.getSgroupname(), s.getExternal()));
         }
         if (!isShared(settings.getInternal().getCachefolder())) {
-            add(new ShareBase(settings.getInternal().getCachefolder(), "public"));
+            add(new ShareBase(settings.getInternal().getCachefolder(), "Public", 0));
         }
         if (!isShared(settings.getInternal().getDownloadfolder())) {
-            add(new ShareBase(settings.getInternal().getDownloadfolder(), "public"));
+            add(new ShareBase(settings.getInternal().getDownloadfolder(), "Public", 0));
         }
         if (fileSystemMonitor != null) {
             fileSystemMonitor.launch();

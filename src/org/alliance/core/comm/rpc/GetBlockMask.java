@@ -54,7 +54,7 @@ public class GetBlockMask extends RPC {
 
                 //lets se if search hit is part of this folder (sb)
                 if (sb.getPath().equalsIgnoreCase(basepath)) {
-                    String sbgroupname = sb.getSBGroupName(); //Group name for specific folder
+                    String sbgroupname = sb.getGroupName(); //Group name for specific folder
                     boolean positive = false;
                     if (sbgroupname.equalsIgnoreCase("public")) {
                         positive = true;

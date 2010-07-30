@@ -101,6 +101,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
     private int userInteractionsInProgress = 0;
     private PublicChatMessageMDIWindow publicChat;
     private JButton rescan;
+    private JPanel statusPanel;
     private Icon[] refreshIconStates = new Icon[2];
 
     public MainWindow() throws Exception {
@@ -134,6 +135,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
         xui.setEventHandler(this);
         xui.setMenuItemDescriptionListener(this);
         statusMessage = (JLabel) xui.getComponent("statusbar");
+        statusPanel = (JPanel) xui.getComponent("statuspanel");
         statusMessage.setText(" ");
         shareMessage = (JLabel) xui.getComponent("sharing");
 
@@ -233,10 +235,16 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
 
             @Override
             public void run() {
-                if (s == null || s.length() == 0) {
+                if (s == null || s.isEmpty()) {
                     statusMessage.setText(" ");
                 } else {
+                    int width = statusPanel.getWidth();
                     statusMessage.setText(s);
+                    if (statusMessage.getMaximumSize().getWidth() != width) {
+                        Dimension d = new Dimension(width - 10, statusMessage.getHeight());
+                        statusMessage.setPreferredSize(d);
+                        statusMessage.setMaximumSize(d);
+                    }
                 }
             }
         });
@@ -259,7 +267,7 @@ public class MainWindow extends XUIFrame implements MenuItemDescriptionListener,
                     }
                     Thread.sleep(5 * 1000);
                     if (longDelay) {
-                        Thread.sleep(60 * 1000);
+                        Thread.sleep(25 * 1000);
                     }
                     if (myThread != messageFadeThread) {
                         return;

@@ -15,9 +15,10 @@ import java.io.IOException;
 public class ShareBase {
 
     private String path;
-    private String groupname; //Bastvera (Each folder has own groupname name)
+    private String groupname;
+    private boolean external;
 
-    public ShareBase(String path, String groupname) {
+    public ShareBase(String path, String groupname, int external) {
         try {
             path = new File(path).getCanonicalFile().getPath();
         } catch (IOException e) {
@@ -27,20 +28,23 @@ public class ShareBase {
         }
         this.path = TextUtils.makeSurePathIsMultiplatform(path);
         this.groupname = groupname;
+        if (external == 0) {
+            this.external = false;
+        } else {
+            this.external = true;
+        }
     }
 
     public String getPath() {
         return path;
     }
 
-    //Bastvera (Group name get)
-    public String getSBGroupName() {
+    public String getGroupName() {
         return groupname;
     }
 
-    //Bastvera (Group name set)
-    public void setSBGroupName(String groupname) {
-        this.groupname = groupname;
+    public boolean isExternal() {
+        return external;
     }
 
     @Override

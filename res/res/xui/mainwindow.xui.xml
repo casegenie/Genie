@@ -63,7 +63,7 @@
         </panel>
         <panel axis="y" border="0">
             <panel axis="x" border="3,3,3,3" expand="horiz" id="bottompanel">
-                <panel heigth="30" axis="x" bordertype="thinlowered" border="2,1,1,1">
+                <panel heigth="30" id="statuspanel" axis="x" bordertype="thinlowered" border="2,1,1,1">
                     <label id="statusbar"/>
                     <filler axis="x"/>
                 </panel>

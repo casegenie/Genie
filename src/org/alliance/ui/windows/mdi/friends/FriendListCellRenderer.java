@@ -10,7 +10,6 @@ import org.alliance.ui.themes.AllianceListCellRenderer;
 import static org.alliance.ui.windows.mdi.friends.FriendListMDIWindow.LEVEL_ICONS;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Insets;
 import java.io.IOException;
@@ -49,13 +48,27 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
             friendIcons[i] = new ImageIcon(ui.getRl().getResource("gfx/icons/" + LEVEL_ICONS[i] + ".png"));
             friendIconsAway[i] = new ImageIcon(ui.getRl().getResource("gfx/icons/" + LEVEL_ICONS[i] + "_away.png"));
         }
-        GROUPS_FONT = new Font(renderer.getFont().getFontName(), Font.BOLD, renderer.getFont().getSize());
-        GROUPS_BG = createGroupBackground(renderer.getBackground().getRed(), renderer.getBackground().getGreen(), renderer.getBackground().getBlue(), 0.85);
-        if (renderer.getBorder() instanceof EmptyBorder) {
-            Insets i = ((EmptyBorder) renderer.getBorder()).getBorderInsets();
+        GROUPS_FONT = new Font(getRenderer().getFont().getFontName(), Font.BOLD, getRenderer().getFont().getSize());
+        GROUPS_BG = createGroupBackground(getRenderer().getBackground().getRed(), getRenderer().getBackground().getGreen(), getRenderer().getBackground().getBlue(), 0.85);
+        if (getRenderer().getBorder() instanceof EmptyBorder) {
+            Insets i = ((EmptyBorder) getRenderer().getBorder()).getBorderInsets();
             MARGIN_BORDER = new EmptyBorder(i.top, 17, i.bottom, i.right);
         } else {
-            MARGIN_BORDER = renderer.getBorder();
+            MARGIN_BORDER = getRenderer().getBorder();
+        }
+    }
+
+    @Override
+    protected void overrideListCellRendererComponent(DefaultListCellRenderer renderer, JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        if (value instanceof String) {
+            paintGroup(renderer, value.toString());
+            return;
+        }
+        Node n = (Node) value;
+        paintFriend(renderer, n, isSelected);
+        renderer.setToolTipText(setupTooltip(n));
+        if (n instanceof Friend) {
+            renderer.setBorder(MARGIN_BORDER);
         }
     }
 
@@ -146,23 +159,5 @@ public class FriendListCellRenderer extends AllianceListCellRenderer {
         sb.append(Language.getLocalizedString(getClass(), "ratio", n.calculateRatio())).append("<br>");
         sb.append(Language.getLocalizedString(getClass(), "group", groupname)).append("</html>");
         return sb.toString();
-    }
-
-    @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-        if (value instanceof String) {
-            paintGroup(renderer, value.toString());
-            return renderer;
-        }
-
-        Node n = (Node) value;
-        paintFriend(renderer, n, isSelected);
-        renderer.setToolTipText(setupTooltip(n));
-        if (n instanceof Friend) {
-            renderer.setBorder(MARGIN_BORDER);
-        }
-        return renderer;
     }
 }

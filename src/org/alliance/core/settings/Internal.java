@@ -111,6 +111,7 @@ public class Internal extends SettingClass {
     private Integer chatsize = 12;
     private Integer firststart = 1;
     private Integer skipportcheck = 0;
+    private Integer autosortshares = 1;
 
     public Internal() {
     }
@@ -653,4 +654,12 @@ public class Internal extends SettingClass {
     public void setFirststart(Integer firststart) {
         this.firststart = firststart;
     }
+
+    public Integer getAutosortshares() {
+        return autosortshares;
+    }
+
+    public void setAutosortshares(Integer autosortshares) {
+        this.autosortshares = autosortshares;
+    }  
 }

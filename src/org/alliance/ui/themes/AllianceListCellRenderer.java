@@ -1,28 +1,53 @@
 package org.alliance.ui.themes;
 
+import org.pushingpixels.substance.api.renderers.SubstanceDefaultListCellRenderer;
+
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
-import org.pushingpixels.substance.api.renderers.SubstanceDefaultListCellRenderer;
 
 /**
  *
  * @author Bastvera
  */
-public class AllianceListCellRenderer extends SubstanceDefaultListCellRenderer {
+public abstract class AllianceListCellRenderer {
 
-    public DefaultListCellRenderer renderer;
+    private DefaultListCellRenderer renderer;
 
-    public AllianceListCellRenderer(boolean substanceInUse) {
+    protected AllianceListCellRenderer(boolean substanceInUse) {
         if (substanceInUse) {
-            renderer = new SubstanceDefaultListCellRenderer();
+            renderer = new AllianceSubstanceListCellRenderer();
         } else {
-            renderer = new DefaultListCellRenderer();
+            renderer = new AllianceDefaultListCellRenderer();
         }
     }
 
-    @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        return renderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+    public DefaultListCellRenderer getRenderer() {
+        return renderer;
+    }
+
+    protected abstract void overrideListCellRendererComponent(DefaultListCellRenderer renderer, JList list, Object value, int index,
+            boolean isSelected, boolean cellHasFocus);
+
+    private class AllianceSubstanceListCellRenderer extends SubstanceDefaultListCellRenderer {
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            overrideListCellRendererComponent(this, list, value, index, isSelected, cellHasFocus);
+            return this;
+        }
+    }
+
+    private class AllianceDefaultListCellRenderer extends DefaultListCellRenderer {
+
+        @Override
+        public Component getListCellRendererComponent(JList list, Object value, int index,
+                boolean isSelected, boolean cellHasFocus) {
+            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            overrideListCellRendererComponent(this, list, value, index, isSelected, cellHasFocus);
+            return this;
+        }
     }
 }

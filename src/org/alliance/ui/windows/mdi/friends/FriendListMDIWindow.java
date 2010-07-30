@@ -96,7 +96,7 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
         list = (JList) xui.getComponent("friendlist");
         list.setModel(ui.getFriendListModel());
         SystemFlavorMap.getDefaultFlavorMap();
-        list.setCellRenderer(new FriendListCellRenderer(this, ui));
+        list.setCellRenderer(new FriendListCellRenderer(this, ui).getRenderer());
         popup = (JPopupMenu) xui.getComponent("popup");
         updateMyLevelInformation();
         update();

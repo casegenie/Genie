@@ -155,6 +155,12 @@ public class ShareScanner extends Thread {
             if (!alive) {
                 break;
             }
+            if (base.isExternal()) {
+                File f = new File(base.getPath());
+                if (f.getTotalSpace() == 0) {
+                    continue;
+                }
+            }
             String basePath = base.getPath();
             manager.getFileDatabase().removeOldDirs(basePath, false);
             if (isBreakScan()) {

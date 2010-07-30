@@ -409,7 +409,7 @@ public class CoreSubsystem implements Subsystem {
         }
     }
 
-    public void addToHistory(String chatType, String from, String message, long tick) {
+    public synchronized void addToHistory(String chatType, String from, String message, long tick) {
         DataOutputStream out = null;
         try {
             if (T.t) {

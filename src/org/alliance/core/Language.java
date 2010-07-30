@@ -48,7 +48,7 @@ public class Language {
             locale = Locale.ENGLISH;
         }
         LANGUAGE_BUNDLE = ResourceBundle.getBundle("alliance", locale, new URLClassLoader(url));
-        
+
         loadAvailableLanguages();
     }
 
@@ -177,6 +177,7 @@ public class Language {
             }
         }
         if (localized == null) {
+            // System.out.println(sb.toString());
             return MISSING_TEXT;
         } else {
             return localized;
@@ -184,6 +185,10 @@ public class Language {
     }
 
     private static String getKeyHeader(Class<?> c) {
-        return c.getName().substring(PACKAGES_HEAD.length()).replaceAll("\\$\\d*", "");
+        String className = c.getCanonicalName();
+        if (className == null) {
+            className = c.getName().replaceAll("\\$\\d*", "");
+        }
+        return className.substring(PACKAGES_HEAD.length());
     }
 }

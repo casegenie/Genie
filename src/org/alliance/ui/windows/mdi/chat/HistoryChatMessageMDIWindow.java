@@ -62,7 +62,7 @@ public class HistoryChatMessageMDIWindow extends AbstractChatMessageMDIWindow {
         chatLines.add(cl);
     }
 
-    private void loadHistory(String chat, String filter) {
+    private synchronized void loadHistory(String chat, String filter) {
         chatLines.clear();
         previousChatLine = null;
         DataInputStream in = null;

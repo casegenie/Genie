@@ -1,13 +1,12 @@
 package org.alliance.ui.windows.shares;
 
+import javax.swing.DefaultListCellRenderer;
 import org.alliance.ui.themes.util.SubstanceThemeHelper;
 import org.alliance.ui.themes.AllianceListCellRenderer;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import javax.swing.BorderFactory;
 import javax.swing.JList;
+import org.alliance.core.Language;
+import org.alliance.core.settings.Share;
 
 /**
  *
@@ -15,31 +14,45 @@ import javax.swing.JList;
  */
 public class SharesListCellRenderer extends AllianceListCellRenderer {
 
-    private static Font EVEN_ROW_FONT;
-    private static Font ODD_ROW_FONT;
     private static String GROUP_TEXT;
+    private static String PATH_TEXT;
+    private static String INFO_TEXT;
+    private boolean showDetails;
 
-    public SharesListCellRenderer(String groupText) {
+    public SharesListCellRenderer(boolean showDetails) {
         super(SubstanceThemeHelper.isSubstanceInUse());
-        GROUP_TEXT = "     --> " + groupText + " ";
-        ODD_ROW_FONT = new Font(renderer.getFont().getFontName(), Font.BOLD, renderer.getFont().getSize());
-        EVEN_ROW_FONT = new Font(renderer.getFont().getFontName(), renderer.getFont().getStyle(), renderer.getFont().getSize() - 2);
+        this.showDetails = showDetails;
+        GROUP_TEXT = " --> " + Language.getLocalizedString(getClass(), "group") + " ";
+        PATH_TEXT = " --> " + Language.getLocalizedString(getClass(), "path") + " ";
+        INFO_TEXT = " --> " + Language.getLocalizedString(getClass(), "info") + " ";
     }
 
     @Override
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-        if (index % 2 == 1) {
-            value = GROUP_TEXT + value;
+    protected void overrideListCellRendererComponent(DefaultListCellRenderer renderer, JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        String path = ((Share) value).getPath();
+        int lastDirPosition = path.lastIndexOf("/");
+        if (lastDirPosition == -1) {
+            lastDirPosition = path.lastIndexOf("\\");
         }
-
-        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-        if (index % 2 == 1) {
-            renderer.setFont(EVEN_ROW_FONT);
-            renderer.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.GRAY));
+        if (lastDirPosition == -1) {
+            return;
+        }
+        String head = path.substring(lastDirPosition + 1);
+        String group = ((Share) value).getSgroupname();
+        String info = null;
+        if (((Share) value).getExternal() > 0) {
+            info = Language.getLocalizedString(getClass(), "external");
+        }
+        if (info == null) {
+            info = Language.getLocalizedString(getClass(), "none");
+        }
+        if (showDetails) {
+            renderer.setText("<html><b>" + head
+                    + "</b><font size=-" + 2 + "><br>" + PATH_TEXT + path
+                    + "<br>" + GROUP_TEXT + group
+                    + "<br>" + INFO_TEXT + info + "</font></html>");
         } else {
-            renderer.setFont(ODD_ROW_FONT);
+            renderer.setText("<html><b>" + head + "</b></html>");
         }
-        return renderer;
     }
 }

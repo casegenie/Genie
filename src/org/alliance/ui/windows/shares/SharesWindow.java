@@ -2,6 +2,9 @@ package org.alliance.ui.windows.shares;
 
 import com.stendahls.XUI.XUIDialog;
 import com.stendahls.util.TextUtils;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import org.alliance.core.settings.Share;
 import org.alliance.core.Language;
 import org.alliance.ui.UISubsystem;
@@ -16,7 +19,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JPopupMenu;
@@ -34,6 +41,8 @@ public class SharesWindow extends XUIDialog {
 
     private UISubsystem ui;
     private JTree sharesTree;
+    private JCheckBox autoSort;
+    private JCheckBox details;
     private DefaultTreeModel sharesTreeModel;
     private JList shareList;
     private DefaultListModel shareListModel;
@@ -51,6 +60,12 @@ public class SharesWindow extends XUIDialog {
         Language.translateXUIElements(getClass(), xui.getXUIComponents());
         SubstanceThemeHelper.setButtonsToGeneralArea(xui.getXUIComponents());
         setTitle(Language.getLocalizedString(getClass(), "title"));
+
+        details = (JCheckBox) xui.getComponent("details");
+        autoSort = (JCheckBox) xui.getComponent("autosort");
+        if (ui.getCore().getSettings().getInternal().getAutosortshares() > 0) {
+            autoSort.setSelected(true);
+        }
 
         popupList = (JPopupMenu) xui.getComponent("popupList");
         popupTree = (JPopupMenu) xui.getComponent("popupTree");
@@ -152,11 +167,10 @@ public class SharesWindow extends XUIDialog {
     private void setupShareList() {
         shareList = (JList) xui.getComponent("sharesListSelected");
         shareListModel = new DefaultListModel();
-        shareList.setCellRenderer(new SharesListCellRenderer(Language.getLocalizedString(getClass(), "group")));
+        shareList.setCellRenderer(new SharesListCellRenderer(false).getRenderer());
         shareList.setModel(shareListModel);
         for (Share share : ui.getCore().getSettings().getSharelist()) {
-            shareListModel.addElement(share.getPath());
-            shareListModel.addElement(share.getSgroupname());
+            shareListModel.addElement(share);
         }
 
         shareList.addMouseListener(new MouseAdapter() {
@@ -171,19 +185,13 @@ public class SharesWindow extends XUIDialog {
                 maybeShowPopup(e);
             }
 
-            private int selectionHelper(MouseEvent e) {
-                int row = shareList.locationToIndex(e.getPoint());
-                if (row % 2 == 1) {
-                    row--;
-                }
-                return row;
-            }
-
             private void maybeShowPopup(MouseEvent e) {
-                int[] indicates = {selectionHelper(e), selectionHelper(e) + 1};
-                shareList.setSelectedIndices(indicates);
                 if (e.isPopupTrigger()) {
-                    if (shareList.getSelectedIndex() != -1) {
+                    int row = shareList.locationToIndex(e.getPoint());
+                    if (!shareList.isSelectedIndex(row)) {
+                        shareList.setSelectedIndex(row);
+                    }
+                    if (!shareList.isSelectionEmpty()) {
                         for (int i = 1; i < popupList.getComponentCount(); i++) {
                             popupList.getComponent(i).setEnabled(true);
                         }
@@ -197,6 +205,32 @@ public class SharesWindow extends XUIDialog {
                 }
             }
         });
+
+        shareList.setDragEnabled(true);
+        DropTargetAdapter dropTargetListener = new DropTargetAdapter() {
+
+            @Override
+            public void drop(DropTargetDropEvent dtde) {
+                int dropRow = shareList.locationToIndex(dtde.getLocation());
+                if (shareList.getSelectedIndex() == dropRow) {
+                    return;
+                }
+                int selectedRow = shareList.getSelectedIndex();
+                Object insertObject = shareListModel.getElementAt(dropRow);
+                shareListModel.set(dropRow, shareListModel.getElementAt(selectedRow));
+                shareListModel.remove(selectedRow);
+                int insertRow = dropRow - 1;
+                if (insertRow < selectedRow) {
+                    shareListModel.insertElementAt(insertObject, insertRow + 2);
+                } else {
+                    shareListModel.insertElementAt(insertObject, insertRow);
+                }
+                shareList.setSelectedIndex(dropRow);
+            }
+        };
+
+        DropTarget dropTarget = new DropTarget(shareList, dropTargetListener);
+        shareList.setDropTarget(dropTarget);
     }
 
     private void setupQuickJump() {
@@ -228,13 +262,14 @@ public class SharesWindow extends XUIDialog {
     private void addNewSharePath(File selectedDir) {
         if (selectedDir.exists() && selectedDir.isDirectory()) {
             String path = selectedDir.getAbsolutePath();
-            for (int i = 0; i < shareListModel.getSize(); i += 2) {
-                if (shareListModel.getElementAt(i).toString().equalsIgnoreCase(path)) {
+            for (int i = 0; i < shareListModel.getSize(); i++) {
+                if (((Share) shareListModel.getElementAt(i)).getPath().equalsIgnoreCase(path)) {
                     return;
                 }
             }
-            shareListModel.addElement(path);
-            shareListModel.addElement(PUBLIC_GROUP);
+            Share share = new Share(path);
+            share.setSgroupname(PUBLIC_GROUP);
+            shareListModel.addElement(share);
         }
         while (removeDuplicateShare()) {
         }
@@ -242,11 +277,11 @@ public class SharesWindow extends XUIDialog {
     }
 
     private boolean removeDuplicateShare() {
-        for (int i = 0; i < shareListModel.size(); i += 2) {
-            String shareRow = shareListModel.getElementAt(i).toString();
+        for (int i = 0; i < shareListModel.size(); i++) {
+            String shareRow = ((Share) shareListModel.getElementAt(i)).getPath();
             ArrayList<String> shares = new ArrayList<String>();
-            for (int j = 0; j < shareListModel.size(); j += 2) {
-                shares.add(shareListModel.getElementAt(j).toString());
+            for (int j = 0; j < shareListModel.size(); j++) {
+                shares.add(((Share) shareListModel.getElementAt(j)).getPath());
             }
             shares.add(ui.getCore().getSettings().getInternal().getDownloadfolder());
             for (String share : shares) {
@@ -255,7 +290,6 @@ public class SharesWindow extends XUIDialog {
                 if (!checkPathDir.equals(pathDir) && pathContains(pathDir, checkPathDir)) {
                     OptionDialog.showInformationDialog(ui.getMainWindow(), Language.getLocalizedString(getClass(),
                             "subshare", pathDir, checkPathDir));
-                    shareListModel.removeElementAt(i);
                     shareListModel.removeElementAt(i);
                     return true;
                 }
@@ -280,22 +314,22 @@ public class SharesWindow extends XUIDialog {
     }
 
     public void EVENT_changegroup(ActionEvent a) throws Exception {
-        int groupRowId = shareList.getSelectedIndex() + 1;
-        EditGroupWindow editWindow = new EditGroupWindow(ui, shareListModel.elementAt(groupRowId).toString(), fixedGroups);
+        Share share = (Share) shareListModel.elementAt(shareList.getSelectedIndex());
+        EditGroupWindow editWindow = new EditGroupWindow(ui, share.getSgroupname(), fixedGroups);
         String groupString = editWindow.getGroupString();
         fixedGroups = editWindow.getAllGroups();
         if (groupString == null) {
             return;
         }
         if (groupString.isEmpty()) {
-            shareListModel.setElementAt(PUBLIC_GROUP, groupRowId);
+            share.setSgroupname(PUBLIC_GROUP);
         } else {
-            shareListModel.setElementAt(groupString, groupRowId);
+            share.setSgroupname(groupString);
         }
     }
 
     public void EVENT_locate(ActionEvent a) throws Exception {
-        String sharePath = shareList.getSelectedValue().toString();
+        String sharePath = ((Share) shareList.getSelectedValue()).getPath();
         DefaultMutableTreeNode rootNode = (DefaultMutableTreeNode) sharesTreeModel.getRoot();
         browseTreeNodes(rootNode, sharePath.toLowerCase(), true);
     }
@@ -334,13 +368,13 @@ public class SharesWindow extends XUIDialog {
     }
 
     public void EVENT_settopublic(ActionEvent a) throws Exception {
-        int groupRowId = shareList.getSelectedIndex() + 1;
-        shareListModel.setElementAt(PUBLIC_GROUP, groupRowId);
+        Share share = (Share) shareListModel.elementAt(shareList.getSelectedIndex());
+        share.setSgroupname(PUBLIC_GROUP);
     }
 
     public void EVENT_addbrowse(ActionEvent a) throws Exception {
         JFileChooser fc = new JFileChooser(shareListModel.getSize() > 0
-                ? shareListModel.getElementAt(shareListModel.getSize() - 2).toString()
+                ? ((Share) shareListModel.getElementAt(shareListModel.getSize() - 1)).getPath()
                 : ".");
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnVal = fc.showOpenDialog(this);
@@ -357,10 +391,34 @@ public class SharesWindow extends XUIDialog {
 
     private void saveShares() throws Exception {
         ui.getCore().getSettings().getSharelist().clear();
-        for (int i = 0; i < shareListModel.size(); i += 2) {
-            ui.getCore().getSettings().getSharelist().add(new Share(shareListModel.getElementAt(i).toString(), shareListModel.getElementAt(i + 1).toString()));
+        for (int i = 0; i < shareListModel.size(); i++) {
+            Share share = (Share) shareListModel.getElementAt(i);
+            ui.getCore().getSettings().getSharelist().add(share);
+        }
+        if (autoSort.isSelected()) {
+            List list = ui.getCore().getSettings().getSharelist();
+            Comparator<Share> comparator = new Comparator<Share>() {
+
+                @Override
+                public int compare(Share o1, Share o2) {
+                    if (o1 == null || o2 == null) {
+                        return 0;
+                    }
+                    String s1 = TextUtils.makeSurePathIsMultiplatform(o1.getPath());
+                    s1 = s1.substring(s1.lastIndexOf("/") + 1);
+                    String s2 = TextUtils.makeSurePathIsMultiplatform(o2.getPath());
+                    s2 = s2.substring(s2.lastIndexOf("/") + 1);
+                    return s1.compareToIgnoreCase(s2);
+                }
+            };
+            Collections.sort(list, comparator);
         }
         ui.getCore().getShareManager().updateShareBases();
+        if (autoSort.isSelected()) {
+            ui.getCore().getSettings().getInternal().setAutosortshares(1);
+        } else {
+            ui.getCore().getSettings().getInternal().setAutosortshares(0);
+        }
         ui.getCore().saveSettings();
     }
 
@@ -379,5 +437,18 @@ public class SharesWindow extends XUIDialog {
 
     public void EVENT_cancel(ActionEvent a) throws Exception {
         dispose();
+    }
+
+    public void EVENT_external(ActionEvent a) throws Exception {
+        Share share = (Share) shareListModel.elementAt(shareList.getSelectedIndex());
+        if (share.getExternal() == 0) {
+            share.setExternal(1);
+        } else {
+            share.setExternal(0);
+        }
+    }
+
+    public void EVENT_details(ActionEvent a) throws Exception {
+        shareList.setCellRenderer(new SharesListCellRenderer(details.isSelected()).getRenderer());
     }
 }

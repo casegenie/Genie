@@ -92,14 +92,16 @@ public class DownloadManager extends Manager implements Runnable {
                 }
             });
 
-            if (System.currentTimeMillis() - lastSaveTick > 1000 * 60 * 10) {
+            if (System.currentTimeMillis() - lastSaveTick > 1000 * 10) {
                 core.invokeLater(new Runnable() {
 
                     @Override
                     public void run() {
                         try {
                             save();
-                        } catch (IOException e) {
+                            core.saveSettings();
+                            core.saveState();
+                        } catch (Exception e) {
                             if (T.t) {
                                 T.error(e);
                             }
@@ -187,7 +189,7 @@ public class DownloadManager extends Manager implements Runnable {
         if (guidsCurrentlyDownloadingFrom.size() < core.getSettings().getInternal().getMaxdownloadconnections()) {
             for (Download d : downloadQue) {
                 if (d.getState() == Download.State.WAITING_TO_START) {
-                    if (d.getAuxInfoGuids() == null || d.getAuxInfoGuids().size() == 0) {//if we don't know whos got the file then start downloading immidiatly
+                    if (d.getAuxInfoGuids() == null || d.getAuxInfoGuids().isEmpty()) {//if we don't know whos got the file then start downloading immidiatly
                         startDownload(d);
                         return;
                     }
@@ -212,7 +214,7 @@ public class DownloadManager extends Manager implements Runnable {
         Download d = downloads.get(root);
         if (d != null) {
             d.blockMaskReceived(srcGuid, hops, bm);
-        } else {          
+        } else {
             if (T.t) {
                 T.trace("Ignoring blockmask for " + root);
             }

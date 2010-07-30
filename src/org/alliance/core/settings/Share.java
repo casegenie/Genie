@@ -10,14 +10,14 @@ package org.alliance.core.settings;
 public class Share {
 
     private String path;
-    private String sgroupname;
+    private String sgroupname = "Public";
+    private Integer external = 0;
 
     public Share() {
     }
 
-    public Share(String path, String sgroupname) {
+    public Share(String path) {
         this.path = path;
-        this.sgroupname = sgroupname;
     }
 
     public String getPath() {
@@ -42,9 +42,14 @@ public class Share {
     }
 
     public String getSgroupname() {
-        if (sgroupname == null) {
-            sgroupname = "Public";
-        }
         return sgroupname;
+    }
+
+    public Integer getExternal() {
+        return external;
+    }
+
+    public void setExternal(Integer external) {
+        this.external = external;
     }
 }

@@ -57,7 +57,7 @@ public class OptionsWindow extends XUIDialog {
                         createTab(tabPane.getSelectedIndex() + 1, tabPane, false);
                     }
                 } catch (Exception ex) {
-                   // ex.printStackTrace();
+                    // ex.printStackTrace();
                 }
             }
         });
@@ -206,6 +206,7 @@ public class OptionsWindow extends XUIDialog {
     public void EVENT_ok(ActionEvent a) throws Exception {
         if (apply()) {
             ui.getMainWindow().saveWindowState(getTitle(), getLocation(), getSize(), -1);
+            ui.getCore().getShareManager().updateShareBases();
             dispose();
         }
     }
