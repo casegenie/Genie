@@ -362,6 +362,8 @@ public class FriendListMDIWindow extends AllianceMDIWindow {
             final Friend f = (Friend) list.getSelectedValue();
             if (f.isConnected()) {
                 f.reconnect();
+            } else {
+                f.connect();
             }
         } else {
             return;
