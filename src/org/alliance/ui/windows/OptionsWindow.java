@@ -99,8 +99,7 @@ public class OptionsWindow extends XUIDialog {
 
         init(ui.getRl(), ui.getRl().getResourceStream("xui/optionswindow.xui.xml"));
 
-        xui.getComponent("server.port").setEnabled(false);
-
+        xui.getComponent("server.port").setEnabled(true);
         nickname = (JTextField) xui.getComponent("my.nickname");
         downloadFolder = (JTextField) xui.getComponent("internal.downloadfolder");
         shareList = (JList) xui.getComponent("shareList");
@@ -141,7 +140,6 @@ public class OptionsWindow extends XUIDialog {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
         pack();
-
         // we set this AFTER we pack the frame - so that the frame isnt made
         // wider because of a long download folder path
         for (String k : OPTIONS) {
@@ -152,6 +150,7 @@ public class OptionsWindow extends XUIDialog {
             }
         }
 
+        
         checkCheckBoxStatus();
         configureCheckBoxListeners();
 

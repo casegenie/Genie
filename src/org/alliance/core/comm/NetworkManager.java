@@ -489,8 +489,8 @@ public class NetworkManager extends Manager {
     public void load(ObjectInputStream in) throws IOException {
         try {
             queuedPersistentRPCs = (ArrayList<PersistentRPC>) in.readObject();
-            for (Iterator i = queuedPersistentRPCs.iterator(); i.hasNext();) {
-                PersistentRPC r = (PersistentRPC) i.next();
+            for (Iterator<PersistentRPC> i = queuedPersistentRPCs.iterator(); i.hasNext();) {
+                PersistentRPC r = i.next();
                 if (r.hasExpired()) {
                     if (T.t) {
                         T.trace("Removing expired PersistentRPC " + r);

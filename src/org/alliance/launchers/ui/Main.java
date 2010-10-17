@@ -42,6 +42,7 @@ public class Main {
                     Runtime.getRuntime().exec("." + System.getProperty("file.separator") + "alliance");
                     System.exit(0);
                 } catch (IOException ex) {
+                    ex.printStackTrace();
                     System.exit(0);
                 }
             }
@@ -64,7 +65,11 @@ public class Main {
 
             Runnable r = null;
             if (!runMinimized) {
-                r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+            	try{
+            		r = (Runnable) Class.forName("org.alliance.launchers.SplashWindow").newInstance();
+            	}catch(Exception e){
+                    e.printStackTrace();
+            	}
             }
 
             String s = getSettingsFile();
