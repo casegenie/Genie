@@ -129,13 +129,13 @@
                             <cell>
                                 <panel border="0" axis="y">
                                     <filler/>
-                                    <label text="Port (you can not change this): "/>
+                                    <label text="Port: "/>
                                 </panel>
                             </cell>
                             <cell>
                                 <panel border="0" axis="x">
                                     <filler axis="x"/>
-                                    <textfield width="45" minwidth="45" maxwidth="45" id="server.port"/>
+                                    <textfield width="70" minwidth="70" maxwidth="70" id="server.port"/>
                                 </panel>
                             </cell>
                         </row>
